@@ -120,7 +120,7 @@ composer install
 |![功能导图](https://www.paheng.com/static/image/feiniao/章节.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/提现.png "功能导图")|
 
 ### 特别感谢
-- 飞鸟阅读基于[https://gitee.com/gouguopen/gougucms](勾股CMS)二次开发完成，同样遵循Apache2开源协议发布。 
+- 飞鸟阅读基于[勾股CMS](https://gitee.com/gouguopen/gougucms)二次开发完成，同样遵循Apache2开源协议发布。 
 - 在这里特别感谢勾股CMS的付出与努力，谢谢！
 
 ### 支持我们
