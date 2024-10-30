@@ -4,8 +4,8 @@ use think\facade\Route;
 
 return [
     'debug' => true,
-    'app_id'  => 'wx04cb2c041d07ddd5',         // AppID
-    'secret'  => '2ddf2ebf5c569d8561c20bcd2a9ffdb1',     // AppSecret
+    'app_id'  => '',         // AppID
+    'secret'  => '',     // AppSecret
     'token'   => '',          // Token
     'aes_key' => '',                    // EncodingAESKey，兼容与安全模式下请一定要填写！！
     'payment' => [
