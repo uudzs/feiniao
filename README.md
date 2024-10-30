@@ -3,7 +3,7 @@
 
 ### 相关链接
 - 项目会不定时进行更新。
-- 演示地址：https://demo.feiniao.paheng.net
+- 演示地址：https://feiniao.paheng.net
 - 文档地址：[https://www.paheng.com/forum-2-1.html](https://www.paheng.com/forum-2-1.html)
 - 开发交流QQ3群：177260545
 
@@ -106,11 +106,11 @@ composer install
 
 5.  如果安装成功后，无法上传文件的，请看是否已安装（开启）了PHP的fileinfo扩展。
 
-6. **如果需要代安装服务，可通过QQ号或去官网得到微信联系方式进行沟通，开源不易，该服务为收费项目，特在此申明以免造成误解**
+6. **如果需要代安装服务，可通过QQ号或去官网得到微信联系方式进行沟通，开源不易，该服务为收费项目，特在此申明以免造成误解。**
 
 ### 截图预览
 
-|页面截图      |    部分截图|
+|页面截图      |    页面截图|
 | :--------: | :--------:|
 | ![功能导图](https://www.paheng.com/static/image/feiniao/首页.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/首页2.png "功能导图")|
 |![功能导图](https://www.paheng.com/static/image/feiniao/首页3.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/书详情.png "功能导图")|
