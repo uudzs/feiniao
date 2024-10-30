@@ -22,7 +22,7 @@
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">备注</td>
-			<td colspan="3"><input type="text" name="notes"  value="{$detail.notes}" autocomplete="off" placeholder="请输入备注" class="layui-input"></td>
+			<td colspan="3"><input type="text" name="notes"  value="{notempty name="$detail.notes"}{$detail.notes}{/notempty}" autocomplete="off" placeholder="请输入备注" class="layui-input"></td>
 		</tr>
 	</table>
 	<div class="py-3">

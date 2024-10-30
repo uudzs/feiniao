@@ -97,7 +97,7 @@
 		<tr>
 			<td class="layui-td-gray-2">内容</td>
 			<td colspan="3">
-				<textarea class="layui-textarea" id="advshtml">{$detail.advshtml}</textarea>
+				<textarea class="layui-textarea" id="advshtml">{notempty name="$detail.advshtml"}{$detail.advshtml}{/notempty}</textarea>
 			</td>
 		</tr>
 	</table>

@@ -6,11 +6,11 @@
 	<table class="layui-table layui-table-form">
 		<tr>
 			<td class="layui-td-gray-2">笔名<font>*</font></td>
-			<td><input type="text" name="nickname" readonly lay-verify="required" lay-reqText="请完善昵称" value="{$detail.nickname}" autocomplete="off" placeholder="请输入昵称" class="layui-input"></td>
+			<td><input type="text" name="nickname" readonly lay-verify="required" lay-reqText="请完善昵称" value="{notempty name="$detail.nickname"}{$detail.nickname}{/notempty}" autocomplete="off" placeholder="请输入昵称" class="layui-input"></td>
 			<td class="layui-td-gray-2">手机<font>*</font></td>
-			<td><input type="text" name="mobile" lay-verify="required" readonly lay-reqText="请完善手机" value="{$detail.mobile}" autocomplete="off" placeholder="请输入手机" class="layui-input"></td>
+			<td><input type="text" name="mobile" lay-verify="required" readonly lay-reqText="请完善手机" value="{notempty name="$detail.mobile"}{$detail.mobile}{/notempty}" autocomplete="off" placeholder="请输入手机" class="layui-input"></td>
 			<td class="layui-td-gray-2">姓名</td>
-			<td><input type="text" name="true_name"  value="{$detail.true_name}" autocomplete="off" placeholder="请输入姓名" class="layui-input"></td>
+			<td><input type="text" name="true_name" value="{notempty name="$detail.true_name"}{$detail.true_name}{/notempty}" autocomplete="off" placeholder="请输入姓名" class="layui-input"></td>
 			
 		</tr>
 		<tr>			
@@ -21,17 +21,17 @@
 				<input type="radio" name="sex" value="" title="保密" {eq name="$detail.sex" value=""} checked{/eq}>
 			</td>
 			<td class="layui-td-gray-2">邮箱</td>
-			<td><input type="text" name="email"  value="{$detail.email}" autocomplete="off" placeholder="请输入邮箱" class="layui-input"></td>		
+			<td><input type="text" name="email"  value="{notempty name="$detail.email"}{$detail.email}{/notempty}" autocomplete="off" placeholder="请输入邮箱" class="layui-input"></td>		
 			<td class="layui-td-gray-2">身份证号</td>
-			<td><input type="text" name="idcard"  value="{$detail.idcard}" autocomplete="off" placeholder="请输入身份证号" class="layui-input"></td>				
+			<td><input type="text" name="idcard" value="{notempty name="$detail.idcard"}{$detail.idcard}{/notempty}" autocomplete="off" placeholder="请输入身份证号" class="layui-input"></td>				
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">生日</td>
-			<td><input type="text" name="birth"  value="{$detail.birth|time_format=###,'Y-m-d'}" readonly id="laydate_birth" autocomplete="off" placeholder="请选择" class="layui-input"></td>
+			<td><input type="text" name="birth" value="{notempty name="$detail.birth"}{$detail.birth|time_format=###,'Y-m-d'}{/notempty}" readonly id="laydate_birth" autocomplete="off" placeholder="请选择" class="layui-input"></td>
 			<td class="layui-td-gray-2">QQ</td>
-			<td><input type="text" name="qq"  value="{$detail.qq}" autocomplete="off" placeholder="请输入qq" class="layui-input"></td>
+			<td><input type="text" name="qq" value="{notempty name="$detail.qq"}{$detail.qq}{/notempty}" autocomplete="off" placeholder="请输入qq" class="layui-input"></td>
 			<td class="layui-td-gray-2">邮编</td>
-			<td><input type="text" name="postcode"  value="{$detail.postcode}" autocomplete="off" placeholder="请输入邮编" class="layui-input"></td>
+			<td><input type="text" name="postcode" value="{notempty name="$detail.postcode"}{$detail.postcode}{/notempty}" autocomplete="off" placeholder="请输入邮编" class="layui-input"></td>
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">省份</td>
@@ -55,13 +55,13 @@
 		</tr>
 		<tr>			
 			<td class="layui-td-gray-2">地址</td>
-			<td colspan="5"><input type="text" name="address"  value="{$detail.address}" autocomplete="off" placeholder="请输入地址" class="layui-input"></td>
+			<td colspan="5"><input type="text" name="address"  value="{notempty name="$detail.address"}{$detail.address}{/notempty}" autocomplete="off" placeholder="请输入地址" class="layui-input"></td>
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">开户银行</td>
-			<td><input type="text" name="bankdeposit"  value="{$detail.bankdeposit}" autocomplete="off" placeholder="请输入开户银行" class="layui-input"></td>
+			<td><input type="text" name="bankdeposit"  value="{notempty name="$detail.bankdeposit"}{$detail.bankdeposit}{/notempty}" autocomplete="off" placeholder="请输入开户银行" class="layui-input"></td>
 			<td class="layui-td-gray-2">银行卡号</td>
-			<td colspan="3"><input type="text" name="bankcard"  value="{$detail.bankcard}" autocomplete="off" placeholder="请输入银行卡号" class="layui-input"></td>			
+			<td colspan="3"><input type="text" name="bankcard"  value="{notempty name="$detail.bankcard"}{$detail.bankcard}{/notempty}" autocomplete="off" placeholder="请输入银行卡号" class="layui-input"></td>			
 		</tr>
 		<tr>			
 			<td class="layui-td-gray-2">开户行所在省</td>
@@ -85,13 +85,13 @@
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">完整银行地址</td>
-			<td colspan="5"><input type="text" name="bankaddress"  value="{$detail.bankaddress}" autocomplete="off" placeholder="请输入完整银行地址" class="layui-input"></td>
+			<td colspan="5"><input type="text" name="bankaddress" value="{notempty name="$detail.bankaddress"}{$detail.bankaddress}{/notempty}" autocomplete="off" placeholder="请输入完整银行地址" class="layui-input"></td>
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">固定电话</td>
-			<td><input type="text" name="telephone"  value="{$detail.telephone}" autocomplete="off" placeholder="请输入固定电话" class="layui-input"></td>
+			<td><input type="text" name="telephone"  value="{notempty name="$detail.telephone"}{$detail.telephone}{/notempty}" autocomplete="off" placeholder="请输入固定电话" class="layui-input"></td>
 			<td class="layui-td-gray-2">工作单位</td>
-			<td colspan="3"><input type="text" name="workunit"  value="{$detail.workunit}" autocomplete="off" placeholder="请输入工作单位" class="layui-input"></td>
+			<td colspan="3"><input type="text" name="workunit"  value="{notempty name="$detail.workunit"}{$detail.workunit}{/notempty}" autocomplete="off" placeholder="请输入工作单位" class="layui-input"></td>
 		</tr>
 		<tr>			
 			<td class="layui-td-gray-2">状态</td>
@@ -116,8 +116,8 @@
 				<div class="layui-upload">
 					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_headimg">选择上传图片</button>
 					<div class="layui-upload-list" id="upload_box_headimg">
-						<img src="{$detail.headimg}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
-						<input type="hidden" name="headimg" value="{$detail.headimg}" >
+						<img src="{notempty name="$detail.headimg"}{$detail.headimg}{/notempty}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="headimg" value="{notempty name="$detail.headimg"}{$detail.headimg}{/notempty}" >
 					</div>
 				</div>
 			</td>
@@ -128,8 +128,8 @@
 				<div class="layui-upload">
 					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_idcardpos">选择上传图片</button>
 					<div class="layui-upload-list" id="upload_box_idcardpos">
-						<img src="{$detail.idcardpos}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
-						<input type="hidden" name="idcardpos" value="{$detail.idcardpos}" >
+						<img src="{notempty name="$detail.idcardpos"}{$detail.idcardpos}{/notempty}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="idcardpos" value="{notempty name="$detail.idcardpos"}{$detail.idcardpos}{/notempty}" >
 					</div>
 				</div>
 			</td>
@@ -140,8 +140,8 @@
 				<div class="layui-upload">
 					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_idcardside">选择上传图片</button>
 					<div class="layui-upload-list" id="upload_box_idcardside">
-						<img src="{$detail.idcardside}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
-						<input type="hidden" name="idcardside" value="{$detail.idcardside}" >
+						<img src="{notempty name="$detail.idcardside"}{$detail.idcardside}{/notempty}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="idcardside" value="{notempty name="$detail.idcardside"}{$detail.idcardside}{/notempty}" >
 					</div>
 				</div>
 			</td>
@@ -152,8 +152,8 @@
 				<div class="layui-upload">
 					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_bankcardphoto">选择上传图片</button>
 					<div class="layui-upload-list" id="upload_box_bankcardphoto">
-						<img src="{$detail.bankcardphoto}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
-						<input type="hidden" name="bankcardphoto" value="{$detail.bankcardphoto}" >
+						<img src="{notempty name="$detail.bankcardphoto"}{$detail.bankcardphoto}{/notempty}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="bankcardphoto" value="{notempty name="$detail.bankcardphoto"}{$detail.bankcardphoto}{/notempty}" >
 					</div>
 				</div>
 			</td>
@@ -173,12 +173,12 @@
 <script type="text/javascript" src="{__STATIC__}/author/js/address.js"></script>
 <script>
 	var moduleInit = ['tool'];
-	var province = "{$detail['province']}";
-	var bankprovince = "{$detail['bankprovince']}";
-	var bankcity = "{$detail['bankcity']}";
-	var bankcounty = "{$detail['bankcounty']}";
-    var city = "{$detail['city']}";
-    var county = "{$detail['county']}";
+	var province = "{notempty name="$detail.province"}{$detail['province']}{/notempty}";
+	var bankprovince = "{notempty name="$detail.bankprovince"}{$detail['bankprovince']}{/notempty}";
+	var bankcity = "{notempty name="$detail.bankcity"}{$detail['bankcity']}{/notempty}";
+	var bankcounty = "{notempty name="$detail.bankcounty"}{$detail['bankcounty']}{/notempty}";
+    var city = "{notempty name="$detail.city"}{$detail['city']}{/notempty}";
+    var county = "{notempty name="$detail.county"}{$detail['county']}{/notempty}";
 	function feiniaoInit() {
 		var form = layui.form, tool = layui.tool;
 		var provincecode = '';

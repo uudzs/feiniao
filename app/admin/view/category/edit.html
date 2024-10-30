@@ -34,8 +34,8 @@
 				<div class="layui-upload">
 					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_icons">选择上传图片</button>
 					<div class="layui-upload-list" id="upload_box_icons">
-						<img src="{$detail.icons}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
-						<input type="hidden" name="icons" value="{$detail.icons}" >
+						<img src="{notempty name="$detail.icons"}{$detail.icons}{/notempty}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="icons" value="{notempty name="$detail.icons"}{$detail.icons}{/notempty}" >
 					</div>
 				</div>
 			</td>
