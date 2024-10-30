@@ -1,0 +1,99 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">提现操作</h3>
+	<table class="layui-table layui-table-form">		
+		<tr>
+			<td class="layui-td-gray-2">提现金额<font>*</font></td>
+			<td><input type="text" name="money" lay-verify="required" readonly lay-reqText="请完善提现额" value="{$detail.money}" autocomplete="off" placeholder="请输入提现额" class="layui-input"></td>
+			<td class="layui-td-gray-2">金币<font>*</font></td>
+			<td><input type="text" name="coin" lay-verify="required" readonly lay-reqText="请完善金币" value="{$detail.coin}" autocomplete="off" placeholder="请输入金币" class="layui-input"></td>			
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">税</td>
+			<td><input type="text" name="tax"  value="{$detail.tax}" readonly autocomplete="off" placeholder="请输入税" class="layui-input"></td>
+			<td class="layui-td-gray-2">状态</td>
+			<td>
+				<input type="radio" name="status" value="0" title="待审" {eq name="$detail.status" value="0"} checked{/eq} lay-filter="status">
+				<input type="radio" name="status" value="1" title="打款" {eq name="$detail.status" value="1"} checked{/eq} lay-filter="status">
+				<input type="radio" name="status" value="2" title="拒绝" {eq name="$detail.status" value="2"} checked{/eq} lay-filter="status">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">备注</td>
+			<td colspan="3"><input type="text" name="notes"  value="{$detail.notes}" autocomplete="off" placeholder="请输入备注" class="layui-input"></td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<input type="hidden" name="user_id" value="{$detail.user_id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+
+		var status = 0;
+
+		//监听状态
+		form.on('radio(status)', function(data) {
+			status = data.value;
+		})
+
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			if(status == 2) {
+				layer.prompt({title: "拒绝理由"}, function(val, index) {
+					if (val == '') {
+						layer.msg('拒绝理由为空');
+						return false;
+					}
+					data.field.reason = val;
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							tool.sideClose(1000);
+						}
+					}
+					tool.post("{:url('withdraw/edit')}", data.field, callback);
+				});
+				return false;
+			}
+			if(status == 1) {
+				layer.confirm('确定要进行打款操作？', {
+					btn: ['确定', '关闭'] //按钮
+				}, function() {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							tool.sideClose(1000);
+						}
+					}
+					tool.post("{:url('withdraw/edit')}", data.field, callback);
+				}, function(){
+					layer.close();
+				});
+				return false;
+			}
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('withdraw/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

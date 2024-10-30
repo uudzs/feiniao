@@ -1,0 +1,186 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="adver" lay-filter="adver"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加广告位">+ 添加广告位</span>
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="read">广告</a><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#adver',
+			title: '广告位列表',
+			toolbar: '#toolbarDemo',
+			url: "{:url('adver/datalist')}",
+			page: true,
+			limit: 20,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'title',
+					title: '名称',
+				},{
+					field: 'channel',
+					title: '展示频道',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.channel) === 999 ? 'APP' : (parseInt(d.channel) === 888 ? '官网' : (parseInt(d.channel) === 777 ? '作家' : '手机版'));
+					}
+				},{
+					field: 'type',
+					title: '广告类型',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.type) === 1 ? '单图' : (parseInt(d.type) === 2 ? '图片' : (parseInt(d.type) === 3 ? '文本' : '代码'));
+					}
+				},{
+					field: 'width',
+					title: '宽度',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.width ? d.width : '--';
+					}
+				},{
+					field: 'height',
+					title: '高度',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.height ? d.height : '--';
+					}
+				},{
+					field: 'status',
+					title: '状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.status) === 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'viewnum',
+					title: '显示条数',
+					align: 'center',
+					width: 100
+				},{
+					field: 'remarks',
+					title: '备注',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.remarks ? d.remarks : '--';
+					}
+				},{
+					field: 'create_time',
+					title: '添加时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.create_time ? d.create_time : '--';
+					}
+				},{
+					field: 'update_time',
+					title: '修改时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.update_time ? d.update_time : '--';
+					}
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 136,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(adver)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('adver/add')}");
+				return false;
+			}
+		});
+
+		//监听表格行工具事件
+		table.on('tool(adver)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side("{:url('advsr/datalist')}?pid="+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side("{:url('adver/edit')}?id="+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('adver/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

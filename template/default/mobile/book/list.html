@@ -1,0 +1,94 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '作品列表';
+{/php}
+{include file="common/header"/}
+<style>
+.bui-btn .bui-thumbnail, [class^=bui-btn] .bui-thumbnail {
+    width: 1rem;
+}
+.bui-btn .price {
+    color: #03d1a1;
+}
+#scrollList .desc {
+    height: 1.2rem;
+    line-height: .4rem;
+    color: #666;
+    overflow: hidden;
+}
+</style>
+<div id="scrollList" class="bui-scroll">
+    <div class="bui-scroll-head"></div>
+    <div class="bui-scroll-main">
+        <ul class="bui-list"></ul>
+    </div>
+    <div class="bui-scroll-foot"></div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "book",
+            data: {
+                all: [],
+                success: [],
+                fail: [],
+            },
+            methods: {      
+                booklist: function (e) {
+                    var that = this;
+                    bui.list({
+                        headers: { Token: token },
+                        id: "#scrollList",
+                        url: "{:furl('v1/booklist', [], true, 'api')}",
+                        pageSize: 10,
+                        data: { order: 'update_time DESC' },
+                        field: {
+                            page: "page",
+                            size: "data.total",
+                            data: "data.data"
+                        },
+                        template: function (data) {
+                            if(data.length <= 0) return `<div class="span1 bui-align-center"><p class="item-text">暂无数据</p></div>`;
+                            var html = "";
+                            data.forEach(function(el, index) {
+                                html +=`<li class="bui-btn bui-box">                        
+                                            <div class="bui-thumbnail"><a href="${el.url}"><img src="${el.cover}"></a></div>
+                                            <div class="span1">
+                                            <a href="${el.url}">
+                                                <h3 class="item-title">${el.title}</h3>
+                                                <p class="item-text desc">${el.remark}</p>
+                                                <p class="item-text author">${el.author}</p>
+                                            </a>
+                                            </div>                        
+                                        </li>`
+                            });
+                            return html;
+                        },
+                        onLoaded: function onLoaded(r) {
+                            if(parseInt(r.code) > 400) {
+                                gettoken();
+                            }
+                        },
+                    });
+                },               
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                this.booklist();               
+            }
+        });
+    })
+</script>
+{/block}

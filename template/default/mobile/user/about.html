@@ -1,0 +1,174 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '关于';
+$conf = get_system_config('other');
+{/php}
+{include file="common/header"/}
+<style>
+.bui-dialog-fullscreen .bui-dialog-main {
+    text-align: left;
+}
+.about {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.about .logo {
+    width: 50%;
+    font-size: 2rem;
+    margin-top: .5rem;
+    color: #03d1a1;
+    /* border-radius: 50%; */
+}
+.about .list {
+    width: 100%;
+    display: block;
+    clear: both;
+    text-align: center;
+    margin-top: .5rem;
+    padding: .2rem;
+}
+.about .list ul {
+    border: #f2f2f2 solid 1px;
+    border-radius: .1rem;
+    padding: 0 .4rem .4rem .4rem;
+}
+.about .list ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: .4rem;
+    font-size: .3rem;
+}
+.about .list ul li span i {
+    margin-right: .2rem;
+}
+.about .list ul li i {
+    color: #03d1a1;
+}
+.about .tips {
+    margin-top: .5rem;
+    width: 100%;
+}
+.about .tips .span1 {
+    width: 90%;
+    margin: 0 auto;
+    line-height: .5rem;
+}
+.about .agreement {
+    background: #fbfffe;
+}
+.about .agreement span {
+    color: #0026ff;
+}
+.about .version {
+    font-size: .25rem;
+}
+</style>
+<div class="about">
+    {notempty name=":get_system_config('web','logo')"}    
+        <img src="{:get_system_config('web','logo')}" class="logo">
+    {/notempty}
+    <div class="tips">
+        <div class="span1">
+            {php}
+                $content = model('pages')->where(['status' => 1, 'name' => 'about'])->value('content');
+            {/php}
+            {notempty name="$content"} 
+                {:nl2br($content)}
+            {/notempty}
+        </div>
+    </div>
+    <div class="list">
+        <ul class="agreement">
+            <li><span b-click="about.agreement">《用户协议》</span><span b-click="about.privacy">《隐私政策》</span></li>
+        </ul>
+    </div>
+    <div class="list">
+        <ul>
+            <li>
+                <span>
+                    <i class="fa fa-volume-control-phone" aria-hidden="true"></i>
+                    {$conf.srevicetel|default='无'}
+                </span>
+                <i class="fa fa-clipboard" b-click="about.copyTextToClipboard('{$conf.srevicetel}')"></i>
+            </li>
+            <li>
+                <span>
+                    <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                    {$conf.sreviceemail|default='无'}
+                </span>
+                <i class="fa fa-clipboard" b-click="about.copyTextToClipboard('{$conf.sreviceemail}')"></i>
+            </li>
+        </ul>
+    </div>
+    <div class="list version">版本：{$conf.version}</div>
+</div>
+{php}
+$agreement = model('pages')->where(['status' => 1, 'name' => 'agreement'])->value('content');
+$privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('content');
+{/php}
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "about",
+            data: {
+                info: [],
+                code: ''
+            },
+            methods: {
+                agreement(e) {
+                    var uiDialog = bui.popover({
+                        content:`{$agreement|raw}`,
+                        title:"《用户协议》",
+                        onClickMain:function(e){
+                            uiDialog.close();
+                        }
+                    })
+                },
+                privacy(e) {
+                    var uiDialog = bui.popover({
+                        content:`{$privacy|raw}`,
+                        title:"《隐私政策》",
+                        onClickMain:function(e){
+                            uiDialog.close();
+                        }
+                    })
+                },
+                async copyTextToClipboard(text) {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        const success = await document.execCommand('copy');
+                        if (success) {
+                            bui.hint('复制成功');
+                        } else {
+                            bui.hint('复制失败');
+                        }
+                    } catch (error) {
+                        bui.hint('复制失败');
+                    }
+                    document.body.removeChild(textarea);
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                var that = this;               
+            }
+        });
+    })
+</script>
+{/block}

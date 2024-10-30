@@ -1,0 +1,143 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="volume" lay-filter="volume"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加章节卷">+ 添加章节卷</span>
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="read">查看</a><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#volume',
+			title: '章节卷列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("volume/datalist")}',
+			page: true,
+			limit: 20,
+			cellMinWidth: 300,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'bookid',
+					title: '作品ID',
+					align: 'center',
+					width: 100
+				},{
+					field: 'title',
+					title: '卷名称',
+				},{
+					field: 'desc',
+					title: '描述',
+					align: 'center',
+					width: 100
+				},{
+					field: 'sort',
+					title: '排序',
+					align: 'center',
+					width: 100
+				},{
+					field: 'create_time',
+					title: '添加时间',
+					align: 'center',
+					width: 100
+				},{
+					field: 'update_time',
+					title: '修改时间',
+					align: 'center',
+					width: 100
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 136,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(volume)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('volume/add')}");
+				return false;
+			}
+		});
+
+		//监听表格行工具事件
+		table.on('tool(volume)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side('{:url("volume/read")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side('{:url("volume/edit")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('volume/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

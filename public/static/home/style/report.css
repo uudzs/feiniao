@@ -1,0 +1,186 @@
+.wrapper, body {
+    background: #F8FAFC;
+}
+.header-area {
+    position: unset;
+    border: 0;
+}
+.report {
+    background-color: #fff;
+    padding: 30px;
+    margin: 0 auto;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 0 3px rgba(26, 26, 26, .08);
+    box-shadow: 0 0 3px rgba(26, 26, 26, .08);
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.footer-area {
+    display: none;
+}
+.report {
+    background: #fff;
+    border-radius: 12px 12px 0 0;
+    margin: 33px auto;
+    overflow: hidden;
+    padding: 0 58px 100px;
+}
+
+.report h1 {
+    color: #333;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 36px;
+    margin: 30px 0;
+}
+
+.report .febk_bigtit {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background: #fff8f8;
+    border-radius: 8px;
+    color: #e60000;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-size: 16px;
+    font-weight: 700;
+    height: 60px;
+    padding-left: 24px;
+}
+
+.report .reportbox {
+    margin-top: 60px;
+    overflow: hidden;
+}
+
+.report .reportbox .report_formbox .report_line .report_line_t {
+    color: #333;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    margin-bottom: 24px;
+}
+
+.report .reportbox .report_need {
+    color: #e60000;
+}
+
+.report .reportbox .report_formbox .report_line .report_line_ipt {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    background-color: #f6f8fa;
+    border: 1px solid #e6e8eb;
+    border-radius: 8px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    float: left;
+    height: 54px;
+    padding-left: 10px;
+    width: 100%;
+}
+
+.report .reportbox .report_formbox .report_line .report_line_ipt input {
+    background: transparent;
+    border: 0;
+    font-size: 18px;
+    height: 54px;
+    outline: none;
+    width: 100%;
+}
+
+.report .reportbox .reportsubtit {
+    color: #333;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    margin-bottom: 24px;
+}
+
+.report .reportbox .report_textbox textarea {
+    background-color: #f6f8fa;
+    border: 1px solid #e6e8eb;
+    border-radius: 8px;
+    color: #333;
+    font-size: 18px;
+    height: 300px;
+    line-height: 22px;
+    padding: 10px;
+    width: 100%;
+}
+
+.report .report_submit {
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    margin-top: 26px;
+}
+
+.report .report_submit .checkercod,
+.report .report_submit {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.report .report_submit .checkercod,
+.report .report_submit {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.report .report_submit .checkercod .code_ipt input {
+    background: #fff;
+    border: 1px solid #e6e8eb;
+    border-radius: 4px;
+    width: 100px;
+    padding: 6px 10px;
+}
+
+.report .report_submit .checkercod .code_img {
+    background: #fff;
+    border: 1px solid #e6e8eb;
+    border-radius: 4px;
+    margin-left: 12px;
+    overflow: hidden;
+}
+
+.report .report_submit .checkercod .code_img img {
+    height: 36px;
+}
+
+.report .report_submit .submit_btn button {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    align-items: center;
+    background: linear-gradient(324deg, #e60000, #ff6114);
+    border-radius: 20px;
+    border: none;
+    color: #fff;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-size: 16px;
+    font-weight: 500;
+    height: 40px;
+    justify-content: center;
+    line-height: 24px;
+    width: 80px;
+}

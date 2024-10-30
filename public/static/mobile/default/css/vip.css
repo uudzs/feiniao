@@ -1,0 +1,176 @@
+.bui-page {
+
+}
+header {
+    z-index: 2;
+}
+header .bui-bar .bui-bar-left>[class*=bui-btn]>i {
+    color: #fff;
+}
+.bui-bar-main {
+    color: #fff !important;
+}
+.bui-bar-right a {
+    color: #fff !important;
+}
+.vipbg {
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    left: -25%;
+    right: -25%;
+    height: 4rem;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+    background: linear-gradient(to right, rgb(3,209,161), rgb(3,184,209)); 
+}
+.vip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 1rem;
+    height: 100vh;
+    display: block;   
+    font-size: .28rem;
+    z-index: 2;
+    padding: .2rem .2rem 2rem .2rem;
+    overflow-x: auto;
+}
+.vip .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: .2rem 0;
+    padding: 0 .1rem;
+}
+.vip .head .gold {
+    color: #fff;
+    display: flex;
+    align-items: center;
+}
+.vip .head .refresh {
+    color: #fff;
+}
+.vip .head .gold i {
+    font-size: .5rem;
+    margin-right: .2rem;
+}
+.vip .head .gold h3 {
+    font-size: .3rem;
+    font-weight: 600;
+    padding: 0 .2rem;
+    background: #00a7a7;
+    border-radius: .05rem;
+}
+.vip .equity {
+    margin: .7rem .1rem .2rem .1rem;
+    border-radius: .2rem;
+    background: #fff;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 8px 0px;
+    padding: .3rem;
+}
+.vip .equity .title {
+    display: flex;
+    color: #333333;
+    justify-content: space-between;
+}
+.vip .equity .title span {
+    font-size: .28rem;
+    display: block;
+}
+.vip .equity .title span u {
+    color: #03d1a1;
+    text-decoration: none;
+}
+.vip .equity .title span i {
+    margin-left: .1rem;
+}
+.vip .equity .title span:last-child {
+    color: #999;
+}
+.vip .equity .main {
+ display: block;
+}
+.vip .equity .main ul {
+    display: flex;
+    justify-content:space-between;
+    padding: .3rem 0 0 0;
+}
+.vip .equity .main ul li {    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: .25rem;    
+}
+.vip .equity .main ul li span {
+    display: block;
+    background: #ead189;
+    border-radius: 50%;
+    padding: .2rem .25rem;
+    margin-bottom: .2rem;
+}
+.vip .equity .main ul li span i {
+    color: #fff;
+    font-size: .6rem;
+}
+.vip .list {
+    margin: 0 .1rem;
+    padding: .3rem 0;
+}
+.vip .list ul {
+    display: block;
+}
+.vip .list ul li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: #ededed 1px solid;
+    background: #f9f9f9;
+    border-radius: .2rem;
+    padding: .25rem;
+    margin-bottom: .28rem;
+}
+.vip .list ul li .icons {
+    background: rgba(3, 209, 161, 0.19);
+    border-radius: 50%;
+    width: 1rem;
+    height: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.vip .list ul li .icons i {
+    font-size: .5rem;
+    color: #03d1a1;
+}
+.vip .list ul li span {
+    display: block;
+}
+.vip .list ul li .buy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.vip .list ul li .buy button {
+    border: 0;
+    background: #03d1a1;
+    border-radius: .1rem;
+    color: #fff;
+    padding: .05rem .2rem;
+    font-size: .25rem;
+    text-align: center;
+    margin-top: .1rem;
+}
+.vip .list ul li .buy u {
+    text-decoration: none; 
+    display: block;
+    border: 0;
+    background: #cccccc;
+    border-radius: .1rem;
+    color: #fff;
+    padding: .05rem .2rem;
+    font-size: .25rem;
+    text-align: center;
+    margin-top: .1rem;
+}

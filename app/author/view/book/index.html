@@ -1,0 +1,96 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+.book {
+    position: relative;
+}
+.book .img-responsive {
+    height: 397px;
+}
+.list-inline {
+    display: flex;
+    justify-content: space-between;
+}
+.book-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.book-foot a {
+    display: inline-block;
+    color: rgb(54, 54, 54);
+}
+</style>
+{/block}
+
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}
+	<div class="row page-titles">
+        <div class="col-md-5 align-self-center">
+            <h3 class="text-themecolor">作品管理</h3>
+        </div>
+        <div class="col-md-7 align-self-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+                <li class="breadcrumb-item active">作品列表</li>
+            </ol>
+        </div>
+    </div>
+
+	<div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body m-auto">
+                        <h4 class="card-title"><a href="{:url('book/add')}"><button type="button" class="btn btn-info btn-rounded">添加作品</button></a></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {notempty name="list"}
+                {volist name="$list" id="v"}        
+                <div class="col-lg-3">                    
+                    <div class="card book">
+                        <a href="{:url('book/detail', ['id'=>$v.id])}"><img class="card-img-top img-responsive" src="{:get_file($v.cover)}" alt="{$v.title}"></a>
+                        <div class="card-body">
+                            <ul class="list-inline font-14">
+                                <li>{$v.words}</li>
+                                <li>{eq name="$v.isfinish" value="2"}完结{else/}连载{/eq}</li>
+                                <li>{if($v.issign == 1)}已签约{else/}未签约{/if}</li>
+                            </ul>
+                            <div class="book-foot font-14">
+                                <a href="{:url('chapter/index',array('bid'=>$v['id']))}">章节列表</a>
+                                {eq name="$v.isfinish" value="2"}
+                                {else/}
+                                    <a href="{:url('chapter/add',array('bid'=>$v['id']))}"><button class="btn btn-success btn-xs btn-rounded waves-effect waves-light">发布章节</button></a>
+                                {/eq}                                
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+                {/volist}
+            {else/}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body m-auto">
+                            暂无作品
+                        </div>
+                    </div>
+                </div>                
+            {/notempty}            
+        </div>
+    </div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+$(window).on('load', function() {
+    //$('.table').footable();
+});
+</script>
+{/block}
+<!-- /脚本 -->

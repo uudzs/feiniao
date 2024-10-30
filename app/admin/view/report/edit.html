@@ -1,0 +1,50 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑举报</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">联系方式</td>
+			<td><input type="text" name="contact"  value="{$detail.contact}" autocomplete="off" placeholder="请输入联系方式" class="layui-input"></td><td class="layui-td-gray-2">状态</td>
+			<td>
+				<input type="radio" name="status" value="0" title="待处理" {eq name="$detail.status" value="0"} checked{/eq}>
+				<input type="radio" name="status" value="1" title="已处理" {eq name="$detail.status" value="1"} checked{/eq}>
+			</td><td colspan='2'></td>
+		</tr><tr><td class="layui-td-gray-2">举报内容<font>*</font></td>
+			<td colspan="5"><textarea name="introduce"  lay-verify="required" lay-reqText="请完善举报内容" placeholder="请输入举报内容" class="layui-textarea">{$detail.introduce}</textarea></td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		
+		
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('report/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

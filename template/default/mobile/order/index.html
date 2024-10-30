@@ -1,0 +1,195 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '订单';
+{/php}
+{include file="common/header"/}
+<style>
+.list .bui-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: .2rem;
+}
+.list .bui-btn i {
+    font-size: .5rem;
+}
+.list .bui-btn .fa-check-circle-o {
+    color:#03d1a1;
+}
+.list .bui-btn .fa-close {
+    color:#a70000;
+}
+.list .bui-btn .fa-clock-o {
+    color:#8a8a8a;
+}
+.list .bui-btn .span1 {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    line-height: .4rem;
+}
+.list .bui-btn .span1 .item-text {
+    margin-right: .1rem;
+    margin-bottom: 0;
+    color: #777;
+}
+.list .bui-btn .span1 .item-text span {
+    color: #333;
+}
+.list .bui-btn .span1 .item-text i {
+    font-size: .25rem;
+    margin-left: .1rem;
+    color: #03d1a1;
+}
+.list .bui-btn .span1 h3 {
+    clear: both;
+    display: block;
+}
+</style>
+<div id="orderTab" class="bui-tab bui-box-vertical">
+    <div class="bui-tab-head">
+        <ul class="bui-nav">
+            <li class="bui-btn">全部</li>
+            <li class="bui-btn">已支付</li>
+            <li class="bui-btn">未支付</li>
+        </ul>
+    </div>
+    <div class="bui-tab-main">
+        <ul>
+            <!-- 内容必须在li里面 -->
+            <li>
+                <div class="list">
+                    <ul b-template="order.tplList(order.all)"></ul>
+                </div>
+            </li>
+            <li style="display: none;">
+                <div class="list">
+                    <ul b-template="order.tplList(order.success)"></ul>
+                </div>
+            </li>
+            <li style="display: none;">
+                <div class="list">
+                    <ul b-template="order.tplList(order.fail)"></ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "order",
+            data: {
+                all: [],
+                success: [],
+                fail: [],
+            },
+            methods: {
+                async copyTextToClipboard(text) {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        const success = await document.execCommand('copy');
+                        if (success) {
+                            bui.hint('复制成功');
+                        } else {
+                            bui.hint('复制失败');
+                        }
+                    } catch (error) {
+                        bui.hint('复制失败');
+                    }
+                    document.body.removeChild(textarea);
+                },
+                init: function() {
+                    var uiTab = bui.tab({
+                        id: "#orderTab",
+                        width: "100%",
+                        onTo(index) {
+                            console.log(index)
+                        }
+                    });
+                },
+                orderlist: function (e) {
+                    var that = this;
+                    post("{:furl('v1/orderlist', [], true, 'api')}", {limit: 9999}, function (result) {
+                        if (result.code == 0) {
+                            if(result.data && result.data.length > 0) {
+                                result.data.forEach((item, index) => {
+                                    if(item.paid == 1) {
+                                        that.success.push(item);
+                                    }
+                                    if(item.paid == 0) {
+                                        that.fail.push(item);
+                                    }
+                                })
+                                that.all = result.data || [];
+                            }                            
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                },               
+            },
+            watch: {},
+            computed: {},
+            templates: {
+                tplList(data) {
+                    let html = "";                    
+                    if(data && data.length > 0) {
+                        data.forEach((item, index) => {
+                        html += `<li>
+                            <div class="bui-btn">
+                                <div class="span1">
+                                    <p class="item-text"><span>订单编号：</span>${item.order_id}<i class="fa fa-clipboard" b-click="order.copyTextToClipboard(${item.order_id})"></i></p>                                                
+                                    <h3 class="item-text"><span>支付价格：</span>${item.total_price}</h3>
+                                    <h3 class="item-text"><span>订单类型：</span>${item.product_type}</h3>
+                                    <p class="item-text"><span>下单时间：</span>${item.add_time}</p>`;
+                                if(parseInt(item.paid) == 1) {
+                                    html += `<p class="item-text"><span>支付方式：</span>${item.pay_type}</p>`;
+                                    html += `<p class="item-text"><span>支付时间：</span>${item.pay_time}</p>`;
+                                }
+                                if(parseInt(item.status) == 0) {
+                                    html += `<p class="item-text"><span>订单状态：</span>待发货</p>`;
+                                }
+                                if(parseInt(item.status) == 1) {
+                                    html += `<p class="item-text"><span>订单状态：</span>待收货</p>`;
+                                }
+                                if(parseInt(item.status) == 2) {
+                                    html += `<p class="item-text"><span>订单状态：</span>已收货</p>`;
+                                }
+                                if(parseInt(item.virtual_type) == 1) {
+                                    html += `<p class="item-text">${item.virtual_info}</p>`;
+                                }  
+                                html += `</div>`
+                                if(parseInt(item.paid) == 1) {
+                                    html += `<i class="fa fa-check-circle-o" aria-hidden="true"></i>`   ;                                             
+                                }
+                                if(parseInt(item.paid) == 0) {
+                                    html += `<i class="fa fa-close" aria-hidden="true"></i>`;
+                                }
+                            html += `</div></li>`;                           
+                        })
+                    }
+                    return html;
+                },
+            },
+            mounted: function () {
+                this.init();
+                this.orderlist();               
+            }
+        });
+    })
+</script>
+{/block}

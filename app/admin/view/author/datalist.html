@@ -1,0 +1,242 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+	[data-field="nickname"], [data-field="nickname"] div {
+		min-width: 300px;
+		text-align: left;
+	}
+</style>
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="笔名/真实姓名/手机号" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline" style="width:120px;">
+			<input type="text" class="layui-input" id="start_time" readonly placeholder="注册开始时间" name="start_time">
+		</div>
+		~
+		<div class="layui-input-inline" style="width:120px;">
+			<input type="text" class="layui-input" id="end_time" readonly placeholder="注册结束时间" name="end_time">
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="author" lay-filter="author"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<!-- <span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加作者">+ 添加作者</span> -->
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form, laydate = layui.laydate;
+
+		laydate.render({
+			elem: '#start_time',
+			type: 'date'
+		});
+
+		laydate.render({
+			elem: '#end_time',
+			type: 'date'
+		});
+
+		layui.pageTable = table.render({
+			elem: '#author',
+			title: '作者列表',
+			toolbar: '#toolbarDemo',
+			url: "{:url('author/datalist')}",
+			page: true,
+			limit: 20,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'nickname',
+					title: '笔名',
+					align: 'center',
+				},{
+					field: 'sex',
+					title: '性别',
+					align: 'center',
+					width: 60,
+					templet:function(d) {
+						return parseInt(d.sex) === 1 ? "男" : (parseInt(d.sex) === 2 ? '女' : '保密');
+					}
+				},{
+					field: 'headimg',
+					title: '头像',
+					align: 'center',
+					width: 100,
+					style:'cursor: pointer;',
+					templet:function(d) {
+						return d.headimg ? '<img src="' + d.headimg + '" width="80" onclick="showBigImage(this)">' : '--';
+					}
+				},{
+					field: 'true_name',
+					title: '姓名',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.true_name ? d.true_name : '--';
+					}
+				},{
+					field: 'mobile',
+					title: '手机',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.mobile ? d.mobile : '--';
+					}
+				},{
+					field: 'qq',
+					title: 'QQ',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.qq ? d.qq : '--';
+					}
+				},{
+					field: 'create_time',
+					title: '注册时间',
+					align: 'center',
+					width: 150
+				},{
+					field: 'status',
+					title: '状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.status) === 1 ? '<span class="layui-badge layui-bg-green">正常</span>' : '<span class="layui-badge">禁止</span>';
+					}
+				},{
+					field: 'update_time',
+					title: '更新时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.update_time ? d.update_time : '--';
+					}
+				},{
+					field: 'issign',
+					title: '是否签约',
+					align: 'center',
+					width: 80,
+					templet:function(d) {
+						return parseInt(d.issign) === 1 ? '<span class="layui-badge layui-bg-green">签约</span>' : '<span class="layui-badge">未签</span>';
+					}
+				},
+				{
+					field: 'authstate',
+					title: '实名认证',
+					align: 'center',
+					width: 80,
+					templet:function(d) {
+						return parseInt(d.authstate) === 1 ? '<span class="layui-badge layui-bg-green">认证</span>' : '<span class="layui-badge">未认证</span>';
+					}
+				},
+				{
+					field: 'bankstate',
+					title: '银行认证',
+					align: 'center',
+					width: 80,
+					templet:function(d) {
+						return parseInt(d.bankstate) === 1 ? '<span class="layui-badge layui-bg-green">认证</span>' : '<span class="layui-badge">未认证</span>';
+					}
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 120,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(author)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('author/add')}");
+				return false;
+			}
+		});
+
+		//监听表格行工具事件
+		table.on('tool(author)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side("{:url('author/read')}?id="+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side("{:url('author/edit')}?id="+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('author/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords,
+					start_time: data.field.start_time,
+					end_time: data.field.end_time
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

@@ -1,0 +1,44 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">新建收藏</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">用户ID<font>*</font></td>
+			<td><input type="text" name="user_id"  lay-verify="required" lay-reqText="请完善用户ID" value="" autocomplete="off" placeholder="请输入用户ID" class="layui-input"></td><td class="layui-td-gray-2">作品ID</td>
+			<td><input type="text" name="pid"  value="" autocomplete="off" placeholder="请输入作品ID" class="layui-input"></td><td colspan='2'></td>
+		</tr>
+	</table>
+	<div class="pt-3">
+		<input type="hidden" name="id" value="0"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;		
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('favorites/add')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

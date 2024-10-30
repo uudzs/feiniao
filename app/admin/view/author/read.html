@@ -1,0 +1,98 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">作者详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">昵称</td>
+			<td>{$detail.nickname}</td><td class="layui-td-gray-2">性别1男2女</td>
+			<td>
+				{eq name="$detail.sex" value="0"}选项一{/eq}
+				{eq name="$detail.sex" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">姓名</td>
+			<td>{$detail.true_name}</td>
+		</tr><tr><td class="layui-td-gray-2">手机</td>
+			<td>{$detail.mobile}</td><td class="layui-td-gray-2">邮箱</td>
+			<td>{$detail.email}</td><td class="layui-td-gray-2">qq</td>
+			<td>{$detail.qq}</td>
+		</tr><tr><td class="layui-td-gray-2">省</td>
+			<td>
+			{eq name="$detail.province" value="1"}选项一{/eq}
+			{eq name="$detail.province" value="2"}选项二{/eq}
+			</td><td class="layui-td-gray-2">市</td>
+			<td>
+			{eq name="$detail.city" value="1"}选项一{/eq}
+			{eq name="$detail.city" value="2"}选项二{/eq}
+			</td><td class="layui-td-gray-2">地区</td>
+			<td>
+			{eq name="$detail.county" value="1"}选项一{/eq}
+			{eq name="$detail.county" value="2"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">详情地址</td>
+			<td>{$detail.address}</td><td class="layui-td-gray-2">邮编</td>
+			<td>{$detail.postcode}</td><td class="layui-td-gray-2">身份证号</td>
+			<td>{$detail.idcard}</td>
+		</tr><tr><td class="layui-td-gray-2">银行卡号</td>
+			<td>{$detail.bankcard}</td><td class="layui-td-gray-2">开户银行</td>
+			<td>
+			{eq name="$detail.bankdeposit" value="1"}选项一{/eq}
+			{eq name="$detail.bankdeposit" value="2"}选项二{/eq}
+			</td><td class="layui-td-gray-2">开户行所在省</td>
+			<td>
+			{eq name="$detail.bankprovince" value="1"}选项一{/eq}
+			{eq name="$detail.bankprovince" value="2"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">开户行所在市</td>
+			<td>
+			{eq name="$detail.bankcity" value="1"}选项一{/eq}
+			{eq name="$detail.bankcity" value="2"}选项二{/eq}
+			</td><td class="layui-td-gray-2">完整银行地址</td>
+			<td>{$detail.bankaddress}</td><td class="layui-td-gray-2">工作单位</td>
+			<td>{$detail.workunit}</td>
+		</tr><tr><td class="layui-td-gray-2">固定电话</td>
+			<td>{$detail.telephone}</td><td class="layui-td-gray-2">密码</td>
+			<td>{$detail.password}</td><td class="layui-td-gray-2">IP</td>
+			<td>{$detail.ip}</td>
+		</tr><tr><td class="layui-td-gray-2">生日</td>
+			<td>{$detail.birth|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">修改时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">认证状态</td>
+			<td>
+				{eq name="$detail.authstate" value="0"}选项一{/eq}
+				{eq name="$detail.authstate" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">银行认证状态</td>
+			<td>
+				{eq name="$detail.bankstate" value="0"}选项一{/eq}
+				{eq name="$detail.bankstate" value="1"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">是否签约</td>
+			<td>
+				{eq name="$detail.issign" value="0"}选项一{/eq}
+				{eq name="$detail.issign" value="1"}选项二{/eq}
+			</td><td colspan='4'></td>
+		</tr><tr><td class="layui-td-gray-2">头像</td>
+			<td colspan="5">
+				<img src="{$detail.headimg}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr><tr><td class="layui-td-gray-2">身份证正面</td>
+			<td colspan="5">
+				<img src="{$detail.idcardpos}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr><tr><td class="layui-td-gray-2">身份证反面</td>
+			<td colspan="5">
+				<img src="{$detail.idcardside}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr><tr><td class="layui-td-gray-2">银行卡照</td>
+			<td colspan="5">
+				<img src="{$detail.bankcardphoto}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

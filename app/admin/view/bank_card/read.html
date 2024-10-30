@@ -1,0 +1,36 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">银行卡详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">卡号</td>
+			<td>{$detail.card_no}</td><td class="layui-td-gray-2">用户id</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">银行名称</td>
+			<td>{$detail.bank_name}</td>
+		</tr><tr><td class="layui-td-gray-2">银行地址</td>
+			<td>{$detail.bank_address}</td><td class="layui-td-gray-2">卡主姓名</td>
+			<td>{$detail.full_name}</td><td class="layui-td-gray-2">卡主电话</td>
+			<td>{$detail.mobile}</td>
+		</tr><tr><td class="layui-td-gray-2">卡片状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">认证状态</td>
+			<td>
+				{eq name="$detail.auth_status" value="0"}选项一{/eq}
+				{eq name="$detail.auth_status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">备注</td>
+			<td>{$detail.remark}</td>
+		</tr><tr><td class="layui-td-gray-2">添加时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td><td colspan='2'></td>
+		</tr><tr><td class="layui-td-gray-2">卡片图片</td>
+			<td colspan="5">
+				<img src="{$detail.card_image}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

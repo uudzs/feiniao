@@ -1,0 +1,15 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">收藏详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">用户ID</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">作品ID</td>
+			<td>{$detail.pid}</td><td class="layui-td-gray-2">添加时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

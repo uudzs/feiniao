@@ -1,0 +1,215 @@
+{extend name="common/base"/}
+{block name="style"}
+<link href="{__STATIC__}/author/css/magnific-popup.css" rel="stylesheet">
+<style>
+.feeds li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ebebeb;
+}
+.feeds li .bookinfo {
+    width: auto;
+    height: auto;
+    margin-right: 0;
+    display: inline-flex;
+    text-align: center;
+    vertical-align: middle;
+    align-items: center;
+    border-radius: 0;
+}
+.feeds li .bookinfo .cover {
+    width: 40px;
+    height: auto;
+    margin-right: 5px;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+}
+.feeds li .bookstatus {
+    width: auto;
+    height: auto;
+    margin-right: 0;
+}
+.feeds li .bookstatus span {
+    margin-left: 5px;
+    float: none;
+}
+.little-profile .pro-img {
+    margin-top: 0;
+}
+.jumbotron {
+    margin-bottom: 0;
+    padding: 20px;
+    min-height: 25rem;
+}
+</style>
+{/block}
+
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}
+	<div class="row page-titles">
+        <div class="col-md-5 align-self-center">
+            <h3 class="text-themecolor">作品签约</h3>
+        </div>
+        <div class="col-md-7 align-self-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+                <li class="breadcrumb-item"><a href="{:url('book/index')}">作品管理</a></li>
+                <li class="breadcrumb-item active">作品签约</li>
+            </ol>
+        </div>
+    </div>
+
+	<div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Column -->
+                <div class="card">
+                    <div class="card-body little-profile text-center">
+                        <div class="pro-img"><img src="{$userInfo.headimg}" onerror="this.src='/static/home/images/logo-ico.png'"></div>
+                        <h3>昵称：{$userInfo.nickname|default="暂无"} / 真实姓名：{$userInfo.true_name|default="暂无"}</h3>
+                        <p>手机：{$userInfo.mobile|default="暂无"} / 邮箱：{$userInfo.email|default="暂无"} / QQ：{$userInfo.qq|default="暂无"}</p>
+                        {eq name="userInfo.authstate" value="1"}
+                            <a href="javascript:;" class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded"><i class="ti-check"></i> 已实名认证</a>
+                        {else/}
+                            <a href="{:url('user/basic')}" class="m-t-10 waves-effect waves-dark btn btn-info btn-md btn-rounded">开始实名认证</a>
+                        {/eq}
+                        {eq name="userInfo.bankstate" value="1"}
+                            <!-- <a href="javascript:;" class="m-t-10 waves-effect waves-dark btn btn-success btn-md btn-rounded"><i class="ti-check"></i> 已银行卡认证</a> -->
+                        {else/}
+                            <!-- <a href="{:url('user/basic')}" class="m-t-10 waves-effect waves-dark btn btn-info btn-md btn-rounded">开始银行卡认证</a> -->
+                        {/eq}
+                        <div class="row text-center m-t-20">
+                            <div class="col-lg-3 col-md-4 m-t-20">
+                                <h3 class="m-b-0 font-light">{$sign_succes}</h3><small>已签约</small></div>
+                            <div class="col-lg-3 col-md-4 m-t-20">
+                                <h3 class="m-b-0 font-light">{$sign_not}</h3><small>未签约</small></div>
+                            <div class="col-lg-3 col-md-4 m-t-20">
+                                    <h3 class="m-b-0 font-light">{$sign_progress}</h3><small>签约中</small></div> 
+                            <div class="col-lg-3 col-md-4 m-t-20">
+                                        <h3 class="m-b-0 font-light">{$sign_refuse}</h3><small>签约失败</small></div> 
+                        </div>
+                    </div>
+                </div>
+                <!-- Column -->
+            </div>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            签约列表
+                            <!-- <span class="pull-right">
+                                <a href="{:url('book/add')}" class="btn btn-success btn-sm"><i class="ti-plus text" aria-hidden="true"></i> 添加作品</a>
+                            </span> -->
+                        </h4>                           
+                        <ul class="feeds m-t-20">
+                            {notempty name="list"}
+                                {volist name="$list" id="v"}
+                                <li>
+                                    <div class="bookinfo">
+                                        <div class="cover"><a class="image-popup-vertical-fit" href="{:get_file($v.cover)}"><img class="img-responsive" src="{:get_file($v.cover)}" alt="{$v.title}"></a></div>
+                                        《{$v.title}》 / {$v.words}字 / {eq name="$v.isfinish" value="2"}<span class="label label-light-success">完结</span>{else/}<span class="label label-light-warning">连载</span>{/eq} / {$v.chapters}章
+                                    </div>
+                                    <div class="bookstatus">
+                                        {if($v.issign == 1 || $v.issign == 3)}
+                                        <button type="button" class="btn waves-effect waves-light btn-sm btn-success btn-rounded">签约成功</button>
+                                        {/if}
+                                        {if($v.issign == 6)}
+                                        <button type="button" class="btn waves-effect waves-light btn-sm btn-danger btn-rounded">签约失败</button>
+                                        {/if}
+                                        {if($v.issign != 0 && $v.issign != 3 && $v.issign != 6 && $v.issign != 1)}
+                                        <button type="button" class="btn waves-effect waves-light btn-sm btn-warning btn-rounded">签约中</button>
+                                        {/if}
+                                        {if($v.issign == 0)}
+                                        <a href="{:url('sign/apply',array('id'=>$v['id']))}" class="btn waves-effect waves-light btn-sm btn-primary">签约申请</a>
+                                        {/if}
+                                        {if($v.issign != 0)}
+                                        <a href="{:url('sign/apply',array('id'=>$v['id']))}" class="btn waves-effect waves-light btn-sm btn-info">签约详情</a>
+                                        {/if}
+                                    </div>                                   
+                                </li>
+                                {/volist}
+                            {/notempty}
+
+                            {notempty name="bank_list"}
+                                {volist name="$bank_list" id="v"}
+                                <li>
+                                    <div class="bookinfo">
+                                        <div class="cover"><a class="image-popup-vertical-fit" href="{$v.log.after.bankcardphoto}"><img class="img-responsive" src="{$v.log.after.bankcardphoto}"></a></div>
+                                        银行卡修改 / 旧卡号：{$v.log.front.bankcard|default='--'} / 新卡号：{$v.log.after.bankcard|default='--'}
+                                    </div>
+                                    <div class="bookstatus">
+                                        {if($v.status == 1)}
+                                        <button type="button" class="btn waves-effect waves-light btn-sm btn-success btn-rounded">签约成功</button>
+                                        {/if}
+                                        {if($v.status == 4)}
+                                        <button type="button" class="btn waves-effect waves-light btn-sm btn-danger btn-rounded">签约失败</button>
+                                        {/if}
+                                        {if($v.status != 1 && $v.status != 4)}
+                                        <button type="button" class="btn waves-effect waves-light btn-sm btn-warning btn-rounded">签约中</button>
+                                        {/if}
+                                        <a href="{:url('sign/apply',array('id'=>$v['id']))}" class="btn waves-effect waves-light btn-sm btn-info">签约详情</a>
+                                    </div>                                   
+                                </li>
+                                {/volist}
+                            {/notempty}                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="jumbotron">
+                            <p class="lead">一、作品范围</p>
+                            <hr class="my-4">
+                            <p>1、尚未与其他平台签约的作品且签约本人拥有独立版权；</p>
+                            <p>2、在{$webtitle}平台发表1万字以上；</p>
+                            <p>3、签约作品没有违反国家的相关法律法规，且没有涉及平台禁止发布的低俗、色情、未成年人负面导向、反人类反社会等内容；</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="jumbotron jumbotron-fluid">
+                            <div class="container">
+                                <p class="lead">二、申请流程</p>
+                                <hr class="my-4">
+                                <p>1、在{$webtitle}平台已审核通过1万字的作品，可于作家后台申请签约，方式为：点击作品签约-在签约列表中选择签约申请。</p>
+                                <p>2、签约时，需先完成实名认证，为确保后续稿费（如产生）支付无误，请填写真实准确的信息。</p>
+                                <p>3、已申请的作品在七日内不可重复申请，编辑会在七个工作日内完成签约审核。</p>
+                                <p>4、通过签约申请的作品，会有编辑尽快与作者联系，沟通签约后续事宜。未通过申请的作品，请您自查内容，或加强更新，优化内容质量，七日后可再次申请。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script src="{__STATIC__}/author/js/jquery.magnific-popup.min.js"></script>
+<script>
+$(window).on('load', function() {
+    $('.image-popup-vertical-fit').magnificPopup({
+		type: 'image',
+		closeOnContentClick: true,
+		mainClass: 'mfp-img-mobile',
+		image: {
+			verticalFit: true
+		}
+		
+	});
+});
+</script>
+{/block}
+<!-- /脚本 -->

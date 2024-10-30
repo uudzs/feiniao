@@ -1,0 +1,267 @@
+.home_notice {
+    background: url('../image/news_bg.png') no-repeat;
+    background-size: cover;
+    border-radius: 10px;
+    margin-top: 90px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 40px 40px 30px 40px;
+    box-shadow: 0px 0px 1px 1px #f5fbfd;
+}
+
+.home_notice ul {
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.home_notice .first {
+    float: right;
+    overflow: hidden;
+    width: 50%;
+}
+
+.home_notice .first .thumbnail {
+    width: 300px;
+    height: 225px;
+    overflow: hidden;
+    float: left;
+    margin-right: 5%;
+    border-radius: 10px;
+}
+
+.home_notice .first .thumbnail img {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.home_notice .first .thumbnail a {
+    text-decoration: none;
+}
+
+.home_notice .first h5 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    font-weight: normal;
+}
+
+.home_notice .first h5 a {
+    color: #000;
+    line-height: 30px;
+    text-decoration: none;
+}
+
+.home_notice .first p {
+    margin: 0;
+    color: #555;
+    line-height: 35px;
+}
+
+.home_notice .list {
+    width: 45%;
+    float: left;
+    position: relative;
+    line-height: 45px;
+    border-bottom: 1px dotted #93e8ff;
+}
+
+.home_notice .list:last-child {
+    border: 0;
+}
+
+.home_notice .list a {
+    display: block;
+    padding-right: 117px;
+    color: #333;
+    white-space: nowrap;
+    font-size: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+}
+
+.home_notice .list a:before {
+    content: '>';
+    font-family: 'Simsun';
+    margin-right: 5px;
+}
+
+.home_notice .list span {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 13px;
+    color: #999;
+}
+
+section.hero-area {
+    position: relative;
+    z-index: 1;
+    padding-bottom: 80px;
+    padding-top: 200px;
+    overflow: hidden;
+    background-image: url(../image/bg.png);
+    background-size: cover;
+    background-position: center right;
+    background-repeat: no-repeat;
+}
+
+img.circle-1 {
+    position: absolute;
+    right: -48px;
+    top: -8px;
+}
+
+img.circle-2 {
+    position: absolute;
+    right: -66px;
+    top: -82px;
+    transform: rotate(9deg);
+}
+
+.hero-circle img {
+    width: 45%;
+}
+
+.hero-left-content h2 {
+    color: #000;
+    font-size: 47px;
+    text-transform: uppercase;
+    font-weight: 400;
+    line-height: 60px;
+    margin-bottom: 16px;
+}
+
+.hero-left-content h2 span {
+    color: #39F;
+    font-weight: 700;
+}
+
+.hero-left-content h2 strong {
+    font-weight: 700;
+}
+
+.hero-left-content p {
+    color: #5B5766;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 33px;
+    margin-bottom: 33px;
+}
+
+/* card area start */
+.card-area {
+    padding-top: 90px;
+}
+
+.card-are-bg {
+    background-image: url(../image/Map-wrap.png);
+    background-position: calc(62%);
+    background-repeat: no-repeat;
+}
+
+.card-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.signle-card-item {
+    position: relative;
+    background: #fff;
+    box-shadow: 0px 0px 20px 0px #E1E4ED;
+    border-radius: 10px;
+    padding: 40px 40px 20px 25px;
+    margin-bottom: 25px;
+    margin-left: 25px;
+    width: 360px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: left;
+    min-height: 200px;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.signle-card-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    /* 白色半透明背景，可以调整RGB和透明度 */
+    pointer-events: none;
+    /* 使伪元素不接收鼠标事件 */
+}
+
+.signle-card-item.last-child {
+    margin-bottom: 0;
+}
+
+.signle-card-item:nth-child(1) {
+    margin-left: 0;
+}
+
+.signle-card-item:hover {
+    background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
+
+}
+
+.signle-card-item:hover h4 {
+    color: #fff;
+}
+
+.signle-card-item:hover p {
+    color: #fff;
+}
+
+.signle-card-item h4 {
+    position: absolute;
+    left: 40px;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 33px;
+    color: #fff;
+    margin-bottom: 15px;
+    transition: .3s;
+}
+
+.signle-card-item p {
+    position: absolute;
+    top: 80px;
+    left: 40px;
+    width: 215px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 28px;
+    color: #fff;
+    margin-bottom: 0;
+    transition: .3s;
+}
+
+.card-right-content h3 {
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 46px;
+    color: #545454;
+    margin-bottom: 23px;
+}
+
+.card-right-content p {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 28px;
+    color: #716C80;
+    margin-bottom: 35px;
+}
+.card-right-content {
+    padding-left: 55px;
+}

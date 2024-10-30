@@ -1,0 +1,962 @@
+{extend name="common/base"/}
+{block name="style"}
+<link href="{__STATIC__}/author/css/steps.css" rel="stylesheet">
+<style>
+    .cd-horizontal-timeline .events a {
+        padding-bottom: 6px;
+    }
+    .cd-horizontal-timeline .events-content {
+        height: auto !important;
+    }
+    .jumbotron .card-body {
+        min-height: 6.5rem;
+    }
+</style>
+{/block}
+
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}
+	<div class="row page-titles">
+        <div class="col-md-5 align-self-center">
+            <h3 class="text-themecolor">作品签约</h3>
+        </div>
+        <div class="col-md-7 align-self-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+                <li class="breadcrumb-item"><a href="{:url('book/index')}">作品管理</a></li>
+                <li class="breadcrumb-item"><a href="{:url('sign/index')}">签约管理</a></li>
+                <li class="breadcrumb-item active">签约申请</li>
+            </ol>
+        </div>
+    </div>
+
+	<div class="container-fluid">
+        <!-- Validation wizard -->
+        <div class="row" id="validation">
+            <div class="col-12">
+                <div class="card wizard-content card-outline-info">
+                    <div class="card-header">
+                        <span class="text-white">《{$book['title']}》主协议签约</span>
+                        {notempty name="book.sign"}
+                            <span class="text-white" style="float: right;">编辑：{notempty name="book.sign.editorname"}{$book.sign.editorname}{else/}--{/notempty}</span>
+                        {/notempty}
+                    </div>
+                    <div class="card-body">         
+                        <form action="#" class="validation-wizard wizard-circle">
+                            <input type="hidden" name="id" id="id" value="{$book.id}">
+                            <!-- Step 1 -->
+                            <h6>申请签约</h6>
+                            <section>                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="jumbotron jumbotron-fluid text-center radius">
+                                            <div class="card-body">
+                                                <input type="hidden" name="wordsstatus" id="wordsstatus" value="{$book.wordsstatus}">
+                                                {notempty name="book.sign"}                        
+                                                    <input type="hidden" name="signstatus" id="signstatus" value="{$book.sign.status}">
+                                                    {eq name="book.sign.status" value="4"}
+                                                        <span class="label label-danger m-r-10">被拒绝</span><code>理由：{$book.sign.reason|default="暂无"} / 时间：{$book.sign.verifytime|date='Y-m-d H:i:s'}</code>
+                                                        <span class="btn waves-effect waves-light btn-info applysign">重新申请签约</span>
+                                                    {else/}
+                                                        {eq name="book.sign.status" value="1"}
+                                                            <span class="label label-success m-r-10">签约成功</span><code>签约时间：{$book.sign.verifytime|date='Y-m-d H:i:s'}</code>
+                                                        {else/}
+                                                            <span class="label label-warning m-r-10">签约中</span><code>提交时间：{$book.sign.applytme|date='Y-m-d H:i:s'}</code>
+                                                        {/eq}
+                                                    {/eq}                                                    
+                                                {else/}
+                                                    <input type="hidden" name="signstatus" id="signstatus" value="-1">
+                                                    {eq name="book.wordsstatus" value="1"}
+                                                        <span class="btn waves-effect waves-light btn-info applysign">申请签约</span>
+                                                    {else/}
+                                                        <h4 class="card-title">作品总字数未达10000字，当前共有：{$book.words}字，请先发布章节。</h4>
+                                                        <a href="{:url('chapter/add',array('bid'=>$book['id']))}" class="btn waves-effect waves-light btn-success">发布章节</a>
+                                                    {/eq}
+                                                {/notempty}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                                
+                            </section>
+                            <!-- Step 2 -->
+                            <h6>填写大纲</h6>
+                            <section>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="jumbotron jumbotron-fluid radius">
+                                            <div class="card-body">
+                                                {notempty name="book.sign"}
+                                                    <input type="hidden" id="outlinestate" name="outlinestate" value="{$book.sign.outlinestate}">
+                                                    {eq name="book.sign.outlinestate" value="2"}
+                                                        <span class="label label-danger m-r-10">被拒绝</span><code>理由：{$book.sign.reason|default="暂无"} / 时间：{$book.sign.verifytime|date='Y-m-d H:i:s'}</code>
+                                                        <div class="form-group m-t-20">
+                                                            <label for="outline">作品大纲</label>
+                                                            <textarea class="form-control" rows="8" id="outline">{$book.outline}</textarea>
+                                                        </div>
+                                                        <button type="button" class="btn btn-primary waves-effect waves-light m-r-10 btn-sm saveoutline">提交大纲</button>
+                                                    {/eq}
+                                                    {eq name="book.sign.outlinestate" value="0"}
+                                                        {empty name="book.outline"}
+                                                            <div class="form-group">
+                                                                <label for="outline">作品大纲</label>
+                                                                <textarea class="form-control" rows="8" id="outline"></textarea>
+                                                            </div>
+                                                            <button type="button" class="btn btn-primary waves-effect waves-light m-r-10 btn-sm saveoutline">提交大纲</button>
+                                                        {else/}
+                                                            <div class="col-12 text-center">
+                                                                <button type="button" class="btn waves-effect waves-light btn-xs btn-warning">待审核</button>
+                                                            </div>
+                                                        {/empty}
+                                                    {/eq}                                
+                                                    {eq name="book.sign.outlinestate" value="1"}
+                                                        <div class="col-12 text-center">
+                                                            <button type="button" class="btn waves-effect waves-light btn-xs btn-success m-r-10">已通过</button><code>时间：{$book.sign.verifytime|date='Y-m-d H:i:s'}</code>
+                                                        </div>
+                                                    {/eq}
+                                                {else/}
+                                                    <input type="hidden" id="outlinestate" name="outlinestate" value="-1">
+                                                    <div class="form-group">
+                                                        <label for="outline">作品大纲</label>
+                                                        <textarea class="form-control" rows="8" id="outline"></textarea>
+                                                    </div>
+                                                    <button type="button" class="btn btn-primary waves-effect waves-light m-r-10 btn-sm saveoutline">提交大纲</button>
+                                                {/notempty}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Step 3 -->
+                            <h6>签约信息确认</h6>
+                            <section>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="jumbotron jumbotron-fluid text-center radius">
+                                            <div class="card-body">                                                
+                                                {notempty name="book.sign"}
+                                                    {eq name="book.sign.status" value="0"}<button type="button" class="btn waves-effect waves-light btn-xs btn-warning m-r-10">待确认</button>{/eq}
+                                                    {eq name="book.sign.status" value="1"}<button type="button" class="btn waves-effect waves-light btn-xs btn-success m-r-10">已确认</button>{/eq}
+                                                    {eq name="book.sign.status" value="2"}
+                                                        {eq name="book.sign.outlinestate" value="1"}
+                                                            <button type="button" data-toggle="modal" data-target="#confirmsign" class="btn btn-primary waves-effect waves-light m-r-10 btn-sm confirmsign">签约确认</button>
+                                                        {else/}
+                                                            <button type="button" class="btn waves-effect waves-light btn-xs btn-warning m-r-10">待确认</button><code>时间：{$book.sign.applytme|date='Y-m-d H:i:s'}</code>
+                                                        {/eq}
+                                                    {/eq}
+                                                    {eq name="book.sign.status" value="4"}
+                                                        <button type="button" class="btn waves-effect waves-light btn-xs btn-success m-r-10">被拒绝</button><code>时间：{$book.sign.verifytime|date='Y-m-d H:i:s'}/理由：{$book.sign.reason|default="暂无"}</code>
+                                                    {else/}
+                                                        <button type="button" class="btn waves-effect waves-light btn-xs btn-warning m-r-10">待审核</button>
+                                                    {/eq}
+                                                {else/}
+                                                    <button type="button" class="btn waves-effect waves-light btn-xs btn-warning">请先申请签约</button>
+                                                {/notempty}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            <!-- Step 4 -->
+                            <h6>实名认证</h6>
+                            <section>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="jumbotron jumbotron-fluid text-center radius">
+                                            <div class="card-body">
+                                                <input type="hidden" name="authstate" id="authstate" value="{$userInfo.authstate}">
+                                                <input type="hidden" name="bankstate" id="bankstate" value="{$userInfo.bankstate}">
+                                                <input type="hidden" name="true_name" id="true_name" value="{$userInfo.true_name}">
+                                                <h4 class="card-title">真实姓名：{$userInfo.true_name|default="暂无"} / 银行卡：{$userInfo.bankcard|default="暂无"}</h4>                                            
+                                                {eq name="userInfo.authstate" value="1"}
+                                                    <button type="button" class="waves-effect waves-dark btn btn-xs btn-success">已实名认证</button>
+                                                {else/}
+                                                    <a href="{:url('user/basic')}" class="waves-effect waves-dark btn btn-xs btn-info">未实名认证</a>
+                                                {/eq}
+                                                {eq name="userInfo.bankstate" value="1"}
+                                                    <button type="button" class="waves-effect waves-dark btn btn-xs btn-success">已银行卡认证</button>
+                                                {else/}
+                                                    <a href="{:url('user/basic')}" class="waves-effect waves-dark btn btn-xs btn-info">未银行卡认证</a>
+                                                {/eq}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            {notempty name="book.sign"}
+                                {eq name="book.sign.mode" value="1"}
+                                    <!-- Step 5 -->
+                                    <h6>电子签约</h6>
+                                    <section>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="jumbotron jumbotron-fluid text-center radius">
+                                                    <div class="card-body">
+                                                        {eq name="book.sign.status" value="1"}
+                                                            <button type="button" class="btn waves-effect waves-light btn-xs btn-success m-r-10">已签约</button><code>时间：{$book.sign.verifytime|date='Y-m-d H:i:s'}</code>
+                                                        {else/}                                                           
+                                                            {eq name="book.sign.status" value="5"}
+                                                                <button type="button" data-toggle="modal" data-target="#signcontract" class="btn btn-primary waves-effect waves-light m-r-10 btn-sm signcontract">签约合同</button>
+                                                            {else/}
+                                                                <button type="button" class="btn waves-effect waves-light btn-xs btn-warning m-r-10">待审核</button>
+                                                            {/eq}
+                                                        {/eq}
+                                                    </div>                                      
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                {/eq}
+                                {eq name="book.sign.mode" value="2"}
+                                    <!-- Step 5 -->
+                                    <h6>线下签约</h6>
+                                    <section>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="jumbotron jumbotron-fluid text-center radius">
+                                                    <div class="card-body">
+                                                        线下签约
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                {/eq}
+                            {/notempty}
+                            <!-- Step 6 -->
+                            <h6>合同下载</h6>
+                            <section>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="jumbotron jumbotron-fluid text-center radius">
+                                            <div class="card-body">
+                                                {notempty name="book.sign"}
+                                                    {eq name="book.sign.status" value="1"}
+                                                        {notempty name="book.sign.contract"}
+                                                            <!-- 主合同 -->
+                                                            <div class="card-body">
+                                                                <h4 class="card-title">主合同</h4>
+                                                                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                                                                    <span class="btn btn-info viewpdf" data-url="{:url('sign/signshowpdf', array('sid'=>$book['sign']['id'],'type'=>0))}"><i class="mdi mdi-book-open-page-variant"></i> 查看</span>
+                                                                    <a class="btn btn-primary" href="{:url('sign/signdown', array('sid'=>$book['sign']['id'],'type'=>0))}"><i class="mdi mdi-package-down"></i> 下载</a>
+                                                                </div>
+                                                            </div>
+                                                        {/notempty}
+                                                        {notempty name="book.sign.rcontract"}
+                                                        <!-- 授权书 -->
+                                                            <div class="card-body">
+                                                                <h4 class="card-title">授权书</h4>
+                                                                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                                                                    <span class="btn btn-info viewpdf" data-url="{:url('sign/signshowpdf', array('sid'=>$book['sign']['id'],'type'=>1))}"><i class="mdi mdi-book-open-page-variant"></i> 查看</span>
+                                                                    <a class="btn btn-primary" href="{:url('sign/signdown', array('sid'=>$book['sign']['id'],'type'=>1))}"><i class="mdi mdi-package-down"></i> 下载</a>
+                                                                </div>
+                                                            </div>
+                                                        {/notempty}
+                                                        <!-- 确认书 -->
+                                                        {notempty name="book.sign.parentauth"}
+                                                            <div class="card-body">
+                                                                <h4 class="card-title">未成年人确认书</h4>
+                                                                <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                                                                    <span class="btn btn-info viewpdf" data-url="{:url('sign/signshowpdf', array('sid'=>$book['sign']['id'],'type'=>2))}"><i class="mdi mdi-book-open-page-variant"></i> 查看</span>
+                                                                    <a class="btn btn-primary" href="{:url('sign/signdown', array('sid'=>$book['sign']['id'],'type'=>2))}"><i class="mdi mdi-package-down"></i> 下载</a>
+                                                                </div>
+                                                            </div>
+                                                        {/notempty}                                               
+                                                    {else/}
+                                                        <button type="button" class="btn waves-effect waves-light btn-xs btn-warning m-r-10">无合同</button>
+                                                    {/eq}
+                                                {else/}
+                                                    <button type="button" class="btn waves-effect waves-light btn-xs btn-warning m-r-10">无合同</button>
+                                                {/notempty}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 补充协议 -->
+        <div class="row">
+            <div class="col-12">
+                {notempty name="signlist"}
+                    {volist name="$signlist" id="v"}
+                        {eq name="v.rtype" value="1"}
+                            <div class="card">
+                                <div class="card-header">
+                                    <span>笔名修改签约</span>
+                                    <span style="float: right;">编辑：{$v.editorname}</span>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">{$v.log.front}<code>更改为</code>{$v.log.after} 时间：{$v.applytme|date='Y-m-d H:i:s'}</h6>
+                                    <div class="button-box">
+                                        <button class="tst1 btn btn-info btn-sm">操作</button>
+                                        <button class="tst2 btn btn-warning btn-sm">操作</button>
+                                        <button class="tst3 btn btn-success btn-sm">操作</button>
+                                        <button class="tst4 btn btn-danger btn-sm">操作</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {/eq}
+                        {eq name="v.rtype" value="3"}
+                            <div class="card">
+                                <div class="card-header">
+                                    <span>作品名称修改签约</span>
+                                    <span style="float: right;">编辑：{$v.editorname}</span>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-subtitle">《{$v.log.front}》<code>更改为</code>《{$v.log.after}》 时间：{$v.applytme|date='Y-m-d H:i:s'}</h6>
+                                    <div class="button-box">
+                                        <button class="tst1 btn btn-info btn-sm">操作</button>
+                                        <button class="tst2 btn btn-warning btn-sm">操作</button>
+                                        <button class="tst3 btn btn-success btn-sm">操作</button>
+                                        <button class="tst4 btn btn-danger btn-sm">操作</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {/eq}
+                    {/volist}
+                {/notempty}
+            </div>
+        </div>
+        <!-- Modal 确认签约 -->
+        <div class="modal fade none-border" id="confirmsign">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">签约确认</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" id="formsave">
+                            <input type="hidden" name="bid" value="{$book.id}">
+                            {notempty name="book.sign"}
+                            <input type="hidden" name="sid" value="{$book.sign.id}">
+                            {/notempty}
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">姓名</label>
+                                <div class="col-md-9">
+                                    <input class="form-control" type="text" name="true_name" value="{$userInfo.true_name}"{notempty name="userInfo.true_name"}{eq name="userInfo.authstate" value="1"} readonly{/eq}{/notempty}>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">笔名</label>
+                                <div class="col-md-9">
+                                    <input class="form-control" type="text" value="{$userInfo.nickname}" name="nickname" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">性别</label>
+                                <div class="col-md-9">     
+                                    <div class="form-control">{$userInfo.sex}</div>                             
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">身份证号</label>
+                                <div class="col-md-9">
+                                    <input class="form-control" type="text" name="idcard" value="{$userInfo.idcard}"{notempty name="userInfo.idcard"}{eq name="userInfo.authstate" value="1"} readonly{/eq}{/notempty}>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">地址</label>
+                                <div class="col-md-9">
+                                    <input class="form-control" type="text" value="{$userInfo.address}" name="address">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">手机</label>
+                                <div class="col-md-9">
+                                    <input class="form-control" type="text" value="{$userInfo.mobile}" name="mobile">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">邮编</label>
+                                <div class="col-md-9">
+                                    <input class="form-control" type="text" value="{$userInfo.postcode}" name="postcode">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-md-3 col-form-label">签约方式</label>
+                                <div class="col-md-9">
+                                    {notempty name="book.sign"}
+                                        {eq name="book.sign.mode" value="1"}
+                                            <div class="form-control">电子签约</div>
+                                        {/eq}
+                                        {eq name="book.sign.mode" value="2"}
+                                            <div class="form-control">线下签约</div>
+                                        {/eq}              
+                                    {else/}
+                                        <div class="form-control">待审核</div>
+                                    {/notempty}
+                                </div>
+                            </div>
+                            <!-- 主协议 -->
+                            {notempty name="book.sign"}
+                                {eq name="book.sign.genre" value="1"}
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label">签约类型</label>
+                                        <div class="col-md-9">
+                                            {eq name="book.sign.type" value="1"}
+                                                <div class="form-control">分成</div>
+                                            {/eq}
+                                            {eq name="book.sign.type" value="2"}
+                                                <div class="form-control">买断</div>
+                                            {/eq}
+                                            {eq name="book.sign.type" value="3"}
+                                                <div class="form-control">买断+保障计划</div>
+                                            {/eq}
+                                            {eq name="book.sign.type" value="4"}
+                                                <div class="form-control">保底</div>
+                                            {/eq}
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-3 col-form-label">签约等级</label>
+                                        <div class="col-md-9">
+                                            {notempty name="book.sign"}
+                                                <!-- 分成签约等级 -->
+                                                {eq name="book.sign.type" value="1"}
+                                                    {eq name="book.sign.level" value="1"}
+                                                        <div class="form-control">普签</div>
+                                                    {/eq}
+                                                    {eq name="book.sign.level" value="2"}
+                                                        <div class="form-control">A签</div>
+                                                    {/eq}
+                                                    {eq name="book.sign.level" value="3"}
+                                                        <div class="form-control">S签</div>
+                                                        {/eq}
+                                                    {eq name="book.sign.level" value="4"}
+                                                        <div class="form-control">大神签</div>
+                                                    {/eq}
+                                                {/eq}
+                                                <!-- 保底签约等级 -->
+                                                {eq name="book.sign.type" value="4"}
+                                                    {eq name="book.sign.level" value="4"}
+                                                        <div class="form-control">普通保底</div>
+                                                    {/eq}
+                                                    {eq name="book.sign.level" value="1"}
+                                                        <div class="form-control">A级保底</div>
+                                                    {/eq}
+                                                    {eq name="book.sign.level" value="2"}
+                                                        <div class="form-control">S级保底</div>
+                                                        {/eq}
+                                                    {eq name="book.sign.level" value="3"}
+                                                        <div class="form-control">大神保底</div>
+                                                    {/eq}
+                                                {/eq}
+                                                <!-- 买断签约等级 -->
+                                                {eq name="book.sign.type" value="2"}
+                                                    {eq name="book.sign.level" value="1"}
+                                                        <div class="form-control">普通买断</div>
+                                                    {/eq}
+                                                    {eq name="book.sign.level" value="2"}
+                                                        <div class="form-control">精品买断</div>
+                                                    {/eq}
+                                                {/eq}                                        
+                                            {else/}
+                                                <div class="form-control">待审核</div>
+                                            {/notempty}
+                                        </div>
+                                    </div>
+                                    {eq name="book.sign.type" value="1"}
+                                        <div class="form-group row">
+                                            <label class="col-md-3 col-form-label">初始全勤收入</label>
+                                            <div class="col-md-9">
+                                                {eq name="book.sign.attendance" value="1"}
+                                                    <div class="form-control">无初始值</div>
+                                                {/eq}
+                                                {eq name="book.sign.attendance" value="2"}
+                                                    <div class="form-control">千字10元</div>
+                                                {/eq}
+                                                {eq name="book.sign.attendance" value="3"}
+                                                    <div class="form-control">前作品最高等级</div>
+                                                {/eq}                                    
+                                            </div>
+                                        </div>
+                                    {/eq}
+                                    {if($book.sign.type == 2 || $book.sign.type == 4)}
+                                        <div class="form-group row">
+                                            <label class="col-md-3 col-form-label">千字价格</label>
+                                            <div class="col-md-9">
+                                                <div class="form-control">{$book.sign.price}</div>                                                               
+                                            </div>
+                                        </div>
+                                    {/if}
+                                {/eq}
+                                <code>请认真核对签约类型、金额是否和编辑沟通一致。</code>
+                            {else/}
+                                <div class="form-control">待审核</div>
+                            {/notempty}
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info waves-effect waves-light save-confirm" data-dismiss="modal">确认</button>
+                        <button type="button" class="btn btn-white waves-effect" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal 签约合同 -->
+        <div class="modal fade none-border" id="signcontract">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">签约合同</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form role="form" id="signcontractform">
+                            <input type="hidden" name="bid" value="{$book.id}">
+                            {notempty name="book.sign"}
+                                <input type="hidden" name="sid" value="{$book.sign.id}">
+                                <label>
+                                    {eq name="book.sign.genre" value="1"}
+                                        主协议
+                                    {/eq}
+                                    {eq name="book.sign.genre" value="2"}
+                                        补充协议
+                                    {/eq}                                        
+                                </label>                                
+                                {eq name="book.sign.rtype" value="1"}
+                                    <hr class="m-b-0 m-t-0">
+                                    <code>作者您好，由于您已变更的笔名与签约合同中笔名不一致，现须签署下方变更信息对应的补充协议</code>
+                                {/eq}
+                                {eq name="book.sign.rtype" value="2"}
+                                    <hr class="m-b-0 m-t-0">
+                                    <code>作者您好，由于您已变更的银行卡与签约合同中银行卡不一致，现须签署下方变更信息对应的补充协议</code>
+                                {/eq}
+                                {eq name="book.sign.rtype" value="3"}
+                                    <hr class="m-b-0 m-t-0">
+                                    <code>作者您好，由于您已变更的书籍名称与签约合同中书籍名称不一致，现须签署下方变更信息对应的补充协议</code>
+                                {/eq}
+                                <div class="form-group">
+                                    {eq name="book.sign.genre" value="1"}
+                                        <div class="input-group m-b-10">
+                                            <button type="button" class="btn btn-success viewpdf" data-url="{:url('sign/signshowpdf', array('sid'=>$book['sign']['id'],'type'=>0))}">点击查看协议</button>
+                                        </div>
+                                        <label>授权书</label>
+                                        <div class="input-group">
+                                            <button type="button" class="btn btn-success viewpdf" data-url="{:url('sign/signshowpdf', array('sid'=>$book['sign']['id'],'type'=>1))}">点击查看协议</button>
+                                        </div>
+                                    {/eq}
+                                    {eq name="book.sign.genre" value="2"}
+                                        <div class="input-group">
+                                            <button type="button" class="btn btn-success viewpdf" data-url="{:url('sign/signshowpdf', array('sid'=>$book['sign']['id'],'type'=>0))}">点击查看协议</button>
+                                        </div>
+                                    {/eq}
+                                </div>
+                                <div class="form-group">
+                                    <label>手机号</label>
+                                    <input type="text" class="form-control" id="signcontractmobile" name="mobile" readonly value="{$book.sign.mobile}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="captcha">验证码</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="captcha" name="captcha" placeholder="输入验证码">
+                                        <div class="input-group-addon getCode" style="cursor: pointer;"><i class="fa fa-send-o m-r-10"></i>发送</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="checkbox checkbox-success">
+                                        <input id="agree" name="agree" type="checkbox" value="1">
+                                        <label for="agree"> 本人同意签署本合同并知晓签署本合同的法律效力 </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <span class="label label-warning">说明：</span>
+                                    <h5>1、当前页面为您展示了即将签署的电子合同的全部条款；</h5>
+                                    <h5>2、如果您对合同的相关条款有异议，请及时与您的编辑进行沟通解决；</h5>
+                                    <h5>3、在您已阅读并知悉了此份电子合同的全部内容及其法律效力的前提下，若您同意接受此份电子合同所有条款的约束，您方可填写验证码并点击“确认签署”，点击“确认签署”即表示您已在电子合同中签字；</h5>
+                                    <h5>4、待平台方（{$webtitle}）在您签字的电子合同中盖章后，合同工将立即生效，对双方具有法律约束。</h5>
+                                </div>
+                            {else/}
+                                待审核
+                            {/notempty}
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info waves-effect waves-light looksign" data-dismiss="modal">确认签署</button>
+                        <button type="button" class="btn btn-white waves-effect" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="jumbotron">
+                            <p class="lead">一、作品范围</p>
+                            <hr class="my-4">
+                            <p>1、尚未与其他单位签约的作品，作者本人拥有独立版权；</p>
+                            <p>2、在{$webtitle}阅读平台发表1万字以上；</p>
+                            <p>3、系作者本人独立创作，并且没有违背国家的相关法律法规，经{$webtitle}阅读平台审核通过；</p>
+                            <p>4、与国家相关法律不违背，不涉及色情、政治、反人类反社会；</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="jumbotron jumbotron-fluid">
+                            <div class="container">
+                                <p class="lead">二、申请流程</p>
+                                <hr class="my-4">
+                                <p>1、在{$webtitle}阅读平台已发表1万字的作品，可于作者后台申请签约，方式为：点击作品名-点击签约申请。</p>
+                                <p>2、可在申请时的输入框内填写您的常用联系QQ，方便编辑最快联系。</p>
+                                <p>3、已申请的作品在七日内不可重复申请。</p>
+                                <p>4、编辑会在七个工作日内审核签约申请。</p>
+                                <p>5、通过申请的作品，会有编辑尽快与作者联系，沟通签约后续事宜。未通过申请的作品，请您自查内容，或加强更新，优化内容质量，七日后可再次申请。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script src="{__STATIC__}/author/js/jquery.steps.min.js"></script>
+<script>
+$(window).on('load', function() {
+    var id = $("#id").val(); //作品ID
+    var authstate = parseInt($("#authstate").val()); //实名认证状态
+    var bankstate = parseInt($("#bankstate").val()); //银行卡认证状态
+    var true_name = $("#true_name").val(); //真实姓名
+    var signstatus = parseInt($("#signstatus").val()); //签约状态
+    var wordsstatus = parseInt($("#wordsstatus").val()); //字数达标状态
+    var outlinestate = parseInt($("#outlinestate").val()); //大纲审核状态
+    
+    $(".validation-wizard").steps({
+        headerTag: "h6"
+        , bodyTag: "section"
+        , transitionEffect: "fade"
+        , titleTemplate: '<span class="step">#index#</span> #title#'
+        , labels: {
+            cancel: "取消",
+            current: "当前步骤：",
+            pagination: "页码",
+            finish: "完成",
+            next: "下一步",
+            previous: "上一步",
+            loading: "加载中……"
+        }
+        , onStepChanging: function (event, currentIndex, newIndex) {
+            // 在步骤更改之前执行的代码
+            // 申请
+            if(currentIndex == 0) {
+                if(wordsstatus == 0) {
+                    swal("信息提示", "字数不够，请先发布章节。");
+                    return false;
+                }
+                if(signstatus == -1 || signstatus == 4) {
+                    swal("信息提示", "请先申请签约。");
+                    return false;
+                }
+                return true;
+            }
+            //如何允许在步骤错误期间后退
+            if (currentIndex > newIndex) {
+                return true;
+            }
+            // 大纲
+            if(currentIndex == 1) {
+                if(signstatus == -1) {
+                    swal("信息提示", "请先提交申请。");
+                    return false;
+                }
+                if(outlinestate == 2) {
+                    swal("信息提示", "请重新提交大纲。");
+                    return false;
+                }
+                if(outlinestate == 0) {
+                    swal("信息提示", "请确认大纲是否填写或还未通过审核。");
+                    return false;
+                }
+                if(signstatus !== 1 && signstatus < 2) {
+                    swal("信息提示", "请等待审核通过，可与编辑沟通签约内容。");
+                    return false;
+                }                
+                return true;
+            }
+            // 确认
+            if(currentIndex == 2) {        
+                if(signstatus !== 1 && signstatus < 3) {
+                    swal("信息提示", "请先确认签约信息。");
+                    return false;
+                }
+                if(outlinestate != 1) {
+                    swal("信息提示", "请等待大纲审核通过。");
+                    return false;
+                }
+                return true;
+            }
+            // 实名
+            if(currentIndex == 3) {
+                if(signstatus !== 1 && signstatus < 3) {
+                    swal("信息提示", "请先确认签约信息。");
+                    return false;
+                }
+                if(authstate !== 1) {
+                    swal("信息提示", "请先完成实名认证。");
+                    return false;
+                }
+                return true;
+            }
+            if(currentIndex == 4) {
+                if(signstatus !== 1) {
+                    swal("信息提示", "请等待签约完成。");
+                    return false;
+                }
+                return true;
+            }
+        }
+        , onFinishing: function (event, currentIndex) {
+            // 在用户试图完成最后一步时执行的代码
+            var form = $(this);
+            console.log('onFinishing');
+        }
+        , onFinished: function (event, currentIndex) {
+             // 在用户完成所有步骤时执行的代码
+            var form = $(this);
+            console.log('onFinished');
+        }
+    })
+
+    // 申请签约
+    $(".applysign").bind("click", function() {
+        $.ajax({
+            url: "{:url('sign/applysave')}",
+            data: { id: id },
+            type: 'post',
+            async: false,
+            success: function (res) {
+                if (res.code === 0) {
+                    swal({
+                        title: res.msg,
+                        text: "信息提示",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    swal("申请失败", res.msg, "error");
+                }
+            }
+        })
+    })
+
+    // 保存大纲
+    $(".saveoutline").bind("click", function() {
+        var outline = $("#outline").val();
+        if(!outline || outline.length <= 0) {
+            swal("错误提示", "大纲内容为空！", "error");
+            return false;
+        }
+        $.ajax({
+            url: "{:url('sign/saveoutline')}",
+            data: { id: id, outline: outline },
+            type: 'post',
+            async: false,
+            success: function (res) {
+                if (res.code === 0) {
+                    swal({
+                        title: res.msg,
+                        text: "信息提示",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    swal("申请失败", res.msg, "error");
+                }
+            }
+        })
+    })
+
+    // 确认签约
+    $(".save-confirm").bind("click", function() {
+        swal({
+            title: "您确定要同意作品签约？",
+            text: "同意后将不可再次同意",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                var params = $("#formsave").serialize();
+                $.ajax({
+                    url: "{:url('sign/saveconfirm')}",
+                    data: params,
+                    type: 'post',
+                    async: false,
+                    success: function (res) {
+                        if (res.code === 0) {
+                            swal({
+                                title: res.msg,
+                                text: "信息提示",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            swal("信息提示", res.msg, "error");
+                        }
+                    }
+                })
+            }
+        });
+        return false;
+    })
+
+    //获取验证码
+    var countdown = 60;
+    $(".getCode").bind("click", function() {
+        if(countdown == 0 || countdown == 60) {
+            let mobile = $("#signcontractmobile").val();
+            if ($('#agree').is(':checked')) {
+            } else {
+                swal("错误提示", "请确保已阅读上方协议内容，并勾选同意签署选项！", "error");
+                return false;
+            }
+            if(!mobile) {
+                swal("错误提示", "手机号信息缺失！！", "error");
+                return false;
+            }
+            $.ajax({
+                url: "{:url('sign/sendsignsms')}",
+                data: {mobile:mobile},
+                type: 'post',
+                async: false,
+                success: function (res) {
+                    if (res.code === 0) {
+                        swal({
+                            title: res.msg,
+                            text: "信息提示",
+                            timer: 1000,
+                            type: "success",
+                            showConfirmButton: false
+                        });
+                        setTimeout(function () {
+                            settime($(".getCode"));
+                        }, 1000);
+                    } else {
+                        swal("信息提示", res.msg, "error");
+                    }
+                }
+            })            
+        }
+        return false;
+    })
+
+    function settime(obj) {
+        if (countdown == 0) {       
+            obj.html('<i class="fa fa-send-o m-r-10"></i>发送');
+            countdown = 60;
+            return false;
+        } else {
+            obj.text(countdown);
+            countdown--;
+        }
+        setTimeout(function() {
+            settime(obj) }
+        ,1000)
+    }
+
+    //签署合同
+    $(".looksign").bind("click", function() {
+        swal({
+            title: "您确定要作品签约？",
+            text: "确定后签约正式生效，并可下载合同。",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                var params = $("#signcontractform").serialize();
+                $.ajax({
+                    url: "{:url('sign/signcontract')}",
+                    data: params,
+                    type: 'post',
+                    async: false,
+                    success: function (res) {
+                        if (res.code === 0) {
+                            swal({
+                                title: res.msg,
+                                text: "信息提示",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            swal("信息提示", res.msg, "error");
+                        }
+                    }
+                })
+            }
+        });
+        return false;
+    })
+    
+    // 显示PDF
+    $(".viewpdf").bind("click", function() {
+        let url = $(this).data('url');
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'blob';
+        xhr.onload = function(e) {
+            if (this.status == 200) {
+                var pdfBlob = new Blob([this.response], {type: 'application/pdf'});
+                var pdfUrl = URL.createObjectURL(pdfBlob);
+                // 打开一个新窗口来显示PDF
+                var win = window.open();
+                win.document.write('<iframe src="' + pdfUrl + '" width="100%" height="100%" frameborder="0"></iframe>');
+            }
+        };
+        xhr.send();
+    });
+
+    $('#confirmsign').on('show.bs.modal', function(){
+        var $this = $(this);
+        var $modal_dialog = $this.find('.modal-dialog');
+        $this.css('display', 'block');
+        $modal_dialog.css({'margin-top': Math.max(0, ($(window).height() - $modal_dialog.height()) / 2), "width": '100%', "max-width": '600px'});        
+    });
+
+    $('#signcontract').on('show.bs.modal', function(){
+        var $this = $(this);
+        var $modal_dialog = $this.find('.modal-dialog');
+        $this.css('display', 'block');
+        $modal_dialog.css({'margin-top': Math.max(0, ($(window).height() - $modal_dialog.height()) / 2), "width": '100%', "max-width": '600px'});        
+    });
+
+});
+</script>
+{/block}
+<!-- /脚本 -->

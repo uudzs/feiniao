@@ -1,0 +1,243 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '实名认证';{/php}
+{include file="common/header"/}
+<style>
+    .realname {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .realname .input {
+        width: 100%;
+        display: block;
+        clear: both;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .realname .input input {
+        width: 80%;
+        border-radius: .5rem;
+        border: 1px solid #ccc;
+        padding: .2rem .5rem;
+        text-align: center;
+    }
+
+    .realname .input .subbtn {
+        width: 80%;
+        border-radius: .5rem;
+        padding: .2rem .5rem;
+        text-align: center;
+        background: #03d1a1;
+        border: 0;
+        color: #fff;
+        font-size: .28rem;
+    }
+
+    .realname .tips {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    .realname .tips .span1 {
+        width: 80%;
+        margin: 0 auto;
+        text-align: left;
+    }
+    .id_card_box {
+        display: flex;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+    .upcardbox {
+        background-color: unset!important;
+        background-repeat: no-repeat!important;
+        background-size: contain!important;
+    }
+    .authsuccess {
+        text-align: center;
+        height: 80vh;
+        padding-top: 20vh;
+        color: #03d1a1;
+    }
+    .progress {
+        text-align: center;
+        height: 80vh;
+        padding-top: 20vh;
+    }
+    .authsuccess i {
+        font-size: 2rem;        
+    }
+    .authsuccess span {
+        display: block;
+        margin-top: .5rem;
+        font-size: .4rem;
+    }
+</style>
+<div class="realname" b-if="(realname.userinfo.realname_status == 0)">
+    <div class="input">
+        <input type="text" value="" placeholder="请输入真实姓名" b-model="realname.realname">
+    </div>
+    <div class="input">
+        <input type="text" value="" placeholder="请输入身份证号" b-model="realname.id_card">
+    </div>
+    <div class="id_card_box">          
+        <div class="bui-upload upcardbox">
+            <div id="btnUpload" class="bui-btn" style="height: auto; line-height: normal;margin-bottom: 0;background-color: unset;">
+                <i class="icon-plus large"></i>
+            </div>
+            <label>身份证照片</label>
+        </div>
+    </div>
+    <div class="input">
+        <button class="subbtn" b-click="realname.realnamesubmit">认证</button>
+    </div>
+    <div class="tips">
+        <div class="span1">
+            <h3 class="item-title">说明：</h3>
+            <p class="item-text">真实姓名必须与身份证照片信息保持一致，否则会认证失败，必须上传身份证正面照片，实名认证与提现账号必须保持一致，否则将不能提现，并且每个人只能认证一次，请认真填写。</p>
+        </div>
+    </div>
+</div>
+<div b-else-if="(realname.userinfo.realname_status == 1)" class="authsuccess">
+    <i class="fa fa-check-circle" aria-hidden="true"></i>
+    <span>已实名认证成功</span>
+</div>
+<div b-else class="progress">
+    <i class="fa fa-meh-o" aria-hidden="true"></i>
+    <span>审核中</span>    
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var uiUpload = bui.upload({
+            showProgress: true,
+        });
+
+        // 上拉菜单 js 初始化:
+        var uiActionsheet = bui.actionsheet({
+            trigger: "#btnUpload",
+            buttons: [{ name: "拍照上传", value: "camera" }, { name: "从相册选取", value: "photo" }],
+            callback: function(e) {
+                var ui = this;
+                var val = $(e.target).attr("value");
+                switch (val) {
+                    case "camera":
+                        ui.hide();
+                        uiUpload.add({
+                            "from": "camera",
+                            // "needCompress": true,
+                            // "width": 300,
+                            "destinationType": "file", //  file | blob | data 
+                            "onSuccess": function(file, data) {
+                                this.start({
+                                    url: "{:furl('v1/upload', [], true, 'api')}",
+                                    data: {
+                                        type: "image",
+                                        file: file
+                                    },
+                                    headers: { Token: token },
+                                    onSuccess: function (res) {                                    
+                                        if (parseInt(res.code) == 0) {
+                                            bs.id_card_photo = res.data.filepath;
+                                            $(".upcardbox").css("background", 'url(' + res.data.filepath + ')');
+                                        } else {
+                                            bui.hint(res.msg);
+                                        }
+                                    },
+                                    onFail: function (res) {
+                                        bui.hint('上传失败！');
+                                    }
+                                })
+
+                            }
+                        })
+                        break;
+                    case "photo":
+                        ui.hide();
+                        uiUpload.add({
+                            "from": "",
+                            "onSuccess": function(file, data) {
+                                this.start({
+                                    url: "{:furl('v1/upload', [], true, 'api')}",
+                                    data: {
+                                        type: "image",
+                                        file: file
+                                    },
+                                    headers: { Token: token },
+                                    onSuccess: function (res) {                                    
+                                        if (parseInt(res.code) == 0) {
+                                            bs.id_card_photo = res.data.filepath;
+                                            $(".upcardbox").css("background", 'url(' + res.data.filepath + ')');
+                                        } else {
+                                            bui.hint(res.msg);
+                                        }
+                                    },
+                                    onFail: function (res) {
+                                        bui.hint('上传失败！');
+                                    }
+                                })
+                            }
+                        })
+                        break;
+                    case "cancel":
+                        ui.hide();
+                        break;
+                }
+            }
+        })
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "realname",
+            data: {
+                userinfo: {},
+                realname: '',
+                id_card_photo: '',
+                id_card: '',
+            },
+            methods: {
+                realnamesubmit: function (e) {
+                    if (!this.realname) return bui.hint("请输入真实姓名！");
+                    if (!this.id_card_photo) return bui.hint("请上传身份证照片！");
+                    var that = this;
+                    post("{:furl('v1/realnameauth', [], true, 'api')}", { "realname": that.realname, "id_card_photo": that.id_card_photo, "id_card": that.id_card }, function (result) {                        
+                        if (result.code == 0) {
+                            bui.hint({
+                                content: result.msg,
+                                onClose: function onClose(e) {
+                                    bui.refresh();
+                                }
+                            })                            
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                var that = this;
+                post("{:furl('v1/mine', [], true, 'api')}", {}, function (result) {
+                    if (result.code == 0) {
+                        that.userinfo = result.data.userinfo || []
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+            }
+        });
+    })
+</script>
+{/block}

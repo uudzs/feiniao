@@ -1,0 +1,33 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">作品分类详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">标题</td>
+			<td>{$detail.name}</td><td class="layui-td-gray-2">标识</td>
+			<td>{$detail.key}</td><td class="layui-td-gray-2">上级分类ID</td>
+			<td>
+			{eq name="$detail.pid" value="1"}选项一{/eq}
+			{eq name="$detail.pid" value="2"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">排序（同级有效）</td>
+			<td>{$detail.ordernum}</td><td class="layui-td-gray-2">状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">创建人</td>
+			<td>{$detail.create_user_id}</td>
+		</tr><tr><td class="layui-td-gray-2">修改人</td>
+			<td>{$detail.update_user_id}</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">修改时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">图标</td>
+			<td colspan="5">
+				<img src="{$detail.icons}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

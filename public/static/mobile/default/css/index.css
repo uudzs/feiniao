@@ -1,0 +1,83 @@
+.edit-title {
+    margin: .2rem 0;
+}
+.edit-list ul {
+    width: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.edit-list ul li {
+    width: 30%;
+    padding: 0;
+}
+.edit-list ul li .bui-pic-title {
+    font-weight: normal;
+}
+.edit-list .bui-pic img {
+    min-height: 3rem;
+    border-radius: 0.1rem;
+}
+.banner img {
+    border-radius: 0.1rem;
+}
+.new-book {
+    margin: .2rem 0;
+}
+.new-book .bui-btn {
+    padding-left: 0;
+    padding-right: 0;
+}
+.new-book .more {
+    display: flex;
+    align-items: center;
+}
+.new-book .small {
+    padding: .05rem .15rem;
+    font-size: .25rem;
+    background: #03d1a1;
+    border-width: 0;
+}
+.new-book .bui-thumbnail img {
+    min-height: 2.5rem;
+    border-radius: 0.1rem;
+}
+.new-book .desc {
+    color: #666;
+    height: 1.2rem;
+    line-height: .4rem;
+    overflow: hidden;
+}
+.new-book .bui-list-pic {
+    padding-left: 0;
+    padding-right: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.new-book .bui-list-pic .span1 {
+    padding-left: 0;
+    padding-right: 0;
+    width: 30%;
+}
+.new-book .bui-list-pic img {
+    min-height: 3rem;
+    border-radius: 0.1rem;
+}
+.new-book .bui-list-pic .bui-pic-title {
+    font-weight: normal;
+}
+.hottop .item-title {
+    color: #222;
+}
+.hottop .desc {
+    height: 1.2rem;
+    line-height: .4rem;
+    color: #666;
+    overflow: hidden;
+}
+.hottop .author {
+    margin-top: .2rem;
+    color: #333;
+}

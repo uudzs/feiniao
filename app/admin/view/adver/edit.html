@@ -1,0 +1,77 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑广告位</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">名称<font>*</font></td>
+			<td><input type="text" name="title"  lay-verify="required" lay-reqText="请完善名称" value="{$detail.title}" autocomplete="off" placeholder="请输入名称" class="layui-input"></td>
+			<td class="layui-td-gray-2">展示频道<font>*</font></td>
+			<td>
+				<input type="radio" name="channel" value="999" title="APP" {eq name="$detail.channel" value="999"} checked{/eq}>
+				<input type="radio" name="channel" value="888" title="官网" {eq name="$detail.channel" value="888"} checked{/eq}>
+				<input type="radio" name="channel" value="777" title="作家" {eq name="$detail.channel" value="777"} checked{/eq}>
+				<input type="radio" name="channel" value="666" title="手机版" {eq name="$detail.channel" value="666"} checked{/eq}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">广告类型</td>
+			<td>
+				<!-- <input type="radio" name="type" value="1" title="单图" {eq name="$detail.type" value="1"} checked{/eq}> -->
+				<input type="radio" name="type" value="2" title="图片" {eq name="$detail.type" value="2"} checked{/eq}>
+				<input type="radio" name="type" value="3" title="文本" {eq name="$detail.type" value="3"} checked{/eq}>
+				<!-- <input type="radio" name="type" value="4" title="代码" {eq name="$detail.type" value="4"} checked{/eq}> -->
+			</td>		
+			<td class="layui-td-gray-2">状态</td>
+			<td>
+				<input type="radio" name="status" value="1" title="正常" {eq name="$detail.status" value="1"} checked{/eq}>
+				<input type="radio" name="status" value="0" title="禁止" {eq name="$detail.status" value="0"} checked{/eq}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">宽度</td>
+			<td><input type="text" name="width"  value="{$detail.width}" autocomplete="off" placeholder="请输入宽度" class="layui-input"></td>
+			<td class="layui-td-gray-2">高度</td>
+			<td><input type="text" name="height"  value="{$detail.height}" autocomplete="off" placeholder="请输入高度" class="layui-input"></td>
+		</tr>
+		<tr>			
+			<td class="layui-td-gray-2">显示条数</td>
+			<td><input type="text" name="viewnum"  value="{$detail.viewnum}" autocomplete="off" placeholder="请输入显示条数" class="layui-input"></td>
+			<td class="layui-td-gray-2">备注</td>
+			<td><input type="text" name="remarks"  value="{$detail.remarks}" autocomplete="off" placeholder="请输入备注" class="layui-input"></td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('adver/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

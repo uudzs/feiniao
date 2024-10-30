@@ -1,0 +1,167 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/index.css?v={$conf.version}">
+{/block}
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}	
+	<section class="hero-area">
+		<div class="hero-circle">
+			<img class="circle-1" src="{__STATIC__}/home/image/top-circle-1.png" alt="messing">
+			<img class="circle-2" src="{__STATIC__}/home/image/top-circle-1.png" alt="messing">
+		</div>
+		<div class="container">
+			<div class="row slider_list owl-carousel">
+				{php}$slide = model('slide_info')->where(['slide_id'=>1, 'status' => 1])->order('sort desc')->select()->toArray();{/php}
+				{notempty name="slide"}
+					{volist name="$slide" id="v"}
+						{eq name="$v.type" value="2"}
+							{$v.desc|raw}
+						{/eq}
+						{eq name="$v.type" value="1"}
+							<a href="{$v.src}" target="_blank"><img src="{:get_file($v.img)}" alt="{$v.title}"></a>
+						{/eq}
+					{/volist}				
+				{/notempty}
+			</div>
+		</div>
+	</section>
+
+	{php}$notice = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_notice'], 'type' => 6])->order('level desc')->limit(6)->select()->toArray();{/php}
+	{notempty name="notice"}
+	<section class="container">
+		<div class="home_notice">
+			<ul>
+				{volist name="$notice" id="v"}
+					{eq name="$key" value="0"}
+					<li class="first">
+						{notempty name="$v.images"}
+						<a href="{:url('notice_detail',['id' => $v['id']])}" target="_blank" title="{$v.title}">
+							<div class="thumbnail" style="background: url('{:get_file($v.images)}') no-repeat; background-size: cover;"></div>
+						</a>
+						{/notempty}
+						<h5><a href="{:url('notice_detail',['id' => $v['id']])}" target="_blank" title="{$v.title}"><font color="{$v.color}">{$v.title}</font></a></h5>
+						<p>{:dsubstr($v.introduction,130,'……')}</p>
+					</li>
+					{else/}
+						<li class="list"><a href="{:url('notice_detail',['id' => $v['id']])}" target="_blank" title="{$v.title}"><font color="{$v.color}">{:dsubstr($v.title,46)}</font></a><span>{:time_format($v.create_time,'m-d')}</span></li>
+					{/eq}
+				{/volist}
+			</ul>
+		</div>
+	</section>		
+	{/notempty}
+
+	<div class="card-area">
+		<div class="card-are-bg">
+			<div class="container">
+				<div class="row al-center">
+					<div class="col-lg-6 col-md-12 order-2 order-md-0">
+						<div class="all-card-item">
+							<div class="card-wrap">
+								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_1.png') no-repeat; background-size: cover;">
+									<h4>创作自由度高‌</h4>
+									<p>小说是一种自由的创作形式，可以自由地构建世界、塑造角色并展开故事情节。</p>
+								</div>
+								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_4.png') no-repeat; background-size: cover;">
+									<h4>提高写作能力‌</h4>
+									<p>通过不断的实践和反思，可以不断完善自己的文学技巧和风格。</p>
+								</div>
+							</div>
+							<div class="card-wrap">
+								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_3.png') no-repeat; background-size: cover;">
+									<h4>带来收益</h4>
+									<p>小说是一种受欢迎的文学形式，可以通过出版书籍、改编电影等方式获得收益。</p>
+								</div>
+								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_2.png') no-repeat; background-size: cover;">
+									<h4>提升个人技能</h4>
+									<p>坚持阅读和撰写小说有助于提高个人的写作技能，叙事技巧和创意思维。</p>
+								</div>
+							</div>						
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-12">
+						<div class="card-right-content">
+							<h3>成为{$conf.title}的签约作者<br>利用人工智能为您赋能</h3>
+							<p>让读者与作者都能赚到钱，并且支持两个角色同时从{$conf.title}赚钱，选择自己喜爱的小说类型和主题，让AI帮你构思和撰写，赚钱不再是梦想，只需轻松坐享其成。</p>
+							<div class="card-btn">								
+								{php}$aid = model('nav')->where(['status' => 1, 'name' => $pageconf['home_1_link_name']])->value('id');{/php}
+								{notempty name="aid"}
+								{php}$nav = model('nav_info')->where(['status' => 1, 'nav_id' => $aid])->find();{/php}
+								{notempty name="nav"}
+								<a href="{$nav.src}" class="main-btn"{eq name="nav.target" value="1"} target="_blank"{/eq}>了解更多详情</a>
+								{/notempty}
+								{/notempty}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="cta-area">
+		<div class="container cta-bg">
+			<div class="cta-ring-img">
+				<div class="cta-ring-left">
+					<img src="{__STATIC__}/home/image/short-ring.svg" alt="messing">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-7 col-md-8 order-2 order-md-0">
+					<div class="cta-left">
+						<h4>阅读小说，轻松赚现金！</h4>
+						<p class="cta-top-text">让你在享受阅读乐趣的同时，轻松地通过{$conf.title}赚取收入。</p>
+					</div>
+				</div>
+				<div class="col-lg-5 col-md-4">
+					<div class="cta-right">
+						{php}$aid = model('nav')->where(['status' => 1, 'name' => $pageconf['home_2_link_name']])->value('id');{/php}
+						{notempty name="aid"}
+						{php}$nav = model('nav_info')->where(['status' => 1, 'nav_id' => $aid])->find();{/php}
+						{notempty name="nav"}
+						<a href="{$nav.src}" class="main-btn"{eq name="nav.target" value="1"} target="_blank"{/eq}>马上赚现金</a>
+						{/notempty}
+						{/notempty}
+					</div>
+				</div>
+			</div>				
+		</div>
+	</div>
+	{php}$links = model('links')->where(['status' => 1, ['logo', '>', 0]])->order('sort desc')->select()->toArray();{/php}
+	{notempty name="links"}
+		<div class="platform-area">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="platform-tittle">
+							<div class="section-tittle">
+								<h2>友情链接</h2>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="owl-carousel all-platform-itme">
+						{volist name="$links" id="v"}
+							<div class="platform">
+								<a href="{$v.src}"{eq name="$v.target" value="1"} target="_blank"{/eq}><img src="{:get_file($v.logo)}" alt="{$v.name}"></a>
+							</div>
+						{/volist}		
+					</div>
+				</div>
+			</div>
+		</div>
+	{/notempty}
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+	<!-- Main JS -->
+	<script src="{__STATIC__}/home/script/main.js?v={$conf.version}"></script>
+    <script>
+		
+    </script>
+{/block}
+<!-- /脚本 -->

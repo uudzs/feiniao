@@ -1,0 +1,144 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    .layui-form-label {
+        width: 150px;
+    }
+</style>
+<form class="layui-form p-4">
+    <h3 class="pb-3">页面设置</h3>
+    <table class="layui-table layui-table-form">        
+        <tr>
+            <td class="layui-td-gray">PC端</td>
+            <td>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">主导航标识</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_nav"}
+                            <input type="text" name="home_nav" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_nav" value="{$config.home_nav}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应导航组中的标识</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页公告ID</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_notice"}
+                            <input type="text" name="home_notice" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_notice" value="{$config.home_notice}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页链接1号名称</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_1_link_name"}
+                            <input type="text" name="home_1_link_name" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_1_link_name" value="{$config.home_1_link_name}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应导航组中的标识</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页链接2号名称</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_2_link_name"}
+                            <input type="text" name="home_2_link_name" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_2_link_name" value="{$config.home_2_link_name}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应导航组中的标识</div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+			<td colspan="2"><hr></td>
+		</tr>        
+        <tr>
+            <td class="layui-td-gray">H5端</td>
+            <td>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页轮播</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.mobile_slide"}
+                            <input type="text" name="mobile_slide" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="mobile_slide" value="{$config.mobile_slide}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页编辑推荐</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.mobile_edit"}
+                            <input type="text" name="mobile_edit" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="mobile_edit" value="{$config.mobile_edit}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页横幅</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.mobile_banner"}
+                            <input type="text" name="mobile_banner" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="mobile_banner" value="{$config.mobile_banner}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页新书上架</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.mobile_newbook"}
+                            <input type="text" name="mobile_newbook" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="mobile_newbook" value="{$config.mobile_newbook}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="py-3">
+        <input type="hidden" name="id" value="{$id}">
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+    function feiniaoInit() {
+        var form = layui.form, tool = layui.tool;
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    parent.layui.tool.close(1000);
+                }
+            }
+            tool.post("{:url('conf/edit')}", data.field, callback);
+            return false;
+        }); 
+    }
+</script>
+{/block}
+<!-- /脚本 -->

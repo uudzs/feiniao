@@ -1,0 +1,89 @@
+{extend name="common/base"/}
+{block name="style"}{/block}
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}	
+	<div class="row page-titles">
+		<div class="col-md-5 align-self-center">
+			<h3 class="text-themecolor">修改密码</h3>
+		</div>
+		<div class="col-md-7 align-self-center">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+				<li class="breadcrumb-item active">修改密码</li>
+			</ol>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+                    <div class="card-header">修改密码</div>
+                    <div class="card-body">
+                        <form class="form-horizontal" id="modifypass">
+                            <div class="form-group row">
+                                <label for="oldpass" class="col-sm-3 text-right control-label col-form-label">旧密码</label>
+                                <div class="col-sm-9">
+                                    <input type="password" class="form-control" id="oldpass" name="oldpass" placeholder="请输入旧密码">
+                                </div>
+                            </div>                           
+                            <div class="form-group row">
+                                <label for="newpass" class="col-sm-3 text-right control-label col-form-label">新密码</label>
+                                <div class="col-sm-9">
+                                    <input type="password" class="form-control" name="newpass" id="newpass" placeholder="请输入新密码">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="confirmnewpass" class="col-sm-3 text-right control-label col-form-label">确认新密码</label>
+                                <div class="col-sm-9">
+                                    <input type="password" class="form-control" name="confirmnewpass" id="confirmnewpass" placeholder="请输入确认新密码">
+                                </div>
+                            </div>                           
+                            <div class="form-group row">
+                                <label class="col-sm-3 text-right control-label col-form-label"> </label>
+                                <div class="col-sm-9">
+                                    <button type="button" class="btn btn-info waves-effect waves-light m-t-10 modifypass">修改</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>		            
+				</div>
+			</div>
+		</div>
+	</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    $(window).on('load', function() {
+        $(".modifypass").bind("click", function() {
+            var param = $('#modifypass').serialize();
+            $.ajax({
+                url: "{:url('user/modifypass')}",
+                data: param,
+                type: 'post',
+                async: false,
+                success: function (res) {
+                    if (res.code === 0) {
+                        swal({
+                            title: res.msg,
+                            text: "请稍候……",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        });
+                        setTimeout(function () {
+                            window.location.href="{:url('login/index')}";
+                        }, 2000);                                
+                    } else {
+                        swal("修改失败", res.msg, "error");
+                    }
+                }
+            })
+        });
+    });
+</script>
+{/block}
+<!-- /脚本 -->

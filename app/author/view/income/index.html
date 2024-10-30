@@ -1,0 +1,148 @@
+{extend name="common/base"/}
+{block name="style"}{/block}
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}	
+	<div class="row page-titles">
+		<div class="col-md-5 align-self-center">
+			<h3 class="text-themecolor">稿酬结算</h3>
+		</div>
+		<div class="col-md-7 align-self-center">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+				<li class="breadcrumb-item active">稿酬结算</li>
+			</ol>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card" style="margin-bottom: 0;">
+                    <div class="card-header">稿酬结算</div>          	            
+				</div>
+
+				<div class="card card-default">
+					<div class="card-header">
+						<div class="card-actions">
+							{notempty name="list"}
+							<select class="custom-select pull-right">
+								{volist name="$list" id="v"} 
+								<option value="{$v.url}"{eq name="$v.id" value="$id"} selected{/eq}>{$v.title}</option>
+								{/volist}
+							</select>
+							{/notempty}
+						</div>
+						<h4 class="card-title m-b-0">累计稿费：{$total_money}</h4>
+					</div>
+					<div class="card-body collapse show">
+						<div class="table-responsive">
+							{notempty name="income"}
+								{eq name="$sign_type" value="保底"}
+								<table class="table product-overview">
+									<thead>
+										<tr>
+											<th>月份</th>
+											<th>更新字数</th>
+											<th>签约模式</th>
+											<th>千字价格</th>
+											<th>保底金额</th>
+											<th>延迟金额</th>
+											<th>累计保底金额</th>
+											<th>是否超保底</th>
+											<th>超保底金额</th>
+											<th>其他收益</th>
+											<th>当月总稿费</th>
+											<th>支付状态</th>
+										</tr>
+									</thead>
+									<tbody>									
+										{volist name="$income" id="v"}
+										<tr>
+											<td>{$v.month}</td>
+											<td>{$v.word_count}</td>
+											<td>{$v.sign_type}</td>
+											<td>{$v.thousand_words_money}</td>
+											<td>{$v.minimum_amount}</td>
+											<td>{$v.delay_money}</td>
+											<td>{$v.total_minimum_amount}</td>
+											<td>{$v.is_super_guaranteed}</td>
+											<td>{$v.super_guaranteed_money}</td>
+											<td>{$v.other_income}</td>
+											<td>{$v.money}</td>
+											<td>
+												{eq name="$v.payment_status" value="1"}<span class="label label-success font-weight-100">已支付</span>{/eq}
+												{eq name="$v.payment_status" value="0"}<span class="label label-warning font-weight-100">未支付</span>{/eq}
+												{eq name="$v.payment_status" value="2"}<span class="label label-danger font-weight-100">延迟付</span>{/eq}
+											</td>
+										</tr>
+										{/volist}
+									</tbody>
+								</table>
+								{/eq}
+								{eq name="$sign_type" value="电子版权"}
+								<table class="table product-overview">
+									<thead>
+										<tr>
+											<th>月份</th>
+											<th>更新字数</th>
+											<th>签约模式</th>
+											<th>渠道收益</th>
+											<th>分成比例</th>
+											<th>电子版权收入</th>
+											<th>酬勤奖励</th>
+											<th>其他收益</th>
+											<th>当月总稿费</th>
+											<th>支付状态</th>
+										</tr>
+									</thead>
+									<tbody>									
+										{volist name="$income" id="v"}
+										<tr>
+											<td>{$v.month}</td>
+											<td>{$v.word_count}</td>
+											<td>{$v.sign_type}</td>
+											<td>{$v.channel_income}</td>
+											<td>{$v.share_ratio}%</td>
+											<td>{$v.copyright_income}</td>
+											<td>{$v.rewards_attendance}</td>
+											<td>{$v.other_income}</td>
+											<td>{$v.money}</td>
+											<td>
+												{eq name="$v.payment_status" value="1"}<span class="label label-success font-weight-100">已支付</span>{/eq}
+												{eq name="$v.payment_status" value="0"}<span class="label label-warning font-weight-100">未支付</span>{/eq}
+												{eq name="$v.payment_status" value="2"}<span class="label label-danger font-weight-100">延迟付</span>{/eq}
+											</td>
+										</tr>
+										{/volist}
+									</tbody>
+								</table>
+								{/eq}
+							{else/}
+								<div class="col-12">
+									<div class="card-body m-auto text-center">
+										暂无数据
+									</div>
+								</div>
+                            {/notempty}
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	$(document).ready(function() {
+		$('.custom-select').on('change', function() {
+        	var url = $(this).val();
+			window.location.href = url;
+      	});
+	});
+</script>
+{/block}
+<!-- /脚本 -->

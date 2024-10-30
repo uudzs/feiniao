@@ -1,0 +1,387 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '任务';
+$conf = get_system_config('reward');
+{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/task.css" />
+<div class="task"></div>
+<div class="body">
+    <div class="head">
+        <div class="gold">
+            我的金币
+            <h3 b-text="task.userinfo.coin">0</h3>
+        </div>
+        <span b-template="task.vipTpl(task.userinfo, {$conf.vip_reward})"></span>
+        {eq name="$conf.open" value="1"}
+        <button class="signbtn" b-click="task.signin()">签到</button>
+        {/eq}   
+    </div>
+    {eq name="$conf.open" value="1"}
+        <div class="signin">
+            <div class="title">
+                <span>已连续签到<u b-text="task.userinfo.consecutive_days">0</u>天</span>
+                <span>签到记录<i class="fa fa-angle-right" aria-hidden="true"></i></span>
+            </div>
+            <div class="main">
+                <ul>
+                    <li>
+                        <p b-template="task.rewardTpl(task.userinfo.isvip, {$conf.day_1_reward}, {$conf.vip_reward})"></p>
+                        <div class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></div>
+                        <span>第一天</span>
+                    </li>
+                    <li>
+                        <p b-template="task.rewardTpl(task.userinfo.isvip, {$conf.day_2_reward}, {$conf.vip_reward})"></p>
+                        <div class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></div>
+                        <span>第二天</span>
+                    </li>
+                    <li>
+                        <p b-template="task.rewardTpl(task.userinfo.isvip, {$conf.day_3_reward}, {$conf.vip_reward})"></p>
+                        <div class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></div>
+                        <span>第三天</span>
+                    </li>
+                    <li>
+                        <p b-template="task.rewardTpl(task.userinfo.isvip, {$conf.day_4_reward}, {$conf.vip_reward})"></p>
+                        <div class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></div>
+                        <span>第四天</span>
+                    </li>
+                    <li>
+                        <p b-template="task.rewardTpl(task.userinfo.isvip, {$conf.day_5_reward}, {$conf.vip_reward})"></p>
+                        <div class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></div>
+                        <span>第五天</span>
+                    </li>
+                    <li>
+                        <p b-template="task.rewardTpl(task.userinfo.isvip, {$conf.day_6_reward}, {$conf.vip_reward})"></p>
+                        <div class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></div>
+                        <span>第六天</span>
+                    </li">
+                    <li>
+                        <p b-template="task.rewardTpl(task.userinfo.isvip, {$conf.day_7_reward}, {$conf.vip_reward})"></p>
+                        <div class="icon"><i class="fa fa-envelope-o" aria-hidden="true"></i></div>
+                        <span>第七天</span>
+                    </li>
+                </ul>
+            </div>        
+        </div>
+    {/eq}
+    <div class="novice">
+        <div class="subtitle">新手任务</div>
+        <ul>
+            <li>
+                <div class="left">
+                    <div class="hallmark"><i class="fa fa-vcard-o" aria-hidden="true"></i></div>
+                    <div class="desc">
+                        <p>绑定您的收款账号</p>
+                        <span>在设置里绑定您的收款账号，您可获得奖励！</span>
+                    </div>                        
+                </div>
+                <div class="right">
+                    <span b-template="task.rewardTpl(task.userinfo.isvip, {$conf.account}, {$conf.vip_reward})"></span>
+                    <div b-template="task.statusTpl(task.tasklist.account, 1)"></div>                    
+                </div>
+            </li>
+            <li>
+                <div class="left">
+                    <div class="hallmark"><i class="fa fa-tablet" aria-hidden="true"></i></div>
+                    <div class="desc">
+                        <p>绑定您的手机号</p>
+                        <span>在设置里绑定您的手机号，您可获得奖励！</span>
+                    </div>                        
+                </div>
+                <div class="right">
+                    <span b-template="task.rewardTpl(task.userinfo.isvip, {$conf.mobile}, {$conf.vip_reward})"></span>
+                    <div b-template="task.statusTpl(task.tasklist.mobile, 2)"></div>                    
+                </div>
+            </li>
+            <li>
+                <div class="left">
+                    <div class="hallmark"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></div>
+                    <div class="desc">
+                        <p>成为平台作者</p>
+                        <span>申请成为平台作者，您可获得奖励！</span>
+                    </div>                        
+                </div>
+                <div class="right">
+                    <span b-template="task.rewardTpl(task.userinfo.isvip, {$conf.author}, {$conf.vip_reward})"></span>
+                    <div b-template="task.statusTpl(task.tasklist.author, 3)"></div>                   
+                </div>
+            </li>
+            <li>
+                <div class="left">
+                    <div class="hallmark"><i class="fa fa-diamond" aria-hidden="true"></i></div>
+                    <div class="desc">
+                        <p>成为VIP会员</p>
+                        <span>申请成为VIP会员，您可获得奖励！</span>
+                    </div>                        
+                </div>
+                <div class="right">
+                    <span b-template="task.rewardTpl(task.userinfo.isvip, {$conf.vip}, {$conf.vip_reward})"></span>
+                    <div b-template="task.statusTpl(task.tasklist.vip, 4)"></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="novice">
+        <div class="subtitle">日常任务</div>
+        <ul>
+            <li>
+                <div class="left">
+                    <div class="hallmark"><i class="fa fa-tags" aria-hidden="true"></i></div>
+                    <div class="desc">
+                        <p>阅读章节超过{$conf.chapter_number}章</p>
+                        <span>阅读章节超过{$conf.chapter_number}章，您可获得奖励！</span>
+                    </div>
+                </div>
+                <div class="right">
+                    <span b-template="task.rewardTpl(task.userinfo.isvip, {$conf.chapter_reward}, {$conf.vip_reward})"></span>
+                    <div b-template="task.statusTpl(task.tasklist.chapter, 5)"></div>
+                </div>
+            </li>
+            <li>
+                <div class="left">
+                    <div class="hallmark"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></div>
+                    <div class="desc">
+                        <p>点赞超过{$conf.like_number}次</p>
+                        <span>当天点赞次数超过{$conf.like_number}次！</span>
+                    </div>                        
+                </div>
+                <div class="right">
+                    <span b-template="task.rewardTpl(task.userinfo.isvip, {$conf.like_reward}, {$conf.vip_reward})"></span>
+                    <div b-template="task.statusTpl(task.tasklist.like, 6)"></div>
+                </div>
+            </li>            
+        </ul>
+    </div>
+    <div class="novice">
+        <div class="subtitle">邀请任务</div>
+        <ul b-template="task.InviteTpl(task.tasklist.other)"></ul>
+    </div>
+    <div class="novice" style="margin-bottom: 1rem;">
+        <a class="bui-btn invite" href="{:furl('invite')}">马上邀请</a>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+  bui.ready(function () {
+    $(".bui-navbar").hide();
+    $('.bui-bar-left').css('visibility', 'hidden');
+    $('.bui-bar-right').css('visibility', 'hidden');
+    var sigopen = "{$conf.open}";
+    // 初始化数据行为存储
+    var bs = bui.store({
+        el: ".bui-page",
+        scope: "task",
+        data: {
+           userinfo: {},
+           tasklist: {}
+        },
+        methods: {
+            signin() {
+                let that = this;
+                post("{:furl('v1/signin', [], true, 'api')}", {}, function(result) {
+                    if(result.code == 0) {
+                        bui.hint("签到成功");
+                        that.init();
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+            },
+            receive(name) {
+                if(!name) return bui.hint('未设置');
+                post("{:furl('v1/gettask', [], true, 'api')}", {name: name}, function(result) {
+                    if(result.code == 0) {
+                        $("#"+name).attr('class', 'btn progress').text('完成中');
+                    } else {                        
+                        bui.hint(result.msg);
+                    }
+                });
+            },
+            async init() {
+                let that = this;
+                try {
+                    // 第一个请求            
+                    await post("{:furl('v1/mine', [], true, 'api')}", {}, function(result) {
+                        if(result.code == 0) {
+                            that.userinfo = result.data.userinfo || [];
+                            if(parseInt(sigopen) === 1) {
+                                let consecutive_days = parseInt(result.data.userinfo.consecutive_days);
+                                for (let index = 0; index < 7; index++) {
+                                    if(index < consecutive_days) {
+                                        $(".signin .main ul").children('li').eq(index).addClass('ok').find('i').attr('class','fa fa-check-circle');
+                                    }                        
+                                }
+                                if(result.data.userinfo.todaysign == 1) {
+                                    $('.signbtn').addClass('ok').attr('disabled', true).html('<i class="fa fa-check" aria-hidden="true"></i>已签到');
+                                }
+                            }
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });                
+                    // 第二个请求            
+                    await post("{:furl('v1/tasklist', [], true, 'api')}", {}, function(result) {
+                        if(result.code == 0) {
+                            that.tasklist = result.data || []                      
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                } catch (error) {
+                    // 处理错误
+                    console.error(error);
+                }                
+            }
+        },
+        watch: {},
+        computed: {},
+        templates: {
+            vipTpl: function(userinfo, vip_reward) {
+                return (parseInt(userinfo.isvip) === 1) ? 'VIP' + parseFloat(vip_reward) + '倍收益中' : '无VIP加倍收益';
+            },
+            rewardTpl: function(isvip, reward, vip_reward) {
+                return (parseInt(isvip) === 1 && parseFloat(vip_reward) > 1) ? '+' + parseInt(parseInt(reward) * parseFloat(vip_reward)) : '+' + parseInt(reward);
+            },
+            statusTpl: function (data, type) {
+                let html = "";
+                if(data) {
+                    if(data.status == 1) {
+                        html += `<button class="btn complete">已完成</button>`;
+                    }
+                    if(data.status == 0) {
+                        if(type == 1) {
+                            html += `<a href="{:furl('bankcard')}" class="btn progress">去完成</a>`;
+                        } else if(type == 3) {
+                            html += `<a href="{:furl('becomeauthor')}" class="btn progress">去完成</a>`;
+                        } else if(type == 4) {
+                            html += `<a href="{:furl('vip')}" class="btn progress">去完成</a>`;
+                        } else {
+                            html += `<a href="{:furl('profile')}" class="btn progress">去完成</a>`;
+                        }                        
+                    }
+                } else {
+                    if(type == 1) html += `<button class="btn started" id="{$conf.account_id}" b-click="task.receive('{$conf.account_id}')">领取</button>`;
+                    if(type == 2) html += `<button class="btn started" id="{$conf.mobile_id}" b-click="task.receive('{$conf.mobile_id}')">领取</button>`;
+                    if(type == 3) html += `<button class="btn started" id="{$conf.author_id}" b-click="task.receive('{$conf.author_id}')">领取</button>`;
+                    if(type == 4) html += `<button class="btn started" id="{$conf.vip_id}" b-click="task.receive('{$conf.vip_id}')">领取</button>`;
+                    if(type == 5) html += `<button class="btn started" id="{$conf.chapter_id}" b-click="task.receive('{$conf.chapter_id}')">领取</button>`;
+                    if(type == 6) html += `<button class="btn started" id="{$conf.like_id}" b-click="task.receive('{$conf.like_id}')">领取</button>`;
+                }
+                return html;
+            },
+            InviteTpl: function (data) {
+                let html = "";
+                data.forEach(function (item, i) {
+                    if(item.type == 3) {
+                        html += `
+                            <li>
+                                <div class="left">
+                                    <div class="hallmark"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+                                    <div class="desc">
+                                        <p>邀请ID为 ${item.taskid} 的好友注册</p>
+                                        <span>邀请一个好友成功注册！</span>
+                                    </div>                        
+                                </div>
+                                <div class="right">
+                                    <span>+{$conf.invite_reward}</span>`;
+                                    if(item.status == 1) {
+                                        html += `<button class="btn complete">已完成</button>`;
+                                    }
+                                    if(item.status == 0) {
+                                        html += `<button class="btn progress">完成中</button>`;
+                                    }
+                                    if(item.status == 2) {
+                                        html += `<button class="btn complete">未完成</button>`;
+                                    }
+                                 html += `</div>
+                            </li>`;
+                    }
+                    if(item.type == 4) {
+                        html += `
+                            <li>
+                                <div class="left">
+                                    <div class="hallmark"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+                                    <div class="desc">
+                                        <p>邀请ID为 ${item.taskid} 的好友阅读</p>
+                                        <span>注册当天首次阅读章节</span>
+                                    </div>                        
+                                </div>
+                                <div class="right">
+                                    <span>+{$conf.invite_1_level}</span>`;
+                                    if(item.status == 1) {
+                                        html += `<button class="btn complete">已完成</button>`;
+                                    }
+                                    if(item.status == 0) {
+                                        html += `<button class="btn progress">完成中</button>`;
+                                    }
+                                    if(item.status == 2) {
+                                        html += `<button class="btn complete">未完成</button>`;
+                                    }
+                                 html += `</div>
+                            </li>`;
+                    }
+                    if(item.type == 5) {
+                        html += `
+                            <li>
+                                <div class="left">
+                                    <div class="hallmark"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+                                    <div class="desc">
+                                        <p>邀请ID为 ${item.taskid} 的好友阅读</p>
+                                        <span>注册开始连续3天阅读章节</span>
+                                    </div>                        
+                                </div>
+                                <div class="right">
+                                    <span>+{$conf.invite_2_level}</span>`;
+                                    if(item.status == 1) {
+                                        html += `<button class="btn complete">已完成</button>`;
+                                    }
+                                    if(item.status == 0) {
+                                        html += `<button class="btn progress">完成中</button>`;
+                                    }
+                                    if(item.status == 2) {
+                                        html += `<button class="btn complete">未完成</button>`;
+                                    }
+                                 html += `</div>
+                            </li>`;
+                    }
+                    if(item.type == 6) {
+                        html += `
+                            <li>
+                                <div class="left">
+                                    <div class="hallmark"><i class="fa fa-user-plus" aria-hidden="true"></i></div>
+                                    <div class="desc">
+                                        <p>邀请ID为 ${item.taskid} 的好友阅读</p>
+                                        <span>注册开始连续7天阅读章节</span>
+                                    </div>                        
+                                </div>
+                                <div class="right">
+                                    <span>+{$conf.invite_3_level}</span>`;
+                                    if(item.status == 1) {
+                                        html += `<button class="btn complete">已完成</button>`;
+                                    }
+                                    if(item.status == 0) {
+                                        html += `<button class="btn progress">完成中</button>`;
+                                    }
+                                    if(item.status == 2) {
+                                        html += `<button class="btn complete">未完成</button>`;
+                                    }
+                                 html += `</div>
+                            </li>`;
+                    }
+                });
+                return html;
+            },
+        },
+        mounted: function() {
+            this.init();
+        }
+    })
+
+    return bs;
+  })
+</script>
+{/block}

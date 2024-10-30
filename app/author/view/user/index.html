@@ -1,0 +1,127 @@
+{extend name="common/base"/}
+{block name="style"}{/block}
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}	
+	<div class="row page-titles">
+		<div class="col-md-5 align-self-center">
+			<h3 class="text-themecolor">作家中心</h3>
+		</div>
+		<div class="col-md-7 align-self-center">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item active">作家中心</li>
+			</ol>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="contact-page-aside">
+						<div class="left-aside bg-light-part">
+							<ul class="list-style-none">
+								<li class="box-label"><a href="{:url('book/index')}">作品管理 <span>{$allbook}</span></a></li>
+								<li class="divider"></li>
+								<li><a href="{:url('book/index',array('finish'=>1))}">更新中 <span>{$bookupdate}</span></a></li>
+								<li><a href="{:url('book/index',array('finish'=>2))}">已完结 <span>{$finishbook}</span></a></li>
+								<li><a href="{:url('book/index',array('signing'=>2))}">已签约 <span>{$signingbook}</span></a></li>
+								<li><a href="{:url('book/index',array('status'=>2))}">已上架 <span>{$livebook}</span></a></li>
+								<li class="box-label"><a href="{:url('book/add')}" class="btn btn-info text-white">+ 添加作品</a></li>
+								
+							</ul>
+						</div>
+						<div class="right-aside">
+							<div class="table-responsive">
+								<div id="calendar"></div>
+							</div>							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<!-- Calendar JavaScript -->
+<script src="{__STATIC__}/author/js/jquery-ui.min.js"></script>
+<script src="{__STATIC__}/author/js/moment.js"></script>
+<script src='{__STATIC__}/author/js/fullcalendar.min.js'></script>
+<script src="{__STATIC__}/author/js/locale-all.js?vv={:get_system_config('web','version')}"></script>
+<script>
+$(window).on('load', function() {
+	var $this = this;
+	var today = new Date($.now());	
+	var calendar = $('#calendar').fullCalendar({
+		dayClick: function() {
+			console.log('dayClick');
+		},
+		slotDuration: '00:15:00', /* If we want to split day time each 15minutes */
+		minTime: '08:00:00',
+		maxTime: '19:00:00',
+		defaultView: 'month',
+		handleWindowResize: true,
+		header: {
+			left: 'prev,next,today',
+			center: 'title',
+			right: 'month,agendaWeek',                
+		},
+		buttonText: {
+			today: '当天',
+			month: '月',
+			agendaWeek: '周',
+		},
+		locale: 'zh-cn',
+		//events: defaultEvents,
+		events: function(start, end, timezone, callback) {
+			var date = this.getDate().format('YYYY-MM');
+			$.ajax({
+				url: "{:url('user/renew')}",
+				type: 'post',
+            	async: false,
+				dataType: 'json',
+				data: {date: date},
+				success: function (res) {
+					if (res.code === 0) {
+						var event = [];
+						$.each(res.data, function(i) {
+							event.push({
+								title: res.data[i].title,
+								start: new Date(res.data[i].start),
+								end: new Date(res.data[i].end),
+								className: res.data[i].className,
+                          	});
+						});
+						callback(event);
+					}
+				}
+			});
+		},
+		editable: true,
+		droppable: true, // this allows things to be dropped onto the calendar !!!
+		eventLimit: true, // allow "more" link when too many events
+		selectable: true,
+		viewRender: function( view, element ) {
+			//禁止查看未来月份
+			if(moment().isBefore(view.intervalEnd, 'day')) {
+				$('.fc-next-button').addClass('fc-state-disabled');
+			} else {
+				$('.fc-next-button').removeClass('fc-state-disabled');
+			}
+		},
+		drop: function(date, jsEvent, u) {
+			console.log('drop',date);
+		},
+		select: function (start, end, allDay) {
+			console.log('select');
+		},
+		eventClick: function(calEvent, jsEvent, view) {
+			console.log('eventClick');
+		}
+	});
+})
+</script>
+{/block}
+<!-- /脚本 -->

@@ -1,0 +1,322 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">数据表信息</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">数据表名称</td>
+			<td>{$detail.title}</td>
+			<td class="layui-td-gray-2">数据表备注</td>
+			<td>{$detail.Comment}</td>
+			<td class="layui-td-gray-2">当前记录数</td>
+			<td>{$detail.Rows}</td>
+			<td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.Create_time}</td>
+		</tr>
+	</table>
+	{neq name="$detail.c" value="0"}
+	<h3 class="py-3">文件信息</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td colspan="8" class="red" style="text-align:left; line-height:1.8">
+				温馨提示：<br/>
+				1、【<strong>一键CRUD生成代码</strong>】已帮你完成 <strong>60%</strong> 以上的开发工作，以下是生成的文件所在目录。
+				<br/>
+				2、可以刷新系统页面，点击左边的刚刚新增的<strong>菜单</strong>访问相关功能，如需更改菜单左侧图标，请在[系统管理]->[菜单节点]找到对应的菜单编辑修改即可。
+				<br/>
+				3、代码生成以后，不建议删除(除非不需要了)，建议在当前的基础上修改或新增开发，开发方式与传统的开发方式无区别。
+				<br/>
+				4、CRUD生成的代码是最基础的代码，开发者通过二次开发修改，可能使得功能更完善，代码更健壮，特别是逻辑上的处理，以下是二次开发建议。
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">控制器</td>
+			<td>{$detail.c}</td>
+			<td class="layui-td-gray">开发建议</td>
+			<td class="red">功能逻辑完善、控制器的其他方法的补充完善等</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">数据模型</td>
+			<td>{$detail.m=='0'?'-':$detail.m}</td>
+			<td class="layui-td-gray">开发建议</td>
+			<td class="red">数据搜索条件完善、查询字段增减调整、关联表查询等</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">数据校验器</td>
+			<td>{$detail.v=='0'?'-':$detail.v}</td>
+			<td class="layui-td-gray">开发建议</td>
+			<td class="red">增强数据校验规则、修改调整校验提示等</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">列表页面</td>
+			<td>{$detail.l=='0'?'-':$detail.l}</td>
+			<td class="layui-td-gray">开发建议</td>
+			<td class="red">列表显示字段增减调整、列表字段表格宽度调整、其他按钮、链接的补充完善等</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">添加页面</td>
+			<td>{$detail.a=='0'?'-':$detail.a}</td>
+			<td class="layui-td-gray">开发建议</td>
+			<td class="red">需要输入的字段增减调整、单选、多选、下拉选的内容调整等</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">编辑页面</td>
+			<td>{$detail.e=='0'?'-':$detail.e}</td>
+			<td class="layui-td-gray">开发建议</td>
+			<td class="red">需要编辑的字段增减调整、单选、多选、下拉选的内容调整等</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">查看页面</td>
+			<td>{$detail.r=='0'?'-':$detail.r}</td>
+			<td class="layui-td-gray">开发建议</td>
+			<td class="red">显示字段增减调整、其他按钮、连接的补充完善等</td>
+		</tr>
+	</table>
+	<h3 class="py-3">数据表字段</h3>
+    <table class="layui-table layui-form">
+        <thead>
+            <th style="text-align:center;">字段列名</th>
+            <th style="text-align:center;">数据类型</th>
+            <th style="text-align:center;">字段注释</th>
+        </thead>
+        <tbody>
+		{volist name="columns" id="vo"}
+		<tr>
+			<td>{$vo.Field}</td>
+			<td>{$vo.Type}</td>
+			<td>{$vo.Comment}</td>
+		</tr>
+        {/volist}
+        </tbody>
+	</table>
+	{else/}
+		<h3 class="py-3">数据表字段</h3>
+    <table class="layui-table layui-form">
+        <thead>
+            <th style="text-align:center;">字段列名</th>
+            <th style="text-align:center;">字段注释</th>
+            <th style="text-align:center;">数据类型</th>
+            <th class="blue" style="text-align:center;">表单字段名称</th>
+            <th class="blue" style="text-align:center;"><input type="checkbox" lay-filter="must" lay-skin="primary" title="是否必填"></th>
+            <th class="blue" style="text-align:center;">表单元素类型</th>
+            <th class="green" style="text-align:center;"><input type="checkbox" lay-filter="pageadd" lay-skin="primary" title="新增页展示"></th>
+            <th class="green" style="text-align:center;"><input type="checkbox" lay-filter="pageedit" lay-skin="primary" title="编辑页展示"></th>
+            <th class="green" style="text-align:center;"><input type="checkbox" lay-filter="pagelist" lay-skin="primary" title="列表页展示"></th>
+            <th class="green" style="text-align:center;"><input type="checkbox" lay-filter="pageread" lay-skin="primary" title="查询页展示"></th>
+        </thead>
+        <tbody>
+		{volist name="columns" id="vo"}
+		<tr>
+			<td>{$vo.Field}</td>
+			<td>{$vo.Comment}</td>
+			<td>{$vo.Type}</td>
+			{eq name="$vo.Field" value="id"}
+			<td style="text-align:center;">-</td>
+			<td style="text-align:center;">-</td>
+			<td style="text-align:center;">-</td>
+			<td style="text-align:center;">-</td>
+			<td style="text-align:center;">-</td>
+			<td style="text-align:center;">-</td>
+			<td style="text-align:center;">-</td>
+			{else/}
+			<td style="text-align:center;">
+				<input type="hidden" name="{$vo.Field}" value="{$vo.Field}" class="crud-flie">
+				<input type="text" name="{$vo.Field}_title" value="{$vo.name|default=''}" class="layui-input">
+			</td>
+			<td style="text-align:center;" class="must"><input type="checkbox" name="{$vo.Field}_required" value="1" lay-skin="primary" class="checkone"></td>
+			<td>
+				<select name="{$vo.Field}_type">
+					<option value="input" selected="">文本框</option>
+					<option value="textarea">多行文本</option>
+					<option value="select">下拉框</option>
+					<option value="radio">单选框</option>
+					<option value="checkbox">复选框</option>
+					<option value="summernote">富文本</option>
+					<option value="datetime">日期控件</option>
+					<option value="upload">上传控件</option>
+				</select>
+			</td>
+			<td style="text-align:center;" class="pageadd"><input type="checkbox" name="{$vo.Field}_add" value="{$vo.Field}" lay-skin="primary"></td>
+			<td style="text-align:center;" class="pageedit"><input type="checkbox" name="{$vo.Field}_edit" value="{$vo.Field}" lay-skin="primary"></td>
+			<td style="text-align:center;" class="pagelist"><input type="checkbox" name="{$vo.Field}_list" value="{$vo.Field}" lay-skin="primary"></td>
+			<td style="text-align:center;" class="pageread"><input type="checkbox" name="{$vo.Field}_read" value="{$vo.Field}" lay-skin="primary"></td>
+			{/eq}
+		</tr>
+        {/volist}
+        </tbody>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="field" value="{$detail.title}">
+		<input type="hidden" name="name" value="{$detail.Comment}">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">一键CRUD生成代码</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+	{/neq}
+</form>
+{/block}
+<!-- /主体 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form,tool=layui.tool;
+
+		form.on('checkbox(must)', function (data) {
+			var child = $(".must input[type='checkbox']");
+				child.each(function (index, item) {
+					item.checked = data.elem.checked;
+				});
+			form.render('checkbox');
+		});
+		
+		form.on('checkbox(pageadd)', function (data) {
+			var child = $(".pageadd input[type='checkbox']");
+				child.each(function (index, item) {
+					item.checked = data.elem.checked;
+				});
+			form.render('checkbox');
+		});
+		
+		form.on('checkbox(pageedit)', function (data) {
+			var child = $(".pageedit input[type='checkbox']");
+				child.each(function (index, item) {
+					item.checked = data.elem.checked;
+				});
+			form.render('checkbox');
+		});
+		
+		form.on('checkbox(pagelist)', function (data) {
+			var child = $(".pagelist input[type='checkbox']");
+				child.each(function (index, item) {
+					item.checked = data.elem.checked;
+				});
+			form.render('checkbox');
+		});
+		
+		form.on('checkbox(pageread)', function (data) {
+			var child = $(".pageread input[type='checkbox']");
+				child.each(function (index, item) {
+					item.checked = data.elem.checked;
+				});
+			form.render('checkbox');
+		});
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			var arr_crud = [],crud_a=[],crud_e=[],crud_r=[],crud_l=[],crud_v=[];
+			$('.crud-flie').each(function() {
+				arr_crud.push($(this).val());
+			});
+			let isPost = true;
+			for(var i=0;i<arr_crud.length;i++){
+				let crud = arr_crud[i];
+				let title = $('[name="'+crud+'_title"]').val();
+				let type = $('[name="'+crud+'_type"]').val();
+				let required = $('input[name="'+crud+'_required"]:checked').val();
+				
+				let add = $('input[name="'+crud+'_add"]:checked').val();
+				let edit = $('input[name="'+crud+'_edit"]:checked').val();
+				let read = $('input[name="'+crud+'_read"]:checked').val();
+				let list = $('input[name="'+crud+'_list"]:checked').val();
+				required=required?1:0;
+				if(required){
+					if(title == ''){
+						layer.msg('字段【'+crud+'】名称不能为空');
+						isPost = false;
+						break;
+					}
+					crud_v.push({'field':crud,'type':type,'title':title});
+				}
+				else{
+					required = 0;
+				}
+				
+				if(add){
+					if(title == ''){
+						layer.msg('字段【'+crud+'】名称不能为空');
+						isPost = false;
+						break;
+					}
+					crud_a.push({'field':crud,'type':type,'required':required,'title':title});
+				}
+				
+				if(edit){
+					if(title == ''){
+						layer.msg('字段【'+crud+'】名称不能为空');
+						isPost = false;
+						break;
+					}
+					crud_e.push({'field':crud,'type':type,'required':required,'title':title});
+				}
+				
+				if(read){
+					if(title == ''){
+						layer.msg('字段【'+crud+'】名称不能为空');
+						isPost = false;
+						break;
+					}
+					crud_r.push({'field':crud,'type':type,'required':required,'title':title});
+				}
+				
+				if(list){
+					if(title == ''){
+						layer.msg('字段【'+crud+'】名称不能为空');
+						isPost = false;
+						break;
+					}
+					crud_l.push({'field':crud,'type':type,'required':required,'title':title});
+				}
+			}
+			//数组
+			console.log(crud_v);
+			console.log(crud_a);
+			console.log(crud_e);
+			console.log(crud_r);
+			console.log(crud_l);
+			if(crud_v.length==0 && isPost == true){
+				layer.msg('必填选项不能为空');
+				return false;
+			}
+			if(crud_a.length==0 && isPost == true){
+				layer.msg('新增页展示不能为空');
+				return false;
+			}
+			if(crud_e.length==0 && isPost == true){
+				layer.msg('编辑页展示不能为空');
+				return false;
+			}
+			if(crud_r.length==0 && isPost == true){
+				layer.msg('查看页展示不能为空');
+				return false;
+			}
+			if(crud_l.length==0 && isPost == true){
+				layer.msg('列表页展示不能为空');
+				return false;
+			}
+			
+			let callback = function (e) {
+				console.log(e);
+				if (e == '') {
+					layer.msg('crud生成成功，正在生成菜单...');
+					tool.post("{:url('crud/menu')}", {field:data.field.field,name:data.field.name}, function(res){
+						layer.msg(res.msg);
+						if (res.code == 0) {
+							setTimeout(function(){
+								parent.location.reload();
+							},2000);							
+						}
+					});
+				}
+				else{
+					layer.msg('代码已生成，如需重新生成，请删除后再重试');
+				}
+			}
+			if(isPost == true){
+				tool.post("{:url('crud/crud')}", {field:data.field.field,name:data.field.name,crud_v:crud_v,crud_a:crud_a,crud_e:crud_e,crud_r:crud_r,crud_l:crud_l}, callback);
+			}
+			return false;
+		});
+	}
+
+</script>
+{/block}

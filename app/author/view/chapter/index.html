@@ -1,0 +1,548 @@
+{extend name="common/base"/}
+{block name="style"}
+<link href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
+<style>
+.icheck-list {
+    display: flex;
+}
+.chapters_wrapper, .dataTables_wrapper {
+    margin-top: 0;
+    padding-top: 0;
+}
+.screen {
+    position: relative;
+}
+.screen .form-group {
+    position: absolute;
+    display: inline-flex;
+    z-index: 10;
+}
+.screen .form-group .icheck-list li {
+    margin-right: 20px;
+}
+.myskin {
+    border-bottom: none!important;
+}
+.myskin th {
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #b1b8bb!important;
+}
+.myskin td {
+    /* border-bottom: none!important; */
+    border-top: none!important;
+    border-right: none!important;
+}
+.myskin tbody td:first-child {
+    border-left: none!important;
+}
+.myskin .refuse {
+    cursor: pointer;
+}
+#chapters_paginate {
+    display: -ms-flexbox;
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+    border-radius: .25rem;
+}
+#chapters_paginate a {
+    display: inline-block;
+    padding: .5rem .75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #0275d8;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+}
+#chapters_paginate a.current, #chapters_paginate a:hover {
+    color: #fff!important;
+    background: #0275d8!important;
+    border-color: #0275d8;
+}
+.myskin th:nth-child(1) {
+    width: 80px!important;
+}
+.myskin th:nth-child(2) {
+    width: auto!important;
+}
+.myskin th:nth-child(3) {
+    width: 80px!important;
+}
+.myskin th:nth-child(4) {
+    width: 60px!important;
+}
+.myskin th:nth-child(5) {
+    width: 60px!important;
+}
+.myskin th:nth-child(6) {
+    width: 140px!important;
+}
+.myskin th:nth-child(7) {
+    width: 60px!important;
+}
+.myskin .trial_time {
+    cursor: pointer;
+    color: #009242;   
+}
+.modal-dialog {
+    width: 80%!important;
+    max-width: 80%!important;
+}
+</style>
+{/block}
+
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}
+	<div class="row page-titles">
+        <div class="col-md-5 align-self-center">
+            <h3 class="text-themecolor">章节管理</h3>
+        </div>
+        <div class="col-md-7 align-self-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+                <li class="breadcrumb-item"><a href="{:url('book/index')}">作品列表</a></li>
+                <li class="breadcrumb-item"><a href="{:url('book/detail',array('id'=>$book['id']))}">作品首页</a></li>
+                <li class="breadcrumb-item active">章节管理</li>
+            </ol>
+        </div>
+    </div>
+
+	<div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title" style="display: inline;">章节列表</h4>
+                        {eq name="book.isfinish" value="1"}
+                        <span style="float: right;">
+                            <a href="{:url('chapter/add',array('bid'=>$book['id']))}" class="btn waves-effect waves-light btn-info">添加章节</a>
+                            {if $allcount <=0 }
+                            <a href="javascript:;" class="btn waves-effect waves-light btn-rounded btn-primary" data-toggle="modal" data-target="#exampleModal"><i class="mdi mdi-cloud-upload"></i> 全本上传</a>
+                            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h4 class="modal-title" id="exampleModalLabel1">全本上传</h4>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="note-editable">                                                
+                                                <ul class="list-icons">
+                                                    <li><i class="fa fa-check text-success"></i>1、全本上传功能适用于已完结作品，连载中作品请不要使用此项功能，以免影响您后续创作；</li>
+                                                    <li><i class="fa fa-check text-success"></i>2、在使用全本上传功能时，请先确定您的作品已经创建完成；</li>
+                                                    <li><i class="fa fa-check text-success"></i>3、全本上传成功后，您可进行用户名修改、签约个人信息上传等操作。</li>
+                                                    <li><i class="fa fa-check text-success"></i>4、全本上传功能格式要求为：</li>
+                                                </ul>
+                                                <blockquote class="m-t-10">①请使用word或者wps格式进行上传，不要使用txt或其他文本格式。</blockquote>
+                                                <blockquote class="m-t-10">②章节标题清晰。</blockquote>
+                                                <p><code>章节序号请使用“第X章”来排序，如：第一章 初来乍到/第二章 顾氏晚宴；</code></p>
+                                                <p><code>请不要使用“001、002”或者其他章节序号，以免上传失败；</code></p>
+                                                <p><code>请确认章节序号不要重复，如遇重复，系统会自动将重复章节生成为下一章，后续所有章节序号顺延；</code></p>                                                
+                                                <p><code>章节序号后必须带小标题，如仅有“第一章/第二章”等章节序号，将出现上传失败情况；</code></p>                                                
+                                                <p><code>作品第一章前如有“楔子”“前传”等内容，该内容将不会被同步，上传功能将从第一章开始上传。</code></p>                                                
+                                                <blockquote class="m-t-10">③段首空两格。</blockquote>  
+                                                <p><code>请使用word/wps或其他码字软件中自带的段首空格功能，word/wps的具体操作方式为鼠标右键-段落-特殊格式（选择首行缩进）-度量值（2字符）；</code></p>
+                                                <p><code>其他码字软件具体设置方式以软件功能为准。</code></p>
+                                                <p><code>请不要使用直接敲击“空格”键作为段首空格的方式，否则将导致上传失败。</code></p>
+                                                <ul class="list-icons">
+                                                    <li><i class="fa fa-check text-success"></i>5、全本上传功能仅为方便作者进行作品上传使用，请作者自行保存好原始稿件，以免造成损失。</li>
+                                                </ul>
+                                                <p><code>以上内容除功能介绍外，还可作为规范示例进行参考，如您阅读后仍有不清楚的地方，请联系责编咨询。</code></p>
+                                            </div>
+                                            <form>
+                                                <style>
+                                                .upload-cover {
+                                                    position: relative;
+                                                    display: inline-block;
+                                                    border: 1px dashed #3a75dc;
+                                                    border-radius: 4px;
+                                                    width: 300px;
+                                                    height: 60px;
+                                                    line-height: 60px;
+                                                    text-align: center;
+                                                    vertical-align: top;
+                                                }                                    
+                                                .upload-cover input {
+                                                    position: absolute;
+                                                    right: 0;
+                                                    top: 0;
+                                                    opacity: 0;
+                                                    cursor: pointer;
+                                                    width: 300px;
+                                                    height: 60px;
+                                                }
+                                                .upload-cover:hover {
+                                                    border: 1px dashed #dc3a3a;
+                                                }
+                                                .upload-cover P {
+                                                    text-align: center;
+                                                }
+                                                </style>
+                                                <div class="form-group upload-cover card-success">
+                                                    <span class="file-icon"></span>
+                                                    <p>点击上传全本word文件</p>
+                                                    <input type="file" name="file" accept=".docx" id="uploadword">
+                                                </div>                                                
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                            <button type="button" class="btn btn-primary submit_upload">发布</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/if}
+                        </span>
+                        
+                        {/eq}
+                        <div class="table-responsive m-t-20 screen">
+                            <div class="form-group m-b-0">
+                                <div class="input-group">                                   
+                                    <ul class="icheck-list">
+                                        <li>
+                                            <input type="radio" class="check" id="flat-radio-1" data-param="" data-value="" checked name="flat-radio" data-radio="iradio_flat-green">
+                                            <label for="flat-radio-1">全部({$allcount})</label>
+                                        </li>
+                                        <li>
+                                            <input type="radio" class="check" id="flat-radio-2" data-param="status" data-value="1" name="flat-radio" data-radio="iradio_flat-green">
+                                            <label for="flat-radio-2">已发布({$alreadycount})</label>
+                                        </li>
+                                        <li>
+                                            <input type="radio" class="check" id="flat-radio-3" data-param="type" data-value="1" name="flat-radio" data-radio="iradio_flat-greend">
+                                            <label for="flat-radio-3">定时发布({$timingcount})</label>
+                                        </li>
+                                        <li>
+                                            <input type="radio" class="check" id="flat-radio-4" data-param="type" data-value="2" name="flat-radio" data-radio="iradio_flat-green">
+                                            <label for="flat-radio-4">草稿箱({$draftcount})</label>
+                                        </li>
+                                        <li>
+                                            <input type="radio" class="check" id="flat-radio-5" data-param="verify" data-value="2" name="flat-radio" data-radio="iradio_flat-green">
+                                            <label for="flat-radio-5">被拒绝({$refusecount})</label>
+                                        </li>
+                                        <input type="hidden" value="0" id="searchData">
+                                    </ul>
+                                </div>
+                            </div>
+                            <table id="chapters" class="table display table-bordered table-striped myskin">
+                                <thead>
+                                    <tr>
+                                        <th>章节序号</th>
+                                        <th>章节名</th>
+                                        <th>章节字数</th>
+                                        <th>状态 </th>
+                                        <th>审核</th>
+                                        <th>发布时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<!-- This is data table -->
+<script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script>
+var table;
+var wordfileid = 0;
+var bookid = '{$book.id}';
+$(document).ready(function() {
+    $('#uploadword').on('change', function(e) {
+        var obj = this;      
+        var imgSize = this.files[0].size;
+        if (imgSize > 1024 * 1024 * 10) { //10M
+            return layer.msg("上传文件不能超过10MB");
+        };
+        var fileName = this.files[0].name;
+        var fileExtension = fileName.split('.').pop();
+        if (fileExtension != 'docx') {
+            return layer.msg("文件格式不正确");
+        }
+        var imgFile = this.files[0];
+        var formFile = new FormData();
+        formFile.append('file', imgFile);
+        formFile.append('type', 'doc');
+        $.ajax({
+            url: "{:url('api/upload')}",
+            type: 'POST',
+            data: formFile,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // traditional:true,
+            dataType:'json',
+            success: function(res) {
+                if(res.code == 0) {
+                    obj.value = '';
+                    wordfileid = res.data.id;
+                } else {
+                    obj.value = '';
+                    layer.msg(res.msg);
+                }
+            }
+        });
+    });
+
+    //提交上传
+    $('.submit_upload').click(function () {
+        if (!wordfileid || wordfileid <= 0) {
+            swal("错误提示", "上传文件错误", "error");
+            return false;
+        }
+        if (!bookid) {
+            swal("错误提示", "作品信息错误", "error");
+            return false;
+        }       
+        swal({
+            title: "确定要导入此文件内的章节吗？",
+            text: "如章节内容格式不符合标准，有导入失败的可能。",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            closeOnConfirm: false,
+            closeOnCancel: true
+        }, function (isConfirm) {
+            if (isConfirm) {
+                $.ajax({
+                    url: "{:url('chapter/importword')}",
+                    data: {"bid": bookid, "wordfileid": wordfileid},
+                    type: 'post',
+                    async: false,
+                    success: function (res) {
+                        if (parseInt(res.code) === 0) {
+                            swal({
+                                title: res.msg,
+                                text: "请稍候……",
+                                timer: 2000,
+                                type: "success",
+                                showConfirmButton: false
+                            });
+                            setTimeout(function () {
+                                location.reload();
+                            }, 2000);
+                        } else {
+                            swal(res.msg, '请重试', "error");
+                        }
+                    }
+                })
+            }
+        });
+    });
+
+
+    $('input[name="flat-radio"]').on('change', function() {
+        let param = $(this).data("param");
+        let value = $(this).data("value");
+        if(param == 'status') {
+            $("#searchData").val(1);            
+        }
+        if(param == 'type') {
+            if(value == 1) {
+                $("#searchData").val(2);
+            }
+            if(value == 2) {
+                $("#searchData").val(3);
+            }
+        }
+        if(param == 'verify') {
+            $("#searchData").val(4);
+        }
+        if(param == '') {
+            $("#searchData").val(0);
+        }
+        $("#chapters").dataTable().fnDestroy();
+        tableInit();
+    });
+    tableInit();
+    //点击审核拒绝
+    $('#chapters tbody').on( 'click', '.refuse', function() {
+        let data = table.row($(this).parent()).data();
+        let verifytime;
+        if(parseInt(data.verifytime) > 0) {
+            verifytime = new Date(parseInt(data.verifytime) * 1000).toLocaleString();
+        }        
+        swal({   
+			title: "章节审核未通过",   
+			text: "审核时间：" + verifytime + "\n" + '拒绝理由：' + (data.verifyresult ? data.verifyresult : '无'),   
+			type: "warning",
+            showCancelButton: false,   
+            confirmButtonColor: "#DD6B55",   
+            confirmButtonText: "确定",   
+            closeOnConfirm: true 
+		}, function() {		
+		});        
+    });
+    //点击删除章节
+    $('#chapters tbody').on( 'click', '.delchapter', function() {
+        let data = table.row($(this).parent()).data();
+        var obj = $(this);
+        let id = data.id;
+        if(parseInt(id) > 0) {
+            swal({
+                title: "确定要删除？",
+                text: "删除后将不可恢复。",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{:url('chapter/delchapter')}",
+                        data: { id: id },
+                        type: 'post',
+                        async: false,
+                        success: function (res) {
+                            if (res.code === 0) {
+                                swal({
+                                    title: res.msg,
+                                    text: "请稍候……",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                });
+                                obj.parent().parent().remove();
+                            } else {
+                                swal("删除失败", res.msg, "error");
+                            }
+                        }
+                    })
+                }
+            });
+        }              
+    });
+    //点击定时图标
+    $('#chapters tbody').on( 'click', '.trial_time', function() {
+        let data = table.row($(this).parent()).data();
+        let trial_time;
+        if(parseInt(data.trial_time) > 0) {
+            trial_time = new Date(parseInt(data.trial_time) * 1000).toLocaleString();
+        }        
+        swal({   
+			title: "定时发布章节",   
+			text: "定时发布时间：" + trial_time,  
+			type: "success",
+            showCancelButton: false,   
+            confirmButtonColor: "#26dad2",   
+            confirmButtonText: "确定",   
+            closeOnConfirm: true 
+		}, function() {		
+		});        
+    });
+    $('#exampleModal').on('show.bs.modal', function(){
+        var $this = $(this);
+        var $modal_dialog = $this.find('.modal-dialog');
+        $this.css('display', 'block');
+        $modal_dialog.css({'margin-top': Math.max(0, ($(window).height() - $modal_dialog.height()) / 2) });        
+    });
+});
+
+function tableInit() {
+    table = $('#chapters').DataTable({
+        "ajax": {
+            "url":"{:url('chapter/index',array('bid'=>$book['id']))}",
+            'type': 'POST',
+            //默认为data
+            "dataSrc": "data",
+            "data": {"searchData":$("#searchData").val()}
+        },               
+        "deferRender": true,//当处理大数据时，延迟渲染数据，有效提高Datatables处理能力
+        "bSort": false, //排序功能
+        "bInfo": true,  //显示表格信息
+        "bPaginate": true,//显示（使用）分页器
+        //"iDisplayLength": 20,
+        "lengthMenu": [[20, 40, 50, -1], ["20条", "40条", "50条", "全部"]],
+        "bLengthChange": false, //是否允许终端用户从一个选择列表中选择分页的页数，页数为10，25，50和100，需要分页组件bPaginate的支持 
+        "processing": true,
+        "serverSide": true, //开启服务器模式
+        "stateSave": true, //保持状态
+        "pagingType": "full_numbers", //numbers - 只有只有数字按钮|simple - 只有上一页、下一页两个按钮|simple_numbers - 除了上一页、下一页两个按钮还有页数按钮，Datatables默认是这个|full - 有四个按钮首页、上一页、下一页、末页|full_numbers - 除首页、上一页、下一页、末页四个按钮还有页数按钮|first_last_numbers - 除首页、末页两个按钮还有页数按钮
+        "language": {
+            "sProcessing": "加载中...",
+            "sLengthMenu": "显示 _MENU_ 条结果",
+            "sZeroRecords": "没有匹配结果",
+            "sInfo": "显示第 _START_ 至 _END_ 条结果，共 _TOTAL_ 条",
+            "sInfoEmpty": "显示第 0 至 0 条结果，共 0 条",
+            "sInfoFiltered": "(由 _MAX_ 条结果过滤)",
+            "sInfoPostFix": "",
+            "sSearch": "搜索:",
+            "sUrl": "",
+            "sEmptyTable": "表中数据为空",
+            "sLoadingRecords": "载入中...",
+            "sInfoThousands": ",",
+            "oPaginate": {
+                "sFirst": "首页",
+                "sPrevious": "上页",
+                "sNext": "下页",
+                "sLast": "末页"
+            },
+            "oAria": {
+                "sSortAscending": ": 以升序排列此列",
+                "sSortDescending": ": 以降序排列此列"
+            }
+        },
+        "columns" : [{
+            data : "chaps",
+            defaultContent : "",
+            'sClass': "text-center"
+        },{
+            data : "title",
+            defaultContent : "",
+            'sClass': "text-center",
+            "render" : function(data, type, row) {
+                console.log('row',row);
+                return parseInt(row.trial_time) > 0 ? data + ' <i class="ti-alarm-clock trial_time"></i>' : data;
+            }
+        },{
+            data : "wordnum",
+            defaultContent : "",
+            'sClass': "text-center"
+        },{
+            data : "status",
+            defaultContent : "",
+            'sClass': "text-center",
+            "render" : function(data, type, row) {
+                return data == 1 ? '<span class="label label-success">上架</span>' : '<span class="label label-danger">下架</span>';
+            }
+        },{
+            data : "verify",
+            defaultContent : "",
+            'sClass': "text-center",
+            "render" : function(data, type, row) {
+                return parseInt(data) == 2 ? '<span class="label label-danger refuse">拒绝 <i class="ti-help-alt"></i></span>' : (parseInt(data) == 1 ? '<span class="label label-success">通过</span>' : '<span class="label label-warning">待审</span>');
+            }
+        },{
+            data : "create_time",
+            defaultContent : "",
+            'sClass': "text-center",
+            "render" : function(data, type, row) {
+                return new Date(parseInt(data) * 1000).toLocaleString();
+            }
+        },{
+            data: null,
+            defaultContent: "",
+            'sClass': "text-center",
+            "render" : function(data, type, row) {
+                return "<a class='btn btn-success btn-xs' href='" + row.editurl + "'>详情</a>";//" <button class='btn btn-danger btn-xs delchapter' type='button'>删除</button>";
+            }
+        }],
+    });
+}
+</script>
+{/block}
+<!-- /脚本 -->

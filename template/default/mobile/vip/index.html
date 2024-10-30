@@ -1,0 +1,217 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = 'VIP';
+$conf = get_system_config('vip');
+{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/vip.css?v=4" />
+<div class="vipbg"></div>
+<div class="vip">
+    <div class="head">
+        <div class="gold">            
+            <i class="fa fa-user-circle" aria-hidden="true"></i>会员有效期至：
+            <h3 b-text="vip.userinfo.viptime"></h3>
+        </div>
+        <div class="refresh" b-click="vip.mine()">
+            <i class="fa fa-refresh" aria-hidden="true"></i>&nbsp;刷新
+        </div>        
+    </div>
+    <div class="equity">
+        <div class="title">
+            <span>VIP权益</span>
+            <span>权益说明<i class="fa fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="main">
+            <ul>
+                <li>
+                    <span><i class="fa fa-umbrella" aria-hidden="true"></i></span>                    
+                    极速提现
+                </li>
+                <li>
+                    <span><i class="fa fa-trophy" aria-hidden="true"></i></span>                    
+                    尊享服务
+                </li>
+                <li>
+                    <span><i class="fa fa-gift" aria-hidden="true"></i></span>                    
+                    加倍收益
+                </li>
+                <li>
+                    <span><i class="fa fa-download" aria-hidden="true"></i></span>                    
+                    全本下载
+                </li>
+            </ul>
+        </div>        
+    </div>
+    <div class="list">
+        <ul>
+            {if condition="$conf.level_1 > 0"}
+            <li>
+                <div class="icons">
+                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
+                </div>
+                <span>时长：{$conf.level_1_day}天</span>
+                <div class="buy">
+                    <span>{$conf.level_1}元</span>
+                    {eq name="$conf.open" value="1"}
+                        <button type="button" b-click="vip.buy(1)">购买</button>
+                    {else/}
+                        <u>禁止购买</u>
+                    {/eq}
+                </div>
+            </li>
+            {/if}
+            {if condition="$conf.level_2 > 0"}
+            <li>
+                <div class="icons">
+                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
+                </div>
+                <span>时长：{$conf.level_2_day}天</span>
+                <div class="buy">
+                    <span>{$conf.level_2}元</span>
+                    {eq name="$conf.open" value="1"}
+                        <button type="button" b-click="vip.buy(2)">购买</button>
+                    {else/}
+                        <u>禁止购买</u>
+                    {/eq}
+                </div>
+            </li>
+            {/if}
+            {if condition="$conf.level_3 > 0"}
+            <li>
+                <div class="icons">
+                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
+                </div>
+                <span>时长：{$conf.level_3_day}天</span>
+                <div class="buy">
+                    <span>{$conf.level_3}元</span>
+                    {eq name="$conf.open" value="1"}
+                        <button type="button" b-click="vip.buy(3)">购买</button>
+                    {else/}
+                        <u>禁止购买</u>
+                    {/eq}
+                </div>
+            </li>
+            {/if}
+            {if condition="$conf.level_4 > 0"}
+            <li>
+                <div class="icons">
+                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
+                </div>
+                <span>时长：{$conf.level_4_day}天</span>
+                <div class="buy">
+                    <span>{$conf.level_4}元</span>
+                    {eq name="$conf.open" value="1"}
+                        <button type="button" b-click="vip.buy(4)">购买</button>
+                    {else/}
+                        <u>禁止购买</u>
+                    {/eq}
+                </div>
+            </li>
+            {/if}
+            {if condition="$conf.level_5 > 0"}
+            <li>
+                <div class="icons">
+                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
+                </div>
+                <span>时长：{$conf.level_5_day}天</span>
+                <div class="buy">
+                    <span>{$conf.level_5}元</span>
+                    {eq name="$conf.open" value="1"}
+                        <button type="button" b-click="vip.buy(5)">购买</button>
+                    {else/}
+                        <u>禁止购买</u>
+                    {/eq}
+                </div>
+            </li>
+            {/if}
+            {if condition="$conf.level_6 > 0"}
+                <li>
+                    <div class="icons">
+                        <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
+                    </div>
+                    <span>时长：{$conf.level_6_day}天</span>
+                    <div class="buy">
+                        <span>{$conf.level_6}元</span>
+                        {eq name="$conf.open" value="1"}
+                            <button type="button" b-click="vip.buy(6)">购买</button>
+                        {else/}
+                            <u>禁止购买</u>
+                        {/eq}
+                    </div>
+                </li>
+            {/if}
+        </ul>
+    </div>
+</div>
+
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right a").attr('href', "{:furl('viplog', [], true, 'home')}").html('记录');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "vip",
+            data: {
+                userinfo: {},
+            },
+            methods: {
+                buy: function (e) {
+                    if(parseInt(e) <= 0) return bui.hint("套餐错误");
+                    var that = this;
+                    if(isWeChat()) {
+                        post("{:furl('v1/createorder', [], true, 'api')}", { "type": "vip", "pid": e, "channel_type": "wechat" }, function (result) {
+                            if (result.code == 0) {
+                                bui.hint({
+                                    content: result.msg,
+                                    onClose: function onClose(e) {
+                                        window.location.href = "{:furl('wechatpay', [], true, 'home')}?order_id=" + result.data.id;
+                                    }
+                                })
+                            } else {
+                                bui.hint(result.msg);
+                            }
+                        });
+                    } else {
+                        post("{:furl('v1/createorder', [], true, 'api')}", { "type": "vip", "pid": e, "channel_type": "alipay" }, function (result) {
+                            if (result.code == 0) {
+                                bui.hint({
+                                    content: result.msg,
+                                    onClose: function onClose(e) {
+                                        window.location.href = "{:furl('alipaypay')}?order_id=" + result.data.id;
+                                    }
+                                })
+                            } else {
+                                bui.hint(result.msg);
+                            }
+                        });
+                    }                
+                },
+                mine: function() {
+                    var that = this;
+                    post("{:furl('v1/mine', [], true, 'api')}", {}, function (result) {
+                        if (result.code == 0) {
+                            that.userinfo = result.data.userinfo || [];
+                            that.isshow = result.data.userinfo.setspwd != 1 ? true : false;
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                }
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                this.mine();               
+            }
+        });
+    })
+</script>
+{/block}

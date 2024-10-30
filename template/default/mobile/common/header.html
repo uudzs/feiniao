@@ -1,0 +1,22 @@
+<div class="bui-page bui-box-vertical">
+    <header>
+       <div class="bui-bar">
+        <div class="bui-bar-left">
+            <a class="bui-btn" onclick="bui.back();"><i class="icon-back"></i></a>
+        </div>
+        <div class="bui-bar-main">{$site_title}</div>
+        <div class="bui-bar-right">
+            <a class="bui-btn" href="{:furl('search', [], true, 'home')}"><i class="icon-search"></i></a>
+        </div>
+       </div>
+    </header>
+    <main>
+        <div class="bui-navbar">
+            <ul class="bui-nav">
+                <li class="bui-btn {if condition="!isset($catid) || empty($catid)"} active{/if}"><a href="{:furl('/', [], true, 'home')}">首页</a></li>
+                {volist name=":model('category')->where(['status' => 1,'pid' => 0])->select()" id="vo"}
+                <li class="bui-btn {if condition="isset($catid) && $catid == $vo.id"} active{/if}"><a href="{:furl('book_cates', ['id'=>$vo.id], true, 'home')}">{$vo.name}</a></li>
+                {/volist}
+            </ul>
+        </div>
+    

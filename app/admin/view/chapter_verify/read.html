@@ -1,0 +1,136 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+.editor {
+	line-height: 2;
+	max-height: 30rem;
+	overflow-y: auto;
+	font-size: 1.0rem;
+}
+</style>
+<form class="layui-form p-4">
+	<h3 class="pb-3">章节审核详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">作者</td>
+			<td>{$detail.author}</td>
+			<td class="layui-td-gray-2">作品</td>
+			<td>《{$detail.btitle}》</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">新标题</td>
+			<td>{$detail.title}</td>
+			<td class="layui-td-gray-2">旧标题</td>
+			<td>{$chapter.title}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">新字数</td>
+			<td>{$detail.wordnum}</td>
+			<td class="layui-td-gray-2">原字数</td>
+			<td>{$chapter.wordnum}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">提交时间</td>
+			<td>{$detail.create_time}</td>
+			<td class="layui-td-gray-2">上次时间</td>
+			<td>{$chapter.create_time|date='Y-m-d H:i:s'}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">新章节内容</td>
+			<td colspan="3"><div class="editor">{$detail.content|raw}</div></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">旧章节内容</td>
+			<td colspan="3"><div class="editor">{$chapter.content|raw}</div></td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="adopt">通过</button>
+		<button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="refuse">拒绝</button>
+		<button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="closes">关闭</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+
+		var form = layui.form, tool = layui.tool;
+
+		//监听提交
+		form.on('submit(adopt)', function (data) {
+			if (data.field.id == '') {
+				layer.msg('ID为空');
+				return false;
+			}
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('dd_chapter_verify/verify')}", data.field, callback);
+			return false;
+		});
+
+		//监听拒绝
+		form.on('submit(refuse)', function (data) {
+			if (data.field.id == '') {
+				layer.msg('ID为空');
+				return false;
+			}
+			layer.prompt({title: "拒绝理由"}, function(val, index) {
+				if (val == '') {
+					layer.msg('拒绝理由为空');
+					return false;
+				}
+				data.field.verifyresult = val;
+				let callback = function (e) {
+					layer.msg(e.msg);
+					if (e.code == 0) {
+						tool.sideClose(1000);
+					}
+				}
+				tool.post("{:url('dd_chapter_verify/verify')}", data.field, callback);
+				return false;
+			});
+			return false;			
+		});
+
+		//监听关闭
+		form.on('submit(closes)', function (data) {
+			tool.sideClose(100);
+			return false;
+		});
+
+		$('.editor').scroll( function() {
+			$('.editor').scrollTop($(this).scrollTop());
+		});
+		//比较相同内容部分
+		var content = $(".editor");
+		var newcontent = content[0].innerHTML;
+		var oldcontent = content[1].innerHTML;
+		var newcontent = newcontent.split('<br>');
+		var oldcontent = oldcontent.split('<br>');
+		console.log(newcontent,oldcontent);
+		for (const k in newcontent) {
+			if (typeof oldcontent[k] !== 'undefined' && newcontent[k] === oldcontent[k]) {
+				newcontent[k] = "<br><span style='background-color: yellow;'>" + newcontent[k] + "</span>";
+				oldcontent[k] = "<br><span style='background-color: yellow;'>" + oldcontent[k] + "</span>";
+			} else {
+				newcontent[k] = "<br>" + newcontent[k] + "</span>";
+				oldcontent[k] = "<br>" + oldcontent[k] + "</span>";
+			}
+		}
+		$('.editor').first().html(newcontent.join(''));
+		$('.editor').last().html(oldcontent.join(''));
+	}
+</script>
+{/block}
+<!-- /脚本 -->

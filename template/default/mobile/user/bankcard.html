@@ -1,0 +1,393 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '银行卡管理';
+{/php}
+{include file="common/header"/}
+<style>
+.bui-btn, [class^=bui-btn] {
+    background-color: unset;
+}
+.upcardbox {
+    background-color: unset!important;
+    background-repeat: no-repeat!important;
+    background-size: contain!important;
+}
+.primary {
+    background-color: #39a4ff!important;
+}
+.danger {
+    background-color: #f9342a!important;
+}
+#listview .bui-btn {
+ align-items: center;
+}
+#listview .bui-btn .bui-icon {
+    border-radius:unset;
+}
+#listview .bui-btn .bui-icon i {
+    color: #03d1a1;
+}
+#listview .bui-btn .time {
+    font-size: .25rem;
+    color: #4b4b4b;
+}
+#listview .bui-btn .pass {
+    color: #03d1a1;
+}
+</style>
+<ul id="listview" class="bui-listview" b-template="card.cardTpl(card.bankcard)"></ul>
+
+<div id="uiDialog" class="bui-dialog">
+    <div class="bui-dialog-head">添加银行卡</div>
+    <div class="bui-dialog-main">
+        <ul class="bui-list">
+            <li class="bui-btn bui-box clearactive">
+                <label class="bui-label">卡主姓名:</label>
+                <div class="span1">
+                    <div class="bui-input">
+                        <input type="text" value="" placeholder="请输入卡主姓名" b-model="card.card.full_name">
+                    </div>
+                </div>
+            </li>
+            <li class="bui-btn bui-box clearactive">
+                <label class="bui-label">银行卡号:</label>
+                <div class="span1">
+                    <div class="bui-input">
+                        <input type="text" value="" placeholder="请输入银行卡号" b-model="card.card.card_no">
+                    </div>
+                </div>
+            </li>
+            <li class="bui-btn bui-box clearactive">
+                <label class="bui-label">选择银行:</label>
+                <div class="span1">
+                    <div class="bui-select" id="select" b-click="card.bankname">请选择</div>
+                </div>
+            </li>
+            <li class="bui-btn bui-box clearactive">
+                <label class="bui-label">银行地址:</label>
+                <div class="span1">
+                    <div class="bui-input">
+                        <input type="text" value="" placeholder="请输入银行地址" b-model="card.card.bank_address">
+                    </div>
+                </div>
+            </li>
+            <li class="bui-btn bui-box clearactive">
+                <label class="bui-label">手机号码:</label>
+                <div class="span1">
+                    <div class="bui-input">
+                        <input type="number" value="" placeholder="请输入手机号码" b-model="card.card.mobile">
+                    </div>
+                </div>
+            </li>            
+            <li class="bui-btn bui-box clearactive">
+                <label class="bui-label">卡片图片:</label>
+                <div class="span1">
+                    <div class="bui-upload upcardbox" style="background-size: cover; background-repeat: no-repeat;">
+                        <div class="span1">
+                            <div id="btnUpload" class="bui-btn" style="height: auto; line-height: normal;margin-bottom: 0;">
+                                <i class="icon-plus large"></i>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </li>
+        </ul>        
+    </div>
+    <div class="bui-dialog-foot">
+        <div class="bui-box">
+            <div class="span1">
+                <div class="bui-btn">取消</div>
+            </div>
+            <div class="span1">
+                <div class="bui-btn blue">确定</div>
+            </div>
+        </div>
+    </div>
+    <div class="bui-dialog-close"><i class="icon-close"></i></div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").html('<span class="bui-btn" b-click="card.add()">添加</span>');
+
+        var uiUpload = bui.upload({
+            showProgress: true,
+        });
+
+        // 上拉菜单 js 初始化:
+        var uiActionsheet = bui.actionsheet({
+            trigger: "#btnUpload",
+            buttons: [{ name: "拍照上传", value: "camera" }, { name: "从相册选取", value: "photo" }],
+            callback: function(e) {
+                var ui = this;
+                var val = $(e.target).attr("value");
+                switch (val) {
+                    case "camera":
+                        ui.hide();
+                        uiUpload.add({
+                            "from": "camera",
+                            // "needCompress": true,
+                            // "width": 300,
+                            "destinationType": "file", //  file | blob | data 
+                            "onSuccess": function(file, data) {
+                                this.start({
+                                    url: "{:furl('v1/upload', [], true, 'api')}",
+                                    data: {
+                                        type: "image",
+                                        file: file
+                                    },
+                                    headers: { Token: token },
+                                    onSuccess: function (res) {                                    
+                                        if (parseInt(res.code) == 0) {
+                                            bs.card.card_image = res.data.filepath;
+                                            $(".upcardbox").css("background", 'url(' + res.data.filepath + ')');
+                                        } else {
+                                            bui.hint(res.msg);
+                                        }
+                                    },
+                                    onFail: function (res) {
+                                        bui.hint('上传失败！');
+                                    }
+                                })
+
+                            }
+                        })
+                        break;
+                    case "photo":
+                        ui.hide();
+                        uiUpload.add({
+                            "from": "",
+                            "onSuccess": function(file, data) {
+                                this.start({
+                                    url: "{:furl('v1/upload', [], true, 'api')}",
+                                    data: {
+                                        type: "image",
+                                        file: file
+                                    },
+                                    headers: { Token: token },
+                                    onSuccess: function (res) {                                    
+                                        if (parseInt(res.code) == 0) {
+                                            bs.card.card_image = res.data.filepath;
+                                            $(".upcardbox").css("background", 'url(' + res.data.filepath + ')');
+                                        } else {
+                                            bui.hint(res.msg);
+                                        }
+                                    },
+                                    onFail: function (res) {
+                                        bui.hint('上传失败！');
+                                    }
+                                })
+                            }
+                        })
+                        break;
+                    case "cancel":
+                        ui.hide();
+                        break;
+                }
+            }
+        })
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "card",
+            data: {
+                userinfo: {},
+                card: {
+                    card_no: '',
+                    bank_name: '',
+                    full_name: '',
+                    card_image: '',
+                    bank_address: '',
+                    mobile: '',
+                },
+                bankcard: [],    
+            },
+            methods: {
+                add: function() {
+                    this.uiDialog.open();
+                },
+                bankname: function() {
+                    var that = this;
+                    var uiSelect = bui.select({
+                        trigger: "#select",
+                        type:"radio",
+                        data: [
+                            {"name":"工商银行","value":"工商银行"},
+                            {"name":"建设银行","value":"建设银行"},
+                            {"name":"农业银行","value":"农业银行"},
+                            {"name":"中国银行","value":"中国银行"},
+                            {"name":"交通银行","value":"交通银行"},
+                            {"name":"邮储银行","value":"邮储银行"},
+                            {"name":"招商银行","value":"招商银行"},
+                            {"name":"兴业银行","value":"兴业银行"},
+                            {"name":"浦发银行","value":"浦发银行"},
+                            {"name":"民生银行","value":"民生银行"},
+                            {"name":"中信银行","value":"中信银行"},
+                            {"name":"华夏银行","value":"华夏银行"},
+                            {"name":"平安银行","value":"平安银行"},
+                            {"name":"广发银行","value":"广发银行"},
+                            {"name":"光大银行","value":"光大银行"},
+                            {"name":"渤海银行","value":"渤海银行"},
+                            {"name":"浙商银行","value":"浙商银行"},
+                            {"name":"恒丰银行","value":"恒丰银行"},
+                            {"name":"浙江网商银行","value":"浙江网商银行"},
+                            {"name":"深圳微众银行","value":"深圳微众银行"},
+                            {"name":"温州民商银行","value":"温州民商银行"},
+                            {"name":"上海华瑞银行","value":"上海华瑞银行"},
+                            {"name":"天津金城银行","value":"天津金城银行"},
+                            {"name":"湖南三湘银行","value":"湖南三湘银行"},
+                            {"name":"重庆富民银行","value":"重庆富民银行"},
+                            {"name":"四川新网银行","value":"四川新网银行"},
+                            {"name":"北京中关村银行","value":"北京中关村银行"},
+                            {"name":"吉林亿联银行","value":"吉林亿联银行"},
+                            {"name":"武汉众邦银行","value":"武汉众邦银行"},
+                            {"name":"福建华通银行","value":"福建华通银行"},
+                            {"name":"威海蓝海银行","value":"威海蓝海银行"},
+                            {"name":"江苏苏宁银行","value":"江苏苏宁银行"},
+                            {"name":"梅州客商银行","value":"梅州客商银行"},
+                            {"name":"安徽新安银行","value":"安徽新安银行"},
+                            {"name":"辽宁振兴银行","value":"辽宁振兴银行"},
+                            {"name":"江西裕民银行","value":"江西裕民银行"}
+                        ],
+                        onChange: function(e) {
+                            that.card.bank_name = e.target.innerText;
+                        }
+                    })
+                },
+                init: function() {
+                    var that = this;
+                    var uiListview = bui.listview({
+                        id: "#listview",
+                        data: [{ "text": "删除", "classname": "danger" }],
+                        position: "right",
+                        callback: function(e) {
+                            var $this = $(e.target);
+                            var text = $this.text();
+                            if (text == '删除') {
+                                bui.confirm("确定要删除吗", function(e) {
+                                    //this 是指点击的按钮
+                                    var text2 = $(e.target).text();
+                                    if (text2 == "确定") {
+                                        // 执行删除整行操作                                        
+                                        var id = $this.parents("li").data('id');
+                                        post("{:furl('v1/delbankcard', [], true, 'api')}", {id: id}, function (result) {
+                                            if (result.code == 0) {                            
+                                                $this.parents("li").fadeOut(300, function() {
+                                                    $(this).remove();
+                                                });
+                                            } else {
+                                                bui.hint(result.msg);
+                                            }
+                                        })                                        
+                                    }
+                                })
+                            }
+                            this.close();
+                        }
+                    });
+                    return uiListview
+                },
+                cardlist: function() {
+                    var that = this;
+                    post("{:furl('v1/bankcard', [], true, 'api')}", {}, function (result) {
+                        if (result.code == 0) {                            
+                            that.bankcard = result.data || [];
+                            that.init();
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });                    
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {
+                cardTpl: function(data) {
+                    var html = "";
+                    data.forEach(function (item, i) {
+                        html += `<li data-id="${item.id}">
+                                <div class="bui-btn bui-box-align-top">
+                                    <div class="bui-icon">`;
+                                        if(item.card_image) {
+                                            html += `<img src="${item.card_image}">`;
+                                        } else {
+                                            html += `<i class="fa fa-credit-card" aria-hidden="true"></i>`;
+                                        }
+                                    html += `</div>
+                                    <div class="span1">
+                                        <h3 class="item-title">${item.bank_name}</h3>
+                                        <p class="item-text">${item.card_no}</p>
+                                    </div>`;
+                                    if(item.auth_status == 1) {
+                                        html += `<span class="time pass">已认证</span>`
+                                    } else {
+                                        html += `<span class="time">认证中</span>`
+                                    }
+                                html += `</div>
+                            </li>`;
+                    });
+                    return html;
+                }
+            },
+            mounted: function () {
+                this.cardlist();
+                this.bankname();
+                var that = this;
+                this.uiDialog = bui.dialog({
+                    id: "#uiDialog",
+                    callback: function callback(e) {
+                        if(e.target.innerText === '取消') {
+                        }
+                        if(e.target.innerText === '确定') {
+                          var data = that.card;
+                            if(!data.full_name) {
+                                bui.hint("请填写卡主姓名");
+                                return false;
+                            }
+                            if(!data.card_no) {
+                                bui.hint("请填写银行卡号");
+                                return false;
+                            }
+                            if(!data.bank_name) {
+                                bui.hint("请选择银行");
+                                return false;
+                            }
+                            if(!data.bank_address) {
+                                bui.hint("请填写银行地址");
+                                return false;
+                            }
+                            if(!data.mobile) {
+                                bui.hint("请填写手机号");
+                                return false;
+                            }
+                            if(!data.card_image) {
+                                bui.hint("请上传卡片图片");
+                                return false;
+                            }
+                            post("{:furl('v1/cardadd', [], true, 'api')}", data, function (result) {
+                                if (result.code == 0) {
+                                    bui.hint({
+                                        content: result.msg,
+                                        onClose: function onClose(e) {
+                                            bui.refresh();
+                                        }
+                                    })
+                                } else {
+                                    bui.hint(result.msg);
+                                }
+                            });
+                            return false;
+                        }
+                    },
+                });
+            }
+        });
+    })
+</script>
+{/block}

@@ -1,0 +1,35 @@
+#scroll .bui-list .bui-box h3 {
+    font-size: .3rem;
+    color: #000;
+    display: block;
+    margin-bottom: .25rem;
+}
+#scroll .bui-list .bui-box .span1 {
+    display: flex;
+    flex-direction: column;
+}
+#scroll .bui-list .bui-box .detail {
+    display: flex;
+    justify-content: space-between;
+}
+#scroll .bui-list .bui-box .detail .right {
+    display: flex;
+    flex-direction: column;
+}
+#scroll .bui-list .bui-box .detail .right a {
+    background: #fff;
+    color: #03d1a1;
+    font-size: .25rem;
+    text-align: center;
+    border-radius: .2rem;
+    padding: .05rem .1rem;
+    border: #03d1a1 1px solid;
+    margin-bottom: .3rem;
+}
+#scroll .bui-list .bui-box .detail .right a:last-child {
+    background: #03d1a1;
+    color: #fff;
+}
+#scroll .bui-list .bui-box .detail .item-text i {
+    margin-right: .1rem;
+}

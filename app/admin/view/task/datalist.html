@@ -1,0 +1,162 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="task" lay-filter="task"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#task',
+			title: '任务列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("task/datalist")}',
+			page: true,
+			limit: 20,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'nickname',
+					title: '用户',
+					align: 'center',
+					width: 200
+				},{
+					field: 'type',
+					title: '任务类型',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.type == 1 ? '一次性任务' : '重复任务';
+					}
+				},{
+					field: 'task_date',
+					title: '日期',
+					align: 'center',
+					width: 100
+				},{
+					field: 'status',
+					title: '状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.status) === 1 ? '<button type="button" class="layui-btn layui-btn-xs">成功</button>' : (parseInt(d.status) === 2 ? '<button type="button" class="layui-btn layui-btn-primary layui-btn-xs layui-btn-disabled">过期</button>' : '<button type="button" class="layui-btn layui-btn-xs layui-btn-normal layui-bg-red">失败</button>');
+					}
+				},{
+					field: 'title',
+					title: '任务名称',
+				},{
+					field: 'reward',
+					title: '奖励',
+					align: 'center',
+					width: 100
+				},{
+					field: 'ip',
+					title: 'IP',
+					align: 'center',
+					width: 100
+				},{
+					field: 'create_time',
+					title: '创建时间',
+					align: 'center',
+					width: 150
+				},{
+					field: 'update_time',
+					title: '更新时间',
+					align: 'center',
+					width: 150
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 136,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(task)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('task/add')}");
+				return false;
+			}
+		});
+
+		//监听表格行工具事件
+		table.on('tool(task)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side('{:url("task/read")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side('{:url("task/edit")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('task/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

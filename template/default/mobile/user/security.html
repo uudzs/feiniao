@@ -1,0 +1,122 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '安全密码';{/php}
+{include file="common/header"/}
+<style>
+    .security {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .security .input {
+        width: 100%;
+        display: block;
+        clear: both;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .security .input input {
+        width: 80%;
+        border-radius: .5rem;
+        border: 1px solid #ccc;
+        padding: .2rem .5rem;
+        text-align: center;
+    }
+
+    .security .input .subbtn {
+        width: 80%;
+        border-radius: .5rem;
+        padding: .2rem .5rem;
+        text-align: center;
+        background: #03d1a1;
+        border: 0;
+        color: #fff;
+        font-size: .28rem;
+    }
+
+    .security .tips {
+        margin-top: 1rem;
+        width: 100%;
+    }
+
+    .security .tips .span1 {
+        width: 80%;
+        margin: 0 auto;
+        text-align: left;
+    }
+</style>
+<div class="security">
+    <div class="input" b-show="security.isshow">
+        <input type="text" value="" placeholder="请输入旧安全密码" b-model="security.oldsecuritypwd">
+    </div>
+    <div class="input">
+        <input type="text" value="" placeholder="请输入安全密码" b-model="security.securitypwd">
+    </div>
+    <div class="input">
+        <button class="subbtn" b-click="security.securitysubmit">设置</button>
+    </div>
+    <div class="tips">
+        <div class="span1">
+            <h3 class="item-title">说明：</h3>
+            <p class="item-text">为了保证您的账户安全，增加了安全密码功能，在支付、修改手机、提现、注销账号时会用于验证身份，防止出现安全问题，请劳记安全密码。</p>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "security",
+            data: {
+                userinfo: {},
+                securitypwd: '',
+                oldsecuritypwd: '',
+                isshow: false
+            },
+            methods: {
+                securitysubmit: function (e) {
+                    if (this.isshow && !this.oldsecuritypwd) return bui.hint("请输入旧安全密码！");
+                    if (!this.securitypwd) return bui.hint("请输入安全密码！");
+                    var that = this;
+                    post("{:furl('v1/security', [], true, 'api')}", { securitypwd: that.securitypwd, oldsecuritypwd: that.oldsecuritypwd }, function (result) {                        
+                        if (result.code == 0) {
+                            bui.hint({
+                                content: result.msg,
+                                onClose: function onClose(e) {
+                                    bui.back();
+                                }
+                            })                            
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                var that = this;
+                post("{:furl('v1/mine', [], true, 'api')}", {}, function (result) {
+                    if (result.code == 0) {
+                        that.userinfo = result.data.userinfo || []
+                        that.isshow = result.data.userinfo.setspwd != 1 ? true : false;
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+            }
+        });
+    })
+</script>
+{/block}

@@ -1,0 +1,44 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/info.css?v={$conf.version}"/>
+{/block}
+{block name="title"}
+<title>{$detail.title}-{$conf.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{$detail.title}" />
+<meta name="description" content="{$detail.introduction}" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index' /}
+<div class="container">
+    <div class="location">
+        <a href="{:url('/')}">首页</a>
+        <a href="{:url('notice')}">公告</a>
+        <span>详情</span>
+    </div>
+    <div class="detail">
+        <h1 class="detail-title">
+            {$detail.title}
+        </h1>
+        <div class="detial-ops">
+            <span>发表于：{:time_format(strtotime($detail.create_time),'m-d')}</span>
+        </div>
+        {notempty name="$detail.images"}
+            <div class="images">
+                <img src="{:get_file($detail.images)}" alt="{$detail.title}">
+            </div>
+        {/notempty}
+        <div id="Detail" class="detial-content">
+            {$detail.advshtml|raw}
+        </div>
+    </div>
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+</script>
+{/block}
+<!-- /脚本 -->

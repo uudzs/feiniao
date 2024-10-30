@@ -1,0 +1,28 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">提现详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">提现人</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">操作员</td>
+			<td>{$detail.admin_id}</td><td class="layui-td-gray-2">税</td>
+			<td>{$detail.tax}</td>
+		</tr><tr><td class="layui-td-gray-2">备注</td>
+			<td>{$detail.notes}</td><td class="layui-td-gray-2">收款账号</td>
+			<td>{$detail.card_id}</td><td class="layui-td-gray-2">提现额</td>
+			<td>{$detail.money}</td>
+		</tr><tr><td class="layui-td-gray-2">金币</td>
+			<td>{$detail.coin}</td><td class="layui-td-gray-2">状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td><td colspan='4'></td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

@@ -1,0 +1,78 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+.content-article img{max-width:88%!important; height:auto!important; margin:6px 0!important; border-radius:4px;}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">文章详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">文章标题</td>
+			<td colspan="3">{$detail.title}</td>
+			<td class="layui-td-gray">所属分类</td>
+			<td>
+			{volist name=":set_recursion(get_article_cate())" id="v"}
+				{eq name="$detail.cate_id" value="$v.id" }{$v.title}{/eq}
+			{/volist}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">关键字</td>
+			<td colspan="3">{$detail.keyword_names}</td>
+			<td class="layui-td-gray">文章属性</td>
+			<td>
+			{eq name="$detail.type" value="1"}精华{/eq}
+			{eq name="$detail.type" value="2"}热门{/eq}
+			{eq name="$detail.type" value="3"}推荐{/eq}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">是否原创</td>
+			<td>
+				{eq name="$detail.original" value="1"}是{/eq}
+				{eq name="$detail.original" value="0"}否{/eq}
+			</td>
+			<td class="layui-td-gray-2">来源或作者</td>
+			<td>{$detail.origin}</td>
+			<td class="layui-td-gray">来源地址</td>
+			<td>{$detail.origin_url}</td>
+		</tr>
+		<tr>			
+			<td class="layui-td-gray">排序</td>
+			<td>{$detail.sort}</td>
+			<td class="layui-td-gray-2">是否首页显示</td>
+			<td>
+				{eq name="$detail.is_home" value="1"}是{/eq}
+				{eq name="$detail.is_home" value="0"}否{/eq}
+			</td>
+			<td rowspan="3" class="layui-td-gray-2">缩略图</td>
+			<td rowspan="3">
+				<img src="{$detail.thumb}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">创建时间</td>
+			<td>{$detail.create_time}</td>
+			<td class="layui-td-gray">状态</td>
+			<td>
+				{eq name="$detail.status" value="1"}正常{/eq}
+				{eq name="$detail.status" value="0"}下架{/eq}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">文章摘要</td>
+			<td colspan="3">{$detail.desc}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">文章内容</td>
+			<td colspan="5" class="content-article">
+				{$detail.content|raw}
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

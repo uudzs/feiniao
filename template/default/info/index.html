@@ -1,0 +1,51 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/notice.css?v={$conf.version}" />
+{/block}
+{block name="title"}
+<title>公告-{$conf.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{$conf.title}" />
+<meta name="description" content="{$conf.title}" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index' /}
+<div class="container">
+    <div class="location">
+        <a href="{:url('/')}">首页</a>
+        <span>公告</span>
+    </div>
+    <div class="infolist" id="news-box">
+        {notempty name="list"}
+            {volist name="$list" id="v"}
+                <div class="row">
+                    <div class="col-sm-5 col-md-4 col-lg-3">
+                        <a class="pic" target="_blank" href="{:url('notice_detail',['id' => $v['id']])}" style="background: #f5fbfd url('{:get_file($v.images)}') no-repeat; background-size: cover;"></a>
+                    </div>
+                    <div class="col-sm-7 col-md-8 col-lg-9">
+                        <div class="tit text-truncate pt-lg-2"> <a target="_blank" href="{:url('notice_detail',['id' => $v['id']])}">{$v.title}</a>
+                        </div>
+                        <div class="date text-secondary"> 日期：{:time_format($v.create_time,'m-d')}</div>
+                        {notempty name="v.introduction"}
+                            <p class="desp mb-0 mt-lg-4 mt-4 mt-sm-2">{:dsubstr($v.introduction,200,'……')}</p>
+                        {else/}
+                            <p class="desp mb-0 mt-lg-4 mt-4 mt-sm-2">--</p>
+                        {/notempty}
+                    </div>
+                </div>
+            {/volist}
+            <div class="pagebar">
+                {$list|raw}
+            </div>
+        {/notempty}
+    </div>
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+</script>
+{/block}
+<!-- /脚本 -->

@@ -1,0 +1,218 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '搜索';{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/search.css" />
+
+<div id="searchbar" class="bui-searchbar bui-box">
+  <div class="span1">
+    <div class="bui-input">
+      <i class="icon-search"></i>
+      <input type="search" value="" placeholder="请输入关键字" />
+    </div>
+  </div>
+  <div class="btn-search">搜索</div>
+</div>
+
+<div class="bui-panel search-panel">
+  <div class="bui-panel-head">最近搜索</div>
+  <div class="bui-panel-main">
+    <ul class="bui-list" b-template="search.tplKeywords(search.keywords)">
+    </ul>
+  </div>
+  <div class="bui-panel-foot">
+    <div class="bui-btn search-remove" b-click="search.clear()">
+      <i class="icon-">&#xe639;</i><span>清空</span>
+    </div>
+  </div>
+</div>
+
+<div class="bui-panel search-tag">
+  <div class="bui-panel-head">
+    搜索热词
+  </div>
+  <div class="bui-panel-main container-y">
+    <div class="bui-fluid-space-3" b-template="search.tplTags(search.tags)">
+    </div>
+  </div>
+</div>
+
+<div id="scrollSearch" class="bui-scroll">
+  <div class="bui-scroll-head"></div>
+  <div class="bui-scroll-main">
+    <ul class="bui-list">
+    </ul>
+  </div>
+  <div class="bui-scroll-foot"></div>
+</div>
+{/block}
+{block name="script"}
+<script>
+  bui.ready(function () {
+
+    $(".footer").hide();
+    $(".bui-navbar").hide();
+    $(".bui-bar-right").css('visibility', 'hidden');
+
+    // 允许存储条数据0为不限制
+    var uiStorage = bui.storage({size: 0});
+
+    // 获取搜索的历史记录
+    let keywords = uiStorage.get("keywords") || [];
+
+    var sl = bui.list({
+      id: "#scrollSearch",
+      url: "{:furl('v1/search', [], true, 'api')}",
+      headers: { Token: token },
+      limit: 10,
+      field: {
+        page: "page",
+        size: "limit",
+        data: "data.data"
+      },
+      data: { client: 5, keywords: '' },
+      template: function (data) {
+        if(data.length <= 0) {
+          $(".search-panel").show();
+          $(".search-tag").show();
+        } else {
+          $(".search-panel").hide();
+          $(".search-tag").hide();
+        }
+        var html = "";
+        data.forEach(function (el, index) {
+          if(el.searchtype == 2) {
+            html += `<li class="bui-btn bui-box">
+              <a href="${el.authorurl}">
+                <div class="thumbnail run bui-sub-bottom" data-sub="作者"><img src="${el.headpic}" alt=""></div>
+                <div class="span1">
+                    <h3 class="item-title">${el.author}</h3>
+                    <p class="item-text">
+                        <time>注册日期：${el.regdate}</time>
+                        <time>已有作品：${el.bookcount}</time>
+                    </p>
+                </div>
+              </a>
+            </li>`
+          } else {
+            html += `<li class="bui-btn bui-box">
+                    <a href="${el.url}">
+                        <div class="bui-thumbnail bui-sub" data-sub="作品"><img src="${el.cover}" alt=""></div>
+                        <div class="span1">
+                          <h3 class="item-title">${el.title}</h3>
+                          <p class="item-text">作者：${el.author}</p>
+                          <p class="item-text">分类：${el.bigcatetitle}</p>
+                          <p class="item-text">字数：${el.words}字</p>
+                        </div>
+                    </a>
+                </li>`
+          }
+        });
+        return html;
+      },
+      onLoaded: function onLoaded(r) {
+          if(parseInt(r.code) > 400) {
+              gettoken();
+          }
+      },
+    });
+
+    var bs = bui.store({
+      el: ".bui-page",
+      scope: "search",
+      data: {
+        keywords: keywords.reverse(),
+        tags: [{
+          keyword: '……'
+        }],
+      },
+      methods: {
+        searchbarInit() {
+          let that = this;
+          return bui.searchbar({
+            id: "#searchbar",
+            callback: function (ui, keyword) {
+              if(keyword) {
+                uiStorage.remove("keywords",keyword);
+                uiStorage.set("keywords", keyword);
+                that.keywords = uiStorage.get("keywords").reverse()
+              }
+              sl.init({
+                page: 1,
+                data: {
+                  client: 5,
+                  "keywords": keyword
+                }
+              }).reload();
+            },
+            onInput: function (ui, keyword) {
+              // 输入实时搜索
+            },
+            onRemove: function (ui, keyword) {
+              sl.init({
+                page: 1,
+                data: {
+                  client: 5,
+                  "keywords": ''
+                }
+              }).reload();
+            }
+          });
+        },
+        clear() {
+          this.keywords = [];
+          uiStorage.remove("keywords");
+        },
+        clickitem(text) {
+          $("#searchbar input").val(text);
+          $(".bui-input").find('.icon-removefill').remove();
+          $(".bui-input").append("<i class='icon-removefill'>");
+          sl.init({
+            page: 1,
+            data: {
+              client: 5,
+              "keywords": text
+            }
+          }).reload();
+        }
+      },
+      watch: {},
+      computed: {},
+      templates: {
+        tplKeywords(data) {
+          let html = "";
+          data.forEach((item, index) => {
+            html += `<li class="bui-btn bui-box data-panel" b-click="search.clickitem('${item}')">
+                            ${item}
+                        </li>`
+          })
+          return html;
+        },
+        tplTags(data) {
+          let html = "";
+          data.forEach((item, index) => {
+            html += `<div class="span1" b-click="search.clickitem('${item.keyword}')">
+                    <div class="bui-btn round">${item.keyword}</div>
+                </div>`
+          })
+          return html;
+        }
+      },
+      mounted: function () {
+        var that = this;
+        // 数据解析后执行
+        searchbar = that.searchbarInit();
+        post("{:furl('v1/keywords', [], true, 'api')}", {limit: 9}, function(result) {
+            if(result.code == 0) {
+              that.tags = result.data || []
+            } else {
+                bui.hint(result.msg);
+            }
+        });
+      }
+    });
+  })
+</script>
+{/block}

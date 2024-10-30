@@ -1,0 +1,476 @@
+{extend name="common/base"/}
+{block name="style"}
+<style type="text/css">
+    .dashboard-num table {width: 100%;}
+    .dashboard-num td {text-align: center; padding: 16px 0; width: 16.6%;border-left: 1px solid #f1f1f1; position: relative;}
+    .dashboard-num td:nth-child(1) { border-left: none}
+    .dashboard-num .num-title { padding-bottom: 10px; color: #999;}
+    .dashboard-num .blue {font-size: 20px; font-weight: 300;}
+    .dashboard-num td .badge {position: absolute;top: 0; right: 0;}
+    .dashboard-num td .badge span { padding: 2px 4px; font-size: 12px; border-radius: 0 0 0 4px;}
+    .dashboard-total td {border-top: 1px solid #f1f1f1}
+    .dashboard-logs .layui-timeline-item {padding-bottom: 1px;}
+    .info-td { width: 90px; text-align: right;background-color: #fafafa; color: #999; padding: 5px 3px;}
+    .info-td {width: 90px; text-align: right;background-color: #fafafa; color: #999; padding: 5px 3px;}
+	.layui-card-body .layui-timeline-title {
+		padding-bottom: 0;
+		font-size: 14px;
+	}
+	.layui-card-body .layui-timeline-item {
+		padding-bottom: 5px;
+	}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+<div class="layui-row layui-col-space12">
+	<div class="layui-col-md8">
+		<div class="layui-row layui-col-space12">
+			<div class="layui-col-md12">
+				<div class="layui-card dashboard-num">
+					<table>
+						<tr>
+						  <td>
+							<div class="num-title">作者</div>
+							<div class="blue">{$authorCount}</div>
+						  </td>
+						  <td>
+							<div class="num-title">用户</div>
+							<div class="blue">{$userCount}</div>
+						  </td>
+						  <td>
+							<div class="num-title">作品</div>
+							<div class="blue">{$bookCount}</div>
+						  </td>
+						  <td>
+							<div class="num-title">订单</div>
+							<div class="blue">{$orderCount}</div>
+						  </td>
+						  <td>
+							<div class="num-title">提现</div>
+							<div class="blue">{$withdrawCount}</div>
+						  </td>
+						  <td>
+							<div class="num-title">举报</div>
+							<div class="blue">{$reportCount}</div>
+						  </td>
+						</tr>
+					</table>
+				</div>
+				<div class="layui-card">
+					<div class="layui-card-title">注册用户</div>
+					<div class="p-3">
+						<table id="UserList" lay-filter="UserList" class="layui-hide"></table>
+					</div>
+				</div>
+				<div class="layui-card">
+					<div class="layui-card-title">最新订单</div>
+					<div class="p-3">
+						<table id="Order" lay-filter="Order" class="layui-hide" style="margin-top:0"></table>
+					</div>
+				</div>
+				<div class="layui-card">
+					<div id="chartView" style="width: 100%;height:300px;"></div>
+				</div>
+				<div class="layui-card">
+					<div id="chartYear" style="width: 100%;height:240px;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="layui-col-md4">
+		<div class="layui-card">
+			<div class="layui-card-title">系统信息</div>
+			<div class="layui-card-body">
+				<table class="layui-table" lay-skin="" lay-size="sm">
+					{if condition="($install == true)"}
+					<tr>
+						<td colspan="4" style="color: #E94335; background-color:#f8f8f8">提醒：发现app目录下的install文件夹没删除，为了系统的安全,请手动去删除。</td>
+					</tr>
+					{/if}
+					<tr>
+						<td class="info-td">操作系统</td>
+						<td>{:get_system_info('os')}</td>
+						<td class="info-td">PHP版本</td>
+						<td>{:get_system_info('php')}</td>
+					</tr>
+					<tr>
+						<td class="info-td">上传限制</td>
+						<td>{:get_system_info('upload_max_filesize')}</td>
+						<td class="info-td">脚本时间</td>
+						<td>{:get_system_info('max_execution_time')}</td>
+					</tr>
+					<tr>
+						<td class="info-td">TP版本</td>
+						<td colspan="3">{$TP_VERSION}<a class="layui-badge layui-bg-blue" style="margin-left:8px" href="https://www.kancloud.cn/manual/thinkphp6_0" target="_blank">TP6文档</a></td>
+					</tr>
+					<tr>
+						<td class="info-td">Layui版本</td>
+						<td colspan="3">{:LAYUI_VERSION}<a class="layui-badge layui-bg-blue" style="margin-left:8px" href="https://layui.dev/docs/2/" target="_blank">Layui文档</a></td>
+					</tr>
+					<tr>
+						<td class="info-td">BUG反馈</td>
+						<td colspan="3"><a class="layui-badge layui-bg-blue" href="https://www.paheng.com/forum-2-1.html" target="_blank">前往反馈</a></td>
+					</tr>
+					<tr>
+						<td class="info-td">QQ交流群</td>
+						<td colspan="3">搜Q群：177260545<br>或点击 <a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=6yTy3PigOA-75YuuIig6wxmfJPIz1fEj&authKey=63BNezoIRTHxZtdhBle5rqntOBwbVwIqt%2FuIZMZFML1OJV8Eq0MsV0TU3GhQsrD6&noverify=0&group_code=177260545" target="_blank" rel="nofollow"><img border="0" src="{__ASSETS__}/init/images/group.png" alt="技术交流群" title="点击链接加入技术交流群" style="vertical-align:middle"></a></td>
+					</tr>
+					<tr>
+						<td class="info-td">开源需要鼓励<br/>鼓励一下作者</td>
+						<td colspan="3">
+							<img src="https://www.paheng.com/static/image/zfb.png" data-event="pay" style="width:50%; max-width:100%; cursor:pointer;" align=center /><img src="https://www.paheng.com/static/image/wx.png" data-event="pay" style="width:50%; max-width:100%; cursor:pointer;"  align=center />
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="layui-card">
+			<div class="layui-card-header"><h3>操作日志</h3><a data-title="操作日志" data-href="{:url('api/log_list')}" class="pull-right tab-a">更多</a></div>
+			<div class="layui-card-body">
+				<ul class="layui-timeline" id="logs"></ul>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script src="{__ASSETS__}/init/echarts.min.js"></script>
+
+<script>
+	function getLogs() {
+		$.ajax({
+			url: "{:url('api/get_log_list')}",
+			type: 'post',
+			data: {
+				page: 1,
+				limit: 20
+			},
+			success: function (e) {
+				if (e.code == 0) {
+					var html = '';
+					$.each(e.data, function (key, value) {
+						html += '<li class="layui-timeline-item">\
+										<i class="layui-icon layui-timeline-axis"></i>\
+										<div class="layui-timeline-content layui-text">\
+										  <div class="layui-timeline-title"><span title="'+ value.id + '">' + value.times + '</span>，' + value.content + '</div>\
+										</div>\
+									  </li>';
+					});
+					$('#logs').html(html);
+				}
+			}
+		})
+	}
+
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool;
+		$('body').on('click','[data-event="pay"]',function(){
+			var src=$(this).attr('src');
+			layer.open({
+				type:1,
+				title:'感谢您给作者的鼓励',
+				content:'<img src="'+src+'" style="width:100%" align=center />',
+			});
+		})
+		getLogs();
+		//注册用户
+		table.render({
+			elem: '#UserList'
+			, url: '{:url("api/get_user_list")}' //数据接口
+			, page: false //开启分页
+			, cols: [[ //表头
+				{ field: 'mobile', title: '手机', templet: function (d) {
+						return d.mobile ? d.mobile : '授权登录用户';
+					}}
+				,{ field: 'nickname', title: '昵称', align: 'center', 'width': 250}
+				,{ field: 'sex', title: '性别','width': 60, align: 'center', templet: function (d) {
+						let str='-';
+						if(d.sex==1){
+							str='男';
+						}
+						else if(d.sex==2){
+							str='女';
+						}
+						return str;
+					}}
+				, {
+					field: 'headimgurl', title: '头像', align: 'center','width': 60, templet: function (d) {
+						var html = '<img src="' + tool.xss(d.headimgurl) + '" width="28" height="28" onerror="javascript:this.src=\'{__ASSETS__}/init/images/nonepic600x360.jpg\';this.onerror=null;"/>';
+						return html;
+					}
+				}
+				, { field: 'login_num', title: '登录次数', align: 'center','width': 100}
+				, { field: 'last_login_time', title: '最后登录时间', align: 'center','width': 168}
+			]]
+		});
+
+		//订单
+		table.render({
+			elem: '#Order'
+			, url: '{:url("api/get_order_list")}' //数据接口
+			, page: false //开启分页
+			, cols: [[ //表头
+				{field: 'order_id', title: '订单号','width': 200, align: 'center'},
+				{field: 'pay_price', title: '金额','width': 100, align: 'center'},
+				{field: 'nickname', title: '下单者', align: 'center'},
+				{field: 'paid', title: '支付状态', align: 'center','width': 100, templet:function(d) {
+							return parseInt(d.paid) === 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+				}},
+				{field: 'add_time', title: '下单时间', align: 'center','width': 150}
+			]]
+		});
+		get_view_data();
+	}
+
+
+	function setHour(num) {
+		var str = num + ':00';
+		if (num < 10) {
+			str = '0' + num + ':00';
+		}
+		return str;
+	}
+	var chartView = echarts.init(document.getElementById('chartView'));
+	function get_view_data() {
+		$.ajax({
+			url: "{:url('api/get_view_data')}",
+			type: 'post',
+			data: {},
+			success: function (e) {
+				if (e.code == 0) {
+					var data_first = e.data.data_first;
+					var data_second = e.data.data_second;
+					archiveCalendar = e.data.data_three;
+					var myDate = new Date();
+					var nowHour = myDate.getHours(); //获取当前小时数(0-23)
+					var xData = [];
+					var yData1 = [];
+					var yData2 = [];
+					$.each(data_first, function (key, value) {
+						if (key <= nowHour) {
+							yData1.push(value);
+						}
+					});
+					$.each(data_second, function (key, value) {
+						xData.push(setHour(key));
+						yData2.push(value);
+					});
+					var ops = {
+						title: {
+							top: '12px',
+							text: '今日与昨日访问统计',
+							left: '10px',
+							textStyle: {
+								fontSize: '18',
+								color: '#333',
+							}
+						},
+						color: ["#1AAD19", "#1890FF"],
+						grid: {
+							left: '16px',
+							right: '30px',
+							bottom: '12px',
+							top: '60px',
+							containLabel: true
+						},
+						tooltip: {
+							trigger: 'axis',
+							axisPointer: {
+								type: 'cross',
+								crossStyle: {
+									color: '#999'
+								}
+							}
+						},
+						toolbox: {
+							show: true,
+						},
+						legend: {
+							data: ["今日", "昨日"],
+							top: '16px',
+						},
+						xAxis: [{
+							type: "category",
+							boundaryGap: !1,
+							data: xData,
+							axisLine: {
+								lineStyle: {
+									color: '#999999',
+									width: 1,
+								}
+							},
+						}],
+						yAxis: [{
+							type: "value",
+							axisLine: {
+								show: true,
+								lineStyle: {
+									color: '#999999',
+									width: 1,
+								}
+							},
+						}],
+						series: [{
+							name: "今日",
+							type: "line",
+							smooth: !0,
+							itemStyle: {
+								normal: {
+									areaStyle: {
+										type: "default",
+										opacity: 0.2
+									}
+								}
+							},
+							data: yData1
+						}, {
+							name: "昨日",
+							type: "line",
+							smooth: !0,
+							itemStyle: {
+								normal: {
+									areaStyle: {
+										type: "default",
+										opacity: 0.2
+									}
+								}
+							},
+							data: yData2
+						}]
+					}
+					chartView.setOption(ops);
+
+
+					let myChart = echarts.init(document.getElementById('chartYear'));
+					let option = {
+						title: {
+							top: '12px',
+							text: '近一年访问统计',
+							left: '10px',
+							textStyle: {
+								fontSize: '18',
+								color: '#333',
+							}
+						},
+						tooltip: {
+							padding: 6,
+							formatter: function (obj) {
+								var value = obj.value;
+								return '<div style="font-size: 12px;">' + value[0] + '：' + value[1] + ' 个访客</div>';
+							}
+						},
+						visualMap: {
+							min: 0,
+							max: 300,
+							show: false,
+							inRange: {
+								color: ['#fafafa', '#1AAD19']
+							}
+						},
+						calendar: {
+							top: 75,
+							left: 50,
+							right: 20,
+							range: getRange(),
+							cellSize: ['auto', 21],
+							splitLine: {
+								lineStyle: {
+									color: '#aaa',
+									type: 'dashed'
+								}
+							},
+							itemStyle: {
+								borderWidth: 0.5
+							},
+							yearLabel: { show: false },
+							monthLabel: {
+								nameMap: 'cn',
+								fontSize: 12
+							},
+							dayLabel: {
+								show: true,
+								formatter: '{start}  1st',
+								fontWeight: 'lighter',
+								nameMap: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+								fontSize: 12
+							}
+						},
+						series: [{
+							type: 'heatmap',
+							coordinateSystem: 'calendar',
+							calendarIndex: 0,
+							data: getDay()
+						}]
+					};
+					myChart.setOption(option);
+
+					setTimeout(function () {
+						window.onresize = function () {
+							chartView.resize();
+							myChart.resize();
+						}
+					})
+					console.log(e.data);
+				}
+			}
+		})
+
+		var archiveCalendar = {};
+		function getRange() {
+			let today = new Date();
+			let tYear = today.getFullYear();
+			let tMonth = today.getMonth() + 1;
+			let tDate = today.getDate();
+			let dateFirst = tYear + "-" + tMonth + "-" + tDate;
+			let datelast = (tYear - 1) + "-" + tMonth + "-" + tDate;
+			let dataRange = [];
+			dataRange.push(dateFirst);
+			dataRange.push(datelast);
+			return dataRange;
+		}
+
+		function getDay() {
+			var today = new Date();
+			var dayArray = [];
+			for (var i = 0; i < 366; i++) {
+				var targetday_milliseconds = today.getTime() - 1000 * 60 * 60 * 24 * i;
+				var date = new Date(targetday_milliseconds);
+				dayArray.push(retunDay(date));
+			}
+			return dayArray;
+		}
+
+		function retunDay(day) {
+			var tYear = day.getFullYear();
+			var tMonth = day.getMonth();
+			var tDate = day.getDate();
+			tMonth = tMonth + 1;
+			if (tMonth.toString().length == 1) {
+				tMonth = "0" + tMonth;
+			}
+			if (tDate.toString().length == 1) {
+				tDate = "0" + tDate;
+			}
+			var dateStr = tYear + "-" + tMonth + "-" + tDate;
+			var dateArray = [];
+			dateArray.push(dateStr);
+			if (archiveCalendar[dateStr]) {
+				dateArray.push(archiveCalendar[dateStr]);
+			}
+			else {
+				dateArray.push(0);
+			}
+			return dateArray;
+		}
+	}
+
+</script>
+{/block}
+<!-- /脚本 -->

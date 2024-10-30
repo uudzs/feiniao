@@ -1,0 +1,244 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="order" lay-filter="order"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#order',
+			title: '订单列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("order/datalist")}',
+			page: true,
+			totalRow: true,
+			limit: 20,
+			cols: [
+				[{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'pid',
+					title: '商品',
+					align: 'center',
+					width: 200,
+					templet:function(d) {
+						return d.product_type == 'vip' ? 'VIP' + d.day + '天套餐' : '--';
+					}
+				},{
+					field: 'order_id',
+					title: '订单号',
+					align: 'center',
+					width: 250
+				},{
+					field: 'trade_no',
+					title: '三方订单号',
+					align: 'center',
+					width: 280,
+					templet:function(d) {
+						return d.trade_no ? d.trade_no : '--';
+					}
+				},{
+					field: 'nickname',
+					title: '用户',
+					align: 'center',
+					width: 250
+				},{
+					field: 'product_type',
+					title: '商品类型',
+					align: 'center',
+					width: 100
+				},{
+					field: 'total_num',
+					title: '订单商品总数',
+					align: 'center',
+					width: 100
+				},{
+					field: 'total_price',
+					title: '订单总价',
+					align: 'center',
+					width: 100,
+					totalRow: '汇总：{{= d.TOTAL_ROW.total_price }}'
+				},{
+					field: 'pay_price',
+					title: '实际支付金额',
+					align: 'center',
+					width: 150,
+					totalRow: '汇总：{{= d.TOTAL_ROW.totalpay_price }}'
+				},{
+					field: 'paid',
+					title: '支付状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.paid) === 1 ? '<button type="button" class="layui-btn layui-btn-xs">成功</button>' : '<button type="button" class="layui-btn layui-btn-xs layui-btn-normal layui-bg-red">失败</button>';
+					}
+				},{
+					field: 'pay_time',
+					title: '支付时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.pay_time ? layui.util.toDateString((parseInt(d.pay_time) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--';
+					}
+				},{
+					field: 'pay_type',
+					title: '支付方式',
+					align: 'center',
+					width: 100
+				},{
+					field: 'add_time',
+					title: '创建时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.add_time ? layui.util.toDateString((parseInt(d.add_time) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--';
+					}
+				},{
+					field: 'status',
+					title: '订单状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.status) === 1 ? '待收货' : (parseInt(d.status) === 0 ? '待发货' : (parseInt(d.status) === 2 ? '已收货' : (parseInt(d.status) === 3 ? '待评价' : d.status === -1 ? '已退款' : '--')));
+					}
+				},{
+					field: 'use_integral',
+					title: '使用金币',
+					align: 'center',
+					width: 100
+				},{
+					field: 'mark',
+					title: '买家备注',
+					align: 'center',
+					width: 250,
+					templet:function(d) {
+						return d.mark ? d.mark : '--';
+					}
+				},{
+					field: 'remark',
+					title: '管理员备注',
+					align: 'center',
+					width: 250,
+					templet:function(d) {
+						return d.remark ? d.remark : '--';
+					}
+				},{
+					field: 'is_channel',
+					title: '支付渠道',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return parseInt(d.is_channel) === 5 ? '支付宝H5' : parseInt(d.is_channel) === 0 ? '微信公众号' : '--';
+					}
+				},{
+					field: 'channel_type',
+					title: '端标识',
+					align: 'center',
+					width: 100
+				},{
+					field: 'virtual_type',
+					title: '虚拟商品',
+					align: 'center',
+					width: 100,
+					templet: function(d) {
+						return parseInt(d.virtual_type) == 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'virtual_info',
+					title: '虚拟商品信息',
+					align: 'center',
+					width: 300
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 100,
+					align: 'center'
+				}]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(order)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('order/add')}");
+				return false;
+			}
+		});
+
+		//监听表格行工具事件
+		table.on('tool(order)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side('{:url("order/read")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side('{:url("order/edit")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('order/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

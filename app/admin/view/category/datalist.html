@@ -1,0 +1,77 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<div class="gg-form-bar border-t border-x" style="padding-bottom:10px">
+		<button class="layui-btn layui-btn-sm add-menu">+ 添加分类</button>
+    </div>
+    <div>
+      <table class="layui-hide" id="category" lay-filter="category"></table>
+    </div> 
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+	<script>
+	const moduleInit = ['tool', 'treeGrid'];
+	function feiniaoInit() {
+		var treeGrid = layui.treeGrid,table = layui.table, tool = layui.tool;
+		var pageTable = treeGrid.render({
+				id:'category'
+				,elem: '#category'
+				,idField:'id'
+				,url:'{:url("category/datalist")}'
+				,treeId:'id'//树形id字段名称
+				,treeUpId:'pid'//树形父id字段名称
+				,treeShowName:'name'//以树形式显示的字段
+				,page:false
+				,cols: [[
+					{field:'id',width:80, title: 'ID号', align:'center'}
+					,{field: 'ordernum', title: '排序', align:'center', width:80}
+					,{field:'name',title: '分类名称'}
+					,{field:'key',width:240, title: '标识'}
+					,{field:'pid', title: '父级ID',width:80, align:'center'}
+					,{field:'icons', title: '图标', width:200,}
+					,{field:'status', title: '状态'}
+					,{width:160,title: '操作', align:'center',templet: function(d){
+						var html = '<span class="layui-btn-group"><span class="layui-btn layui-btn-normal layui-btn-xs" lay-event="add">添加子分类</span><span class="layui-btn layui-btn-xs" lay-event="edit">编辑</span><span class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</span></span>';
+					return html;
+					  }
+					}
+				]]
+			});
+			//表头工具栏事件
+			$('.add-menu').on('click', function(){
+				tool.side("{:url('category/add')}");
+				return;
+			});
+			
+			//操作按钮
+			treeGrid.on('tool(category)',function (obj) {
+				if (obj.event === 'add') {
+					tool.side("{:url('category/add')}?pid="+obj.data.id);
+					return;
+				}
+				if (obj.event === 'edit') {
+					tool.side("{:url('category/edit')}?id="+obj.data.id);
+					return;
+				}
+				if(obj.event === 'del'){
+					layer.confirm('确定要删除吗?', {icon: 3, title:'提示'}, function(index){
+						let callback = function (e) {
+							layer.msg(e.msg);
+							if (e.code == 0) {
+								obj.del();
+							}
+						}
+						tool.delete("{:url('category/del')}", { id: obj.data.id}, callback);
+						layer.close(index);
+					});
+				}
+			});
+		}
+	</script>
+{/block}
+<!-- /脚本 -->

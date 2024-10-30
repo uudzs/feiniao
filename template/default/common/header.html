@@ -1,0 +1,39 @@
+<div class="progress-wrap">
+	<svg class="progress-circle svg-content" width="100%" height="100%" viewbox="-1 -1 102 102">
+		<path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"></path>
+	</svg>
+</div>
+
+<div class="header-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 col-md-3">
+				<div class="logo">
+					<a href="{:url('/')}"><img src="{$conf.logo}" alt="{$conf.title}"></a>
+				</div>
+			</div>
+			<div class="col-lg-9 col-md-9">
+				<div class="top-manu">
+					<ul>
+						{foreach name=":get_navs($pageconf['home_nav'])" item="a"}
+							{empty name="$a.list"}
+								<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'/':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+							{else/}
+								<li>
+									<a href="{$a.src==''?'/':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a>
+									<ul class="sub-manu">
+										{foreach name="$a.list" item="b"}
+										<li><a href="{$b.src==''?'/':$b.src}" {eq name="b.target" value="1" } target="_blank"{/eq}>{$b.title}</a></li>
+										{/foreach}
+									</ul>
+								</li>
+							{/empty}
+						{/foreach}
+						<li><a href="javascript:;" class="login-btn">登录</a></li>
+						<li><a href="{:furl('/', [], true, 'author')}" class="creat-accout-btn" target="_blank">作家中心</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,393 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '章节阅读';{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/chapter.css" />
+<style>
+
+</style>
+<div id="page_reader" class="bui-scroll">
+    <div id="fukerrwowo" data-saact="clickDiver" data-sys="android" data-statid="409">
+        <div class="box2_bg">
+            <div class="box2_bg_l">
+                <div class="box2_bg_bookcover"><img  b-src="chapter.cover" src=""><em></em>
+                </div>
+                <div class="box2_bg_bookinfo">
+                    <div class="box2_btit" b-text="chapter.title"></div>
+                    <div class="prgout">
+                        <div class="progress">
+                            <div class="A_Gray" style="width: 0%; transition-property: width; transition-duration: 1s; transition-timing-function: linear;"></div>
+                        </div>
+                        <div class="Day">阅读进度<span class="freePerNamber" b-text="chapter.speed">0</span>%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="chapterList">
+     
+    </div>
+    <div class="ctl_panel" id="adom_panel">
+        <div class="ctl_bottom">
+            <div class="c_line1">
+                <div class="c_font">
+                    <div class="font_tit">字体</div>
+                    <div class="btn_fontsize font_smaller" b-click="chapter.setFontSize('-')">A-</div>
+                    <div class="font_num" id="adom_reader_font_size">20</div>
+                    <div class="btn_fontsize font_bigger" b-click="chapter.setFontSize('+')">A+</div>
+                </div>
+                <div class="btn_night" id="adom_btn_night" b-click="chapter.toggleNight()"><span>夜间模式</span><i class="fa fa-moon-o" aria-hidden="true"></i></div>
+            </div>
+            <div class="c_line2" b-template="chapter.tplSkin(chapter.SKIN)"></div>
+            <div class="c_line3">
+                <div class="comm_chapter_bar">
+                    <a href="javascript:;" class="c_prev"><i class="fa fa-angle-left" aria-hidden="true"></i><span>上一章</span></a>
+                    <div class="c_vline"></div>
+                    <a href="javascript:;" class="c_clist" b-click="chapter.openDirectory()"><i class="fa fa-navicon" aria-hidden="true"></i><span>目录</span></a>
+                    <div class="c_vline"></div>
+                    <a href="javascript:;" class="c_next"><span>下一章</span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="chapter-top-menu" id="chapter-top-menu">
+    <div class="chapter-top-menu__content">
+        <div class="chapter-top-menu__content-item">
+            <a href="{:furl('/', [], true, 'home')}">
+                <i class="fa fa-home" aria-hidden="true"></i>
+                <p>返回首页</p>
+            </a>
+        </div>
+        <div class="chapter-top-menu__content-item">
+            <a href="{:furl('book_detail',['id'=>$bookid], true, 'home')}">
+                <i class="fa fa-file-text" aria-hidden="true"></i>
+                <p>书籍详情</p>
+            </a>
+        </div>        
+        <div class="chapter-top-menu__content-item">
+            <a href="javascript:void(0)" b-click="chapter.like()">
+                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                <p>章节点赞</p>
+            </a>
+        </div>
+        <div class="chapter-top-menu__content-item">
+            <a href="{:furl('bookshelf', [], true, 'home')}">
+                <i class="fa fa-server" aria-hidden="true"></i>
+                <p>前往书架</p>
+            </a>
+        </div>
+    </div>
+    <div class="chapter-top-menu__btn">
+        <a href="javascript:void(0)" class="chapter-btn" b-click="chapter.bookshelf()"><i class="fa fa-plus" aria-hidden="true"></i>加入书架</a>
+    </div>
+</div>
+<div class="drawer drawer-init">
+    <div class="drawer-bg" style="display: none;" b-click="chapter.closeDirectory()"></div>
+    <div class="cata-title">
+      章节目录
+      <em b-click="chapter.closeDirectory()"><i class="icon-close"></i></em>
+    </div>
+    <div class="drawer-content">
+      <ul>
+        {notempty name="$chapterlsit"}
+          {volist name="chapterlsit" id="v"}
+          <li id="chapterDirectory-{$v.id}" {eq name="v.id" value="$id"}class="active"{/eq}><a href="{$v.chapter_url}">{$v.title}</a></li>
+          {/volist}
+        {/notempty}
+      </ul>
+    </div>    
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".footer").hide();
+        $(".bui-navbar").hide();
+        $(".bui-bar-right a").attr('href', "javascript:;").find('i').removeClass('icon-search').addClass("fa fa-navicon");
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "chapter",
+            data: {
+                cover: '',
+                title: '',
+                speed: 0,
+                isrefresh: false,
+                fid: 0,
+                bookid: '{$bookid}',
+                id: '{$id}',
+                nid: 0,
+                fav: 0,
+                sl: null,
+                CACHEKEY: "fnReader",
+                SIZE: [16, 18, 20, 22, 24, 26, 28, 30],
+                SKIN: {                    
+                    dyb: {
+                        text: "淡雅白",
+                        name: "dyb",
+                        theme: "theme1"
+                    },                    
+                    hyl: {
+                        text: "护眼绿",
+                        name: "hyl",
+                        theme: "theme2"
+                    },
+                    bsl: {
+                        text: "冰爽蓝",
+                        name: "bsl",
+                        theme: "theme3"
+                    },
+                    lmf: {
+                        text: "浪漫粉",
+                        name: "lmf",
+                        theme: "theme4"
+                    },
+                    ypz: {
+                        text: "羊皮纸",
+                        name: "ypz",
+                        theme: "theme5"
+                    }
+                },
+                config: {
+                    mode: 0, //夜间模式
+                    size: 2, //文字大小
+                    skin: "dyb" //主题
+                }
+            },
+            methods: {           
+                render: function() {
+                    1 === this.config.mode ? this.setNight(this.config.mode) : this.setTheme(this.config.skin), this.setFontSize(0);
+                },
+                initialize: function(t) {
+                    let config = storage.get(this.CACHEKEY, 0);
+                    if(config) {
+                        this.config = config;
+                    } else {
+                        storage.set(this.CACHEKEY, this.config);
+                    }
+                    this.render();
+                },    
+                chapter() {
+                    var that = this;
+                    that.sl = bui.list({
+                        id: "#page_reader",
+                        children: ".chapterList",
+                        url: "{:furl('v1/chapter', [], true, 'api')}",
+                        headers: { Token: token },
+                        method: 'POST',
+                        pageSize:1,
+                        commandRefresh: 'prepend',
+                        data: {limit: 1, id: that.id},
+                        field: {
+                            page: "page",
+                            size: "data.per_page",
+                            data: "data.data"
+                        },
+                        template: function (data) {
+                            if(!data[0]) return '';                          
+                            let item = that.sl.getData();                 
+                            if(that.fid > 0) {
+                                that.id = data[0].after_chapter;
+                                that.sl.option("data", {"id": data[0].after_chapter});
+                            } else {                                
+                                that.sl.option("data", {"id": data[0].after_chapter, "fid": data[0].front_chapter});
+                                that.id = data[0].after_chapter;
+                                that.fid = data[0].front_chapter;
+                            }                           
+                            if(that.isrefresh) {
+                                return '';
+                            } else {
+                                return `<div class="chapterName">
+                                            <div class="chapterName-modul">
+                                                <p> ${data[0].chaps} </p><span> ${data[0].title} </span>
+                                            </div>
+                                        </div><div class="content" b-click="chapter.menu($(this))">${data[0].content}</div>
+                                        <div class="chapterName-line"></div>`;
+                            }
+                        },
+                        //刷新前执行
+                        onBeforeRefresh: function onBeforeRefresh() {
+                            if(that.nid == 0) {
+                                that.nid = that.id;
+                            }                            
+                            if(parseInt(that.fid) <= 0) {
+                                that.isrefresh = true;
+                                that.sl.widget("scroll").lockrefresh();
+                                //return bui.hint("没有上一章");
+                            }
+                            that.id = that.fid;                            
+                            that.sl.option("data", {"id": that.fid});
+                            that.fid = 0;
+                        },
+                        //加载前执行
+                        onBeforeLoad: function onBeforeLoad(r) {
+                            console.log("onBeforeLoad",that.id);
+                            if(that.nid > 0) {
+                                that.id = that.nid;                            
+                                that.sl.option("data", {"id": that.nid});
+                            }
+                            if(that.id <= 0) that.sl.widget("scroll").lock();
+                            that.nid = 0;
+                            that.isrefresh = false;
+                        },
+                        //只有第一次初始化并取到数据的时候会执行
+                        onFirstLoad: function onFirstLoad(e) {
+                            console.log("onFirstLoad");
+                        },
+                        //初始化前触发
+                        onBeforeInit: function onBeforeInit(r) {
+                            console.log("onBeforeInit");
+                        },
+                        //刷新数据以后的回调，第一个参数是接口返回数据
+                        onRefreshed: function onRefreshed(r) {
+                            console.log("onRefreshed");
+                        },
+                        //初始化以后触发
+                        onInited: function onInited(r) {
+                            console.log("onInited");
+                        },
+                        //请求数据后执行，第一个参数是接口返回数据
+                        onLoaded: function onLoaded(r) {
+                            console.log("onLoaded",that.id);
+                            if(parseInt(r.code) > 400) {
+                                gettoken();
+                            }
+                            if(!!r.data.data[0]) {
+                                that.cover = r.data.data[0].book.cover;
+                                that.title = r.data.data[0].book.title;
+                                that.speed = r.data.data[0].speed;
+                                $(".A_Gray").css('width', that.speed + '%');
+                                $(".c_prev").attr('href', r.data.data[0].front_url);
+                                $(".c_next").attr('href', r.data.data[0].after_url);                            
+                                $('.drawer-content ul li').removeClass('active');
+                                $('#chapterDirectory-' + r.data.data[0].id).addClass('active');
+                                that.fav = parseInt(r.data.data[0].fav);
+                                if(parseInt(r.data.data[0].fav) > 0) {
+                                    $('.chapter-btn').html('<i class="fa fa-trash-o" aria-hidden="true"></i>删除书架');
+                                }
+                            }
+                        },
+                        //失败的回调
+                        onFail: function onFail(e) {
+                            console.log("onFail", e);
+                        }
+                    })
+                },
+                menu(t) {
+                    $("#adom_panel").toggle().css('transform','none');
+                    $("#chapter-top-menu").toggle();
+                },
+                setTheme: function(t) {
+                    $(".bui-page").attr("class", "bui-page " + this.SKIN[t].theme),
+                    $(".bui-page").find('.font_bgcolor[data-skin="' + t + '"]').addClass("active").siblings().removeClass("active"),
+                    this.config.skin = t,
+                    this.config.mode = 0,
+                    storage.set(this.CACHEKEY, {
+                        mode: 0,
+                        size: this.config.size,
+                        skin: t
+                    })
+                },
+                setFontSize: function(t) {
+                    let size = parseInt(this.config.size);
+                    if(t == '-') {
+                        t = size-1;
+                    } else if (t == '+') {
+                        t = size+1;
+                    } else {
+                        t = size + parseInt(t);
+                    }
+                    this.SIZE.length <= t ? bui.hint({ content:"已达到最大值", position:"center", height: "1rem" }) : t < 0 ? bui.hint({ content:"已达到最小值", position:"center", height: "1rem" }) : ($(".bui-page").find("#adom_reader_font_size").html(this.SIZE[t]),
+                    this.config.size = t,
+                    $("#page_reader").css("font-size", this.SIZE[t]),
+                    this.config.size = t,
+                    storage.set(this.CACHEKEY, {
+                        mode: this.config.mode,
+                        size: t,
+                        skin: this.config.skin
+                    }))
+                },
+                toggleNight: function() {
+                    var t = 1 === this.config.mode ? 0 : 1;
+                    this.setNight(t)
+                },
+                openDirectory: function() {
+                    $('.drawer').removeClass('drawer-init').addClass('drawer-open').find('.drawer-bg').show();         
+                },
+                closeDirectory: function() {
+                    $('.drawer').removeClass('drawer-open').addClass('drawer-init').find('.drawer-bg').hide();
+                },
+                bookshelf: function(t) {
+                    var that = this;
+                    post("{:furl('v1/favorites', [], true, 'api')}", {bookid: that.bookid}, function(result) {
+                        if(result.code == 0) {
+                            if(that.fav > 0) {
+                                that.fav = 0;
+                                $('.chapter-btn').html('<i class="fa fa-plus" aria-hidden="true"></i>加入书架');
+                            } else {
+                                that.fav = result.data.fid;
+                                $('.chapter-btn').html('<i class="fa fa-trash-o" aria-hidden="true"></i>删除书架');
+                            }
+                            bui.hint('操作成功');
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                },
+                setNight: function(t) {
+                    1 === t ? ($(".bui-page").attr("class", "bui-page theme0"), $("#adom_btn_night span").html("日间模式"), $("#adom_btn_night i").attr('class', 'fa fa-circle-o')) : ($("#adom_btn_night span").html("夜间模式"), $("#adom_btn_night i").attr('class', 'fa fa-moon-o'),this.setTheme(this.config.skin)),
+                    this.config.mode = t,
+                    storage.set(this.CACHEKEY, {
+                        mode: t,
+                        size: this.config.size,
+                        skin: this.config.skin
+                    })
+                },
+                like: function() {
+                    var that = this;
+                    post("{:furl('v1/like', [], true, 'api')}", {book_id: that.bookid, chapter_id: that.id}, function(result) {
+                        if(result.code == 0) {
+                            bui.hint('点赞成功');
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                }
+            },
+            watch: {},
+            computed: {},
+            templates: {
+                tplSkin(data) {
+                    let html = '';
+                    if(!data && data.length <= 0) return html;
+                    for (const index in data) {                
+                        const el = data[index];
+                        if(this.config.skin == el.name) {
+                            html += `<div class="font_bgcolor ${el.theme} active" b-click="chapter.setTheme(${index})" data-skin="${el.name}"></div>`;
+                        } else {
+                            html += `<div class="font_bgcolor ${el.theme}" b-click="chapter.setTheme(${index})" data-skin="${el.name}"></div>`;
+                        }
+                    }
+                    return html;
+                }
+            },
+            mounted: function () {
+                var that = this;
+                const viewportHeight = $(window).height();
+                const elementHeight = $('header').height();
+                if(viewportHeight > 0 && elementHeight > 0) {
+                    const bodyHeigt = viewportHeight - elementHeight + 'px';
+                    $("main").css('height', bodyHeigt)
+                }
+                that.initialize();
+                that.chapter();
+            }
+        })
+        $(".bui-bar-right").on("click", ".bui-btn", function() {
+            bs.menu();
+        })
+    })     
+</script>
+{/block}

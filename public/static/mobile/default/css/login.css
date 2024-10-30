@@ -1,0 +1,93 @@
+.bui-page {
+    background-image: linear-gradient(to bottom, #5f7a8d, #5e6c85);
+}
+
+header .bui-bar .bui-bar-left>[class*=bui-btn]>i,
+header .bui-bar .bui-bar-right>[class*=bui-btn]>i,
+header .bui-bar .bui-bar-main {
+    color: #fff;
+}
+
+.logo h1 {
+    font-size: .68rem;
+    color: #fff;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+}
+
+.container {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.bui-box-center {
+    font-size: .28rem;
+}
+
+.login-form {
+    background-color: #fff;
+    -webkit-border-radius: .2rem;
+    border-radius: .2rem;
+    padding: .5rem .3rem;
+}   
+
+.login-form .subtitle {
+    font-size: .36rem;
+    margin-bottom: .2rem;
+}
+
+.login-form .bui-list {
+    overflow: hidden;
+    padding-left: .2rem;
+    padding-right: .2rem;
+}
+
+.login-form .bui-list .bui-btn {
+    border: 0;
+    padding: 0;
+    margin-bottom: .3rem;
+}
+
+.login-form .bui-input {
+    background: #f1f0f0;
+    padding: .15rem .1rem;
+}
+
+.login-form .bui-btn.primary {
+    margin-bottom: .5rem;
+}
+
+.login-form .btn-getcode.disabled {
+    background-color: #f1f0f0;
+    color: #ccc;
+}
+
+.bui-btn-text,
+.login-form label {
+    color: #666;
+}
+
+.login-form .btn-getcode {
+    background: #03d1a1;
+    padding: 0 .3rem;
+    height: .86rem;
+    line-height: .86rem;
+    margin-left: .2rem;
+}
+
+.login-form .bui-list {
+    margin-bottom: .3rem;
+}
+
+.login-form .loginbtn {
+    background: #03d1a1;
+    border: #03d1a1 1px solid;
+}
+.login-form .forgotpwd {
+    display: block;
+    margin-top: .5rem;
+    padding: .15rem .25rem;
+    border-radius: .05rem;
+    color: #fff;
+    border: 0;
+}

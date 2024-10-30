@@ -1,0 +1,92 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+.layui-td-gray {
+    min-width: 200px;
+}
+.layui-form-label {
+    width: 50px;
+}
+.layui-form-item .layui-input-inline {
+    width: 150px;
+}
+</style>
+<form class="layui-form p-4">
+	<h3 class="pb-3">提现设置</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">开启状态</td>
+			<td>
+                {empty name="$config.open"}
+                    <input type="radio" name="open" value="2" title="禁止">
+                    <input type="radio" name="open" value="1" title="开启" checked>
+                {else/}
+                    <input type="radio" name="open" value="2" title="禁止"{eq name="$config.open" value="2"} checked{/eq}>
+                    <input type="radio" name="open" value="1" title="开启"{eq name="$config.open" value="1"} checked{/eq}>
+                {/empty}
+            </td>
+		</tr>
+        <tr>
+            <td class="layui-td-gray">提现范围</td>
+            <td>
+				<div class="layui-form-item" style="margin-bottom: 0;">
+					<div class="layui-input-inline" style="width: 100px;">
+						<input type="text" name="price_min" placeholder="￥" autocomplete="off" class="layui-input"{notempty name="$config.price_min"} value="{$config.price_min}"{/notempty}>
+					</div>
+					<div class="layui-form-mid">-</div>
+					<div class="layui-input-inline" style="width: 100px;">
+						<input type="text" name="price_max" placeholder="￥" autocomplete="off" class="layui-input"{notempty name="$config.price_max"} value="{$config.price_max}"{/notempty}>
+					</div>
+					<div class="layui-form-mid layui-text-em">提现金额为空或为0则不限制</div>
+				</div>
+			</td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">兑换比例</td>
+            <td><input type="text" name="ratio" autocomplete="off" placeholder="1人民币对应金币数量" class="layui-input" {notempty name="$config.ratio"} value="{$config.ratio}"{/notempty}></td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">税点</td>
+            <td><input type="text" name="tax" autocomplete="off" placeholder="提现所要扣除的税点，百分比。" class="layui-input" {notempty name="$config.tax"} value="{$config.tax}"{/notempty}></td>
+        </tr>
+		<tr>
+			<td class="layui-td-gray">提现说明</td>
+			<td><textarea name="description" placeholder="" class="layui-textarea" id="description">{notempty name="$config.description"}{$config.description}{/notempty}</textarea></td>
+		</tr>     
+	</table>
+	<div class="py-3">
+        <input type="hidden" name="id" value="{$id}">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool','tinymce'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool, tinymce = layui.tinymce;
+		var description = tinymce.render({
+			selector: "#description",
+			height: 400
+		});
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			data.field.description = tinyMCE.editors['description'].getContent();
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

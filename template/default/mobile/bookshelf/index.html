@@ -1,0 +1,192 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '书架';{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/bookshelf.css" />
+<div id="bookshelf" class="bui-tab bui-box-vertical">
+    <div class="statusbar">
+        <span b-click="bookshelf.allSelect">全选</span>
+        <span>已选<i>0</i>本书</span>
+        <span b-click="bookshelf.complete">完成</span>
+    </div>
+    <div class="bui-tab-head">
+        <ul class="tab-nav">
+            <li class="tab-item">书架</li>
+            <li class="tab-item">作者</li>
+        </ul>
+    </div>
+    <div class="bui-tab-main">
+        <ul>
+            <li>
+                <!-- 书架 -->
+                <div class="menu">
+                    <div class="today">
+                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                        <span>今日阅读<i b-text="bookshelf.todayreadnum"></i>章节</span>
+                    </div>
+                    <div class="operate">
+                        <a href="{:furl('readlog', [], true, 'home')}">浏览历史</a>
+                        <span b-click="bookshelf.manageBook()">编辑</span>
+                    </div>
+                </div>
+                <div class="booklist">
+                    <ul></ul>
+                    <div class="delbook" b-click="bookshelf.delbook()">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i>                        
+                        <span>删除</span>
+                    </div>
+                </div>
+            </li>
+            <li style="display: none;">
+                <!-- 作者 -->
+                <div class="authorlist">
+                    <ul>
+                        <li>暂无数据</li>                        
+                    </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+  bui.ready(function () {
+    $("header").hide();
+    $(".bui-navbar").hide();
+    $('.bui-bar-left').css('visibility', 'hidden');
+    $('.bui-bar-right').css('visibility', 'hidden');
+    var uiTab = null;
+    // 初始化数据行为存储
+    var bs = bui.store({
+        el: ".bui-page",
+        scope: "bookshelf",
+        data: {
+           booklist: [],
+           authorlist: [],
+           tabindex: 0,
+           todayreadnum: 0
+        },
+        methods: {
+            checked() {
+                if(this.tabindex === 0) {
+                    var ids = $(".booklist input[name='ids[]']").map(function() {
+                        if ($(this).is(':checked')) {  
+                            return this.value;
+                        }
+                    }).get();
+                    $(".statusbar i").text(ids.length);
+                }
+            },
+            delbook() {
+                var that = this;
+                if(that.tabindex === 0) {
+                    var ids = $(".booklist input[name='ids[]']").map(function() {
+                        if ($(this).is(':checked')) {  
+                            return this.value;
+                        }
+                    }).get();
+                    if(ids.length <= 0) return false;
+                    bui.confirm({
+                        content:"确定要删除选中作品吗？",
+                        buttons:["取消","确定"],
+                        callback:function(e){
+                            var text = $(e.target).text();
+                            if( text == "确定") {
+                                post("{:furl('v1/delbookshelf', [], true, 'api')}", {bid: ids.join(',')}, function(result) {
+                                    if(result.code == 0) {
+                                        bui.hint('删除成功');
+                                        bui.refresh();
+                                    } else {
+                                        bui.hint(result.msg);
+                                    }
+                                });                                
+                            }
+                            this.close();
+                        }
+                    })
+                }
+            },
+            complete() {
+                if(this.tabindex === 0) {
+                    $('.statusbar').css('display', 'none');
+                    $(".booklist input[name='ids[]']").hide();
+                    $(".booklist .delbook").hide();
+                    $('.bui-tab-head').show();
+                    $('.menu').show();
+                    $(".booklist input[name='ids[]']").prop("checked", false);
+                    this.checked();
+                }
+            },
+            allSelect() {
+                if(this.tabindex === 0) {
+                    $(".booklist input[name='ids[]']").prop("checked", true);
+                }
+                this.checked();
+            },
+            manageBook() {
+                $('.bui-tab-head').hide();
+                $('.menu').hide();
+                $('.statusbar').css('display', 'flex');
+                $('.booklist .delbook').css('display', 'block');
+                $(".booklist input[name='ids[]']").show();
+            },
+            getBooks() {
+                var that = this;
+                post("{:furl('v1/bookshelf', [], true, 'api')}", {}, function(result) {
+                    if(result.code == 0) {
+                        that.todayreadnum = result.data.todayreadnum;
+                        that.booklist = result.data.data || [];
+                        if(!result.data.data || result.data.data.length <= 0) {
+                            $(".booklist ul").html(`<li class="add"><a href="{:furl('/', [], true, 'home')}">
+                                        <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+                                        <p>去挑书</p></a>
+                                    </li>`);
+                        } else {
+                            var html = "";
+                            result.data.data.forEach(function(el, index) {
+                                html +=`<li>
+                                    <a href="${el.url}">
+                                        <input name="ids[]" type="checkbox" class="bui-choose" b-click="bookshelf.checked()" value="${el.pid}">
+                                        <img src="${el.cover}">
+                                        <h3>${el.title}</h3>
+                                        <p>读到${el.speed}%</p>
+                                    </a>
+                                </li>`
+                            });
+                            $(".booklist ul").html(html + `<li class="add"><a href="{:furl('/', [], true, 'home')}">
+                                        <i class="fa fa-plus-square-o" aria-hidden="true"></i>
+                                        <p>去挑书</p></a>
+                                    </li>`);
+                        }
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+            },
+            getAuthors() {
+                var that = this;
+            }
+        },
+        watch: {},
+        computed: {},
+        templates: {},
+        mounted: function(){
+            var that = this;
+            uiTab = bui.tab({
+                id: "#bookshelf",
+                onTo(index) {
+                    that.tabindex = index;
+                    if(index === 0) that.getBooks();
+                    if(index === 1) that.getAuthors();
+                }
+            });
+            that.getBooks();
+        }
+    })
+    return bs;
+  })
+</script>
+{/block}

@@ -1,0 +1,78 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/report.css?v={$conf.version}" />
+{/block}
+{block name="title"}
+<title>举报-{$conf.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="举报" />
+<meta name="description" content="举报" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index'/}
+<div class="container">
+    <div class="report">
+        <h1>在线举报</h1>
+        <h3 class="febk_bigtit">请在这里留下您举报的内容以及联系方式，以便我们及时将处理结果反馈给您！</h3>
+        <div class="reportbox">
+            <div class="report_formbox">
+                <div class="report_line">
+                    <div class="report_line_t"><span class="report_need">*</span>联系方式(请留下您的手机、QQ号或邮箱，方便联系)</div>
+                    <div>
+                        <div class="report_line_ipt"><input type="text" name="report_contact" id="report_contact" value=""></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="reportbox">
+            <div class="reportsubtit"><span class="report_need">*</span>请详细填写您举报的内容，以便我们快速处理。</div>
+            <div class="report_textbox">
+                <textarea name="report_content" id="report_content" cols="30" rows="10">举报链接{$refererUrl|default="无"}</textarea>
+            </div>
+        </div>
+        <div class="report_submit">
+            <div class="checkercod">
+                <div class="code_ipt"><input type="text" name="code" id="code" value=""></div>
+                <div class="code_img">
+                    {:captcha_img()}
+					<input type="hidden" value="{:make_token()}" />
+                </div>
+            </div>
+            <div class="submit_btn"><button id="doreportBtn" type="submit">发表</button></div>
+        </div>        
+    </div>
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script type="text/javascript">
+    $('#doreportBtn').on('click', function () {
+        var report_contact = $("#report_contact").val();
+        var report_content = $("#report_content").val();
+        var code = $("#code").val();
+        if(!report_contact) return alert('请填写联系方式');
+        if(!report_content) return alert('请填写举报内容');
+        if(!code) return alert('请填写验证码');
+        $.ajax({
+            url: "{:url('report')}",
+            data: {"report_contact": report_contact, "report_content": report_content, "code": code},
+            type: 'post',
+            async: false,
+            success: function (res) {
+                alert(res.msg);
+                if (res.code === 0) {
+                    setTimeout(function () {
+                        window.location.href="{:url('/')}";
+                    }, 1000);
+                } else {
+                    $('[alt="captcha"]').click();
+                    $('input[name="code"]').val('');
+                }
+            }
+        })
+    });
+</script>
+{/block}
+<!-- /脚本 -->

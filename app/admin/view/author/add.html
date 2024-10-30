@@ -1,0 +1,231 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">新建作者</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">昵称<font>*</font></td>
+			<td><input type="text" name="nickname"  lay-verify="required" lay-reqText="请完善昵称" value="" autocomplete="off" placeholder="请输入昵称" class="layui-input"></td><td class="layui-td-gray-2">性别1男2女</td>
+			<td>
+				<input type="radio" name="sex" value="0" title="选项一">
+				<input type="radio" name="sex" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">姓名</td>
+			<td><input type="text" name="true_name"  value="" autocomplete="off" placeholder="请输入姓名" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">手机<font>*</font></td>
+			<td><input type="text" name="mobile"  lay-verify="required" lay-reqText="请完善手机" value="" autocomplete="off" placeholder="请输入手机" class="layui-input"></td><td class="layui-td-gray-2">邮箱</td>
+			<td><input type="text" name="email"  value="" autocomplete="off" placeholder="请输入邮箱" class="layui-input"></td><td class="layui-td-gray-2">qq</td>
+			<td><input type="text" name="qq"  value="" autocomplete="off" placeholder="请输入qq" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">省</td>
+			<td>
+				<select name="province" >
+					<option value="">请选择</option>
+					<option value="1">选项一</option>
+					<option value="2">选项二</option>
+				</select>
+			</td><td class="layui-td-gray-2">市</td>
+			<td>
+				<select name="city" >
+					<option value="">请选择</option>
+					<option value="1">选项一</option>
+					<option value="2">选项二</option>
+				</select>
+			</td><td class="layui-td-gray-2">地区</td>
+			<td>
+				<select name="county" >
+					<option value="">请选择</option>
+					<option value="1">选项一</option>
+					<option value="2">选项二</option>
+				</select>
+			</td>
+		</tr>
+				<tr><td class="layui-td-gray-2">详情地址</td>
+			<td><input type="text" name="address"  value="" autocomplete="off" placeholder="请输入详情地址" class="layui-input"></td><td class="layui-td-gray-2">邮编</td>
+			<td><input type="text" name="postcode"  value="" autocomplete="off" placeholder="请输入邮编" class="layui-input"></td><td class="layui-td-gray-2">身份证号</td>
+			<td><input type="text" name="idcard"  value="" autocomplete="off" placeholder="请输入身份证号" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">银行卡号</td>
+			<td><input type="text" name="bankcard"  value="" autocomplete="off" placeholder="请输入银行卡号" class="layui-input"></td><td class="layui-td-gray-2">开户银行</td>
+			<td>
+				<select name="bankdeposit" >
+					<option value="">请选择</option>
+					<option value="1">选项一</option>
+					<option value="2">选项二</option>
+				</select>
+			</td><td class="layui-td-gray-2">开户行所在省</td>
+			<td>
+				<select name="bankprovince" >
+					<option value="">请选择</option>
+					<option value="1">选项一</option>
+					<option value="2">选项二</option>
+				</select>
+			</td>
+		</tr>
+				<tr><td class="layui-td-gray-2">开户行所在市</td>
+			<td>
+				<select name="bankcity" >
+					<option value="">请选择</option>
+					<option value="1">选项一</option>
+					<option value="2">选项二</option>
+				</select>
+			</td><td class="layui-td-gray-2">完整银行地址</td>
+			<td><input type="text" name="bankaddress"  value="" autocomplete="off" placeholder="请输入完整银行地址" class="layui-input"></td><td class="layui-td-gray-2">工作单位</td>
+			<td><input type="text" name="workunit"  value="" autocomplete="off" placeholder="请输入工作单位" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">固定电话</td>
+			<td><input type="text" name="telephone"  value="" autocomplete="off" placeholder="请输入固定电话" class="layui-input"></td><td class="layui-td-gray-2">密码</td>
+			<td><input type="text" name="password"  value="" autocomplete="off" placeholder="请输入密码" class="layui-input"></td><td class="layui-td-gray-2">生日</td>
+			<td><input type="text" name="birth"  value="" readonly id="laydate_birth" autocomplete="off" placeholder="请选择" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">状态</td>
+			<td>
+				<input type="radio" name="status" value="0" title="选项一">
+				<input type="radio" name="status" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">认证状态</td>
+			<td>
+				<input type="radio" name="authstate" value="0" title="选项一">
+				<input type="radio" name="authstate" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">银行认证状态</td>
+			<td>
+				<input type="radio" name="bankstate" value="0" title="选项一">
+				<input type="radio" name="bankstate" value="1" title="选项二">
+			</td>
+		</tr>
+				<tr><td class="layui-td-gray-2">是否签约</td>
+			<td>
+				<input type="radio" name="issign" value="0" title="选项一">
+				<input type="radio" name="issign" value="1" title="选项二">
+			</td><td colspan='4'></td>
+		</tr><tr><td class="layui-td-gray-2">头像</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_headimg">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_headimg">
+						<img src="" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="headimg" value="" >
+					</div>
+				</div>
+			</td>
+		</tr><tr><td class="layui-td-gray-2">身份证正面</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_idcardpos">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_idcardpos">
+						<img src="" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="idcardpos" value="" >
+					</div>
+				</div>
+			</td>
+		</tr><tr><td class="layui-td-gray-2">身份证反面</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_idcardside">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_idcardside">
+						<img src="" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="idcardside" value="" >
+					</div>
+				</div>
+			</td>
+		</tr><tr><td class="layui-td-gray-2">银行卡照</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_bankcardphoto">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_bankcardphoto">
+						<img src="" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="bankcardphoto" value="" >
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<div class="pt-3">
+		<input type="hidden" name="id" value="0"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		//日期选择
+		layui.laydate.render({
+			elem: '#laydate_birth' //指定元素
+		});
+		//上传头像
+		var upload_headimg = layui.upload.render({
+			elem: '#upload_btn_headimg',
+			url: '{:url("api/upload")}',
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_headimg input').attr('value', res.data.filepath);
+				$('#upload_box_headimg img').attr('src', res.data.filepath);
+			}
+		});//上传身份证正面
+		var upload_idcardpos = layui.upload.render({
+			elem: '#upload_btn_idcardpos',
+			url: '{:url("api/upload")}',
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_idcardpos input').attr('value', res.data.filepath);
+				$('#upload_box_idcardpos img').attr('src', res.data.filepath);
+			}
+		});//上传身份证反面
+		var upload_idcardside = layui.upload.render({
+			elem: '#upload_btn_idcardside',
+			url: '{:url("api/upload")}',
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_idcardside input').attr('value', res.data.filepath);
+				$('#upload_box_idcardside img').attr('src', res.data.filepath);
+			}
+		});//上传银行卡照
+		var upload_bankcardphoto = layui.upload.render({
+			elem: '#upload_btn_bankcardphoto',
+			url: '{:url("api/upload")}',
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_bankcardphoto input').attr('value', res.data.filepath);
+				$('#upload_box_bankcardphoto img').attr('src', res.data.filepath);
+			}
+		});
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('author/add')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

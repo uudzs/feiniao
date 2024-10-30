@@ -1,0 +1,70 @@
+{
+    "name": "paheng/feiniao",
+    "description": "the feiniao project",
+    "type": "project",
+    "keywords": [
+        "xiaoshuo",
+        "read",
+        "feiniao"
+    ],
+    "homepage": "http://feiniao.paheng.net/",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "feiniao",
+            "email": "uudzs@qq.com"
+        }        
+    ],
+    "require": {
+        "php": ">=7.4",
+        "topthink/framework": "^6.1",
+		"topthink/think-filesystem": "^2.0",
+        "topthink/think-orm": "^2.0",
+        "topthink/think-multi-app": "^1.0",
+        "topthink/think-view": "^1.0",
+        "topthink/think-image": "^1.0",
+        "topthink/think-captcha": "^3.0",
+        "phpmailer/phpmailer": "^6.6",
+		"firebase/php-jwt": "^6.1",
+		"symfony/var-exporter": "^5.4",
+		"ezyang/htmlpurifier":"^4.1",
+        "tencentcloud/tencentcloud-sdk-php": "^3.0",
+        "phpoffice/phpspreadsheet": "^2.1",
+        "alibabacloud/dysmsapi-20170525": "^2.0",
+        "zzstudio/think-addons": "^2.0",
+        "aliyuncs/oss-sdk-php": "^2.7",
+        "alibabacloud/sdk": "^1.8",
+        "mpdf/mpdf": "^8.2",
+        "phpoffice/phpword": "^1.2",
+        "liliuwei/thinkphp-jump": "^1.5",
+        "overtrue/pinyin": "^5.3",
+        "endroid/qr-code": "^4.8",
+        "w7corp/easywechat": "^5.30",
+        "yansongda/pay": "^3.7",
+        "hyperf/pimple": "~2.2.0"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^5.4",
+        "topthink/think-trace":"^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app"
+        },
+        "psr-0": {
+            "": "extend/"
+        }
+    },
+    "config": {
+        "preferred-install": "dist",
+        "allow-plugins": {
+            "easywechat-composer/easywechat-composer": true
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "@php think service:discover",
+            "@php think vendor:publish"
+        ]
+    }
+}

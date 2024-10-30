@@ -1,0 +1,32 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/info.css?v={$conf.version}"/>
+{/block}
+{block name="title"}
+<title>{$seotitle}-{$conf.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{$seokeywords}" />
+<meta name="description" content="{$seodescription}" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index' /}
+<div class="container">
+    <div class="detail">
+        <h1 class="detail-title">
+            {$detail.title}
+        </h1>
+		<div class="detial-ops"></div>
+        <div id="Detail" class="detial-content">
+            {$detail.content|raw}
+        </div>
+    </div>
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+</script>
+{/block}
+<!-- /脚本 -->

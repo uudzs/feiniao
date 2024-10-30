@@ -1,0 +1,209 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '';{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/book.css" />
+<style>
+  .book-detail ul li .item-text {
+    display: flex;
+  }
+</style>
+<div class="book-detail">
+  <ul class="bui-list bui-list-thumbnail">
+    <li class="bui-btn bui-box">
+      <div b-if="(book.bookinfo.isfinish==2)" class="bui-thumbnail bui-sub" data-sub="完结"><img b-src="book.bookinfo.cover"></div>
+      <div b-else class="bui-thumbnail"><img b-src="book.bookinfo.cover"></div>
+      <div class="span1">
+        <h3 class="item-title" b-text="book.bookinfo.title"></h3>
+        <p class="item-text">
+          <span b-text="book.bookinfo.bigclassname"></span>&nbsp;/&nbsp;<span b-text="book.bookinfo.smallclassname"></span>
+          <span b-if="(book.bookinfo.isfinish==2)">&nbsp;/&nbsp;已完结</span><span b-else>&nbsp;/&nbsp;连载中</span>
+        </p>
+        <a class="item-text author" b-href="book.bookinfo.authorurl"><i class="icon-user"></i><span b-text="book.bookinfo.author"></span><img b-if="(book.bookinfo.issign==1)" src="{__ASSETS__}/init/images/sign_ico.png"></a>
+      </div>
+      <span class="price" b-text="book.bookinfo.words"></span>      
+    </li>
+  </ul>
+</div>
+<div class="container">
+  <div class="desc">
+    <p b-html="book.bookinfo.remark"></p>
+    <div class="launch"><i class="icon-listdown"></i></div>
+  </div>
+  <div class="tags" b-if="(book.bookinfo.label.length > 0)">
+    <ul b-template="book.tplLabel(book.bookinfo.label)"></ul>
+  </div>
+  <div class="base-line"></div>
+  <div class="center_directory">
+    <ul class="bui-list">
+      <li class="bui-btn bui-box">
+          <div class="icon"><i class="icon-menu"></i></div>
+          <div class="span1">章节目录</div>
+          <div class="item-text" b-if="(book.bookinfo.chaptertime.length>0)">
+              <span b-text="book.bookinfo.chaptertime"></span>更新至第<span b-text="book.bookinfo.last_chapter.chaps"></span>章
+          </div>
+          <div class="item-text" b-else>还没有章节</div>
+          <i class="icon-listright"></i>
+      </li>
+    </ul>
+  </div>
+
+  <div class="drawer drawer-init">
+    <div class="drawer-bg" style="display: none;"> </div>
+    <div class="cata-title">
+      章节目录
+      <em><i class="icon-close"></i></em>
+    </div>
+    <div class="drawer-content">
+      <ul b-template="book.tplChapterList(book.bookinfo.chapter)"></ul>
+    </div>    
+  </div>
+
+  <div class="similar bui-scroll">
+    <div class="section-title">同类推荐</div>
+    <ul class="bui-list bui-list-pic bui-scroll-main"></ul>
+  </div>
+
+  <div class="foot">
+    <div class="bui-btn ring cancelfav" b-if="(book.bookinfo.fav.id > 0)">取消书架</div>
+    <div class="bui-btn ring addfav" b-else>加入书架</div>  
+    <a class="bui-btn ring success" b-href="book.bookinfo.chapter_url">开始阅读</a>
+  </div>
+
+</div>
+{/block}
+{block name="script"}
+<script>
+  bui.ready(function () {
+    $(".footer").hide();
+    $(".bui-navbar").hide();
+
+    var bs = bui.store({
+        el: ".bui-page",
+        scope: "book",
+        data: {
+            bookinfo: {},
+            code: '',
+            bid: parseInt('{$bid}')
+        },
+        methods: {},
+        watch: {},
+        computed: {},
+        templates: {
+          tplLabel: function(data) {
+            let html = "";
+            data.forEach(function (item, i) {
+              html += `<li>${item}</li>`;
+            });
+            return html;
+          },
+          tplChapterList: function (data) {
+            let that = this;
+            let html = "";
+            data.forEach(function (item, i) {
+              if(that.bookinfo.chapter_url == item.chapter_url) {
+                html += `<li class="active"><a href="${item.chapter_url}">${item.title}</a></li>`;
+              } else {
+                html += `<li><a href="${item.chapter_url}">${item.title}</a></li>`;
+              }
+            });
+            return html;
+          }
+        },
+        mounted: function () {
+            var that = this;
+            post("{:furl('v1/bookdetail', ['id' => $bid], true, 'api')}", {}, function(result) {
+                if(result.code == 0) {
+                    that.bookinfo = result.data || [];     
+                    $('.bui-page').css('background', 'url("' + result.data.cover + '") center top / contain no-repeat;');
+
+                    var sl = bui.list({
+                      id: ".similar",
+                      url: "{:furl('v1/booklist', [], true, 'api')}",
+                      headers: { Token: token },
+                      pageSize: 9,
+                      field: {
+                        page: "page",
+                        size: "limit",
+                        data: "data.data"
+                      },
+                      data: { genre: result.data.genre, bookid: result.data.id },
+                      template: function (data) {
+                        var html = "";
+                        0 < data.length ? data.forEach(function (el, index) {
+                          html += `<li>
+                                      <a href="${el.url}">
+                                      <div class="bui-pic">
+                                          <div class="bui-pic-img"><img src="${el.cover}"></div>
+                                          <div class="bui-pic-title">${el.title}</div>
+                                      </div>
+                                      </a>
+                                    </li>`
+                        }) : html += '<p>无内容</p>';
+                        return html;
+                      },
+                      onLoaded: function onLoaded(r) {
+                          if(parseInt(r.code) > 400) {
+                              gettoken();
+                          }
+                      },
+                    });
+                } else {
+                    bui.hint(result.msg);
+                }
+            });
+        }
+    });
+
+    $('.launch').click(function() {
+      if($(this).find('i').attr('class') == 'icon-listdown') {
+        $('.container .desc').addClass('more');
+        $(this).find('i').removeClass('icon-listdown').addClass('icon-listup');
+      } else {
+        $('.container .desc').removeClass('more');
+        $(this).find('i').removeClass('icon-listup').addClass('icon-listdown');
+      }
+    })
+
+    $('.center_directory').click(function() {
+      $('.drawer').removeClass('drawer-init').addClass('drawer-open').find('.drawer-bg').show();
+    })
+
+    $('.drawer-bg').click(function() {
+      $('.drawer').removeClass('drawer-open').addClass('drawer-init').find('.drawer-bg').hide();
+    })
+
+    $('.cata-title em').click(function() {
+      $('.drawer').removeClass('drawer-open').addClass('drawer-init').find('.drawer-bg').hide();
+    })
+
+    $('.addfav').click(function() {
+      var postData = {bookid: bs.bookinfo.id};
+      post("{:furl('v1/favorites', [], true, 'api')}", postData, function(result) {
+          if(result.code == 0) {
+            bui.hint('操作成功');
+            $(".addfav").hide();
+            $(".cancelfav").show();
+          } else {
+              bui.hint(result.msg);
+          }
+      });
+    })
+
+    $('.cancelfav').click(function() {
+      var postData = {bookid: bs.bookinfo.id};
+      post("{:furl('v1/favorites', [], true, 'api')}", postData, function(result) {
+          if(result.code == 0) {
+            bui.hint('操作成功');
+            $(".cancelfav").hide();
+            $(".addfav").show();
+          } else {
+              bui.hint(result.msg);
+          }
+      });
+    })
+  })
+</script>
+{/block}

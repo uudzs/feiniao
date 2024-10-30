@@ -1,0 +1,219 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '邀请';{/php}
+{include file="common/header"/}
+{php}
+$conf = get_system_config('reward');
+$inviteconf = get_system_config('invite');
+$bglist = [];
+if (!empty($inviteconf['bglist'])) {
+    $bglist = explode(',', $inviteconf['bglist']);
+}
+{/php}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/invite.css" />
+<div class="invite">
+    <h3>每次邀请 1 位好友获得金币约</h3>
+    <h1>{$conf.invite_reward}</h1>
+    <div class="invite-code">
+       我的邀请码：<span b-text="invite.userinfo.qrcode_invite">未登录</span>
+        <div class="btn" b-click="invite.copyTextToClipboard(invite.userinfo.qrcode_invite)">复制</div>
+    </div>
+    <a href="javascript:;" class="invitation"  b-click="invite.copyTextToClipboard(invite.userinfo.qrcode_invite)">点击复制邀请链接</a>
+    <div class="menu-list">
+        <div class="sub-title">我如何获得奖励？</div>
+        <div class="item-title">让您的朋友按以下操作可获得三次奖励！</div>
+        <ul class="bui-list">
+            <li class="bui-btn bui-box bui-sub" data-sub="1">
+                <img src="{__MOBILE__}/default/image/coin.png" alt="">
+                <h5 class="item-title">{$conf.invite_1_level}</h3>
+                <p class="item-text">注册成功后</p>
+                <p class="item-text">首次阅读章节</p>
+            </li>
+            <li class="bui-btn bui-box bui-sub" data-sub="2">
+                <img src="{__MOBILE__}/default/image/coin.png" alt="">
+                <h5 class="item-title">{$conf.invite_2_level}</h3>
+                <p class="item-text">注册后连续3天</p>
+                <p class="item-text">阅读章节</p>
+            </li>
+            <li class="bui-btn bui-box bui-sub" data-sub="3">
+                <img src="{__MOBILE__}/default/image/coin.png" alt="">
+                <h5 class="item-title">{$conf.invite_3_level}</h3>
+                <p class="item-text">注册后连续7天</p>
+                <p class="item-text">阅读章节</p>
+            </li>
+        </ul>
+    </div>
+    <div class="menu-list">
+        <div class="sub-title">邀请步骤</div>
+        <div class="item-title">邀请朋友如果没有自动绑定，可单独复制邀请码给您的朋友，让其在【我的】菜单中输入邀请码完成绑定关系！</div>
+        <ul class="list">
+            <li>
+                <span class="icon">
+                    <i class="fa fa-external-link-square" aria-hidden="true"></i>
+                </span>
+                <span>
+                    <h4>1、单击按钮复制邀请链接</h4>
+                    <p>将链接分享给您的朋友。</p>
+                </span>
+            </li>
+            <li>
+                <span class="icon">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                </span>                
+                <span>
+                    <h4>2、您的朋友通过您的链接完成注册</h4>
+                    <p>您朋友注册后将自动成为邀请关系。</p>
+                </span>
+            </li>
+            <li>
+                <span class="icon">
+                    <i class="fa fa-gift" aria-hidden="true"></i>
+                </span>
+                <span>
+                    <h4>3、您好友完成阅读任务，您可获得奖励</h4>
+                    <p>您好友满足以上条件您将获得奖励。</p>
+                </span>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="dialogCenter" class="bui-dialog bui-dialog-center" style="display: none;">
+    <div class="bui-dialog-head">邀请海报模板</div>
+    <div class="bui-dialog-main">
+        <div class="theme">
+            {notempty name="$bglist"}                        
+                {volist name="bglist" id="v"}
+                    <div class="theme-item">
+                        <img src="{$v}">
+                        <div>
+                            <button class="btn" b-click="invite.themeview('{$v}')">查看</button>
+                        </div>
+                    </div>
+                {/volist}
+            {/notempty}
+        </div>
+    </div>
+    <div class="bui-dialog-foot">
+        <div class="bui-box">
+            <div class="span1">
+                <div class="bui-btn">取消</div>
+            </div>
+            <div class="span1">
+                <div class="bui-btn blue">确定</div>
+            </div>
+        </div>
+    </div>
+    <div class="bui-dialog-close"><i class="icon-close"></i></div>
+</div>
+{/block}
+{block name="script"}
+<script>
+  bui.ready(function () {
+    $(".bui-navbar").hide();
+    $('.bui-bar-left').css('visibility', 'hidden');
+    $(".bui-bar-right a").attr('href', "javascript:;").html('邀请海报 <i class="fa fa-id-badge" aria-hidden="true"></i>');
+    var uiDialog = null;
+    // 初始化数据行为存储
+    var bs = bui.store({
+        el: ".bui-page",
+        scope: "invite",
+        data: {
+           userinfo: {},
+        },
+        methods: {
+            async copyTextToClipboard(text) {                
+                var protocol = window.location.protocol; // 获取协议
+                var hostname = window.location.hostname; // 获取域名
+                text = protocol + '//' + hostname + '/i/' + text;
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    const success = await document.execCommand('copy');
+                    if (success) {
+                        bui.hint('复制成功');
+                    } else {
+                        bui.hint('复制失败');
+                    }
+                } catch (error) {
+                    bui.hint('复制失败');
+                }
+                document.body.removeChild(textarea);
+            },
+            setskin() {
+                uiDialog = bui.dialog({
+                    id: "#dialogCenter",
+                    height: '80%',
+                    zIndex: 300,
+                    dragable: true,
+                    mask: false,
+                    touch: {
+                    onDragend: function onDragend() {
+                        // 移动后还原位置
+                        this.reset();
+                    }
+                    },
+                    callback: function callback(e) {
+                        console.log(e.target);
+                    }
+                }).open();
+            },
+            themeview(path) {
+                var that = this;
+                post("{:furl('v1/invitetheme', [], true, 'api')}", {path: path}, function(result) {
+                    if(result.code == 0) {
+                        var dialog = bui.dialog();
+                        dialog.create({
+                            title:"查看邀请海报", 
+                            zIndex: 400, 
+                            fullscreen: true,
+                            autoClose: false,
+                            mask: false,
+                            render: true,
+                            buttons:  [{name:"<i class=\"icon-close\"></i>",className:"bui-dialog-close"},{name: "<span data-url='"+result.data.path+"'>下载</span>",className:"poster-down"}], 
+                            content:"<div class='poster'><img src='" + result.data.path + "' width='100%'></div>",
+                        }).open();
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+            },
+        },
+        watch: {},
+        computed: {},
+        templates: {
+        },
+        mounted: function(){
+            var that = this;
+            post("{:furl('v1/mine', [], true, 'api')}", {}, function(result) {
+                if(result.code == 0) {
+                    that.userinfo = result.data.userinfo || []
+                } else {
+                    bui.hint(result.msg);
+                }
+            });
+        }
+    })
+
+    $(document).on('click', '.bui-bar-right a', function() {
+       bs.setskin();
+    })
+
+    $(document).on('click', '.poster-down', function() {
+        let imageUrl = $(this).find('span').data('url');
+        if(!imageUrl) return false;
+        var downloadUrl = imageUrl + '?download=邀请海报.jpg';  
+        var link = $('<a>')
+            .attr('href', downloadUrl)
+            .attr('download', '邀请海报.jpg')
+            .hide()
+            .appendTo('body');
+        link[0].click();
+        link.remove();
+    });
+  })
+</script>
+{/block}

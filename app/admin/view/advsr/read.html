@@ -1,0 +1,39 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">广告列表详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">广告标题</td>
+			<td>{$detail.title}</td><td class="layui-td-gray-2">标题颜色</td>
+			<td>{$detail.color}</td><td class="layui-td-gray-2">链接类型</td>
+			<td>
+				{eq name="$detail.type" value="0"}选项一{/eq}
+				{eq name="$detail.type" value="1"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">描述</td>
+			<td>{$detail.introduction}</td><td class="layui-td-gray-2">链接地址</td>
+			<td>{$detail.link}</td><td class="layui-td-gray-2">作品ID集</td>
+			<td>{$detail.books}</td>
+		</tr><tr><td class="layui-td-gray-2">优先级</td>
+			<td>{$detail.level}</td><td class="layui-td-gray-2">状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">开始时间</td>
+			<td>{$detail.start_time|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">结束时间</td>
+			<td>{$detail.end_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">广告位置</td>
+			<td colspan="5">{$detail.adver_id}</td>
+		</tr><tr><td class="layui-td-gray-2">图片地址</td>
+			<td colspan="5">
+				<img src="{$detail.images}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

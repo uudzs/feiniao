@@ -1,0 +1,221 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+.layui-td-gray {
+    min-width: 200px;
+}
+</style>
+<form class="layui-form p-4">
+	<h3 class="pb-3">奖励设置</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">签到状态</td>
+			<td colspan="5">
+                {empty name="$config.open"}
+                <input type="radio" name="open" value="2" title="禁止">
+				<input type="radio" name="open" value="1" title="开启" checked>
+                {else/}
+                <input type="radio" name="open" value="2" title="禁止"{eq name="$config.open" value="2"} checked{/eq}>
+				<input type="radio" name="open" value="1" title="开启"{eq name="$config.open" value="1"} checked{/eq}>
+                {/empty}
+            </td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">连续签到奖励</td>
+			<td colspan="5">
+				<div class="layui-form-item">
+                    <div class="layui-inline">                        
+                        <div class="layui-form-mid">第一天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_1_reward"}
+                                <input type="number" value="1" name="day_1_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_1_reward}" name="day_1_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>                        
+                        <div class="layui-form-mid">第二天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_2_reward"}
+                                <input type="number" value="1" name="day_2_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_2_reward}" name="day_2_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>
+                        <div class="layui-form-mid">第三天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_3_reward"}
+                                <input type="number" value="1" name="day_3_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_3_reward}" name="day_3_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>                        
+                        <div class="layui-form-mid">第四天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_4_reward"}
+                                <input type="number" value="1" name="day_4_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_4_reward}" name="day_4_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>
+                        <hr>
+                        <div class="layui-form-mid">第五天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_5_reward"}
+                                <input type="number" value="1" name="day_5_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_5_reward}" name="day_5_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>
+                        <div class="layui-form-mid">第六天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_6_reward"}
+                                <input type="number" value="1" name="day_6_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_6_reward}" name="day_6_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>
+                        <div class="layui-form-mid">第七天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_7_reward"}
+                                <input type="number" value="1" name="day_7_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_7_reward}" name="day_7_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>
+                        <div class="layui-form-mid">超七天</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.day_8_reward"}
+                                <input type="number" value="1" name="day_8_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.day_8_reward}" name="day_8_reward" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>  
+                    </div>
+                </div>
+			</td>
+		</tr>
+        <tr>
+			<td colspan="6"><hr></td>
+		</tr>
+        <tr>
+            <td class="layui-td-gray">收款账号奖励ID</td>
+            <td colspan="2"><input type="text" name="account_id" autocomplete="off" placeholder="请输入，不可重复" class="layui-input" {notempty name="$config.account_id"} readonly value="{$config.account_id}"{else/} value="{:set_salt()}"{/notempty}></td>
+            <td class="layui-td-gray">收款账号奖励</td>
+            <td colspan="2"><input type="number" name="account" autocomplete="off" placeholder="请输入收款账号奖励" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.account"} value="{$config.account}"{/notempty}></td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">绑定手机号奖励ID</td>
+            <td colspan="2"><input type="text" name="mobile_id" autocomplete="off" placeholder="请输入，不可重复" class="layui-input" {notempty name="$config.mobile_id"} readonly value="{$config.mobile_id}"{else/} value="{:set_salt()}"{/notempty}></td>
+            <td class="layui-td-gray">绑定手机号奖励</td>
+            <td colspan="2"><input type="number" name="mobile" autocomplete="off" placeholder="请输入绑定手机号奖励" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.mobile"} value="{$config.mobile}"{/notempty}></td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">成为作者奖励ID</td>
+            <td colspan="2"><input type="text" name="author_id" autocomplete="off" placeholder="请输入，不可重复" class="layui-input" {notempty name="$config.author_id"} readonly value="{$config.author_id}"{else/} value="{:set_salt()}"{/notempty}></td>
+            <td class="layui-td-gray">成为作者奖励</td>
+            <td colspan="2"><input type="number" name="author" autocomplete="off" placeholder="请输入成为作者奖励" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.author"} value="{$config.author}"{/notempty}></td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">成为VIP奖励ID</td>
+            <td colspan="2"><input type="text" name="vip_id" autocomplete="off" placeholder="请输入，不可重复" class="layui-input" {notempty name="$config.vip_id"} readonly value="{$config.vip_id}"{else/} value="{:set_salt()}"{/notempty}></td>
+            <td class="layui-td-gray">成为VIP奖励</td>
+            <td colspan="2"><input type="number" name="vip" autocomplete="off" placeholder="请输入成为VIP奖励" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.vip"} value="{$config.vip}"{/notempty}></td>
+        </tr>
+        <tr>
+			<td colspan="6"><hr></td>
+		</tr>
+        <tr>
+            <td class="layui-td-gray">每日阅读章节奖励ID</td>
+            <td><input type="text" name="chapter_id" autocomplete="off" placeholder="请输入，不可重复" class="layui-input" {notempty name="$config.chapter_id"} readonly value="{$config.chapter_id}"{else/} value="{:set_salt()}"{/notempty}></td>
+            <td class="layui-td-gray">每日阅读章节数</td>
+            <td><input type="number" name="chapter_number" autocomplete="off" placeholder="请输入每日阅读章节数" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.chapter_number"} value="{$config.chapter_number}"{/notempty}></td>
+            <td class="layui-td-gray">每日阅读章节奖励</td>
+            <td><input type="number" name="chapter_reward" autocomplete="off" placeholder="请输入每日阅读章节奖励" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.chapter_reward"} value="{$config.chapter_reward}"{/notempty}></td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">每日点赞奖励ID</td>
+            <td><input type="text" name="like_id" autocomplete="off" placeholder="请输入，不可重复" class="layui-input" {notempty name="$config.like_id"} readonly value="{$config.like_id}"{else/} value="{:set_salt()}"{/notempty}></td>
+            <td class="layui-td-gray">每日点赞奖励次数</td>
+            <td><input type="number" name="like_number" autocomplete="off" placeholder="请输入每日点赞奖励次数" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.like_number"} value="{$config.like_number}"{/notempty}></td>
+            <td class="layui-td-gray">每日点赞奖励奖励</td>
+            <td><input type="number" name="like_reward" autocomplete="off" placeholder="请输入每日点赞奖励奖励" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.like_reward"} value="{$config.like_reward}"{/notempty}></td>
+        </tr>
+        <tr>
+			<td colspan="6"><hr></td>
+		</tr>
+        <tr>
+            <td class="layui-td-gray">邀请一个好友奖励</td>
+            <td colspan="5"><input type="number" name="invite_reward" autocomplete="off" placeholder="请输入邀请好友奖励" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.invite_reward"} value="{$config.invite_reward}"{/notempty}></td>
+        </tr>
+        <tr>
+			<td class="layui-td-gray">邀请好友奖励阅读奖励</td>
+			<td colspan="5">
+				<div class="layui-form-item">
+                    <div class="layui-inline">                        
+                        <div class="layui-form-mid">注册当天首次阅读章节</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.invite_1_level"}
+                                <input type="number" value="1" name="invite_1_level" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.invite_1_level}" name="invite_1_level" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>                        
+                        <div class="layui-form-mid">注册开始连续3天阅读章节</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.invite_2_level"}
+                                <input type="number" value="1" name="invite_2_level" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.invite_2_level}" name="invite_2_level" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>
+                        <div class="layui-form-mid">注册开始连续7天阅读章节</div>
+                        <div class="layui-input-inline" style="width: 100px;">
+                            {empty name="$config.invite_3_level"}
+                                <input type="number" value="1" name="invite_3_level" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {else/}
+                                <input type="number" value="{$config.invite_3_level}" name="invite_3_level" placeholder="" autocomplete="off" class="layui-input" min="0" step="1" lay-affix="number">
+                            {/empty}
+                        </div>                     
+                    </div>
+                </div>
+			</td>
+		</tr>
+        <tr>
+			<td colspan="6"><hr></td>
+		</tr>
+        <tr>
+            <td class="layui-td-gray">VIP会员奖励倍数</td>
+            <td colspan="5"><input type="number" name="vip_reward" autocomplete="off" placeholder="请输入VIP会员奖励倍数，1倍等于不奖励。" class="layui-input" min="0" step="1" lay-affix="number" {notempty name="$config.vip_reward"} value="{$config.vip_reward}"{/notempty}></td>
+        </tr>
+	</table>
+	<div class="py-3">
+        <input type="hidden" name="id" value="{$id}">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

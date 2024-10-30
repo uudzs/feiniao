@@ -1,0 +1,244 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    #upload-demo-preview {
+        display: flex;
+    }
+
+    #upload-demo-preview li {
+        display: block;
+    }
+
+    #upload-demo-preview li .layui-progress {
+        margin-top: 10px;
+    }
+    #upload-list td {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+</style>
+<form class="layui-form p-4">
+    <h3 class="pb-3">邀请设置</h3>
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">模板说明</td>
+            <td>
+                <blockquote class="layui-elem-quote">
+                    <p>规范说明：</p>
+                    <p>1、标签{sitename} 表示网站名称。</p>
+                    <p>2、标签{nickname} 表示用户昵称。</p>
+                </blockquote>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">邀请模板</td>
+            <td>
+                <textarea class="layui-textarea" name="invite_content">{notempty name="$config.invite_content"}{$config.invite_content}{/notempty}</textarea>                
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">文本颜色</td>
+            <td>
+                <div id="textColor"></div>
+                {empty name="$config.textColor"}
+                    <input type="hidden" name="textColor" id="color" value="">
+                    <script>
+                        var textColor = '';
+                    </script>
+                {else/}
+                    <input type="hidden" name="textColor" id="color" value="{$config.textColor}">
+                    <script>
+                        var textColor = '{$config.textColor}';
+                    </script>
+                {/empty}
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">图片说明</td>
+            <td>
+                <blockquote class="layui-elem-quote">
+                    <p>标准尺寸为：720*1280或9：16的图片，统一尺寸。</p>
+                </blockquote>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">背景图</td>
+            <td>                
+                <div class="layui-upload">
+                    <button type="button" class="layui-btn layui-btn-normal" id="select-upload">选择图片</button>                    
+                    <div class="layui-upload-list">
+                        <table class="layui-table">
+                          <colgroup>
+                            <col width="100">
+                            <col width="150">
+                            <col>
+                            <col width="150">
+                          </colgroup>
+                          <thead>
+                            <th>文件名</th>
+                            <th>大小</th>
+                            <th>上传进度</th>
+                            <th>操作</th>
+                          </thead>
+                          <tbody id="upload-list">
+                            {notempty name="$config.bglist"}
+                                {php} $list = explode(',', $config['bglist']);{/php}                            
+                                {volist name="list" id="v"}
+                                    <tr>
+                                        <td><img src="{$v}" style="width: 20px; height: 30px;" onclick="showBigImage(this)"></td>
+                                        <td>--</td>
+                                        <td>--</td>
+                                        <td>
+                                            <span class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</span>
+                                        </td>
+                                    </tr>
+                                {/volist}
+                            {/notempty}
+                          </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="layui-btn" id="start-upload">开始上传</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <div class="py-3">
+        <input type="hidden" name="id" value="{$id}">
+        {empty name="$config.bglist"}
+            <input type="hidden" name="bglist" id="upload-bglist" value="">
+        {else/}
+            <input type="hidden" name="bglist" id="upload-bglist" value="{$config.bglist}">
+        {/empty}
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+    function feiniaoInit() {
+        var form = layui.form, tool = layui.tool, upload = layui.upload, element = layui.element, colorpicker = layui.colorpicker;
+
+        colorpicker.render({
+            elem: '#textColor',
+            color: textColor,
+            format: 'rgb',
+            alpha: false,
+            done: function(value) {
+                $("#color").val(value);
+            }
+        });
+        
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    parent.layui.tool.close(1000);
+                }
+            }
+            tool.post("{:url('conf/edit')}", data.field, callback);
+            return false;
+        });
+
+        window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+
+        // 多文件上传
+        var uploadListIns = upload.render({
+            elem: '#select-upload',
+            elemList: $('#upload-list'), // 列表元素对象
+            url: "{:url('api/upload')}",
+            accept: 'file',
+            multiple: true,
+            number: 30,
+            auto: false,
+            acceptMime:'image/jpeg, image/jpg',
+            exts: 'jpg|jpeg',
+            bindAction: '#start-upload',
+            choose: function (obj) {
+                var that = this;
+                this.uplist = [];
+                var files = this.files = obj.pushFile(); // 将每次选择的文件追加到文件队列
+                // 读取本地文件
+                obj.preview(function (index, file, result) {
+                    var tr = $(['<tr id="upload-' + index + '">',
+                    '<td><img src="' + result + '" alt="' + file.name + '" style="width: 30px; height: 50px;"></td>',
+                    '<td>' + (file.size / 1024).toFixed(1) + 'kb</td>',
+                    '<td><div class="layui-progress" lay-filter="progress-demo-' + index + '"><div class="layui-progress-bar" lay-percent=""></div></div></td>',
+                        '<td>',
+                        '<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>',
+                        '<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>',
+                        '</td>',
+                        '</tr>'].join(''));
+                    // 单个重传
+                    tr.find('.demo-reload').on('click', function () {
+                        obj.upload(index, file);
+                    });
+                    // 删除
+                    tr.find('.demo-delete').on('click', function () {
+                        delete files[index]; // 删除对应的文件
+                        tr.remove(); // 删除表格行
+                        // 清空 input file 值，以免删除后出现同名文件不可选
+                        uploadListIns.config.elem.next()[0].value = '';
+                    });
+                    that.elemList.append(tr);
+                    element.render('progress'); // 渲染新加的进度条组件
+                });
+            },
+            done: function (res, index, upload) { // 成功的回调
+                var that = this;
+                if(res.code == 0){ // 上传成功
+                    var tr = that.elemList.find('tr#upload-' + index)
+                    var tds = tr.children();
+                    tds.eq(3).html(''); // 清空操作
+                    delete this.files[index]; // 删除文件队列已经上传成功的文件
+                    that.uplist.push(res.data.filepath);
+                    return;
+                }
+                this.error(index, upload);
+            },
+            allDone: function (obj) { // 多文件上传完毕后的状态回调
+                var that = this;
+                var list = $("#upload-bglist").val().split(',');
+                let mergedArray = list.concat(that.uplist);
+                $("#upload-bglist").val(mergedArray.join(','));
+            },
+            error: function (index, upload) { // 错误回调
+                var that = this;
+                var tr = that.elemList.find('tr#upload-' + index);
+                var tds = tr.children();
+                // 显示重传
+                tds.eq(3).find('.demo-reload').removeClass('layui-hide');
+            },
+            progress: function (n, elem, e, index) { // 注意：index 参数为 layui 2.6.6 新增
+                element.progress('progress-demo-' + index, n + '%'); // 执行进度条。n 即为返回的进度百分比
+            }
+        });
+        
+        $('.demo-delete').on('click', function() {
+            var index = $('#upload-list .demo-delete').index(this);
+            var list = $("#upload-bglist").val().split(',');
+            if(list.length <= 0) return false;
+            list.splice(index, 1);          
+            $("#upload-bglist").val(list.join(','));
+            $(this).parent().parent().remove();
+        });        
+    }
+</script>
+{/block}
+<!-- /脚本 -->

@@ -1,0 +1,200 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    [data-field="title"], [data-field="title"] div {
+        min-width: 200px;
+    }
+</style>
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="book" lay-filter="book"></table>
+</div>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><button class="layui-btn layui-btn-normal layui-btn-xs" lay-event="select">选择</button></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#book',
+			title: '作品列表',
+			toolbar: false,
+			url: "{:url('book/booklist')}",
+			page: true,
+			limit: 20,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: 'ID',
+					align: 'center',
+					width: 80
+				},{
+					field: 'title',
+					title: '作品名称',
+					align: 'center',
+				},{
+					field: 'author',
+					title: '作者',
+					align: 'center',
+					width: 150
+				},{
+					field: 'cover',
+					title: '封面图片',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.cover ? '<img src="' + d.cover + '" width="80" onclick="showBigImage(this)">' : '--';
+					}
+				},{
+					field: 'label',
+					title: '标签',
+					align: 'center',
+					width: 250,
+					templet:function(d) {
+						return d.label ? d.label : '--';
+					}
+				},{
+					field: 'remark',
+					title: '简介',
+					align: 'center',
+					width: 250,
+					templet:function(d) {
+						return d.remark ? d.remark : '--';
+					}
+				},{
+					field: 'bigcatetitle',
+					title: '大类',
+					align: 'center',
+					width: 100
+				},{
+					field: 'sellcatetitle',
+					title: '小类',
+					align: 'center',
+					width: 100,
+                    templet:function(d) {
+						return d.sellcatetitle ? d.sellcatetitle : '--';
+					}
+				},{
+					field: 'isfinish',
+					title: '完结状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.isfinish) ? (parseInt(d.isfinish) === 2 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>') : '--';
+					}
+				},{
+					field: 'finishtime',
+					title: '完结时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.finishtime ? layui.util.toDateString((parseInt(d.finishtime) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--';
+					}
+				},{
+					field: 'words',
+					title: '总字数',
+					align: 'center',
+					width: 80
+				},{
+					field: 'lastmonthwords',
+					title: '上月更新字数',
+					align: 'center',
+					width: 120
+				},{
+					field: 'chapters',
+					title: '总章节数',
+					align: 'center',
+					width: 80
+				},{
+					field: 'issign',
+					title: '是否签约',
+					align: 'center',
+					width: 100,
+                    templet: function(d) {
+						return parseInt(d.issign) == 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'create_time',
+					title: '创建时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.create_time ? d.create_time : '--';
+					}
+				},{
+					field: 'update_time',
+					title: '更新时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.update_time ? d.update_time : '--';
+					}
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 60,
+					align: 'center'
+				}				
+				]
+			]
+		});	
+
+		//监听表格行工具事件
+		table.on('tool(book)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'select') {
+				let a = parent.get_book_data(data);
+                var index= parent.layer.getFrameIndex(window.name);
+                parent.layer.close(index);
+			}
+			return false;
+		});
+
+        window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

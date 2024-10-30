@@ -1,0 +1,251 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">新建作品</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">作品名称<font>*</font></td>
+			<td><input type="text" name="title"  lay-verify="required" lay-reqText="请完善作品名称" value="" autocomplete="off" placeholder="请输入作品名称" class="layui-input"></td>
+			<td class="layui-td-gray-2">作品作者<font>*</font></td>
+			<td>
+				<input type="text" name="author" id="author" value="" autocomplete="off" placeholder="请选择作者" class="layui-input" readonly>
+				<input type="hidden" id="authorid" name="authorid" autocomplete="off" value="">				
+			</td>			
+			<td class="layui-td-gray-2">编辑人员</td>
+			<td>
+				<input type="text" name="editor" id="editor"  value="" autocomplete="off" placeholder="请输入编辑人员" class="layui-input" readonly>
+				<input type="hidden" id="editorid" name="editorid" autocomplete="off">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">是否上架</td>
+			<td>
+				<input type="radio" name="status" value="1" title="上架" checked>
+				<input type="radio" name="status" value="0" title="下架">
+			</td>
+			<td class="layui-td-gray-2">作品大类</td>
+			<td>
+				<select name="genre" id="genre" lay-filter="genre">
+					<option value="">请选择</option>
+					{volist name="genres" id="v"}
+					<option value="{$v.id}">{$v.name}</option>
+					{/volist}
+				</select>
+			</td>
+			<td class="layui-td-gray-2">作品小类</td>
+			<td>
+				<select name="subgenre" id="subgenre">
+					<option value="">请选择</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">{$tags.style.name}</td>
+			<td>
+				<select name="style">
+					<option value="">请选择</option>
+					{volist name="$tags.style.data" id="v"}
+						<option value="{$v}">{$v}</option>
+					{/volist}
+				</select>
+			</td>
+			<td class="layui-td-gray-2">{$tags.ending.name}</td>
+			<td>
+				<select name="ending">
+					<option value="">请选择</option>
+					{volist name="$tags.ending.data" id="v"}
+						<option value="{$v}">{$v}</option>
+					{/volist}
+				</select>
+			</td>			
+			<td class="layui-td-gray-2">是否签约</td>
+			<td>
+				<input type="radio" name="issign" value="0" title="否" checked>
+				<input type="radio" name="issign" value="1" title="是">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">简介</td>
+			<td colspan="5"><textarea name="remark" placeholder="请输入简介" class="layui-textarea"></textarea></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">作品标签</td>
+			<td colspan="5">
+				<div class="layui-card">
+					<div class="layui-card-header">{$tags.identity.name}</div>
+					<div class="layui-card-body">
+						{volist name="$tags.identity.data" id="v"}
+							<input type="radio" name="identity" value="{$v}" title="{$v}" lay-skin="primary" />
+						{/volist}
+					</div>
+				</div>
+				<div class="layui-card">
+					<div class="layui-card-header">{$tags.image.name}</div>
+					<div class="layui-card-body">
+						{volist name="$tags.image.data" id="v"}				
+							<input type="radio" name="image" value="{$v}" title="{$v}" lay-skin="primary" />
+						{/volist}
+					</div>
+				</div>
+				<div class="layui-card">
+					<div class="layui-card-header">{$tags.schools.name}</div>
+					<div class="layui-card-body">
+						{volist name="$tags.schools.data" id="v"}				
+							<input type="radio" name="schools" value="{$v}" title="{$v}" lay-skin="primary" />
+						{/volist}
+					</div>
+				</div>
+				<div class="layui-card">
+					<div class="layui-card-header">{$tags.element.name}</div>
+					<div class="layui-card-body">
+						{volist name="$tags.element.data" id="v"}				
+							<input type="radio" name="element" value="{$v}" title="{$v}" lay-skin="primary" />
+						{/volist}
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">自定义标签</td>
+			<td colspan="5">
+				<input type="text" id="label_custom" name="label_custom" autocomplete="off" placeholder="请选择自定义标签" class="layui-input">
+			</td>			
+		</tr>
+		<tr>			
+			<td class="layui-td-gray-2">完结状态</td>
+			<td>
+				<input type="radio" name="isfinish" value="1" title="连载" checked>
+				<input type="radio" name="isfinish" value="2" title="完结">
+			</td>
+			<td class="layui-td-gray-2">完结时间</td>
+			<td><input type="text" name="finishtime" value="" readonly id="laydate_finishtime" autocomplete="off" placeholder="请选择" class="layui-input"></td>
+			<td class="layui-td-gray-2">大纲时间</td>
+			<td><input type="text" name="outlinetime" value="" readonly id="laydate_outlinetime" autocomplete="off" placeholder="请选择" class="layui-input"></td>
+		</tr>		
+		<tr>
+			<td class="layui-td-gray-2">大纲</td>
+			<td colspan="5"><textarea name="outline" placeholder="请输入大纲" class="layui-textarea"></textarea></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">封面图片</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_cover">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_cover">
+						<img src="" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="cover" value="">
+					</div>
+				</div>
+			</td>
+		</tr>		
+	</table>
+	<div class="pt-3">
+		<input type="hidden" name="id" value="0"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool', 'tagpicker'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool, tagspicker = layui.tagpicker;
+
+		//编辑
+		var editor = new tagspicker({
+			'url': "{:url('api/get_editor')}",
+			'target': 'editor',
+			'tag_ids': 'editorid',
+			'tag_tags': 'editor',
+			'height': 500,
+			'len': 1,
+			'isDiy': 0,
+			'title': '选择编辑人员',
+		});
+
+		$(document).on('click', '#author', function() {
+			tool.side("{:url('author/authorlist')}");
+			return false;
+		});
+
+		//回调
+		window.get_author_data = function (v) {
+			$("#author").val(v.nickname);
+			$("#authorid").val(v.id);		
+		}
+				
+		//监听大类选择
+		form.on('select(genre)', function(data) {
+			getSmallCategory(data.value);
+		})
+
+		//获取小分类
+		window.getSmallCategory = function(pid) {
+			let callback = function (e) {				
+				if (e.code == 0) {
+					if(e.data.length > 0) {
+						$("#subgenre").empty();
+						var options = '<option value="">请选择</option>'
+						for (const key in e.data) {
+							options += '<option value="'+e.data[key].id+'">'+e.data[key].name+'</option>';		
+						}
+						$("#subgenre").append(options);
+						form.render('select');
+					}
+				} else {
+					layer.msg(e.msg);
+				}
+			}
+			tool.post("{:url('category/getsmallcate')}", {pid:pid}, callback);
+			return false;
+		}
+		
+		//日期选择
+		layui.laydate.render({
+			type: 'datetime',
+    		fullPanel: true,
+			elem: '#laydate_outlinetime' //指定元素
+		});
+
+		//日期选择
+		layui.laydate.render({
+			type: 'datetime',
+    		fullPanel: true,
+			elem: '#laydate_finishtime' //指定元素
+		});
+
+		//上传封面图片
+		var upload_cover = layui.upload.render({
+			elem: '#upload_btn_cover',
+			url: "{:url('api/upload')}",
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_cover input').attr('value', res.data.filepath);
+				$('#upload_box_cover img').attr('src', res.data.filepath);
+			}
+		});		
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('book/add')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

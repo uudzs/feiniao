@@ -1,0 +1,77 @@
+.search-panel {
+    margin-bottom: .2rem;
+}
+
+.search-panel .bui-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    padding: 5px;
+}
+
+.search-panel .bui-list li {
+    background-color: #ebf9ff;
+    border-width: 0;
+    border: 0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin: 2px 0;
+}
+
+.search-panel .bui-panel-foot .bui-btn {
+    border: 0;
+    padding-top: .1rem;
+    padding-bottom: .1rem;
+}
+
+.search-tag .bui-btn {
+    padding: .2rem 0;
+    font-size: .2rem;
+    color: #666;
+    background-color: #ebf9ff;
+    border: 0;
+    margin-bottom: .2rem;
+}
+
+#scrollSearch .bui-list .bui-btn .bui-sub:before {
+    border-color: rgba(0, 0, 0, 0) #03d1a1 rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
+}
+
+#scrollSearch .bui-list .bui-box {
+    width: 100%;
+}
+
+#scrollSearch .bui-list .bui-btn a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#scrollSearch .bui-btn a .span1 {
+    display: block;
+}
+
+#scrollSearch .bui-btn .bui-thumbnail {
+    float: left;    
+}
+
+#scrollSearch .bui-btn .thumbnail {
+    float: left;
+    line-height: 0.88rem;
+    height: 0.88rem;
+    width: 0.88rem;
+    text-align: center;
+    color: #ffffff;
+}
+
+#scrollSearch .bui-sub:after {
+    font-size: .20rem;
+    top: 6px;
+    left: 2px;
+}
+
+#scrollSearch .bui-sub-bottom:after {
+    bottom: -11px;
+    right: 1px;
+    font-size: 0.20rem;
+}

@@ -1,0 +1,72 @@
+{extend name="common/base"/}
+{block name="style"}
+<style type="text/css">
+.editormd-code-toolbar select {display: inline-block}
+.editormd li {list-style: inherit;}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">导入作品</h3>
+	<table class="layui-table layui-table-form">
+		<tr>			
+			<td class="layui-td-gray" style="vertical-align:top;">文件</td>
+			<td>
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_file">上传TXT文件</button>
+				</div>
+			</td>
+		</tr>		
+	</table>
+	<div class="pt-3">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		var loadIndex;
+		//上传文件
+		var upload_thumb = layui.upload.render({
+			elem: '#upload_file',
+			field: 'txtfile',
+			data: {},
+			accept: 'file',
+			url: "{:url('book/import')}",
+			choose: function(obj) {
+				loadIndex = layer.load(2);
+			},
+			done: function (res) {
+				layer.close(loadIndex);
+				layer.msg(res.msg);
+				if (res.code == 0) {
+					tool.tabRefresh(71);
+					tool.sideClose(2000);
+				} else {
+					return false;
+				}
+			},
+			error: function(index, upload) {
+				layer.close(loadIndex);
+				layer.msg('上传错误');
+			}
+		});	
+
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			tool.tabRefresh(71);
+			tool.sideClose(1000);
+		});
+
+	}
+</script>
+{/block}
+<!-- /脚本 -->

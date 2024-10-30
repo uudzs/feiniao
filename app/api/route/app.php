@@ -1,0 +1,51 @@
+<?php
+
+use think\facade\Route;
+
+Route::group('v1', function () {
+    Route::rule('login', 'api/v1.common/login', 'GET|POST');
+    Route::rule('logout', 'api/v1.common/logout', 'GET|POST');
+    Route::rule('service', 'api/v1.common/service', 'GET|POST');
+    Route::rule('mine', 'api/v1.common/mine', 'GET|POST');
+    Route::rule('advert', 'api/v1.common/recommend', 'GET|POST');
+    Route::rule('bigcate', 'api/v1.category/bigcate', 'GET|POST');
+    Route::rule('bookdetail', 'api/v1.book/detail', 'GET|POST');
+    Route::rule('booklist', 'api/v1.book/booklist', 'GET|POST');
+    Route::rule('search', 'api/v1.search/index', 'GET|POST');
+    Route::rule('keywords', 'api/v1.search/keywords', 'GET|POST');
+    Route::rule('smssend', 'api/v1.common/smssend', 'GET|POST');
+    Route::rule('gettoken', 'api/v1.common/token', 'GET|POST');
+    Route::rule('favorites', 'api/v1.user/favorites', 'GET|POST');
+    Route::rule('bookshelf', 'api/v1.user/bookshelf', 'GET|POST');
+    Route::rule('delbookshelf', 'api/v1.user/delbookshelf', 'GET|POST');
+    Route::rule('readlog', 'api/v1.user/readlog', 'GET|POST');
+    Route::rule('chapter', 'api/v1.chapter/detail', 'GET|POST');
+    Route::rule('signin', 'api/v1.user/signin', 'GET|POST');
+    Route::rule('gettask', 'api/v1.task/gettask', 'GET|POST');
+    Route::rule('tasklist', 'api/v1.task/index', 'GET|POST');
+    Route::rule('like', 'api/v1.user/like', 'GET|POST');
+    Route::rule('invitetheme', 'api/v1.user/invite', 'GET|POST');
+    Route::rule('bindinvitecode', 'api/v1.user/bindinvitecode', 'GET|POST');
+    Route::rule('upload', 'api/v1.common/upload', 'GET|POST');
+    Route::rule('avatar', 'api/v1.user/avatar', 'GET|POST');
+    Route::rule('nickname', 'api/v1.user/nickname', 'GET|POST');
+    Route::rule('mobile', 'api/v1.user/mobile', 'GET|POST');
+    Route::rule('security', 'api/v1.user/security', 'GET|POST');
+    Route::rule('createorder', 'api/v1.order/create', 'GET|POST');
+    Route::rule('getorder', 'api/v1.order/info', 'GET|POST');
+    Route::rule('orderlist', 'api/v1.order/index', 'GET|POST');
+    Route::rule('coinlist', 'api/v1.coin/index', 'GET|POST');
+    Route::rule('viplog', 'api/v1.vip/log', 'GET|POST');
+    Route::rule('bankcard', 'api/v1.user/bankcard', 'GET|POST');
+    Route::rule('cardadd', 'api/v1.user/cardadd', 'GET|POST');
+    Route::rule('delbankcard', 'api/v1.user/delbankcard', 'GET|POST');
+    Route::rule('withdrawapply', 'api/v1.withdraw/apply', 'GET|POST');
+    Route::rule('withdrawlog', 'api/v1.withdraw/log', 'GET|POST');
+    Route::rule('realnameauth', 'api/v1.user/realnameauth', 'GET|POST');
+    Route::rule('myinvite', 'api/v1.user/myinvite', 'GET|POST');
+    Route::rule('regauthor', 'api/v1.user/regauthor', 'GET|POST');
+});
+Route::rule('book-:id', 'book/detail', 'GET|POST')->name('book_detail');
+Route::rule('author-:id', 'author/detail', 'GET|POST')->name('author_detail');
+Route::rule('chapter-:id', 'chapter/detail', 'GET|POST')->name('chapter_detail');
+Route::rule('i/<name>', 'invite/index', 'GET|POST')->pattern(['name' => '\w+'])->name('inviteurl');

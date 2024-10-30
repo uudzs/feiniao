@@ -1,0 +1,40 @@
+</main>
+<footer>
+    <div class="bui-tab bui-box-vertical footer" style="position: relative; overflow: hidden; width: 100%; height: 60px;">
+        <div class="bui-tab-head bui-tab-foot">
+            <ul class="bui-nav">
+                <li class="bui-btn bui-align-center bui-box-vertical{if condition="$params.controller == 'Index' || !$params.controller"} active{/if}">
+                    <a href="{:furl('/', [], true, 'home')}">
+                        <i class="fa fa-home fa-fw"></i>
+                        <div class="span1">首页</div>
+                    </a>
+                </li>
+                <li class="bui-btn bui-align-center bui-box-vertical{if condition="$params.controller == 'Task'"} active{/if}">
+                    <a href="{:furl('task', [], true, 'home')}">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        <div class="span1">任务</div>
+                    </a>
+                </li>
+                <li class="bui-btn bui-align-center bui-box-vertical{if condition="$params.controller == 'Invite'"} active{/if}">
+                    <a href="{:furl('invite', [], true, 'home')}">
+                        <i class="fa fa-podcast" aria-hidden="true"></i>
+                        <div class="span1">邀请</div>
+                    </a>
+                </li>
+                <li class="bui-btn bui-align-center bui-box-vertical{if condition="$params.controller == 'Bookshelf'"} active{/if}">
+                    <a href="{:furl('bookshelf', [], true, 'home')}">
+                        <i class="fa fa-book fa-fw"></i>
+                        <div class="span1">书架</div>
+                    </a>
+                </li>
+                <li class="bui-btn bui-align-center bui-box-vertical{if condition="$params.controller == 'User'"} active{/if}">
+                    <a href="{:furl('my', [], true, 'home')}">
+                        <i class="fa fa-user-circle-o" aria-hidden="true"></i>
+                        <div class="span1">我的</div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</footer>
+</div>

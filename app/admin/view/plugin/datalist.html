@@ -1,0 +1,121 @@
+{extend name="common/base" /}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<table class="layui-hide" id="list" lay-filter="list"></table>
+</div>
+<script type="text/html" id="toolbarDemo">
+  <div>
+  	<span class="red">插件市场即将推出。</span>
+  </div>
+</script>
+<script type="text/html" id="plugin-status-switch">
+	<input type="checkbox" name="status" value="{{= d.status }}" title="开|关" lay-skin="switch" lay-filter="plugin-status" {{= d.status == 1 ? "checked" : "" }}>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var tool = layui.tool, table = layui.table, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#list',
+			toolbar: '#toolbarDemo',
+			title: '功能模块列表',
+			url: "{:url('plugin/datalist')}",
+			page: true,
+			limit: 20,
+			cellMinWidth: 80
+			, cols: [[
+				{field: 'name', width: 200, title: '插件标识', align: 'center'},
+				{field: 'title', title: '插件名称'},
+				{field: 'description', title: '插件介绍'},
+				{field: 'author', title: '作者'},
+				{field: 'version', width:85, title: '版本'},
+				{title: '状态', width:85, templet: '#plugin-status-switch'},				
+				{
+					width: 100, title: '操作', align: 'center', templet: function (d) {
+						if (d.install == 1) {
+							return '<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="config">配置</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="uninstall">卸载</a></div>';
+						} else {
+							return '<div class="layui-btn-group"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="install">安装</a></div>';
+						}
+					}
+				}
+			]]
+		});
+
+		// 状态 - 开关操作
+		form.on('switch(plugin-status)', function(obj) {
+			var id = obj.othis.parents('tr').find("td:first").text();
+			if(!obj.elem.checked) {
+				layer.confirm('确定要禁用该插件吗?', { icon: 3, title: '提示' }, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							layui.pageTable.reload();
+						} else {
+							layui.pageTable.reload();
+						}
+					}
+					tool.post("{:url('plugin/state')}", { id: id }, callback);
+					layer.close(index);
+				}, function() {
+					obj.elem.checked = true;
+					obj.othis.parents('tr').find("td .layui-form-switch").addClass('layui-form-onswitch');
+					obj.othis.parents('tr').find("td input[name='status']").attr('checked', true);
+      			});
+			} else{
+				let callback = function (e) {
+					layer.msg(e.msg);
+					if (e.code == 0) {
+						layui.pageTable.reload()
+					} else {
+						obj.elem.checked = false;
+						obj.othis.parents('tr').find("td .layui-form-onswitch").removeClass('layui-form-onswitch');
+						obj.othis.parents('tr').find("td input[name='status']").attr('checked', false);
+					}
+				}
+				tool.post("{:url('plugin/state')}", { id: id }, callback);
+			}
+			return false;
+		});
+
+		table.on('tool(list)', function (obj) {
+			if (obj.event === 'config') {
+				tool.side("{:url('plugin/config')}?name="+obj.data.name);
+			}
+			if (obj.event === 'uninstall') {
+				layer.confirm('确定要卸载该插件吗?', { icon: 3, title: '提示' }, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							layer.close(index);
+							layui.pageTable.reload()
+						}
+					}
+					tool.post("{:url('plugin/uninstall')}", { id: obj.data.name }, callback);
+					layer.close(index);
+				});
+			}
+			if (obj.event === 'install') {
+				layer.confirm('确定要安装该插件吗?', { icon: 3, title: '提示' }, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							layer.close(index);
+							layui.pageTable.reload()
+						}
+					}
+					tool.post("{:url('plugin/install')}", { id: obj.data.name }, callback);
+					layer.close(index);
+				});
+			}
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

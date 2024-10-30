@@ -1,0 +1,23 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">阅读记录详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">用户ID</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">IP</td>
+			<td>{$detail.ip}</td><td class="layui-td-gray-2">作品ID</td>
+			<td>{$detail.book_id}</td>
+		</tr><tr><td class="layui-td-gray-2">添加时间</td>
+			<td>{$detail.chapter_id}</td><td class="layui-td-gray-2">章节位置坐标</td>
+			<td>{$detail.position}</td><td class="layui-td-gray-2">阅读次数</td>
+			<td>{$detail.readnum}</td>
+		</tr><tr><td class="layui-td-gray-2">作品名称</td>
+			<td>{$detail.title}</td><td class="layui-td-gray-2">添加时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

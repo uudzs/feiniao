@@ -1,0 +1,136 @@
+	<style>
+		.topbar {
+			box-shadow: 1px 0px 20px rgba(0, 0, 0, 0.3);
+		}
+		.topbar .top-navbar .navbar-header {
+			width: auto;    		
+		}
+		.sidebar-nav {
+			background: none;
+		}
+		.sidebar-nav ul {
+			display: flex;
+			justify-content: center;
+		}
+		.layui-layer-btn .layui-layer-btn0 {
+			color: #fff!important;
+		}
+		.sidebar-nav ul li a {
+			padding: 5px 20px;
+			font-size: 1rem;
+			color: #fff;
+		}
+		.sidebar-nav>ul>li>a i {
+			width: 30px;
+			font-size: 1.5rem;
+			color: #fff;
+		}
+		.sidebar-nav > ul > li.active > a i {
+			color: #d9fbff;
+		}
+		.sidebar-nav>ul>li>a.active {
+			background: none;
+		}
+		.topbar .profile-pic {
+			height: 30px;
+			border: #ade0f3 1px solid;
+		}
+		.sidebar-nav>ul>li:hover>a,.sidebar-nav>ul>li:hover>a i {
+			color: #d9fbff
+		}
+		.sidebar-nav ul li a.active, .sidebar-nav ul li a:hover {
+			color: #d9fbff;
+		}
+		.sidebar-nav ul li a.active i, .sidebar-nav ul li a:hover i {
+			color: #d9fbff;
+		}
+		.sidebar-nav > ul > li.active > a {
+			color: #d9fbff;
+		}
+		.page-wrapper {
+			padding-top: 0;
+		}
+		.modal {
+			background: rgba(0, 0, 0, .5);
+		}
+	</style>
+	<div class="preloader">
+        <svg class="circular" viewbox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle> </svg>
+    </div>
+    <div id="main-wrapper">
+        <header class="topbar">
+            <nav class="navbar top-navbar navbar-expand-md navbar-light">
+                <div class="navbar-header">
+                    <nav class="sidebar-nav">
+						<ul id="sidebarnav">
+							<li {if $params.controller == 'User' && $params.action == 'index'}class="active"{/if}> <a class="has-arrow waves-effect waves-dark {if $params.controller == 'User' && $params.action == 'index'}active{/if}" href="{:url('user/index')}"><i class="mdi mdi-home"></i><span class="hide-menu">作家中心</span></a></li>
+							<li {eq name="params.controller" value="Book"}class="active"{/eq}> <a class="has-arrow waves-effect waves-dark {eq name="params.controller" value="Book"}active{/eq}" href="{:url('book/index')}"><i class="mdi mdi-book-open-variant"></i><span class="hide-menu">作品管理</span></a></li>
+							<li {eq name="params.controller" value="Sign"}class="active"{/eq}> <a class="has-arrow waves-effect waves-dark" {eq name="params.controller" value="Sign"}active{/eq} href="{:url('sign/index')}"><i class="mdi mdi-arrange-send-backward"></i><span class="hide-menu">作品签约</span></a></li>
+							<li {eq name="params.controller" value="Income"}class="active"{/eq}> <a class="has-arrow waves-effect waves-dark" {eq name="params.controller" value="Income"}active{/eq} href="{:url('income/index')}"><i class="mdi mdi-gauge"></i><span class="hide-menu">稿酬结算</span></a></li>
+							<li {eq name="params.action" value="basic"}class="active"{/eq}> <a class="has-arrow waves-effect waves-dark" {eq name="params.action" value="basic"}active{/eq} href="{:url('user/basic')}"><i class="mdi mdi-widgets"></i><span class="hide-menu">基本设置</span></a></li>
+							<li {eq name="params.action" value="service"}class="active"{/eq}> <a class="has-arrow waves-effect waves-dark" {eq name="params.action" value="service"}active{/eq} href="{:url('user/service')}"><i class="mdi mdi-chart-bubble"></i><span class="hide-menu">联系我们</span></a></li>
+						</ul>
+					</nav>
+                </div>
+                <div class="navbar-collapse">
+				<ul class="navbar-nav mr-auto mt-md-0"></ul>
+				<ul class="navbar-nav my-lg-0">
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{$userInfo.headimg}" onerror="this.src='/static/home/images/logo-ico.png'" alt="user" class="profile-pic"></a>
+						<div class="dropdown-menu dropdown-menu-right scale-up">
+							<ul class="dropdown-user">
+								<li>
+									<div class="dw-user-box">
+										<!-- <div class="u-img"><img src="{$userInfo.headimg}" alt="user"></div> -->
+										<div class="u-text" style="padding-left: 0;">
+											<h4>{$userInfo.nickname}</h4>
+											<!-- <p class="text-muted">{$userInfo.mobile}</p> -->
+											<!-- <a href="{:url('user/basic')}" class="btn btn-rounded btn-info btn-sm">修改头像</a> -->
+										</div>
+									</div>
+								</li>
+								<li role="separator" class="divider"></li>
+								<li><a href="{:url('user/basic')}"><i class="ti-user"></i> 基本信息</a></li>
+								<!-- <li><a href="{:url('income/index')}"><i class="ti-wallet"></i> 稿酬结算</a></li> -->
+								<li><a href="{:url('user/modifypass')}"><i class="ti-lock"></i> 修改密码</a></li>
+								<!-- <li><a href="#"><i class="ti-email"></i> 消息动态</a></li> -->
+								<li role="separator" class="divider"></li>
+								<li><a href="javascript:;" data-node="logout"><i class="fa fa-power-off"></i> 退出登录</a></li>
+							</ul>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</nav>
+	</header>
+	<div class="page-wrapper">
+		
+	<script>
+	$('[data-node="logout"]').on("click", function () {
+		swal({   
+			title: "确定要退出登录吗？",   
+			text: "请确保您的内容都已保存完毕！",   
+			type: "warning",   
+			showCancelButton: true,   
+			confirmButtonColor: "#DD6B55",   
+			confirmButtonText: "确定",   
+			cancelButtonText: "关闭",   
+			closeOnConfirm: false 
+		}, function(){
+			$.ajax({
+				url: "{:url('login/login_out')}",
+				success: function (res) {
+					if (res.code == 0) {
+						swal(res.msg, "将跳转到其他页面", "success"); 
+						setTimeout(function () {
+							location.href = "{:url('login/index')}"
+						}, 1000)
+					} else{
+						layer.msg(res.msg);
+					}
+				}
+			})			
+		});
+	})
+	</script>

@@ -1,0 +1,58 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">协议配置</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">用户协议</td>
+			<td><textarea name="agreement" placeholder="" class="layui-textarea" id="agreement">{notempty name="$config.agreement"}{$config.agreement}{/notempty}</textarea></td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">隐私政策</td>
+			<td><textarea name="privacy" placeholder="" class="layui-textarea" id="privacy">{notempty name="$config.privacy"}{$config.privacy}{/notempty}</textarea></td>
+		</tr>
+	</table>
+	<div class="py-3">
+        <input type="hidden" value="{$id}" name="id">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool','tinymce'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool, tinymce = layui.tinymce;
+		
+		var agreement = tinymce.render({
+			selector: "#agreement",
+			height: 300
+		});
+
+        var privacy = tinymce.render({
+			selector: "#privacy",
+			height: 300
+		});
+
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			data.field.agreement = tinyMCE.editors['agreement'].getContent();
+			data.field.privacy = tinyMCE.editors['privacy'].getContent();
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

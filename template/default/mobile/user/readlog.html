@@ -1,0 +1,102 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '浏览历史';{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/readlog.css" />
+
+<div id="scroll" class="bui-scroll">
+    <div class="bui-scroll-head"></div>
+    <div class="bui-scroll-main">
+        <ul id="scrollList" class="bui-list">
+        </ul>
+    </div>
+    <div class="bui-scroll-foot"></div>
+</div>
+
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".footer").hide();
+        $(".bui-navbar").hide();
+        var bs = bui.store({
+            scope: "readlog",
+            data: {
+                sl: null
+            },
+            methods: {
+                bookshelf(bookid) {
+                    if(!bookid) bui.hint("ID为空");
+                    post("{:furl('v1/favorites', [], true, 'api')}", {bookid:bookid}, function(result) {
+                        if(result.code == 0) {
+                            bui.hint('操作成功');
+                            if($("#bookshelf-"+bookid).text()=='加入书架') {
+                                $("#bookshelf-"+bookid).text('取消书架');
+                            } else {
+                                $("#bookshelf-"+bookid).text('加入书架');
+                            }                            
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                }
+            },
+            watch: {
+            },
+            computed: {},
+            templates: {},
+            mounted: function mounted() {
+                this.sl = bui.list({
+                    id: "#scroll",
+                    children: ".bui-list",
+                    url: "{:furl('v1/readlog', [], true, 'api')}",
+                    headers: { Token: token },
+                    limit: 10,
+                    field: {
+                        page: "page",
+                        size: "limit",
+                        data: "data.data"
+                    },
+                    data: {},
+                    template: function (data) {
+                        if(data.length <= 0) return '';
+                        var html = "";
+                        data.forEach(function (el, index) {
+                            html += `<li class="bui-btn bui-box">                    
+                                        <div class="bui-thumbnail"><a href="${el.bookurl}"><img src="${el.cover}" alt=""></a></div>
+                                        <div class="span1">                                
+                                            <h3 class="item-title">${el.booktitle}</h3>
+                                            <div class="detail">
+                                                <div>
+                                                    <a href="${el.bookurl}">
+                                                        <p class="item-text"><i class="fa fa-user-circle-o" aria-hidden="true"></i>${el.author}</p>
+                                                        <p class="item-text">阅读到${el.speed}%</p>
+                                                    </a>
+                                                </div>
+                                                <div class="right">                  
+                                                    <a href="${el.chapterurl}">阅读</a>`
+                                                    if(el.isfav > 0) {
+                                                        html += `<a href="javascript:;" id="bookshelf-${el.book_id}" b-click="readlog.bookshelf(${el.book_id})">取消书架</a>`
+                                                    } else {
+                                                        html += `<a href="javascript:;" id="bookshelf-${el.book_id}" b-click="readlog.bookshelf(${el.book_id})">加入书架</a>`
+                                                    }
+                                                    html += `</div>
+                                            </div>
+                                        </div>
+                                    </li>`
+                        });
+                        return html;
+                    },
+                    onLoaded: function onLoaded(r) {
+                        if(parseInt(r.code) > 400) {
+                            gettoken();
+                        }
+                    },
+                });
+            }
+        });        
+    })
+</script>
+{/block}

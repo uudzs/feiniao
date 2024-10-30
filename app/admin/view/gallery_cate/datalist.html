@@ -1,0 +1,104 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<div class="gg-form-bar border-t border-x" style="padding-bottom:10px;">
+		<button class="layui-btn layui-btn-sm add-menu">+ 添加图集分类</button>
+    </div>
+	<table class="layui-hide" id="gallery_cate" lay-filter="gallery_cate"></table>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool', 'treeGrid'];
+	function feiniaoInit() {
+		var treeGrid = layui.treeGrid,table = layui.table, tool = layui.tool;
+		var pageTable = treeGrid.render({
+			id:'gallery_cate'
+			,elem: '#gallery_cate'
+			,idField:'id'
+			,url:'{:url("gallery_cate/datalist")}'
+			,cellMinWidth: 300
+			,treeId:'id'//树形id字段名称
+			,treeUpId:'pid'//树形父id字段名称
+			,treeShowName:'title'//以树形式显示的字段
+			,page:false
+			,cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'sort',
+					title: '排序',
+					align: 'center',
+					width: 100
+				},{
+					field: 'title',
+					title: '分类名称',
+					width: 200
+				},{
+					field: 'pid',
+					title: '父级ID',
+					align: 'center',
+					width: 100
+				},{
+					field: 'keywords',
+					title: '关键字',
+					width: 200
+				},{
+					field: 'desc',
+					title: '分类描述'
+				},
+				{width:160,title: '操作', align:'center',templet: function(d){
+						var html = '<span class="layui-btn-group"><span class="layui-btn layui-btn-normal layui-btn-xs" lay-event="add">添加子分类</span><span class="layui-btn layui-btn-xs" lay-event="edit">编辑</span><span class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</span></span>';
+					return html;
+					  }
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		$('.add-menu').on('click', function(){
+			tool.side("{:url('gallery_cate/add')}");
+			return false;
+		});
+
+		//监听表格行工具事件
+		treeGrid.on('tool(gallery_cate)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'add') {
+				tool.side('{:url("gallery_cate/add")}?pid='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side('{:url("gallery_cate/edit")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('gallery_cate/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

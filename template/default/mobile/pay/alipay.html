@@ -1,0 +1,63 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <title>{:get_system_config('web','title')}</title>		
+    <meta name="keywords" content="{:get_system_config('web','keywords')}"/>
+    <meta name="description" content="{:get_system_config('web','desc')}"/>
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="{__STATIC__}/font-awesome/css/font-awesome.min.css?v={:get_system_config('web','version')}" />
+    <link rel="stylesheet" href="{__STATIC__}/bui/css/bui.css?v={:get_system_config('web','version')}" />
+    <link rel="stylesheet" href="{__MOBILE__}/default/css/style.css?v={:get_system_config('web','version')}" />
+    <script>
+        var tokenurl = "{:furl('v1/gettoken', [], true, 'api')}";
+        var loginurl = "{:furl('login', [], true, 'home')}";
+        var sessionname = "{:get_config('app.session_user')}";
+    </script>
+    <script src="{__STATIC__}/bui/js/zepto.js?v={:get_system_config('web','version')}"></script>
+    <script src="{__STATIC__}/bui/js/bui.js?v={:get_system_config('web','version')}"></script>
+</head>
+<body>
+<style>
+.container {
+    display: flex;
+    width: 100%;
+    height: 80vh;
+    align-items: center;
+    justify-content: center;
+    font-size: .3rem;
+    flex-direction: column;
+}
+.container i {
+    font-size: 1rem;
+    color: #03d1a1;
+}
+.container h3 {
+    padding: .2rem 0;
+    text-align: center;
+    font-size: .3rem;
+}
+.container .btn {
+    color: #fff;
+    background: #03d1a1;
+    border-radius: .1rem;
+    border: 0;
+    padding: .12rem .5rem;
+    margin-top: .2rem;
+}
+</style>
+<div class="bui-page bui-box-vertical">
+    <main>
+        <div class="container">
+            <i class="fa fa-meh-o" aria-hidden="true"></i>
+            <h3 class="section-title">{$msg}</h3>
+            <a href="{$url}" class="btn">点击前往</a>
+        </div>
+    </main>
+</div>
+<script type="text/javascript" charset="utf-8">
+    bui.ready(function () {
+        
+    })
+</script>

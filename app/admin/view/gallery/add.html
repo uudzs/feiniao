@@ -1,0 +1,272 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+	.layui-upload-add {position: relative;padding:16px 0;font-size:14px;box-sizing: border-box;text-align: center;cursor: pointer;color: #999;width:100%; background-color:#F5FAFF}
+	.layui-upload-add .layui-icon{font-size:48px; color:#3c9cff}
+	
+	.gallery-item{background-color:#fff; padding:12px 12px 0; position:relative; padding-right:268px; margin:12px 0; box-sizing: border-box;border: 1px solid #eee;}
+	.gallery-item .gallery-thumb{width:256px; height:144px; position:absolute; top:12px; right:12px; text-align:center;}
+	.gallery-item .layui-btn-group{position:absolute; top:12px; right:12px; display:none;}
+	.gallery-item:hover .layui-btn-group{display:block;}
+	.gallery-thumb img {display: block;width: 100%;height: 100%;object-fit: cover;}
+	.gallery-from .layui-form-label{width:50px;}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-3">
+<div class="layui-row layui-col-space12">
+	<div class="layui-col-md8">
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">图集标题<font>*</font></td>
+			<td><input type="text" name="title" lay-verify="required" lay-reqText="请输入图集标题" placeholder="请输入图集标题" class="layui-input"></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray" style="vertical-align:top;">图集简介</td>
+			<td>
+				<textarea name="desc" placeholder="请输入图集简介，200字以内" class="layui-textarea"></textarea>
+			</td>
+		</tr>
+	</table>
+	
+	<div id="imgList"></div>
+	
+	<div class="layui-row" style="border:1px solid #eee;">
+		<div class="layui-col-xs6" id="upload-one">
+		  	<div class="layui-upload-add">
+				<i class="layui-icon">&#xe681;</i>
+				<p>单个上传图片</p>
+			</div>
+		</div>
+		<div class="layui-col-xs6" id="upload-more">
+		  	<div class="layui-upload-add">
+				<i class="layui-icon">&#xe67c;</i>
+				<p>批量上传图片</p>
+			</div>
+		</div>
+	</div>
+	
+	</div>
+	<div class="layui-col-md4">
+		<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">图集分类<font>*</font></td>
+			<td>
+				<select name="cate_id" lay-verify="required" lay-reqText="请选择图集分类">
+					<option value="">请选择图集分类</option>
+					{volist name=":set_recursion(get_gallery_cate())" id="v"}
+					<option value="{$v.id}">{$v.title}</option>
+					{/volist}
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">状态<font>*</font></td>
+			<td>
+				<input type="radio" name="status" value="1" title="正常" checked>
+				<input type="radio" name="status" value="0" title="下架">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">关键字<font>*</font></td>
+			<td>
+				<input type="text" id="keyword_name" name="keyword_names" lay-verify="required" lay-reqText="请选择关键字"
+					placeholder="请选择关键字" class="layui-input" readonly>
+				<input type="hidden" id="keyword_id" name="keyword_ids">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">封面图</td>
+			<td style="vertical-align:top">
+				<div class="layui-upload" style="text-align:center;">
+					<button type="button" class="layui-btn layui-btn-sm" id="uploadBtn">上传图集封面图(尺寸：500x500)</button>
+					<div class="layui-upload-list" id="demo1">
+						<img src="" width="100" style="width:200px;max-width:200px" />
+						<input type="hidden" name="thumb" value="">
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">作者/来源</td>
+			<td>
+				<input type="text" name="origin" class="layui-input" autocomplete="off" placeholder="请输入来源" value="">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">属性</td>
+			<td>
+				<select name="type">
+					<option value="">请选择属性</option>
+					<option value="3">置顶</option>
+					<option value="2">精华</option>
+					<option value="1">推荐</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">首页显示</td>
+			<td>
+				<input type="radio" name="is_home" value="1" title="是" checked>
+				<input type="radio" name="is_home" value="0" title="否">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">排序</td>
+			<td>
+				<input type="text" name="sort" value="0" lay-verify="number" placeholder="请输入排序，数字" class="layui-input">
+			</td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="0">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+		<button lay-event="back" class="layui-btn layui-btn-primary">关闭</button>
+	</div>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool', 'tagpicker','uploadplus'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool,element = layui.element, tagspicker = layui.tagpicker, upload = layui.upload, uploadplus = layui.uploadplus;
+		
+		var tags = new tagspicker({
+			'url': '{:url("api/get_keyword_cate")}',
+			'target': 'keyword_name',
+			'tag_ids': 'keyword_id',
+			'tag_tags': 'keyword_name',
+			'height': 500,
+			'isDiy': 1
+		});
+		
+
+		var upload_one = new uploadplus({
+			'url': '{:url("api/upload/thumb/500")}',
+			'target': 'upload-one',
+			'type': 1,
+			'callback':function(res){
+				console.log(res);
+				appendImg(res,0);
+			}
+		});
+
+		var upload_more = new uploadplus({
+			'url': '{:url("api/upload/thumb/500")}',
+			'target': 'upload-more',
+			'type': 2,
+			'callback':function(res){
+				console.log(res);
+				for(let i=0;i<res.length;i++){
+					appendImg(res[i],0);
+				}
+			}
+		});
+		
+		$('#imgList').on('click','.item-edit',function(){
+			let id=$(this).data('id');
+			let that = $(this);
+			var upload_one = new uploadplus({
+				'url': '{:url("api/upload/thumb/500")}',
+				'target': that,
+				'type': 1,
+				'callback':function(res){
+					console.log(res);
+					appendImg(res,id);
+				}
+			});
+		});
+		
+		$('#imgList').on('click','.item-del',function(){
+			let id=$(this).data('id');
+			$('#item_'+id).remove();
+		});
+		
+		//缩略图上传
+		var uploadInst = upload.render({
+			elem: '#uploadBtn'
+			, url: '{:url("api/upload/thumb/500")}'
+			, done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#demo1 input').attr('value', res.data.id);
+				$('#demo1 img').attr('src', res.data.filepath);
+			}
+		});
+
+		//监听返回
+		$('body').on('click', '[lay-event="back"]', function () {
+			tool.tabClose();
+			return false;
+		});
+		
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				if (e.code == 0) {
+					tool.tabRefresh(94);
+					layer.confirm('保存成功,关闭当前页面吗?', { icon: 3, title: '提示' }, function (index) {
+						tool.tabClose();
+					});
+				} else {
+					layer.msg(e.msg);
+				}
+			}
+			tool.post("{:url('gallery/add')}", data.field, callback);
+			return false;
+		});
+		
+		function appendImg(res,id){
+			if(id == 0){
+				id = Date.now();
+				$('#imgList').append(`<div class="gallery-item" id="item_${id}">
+			<div class="gallery-from">
+				<table class="layui-table layui-table-form" style="margin-top:0">
+					<tr>
+						<td class="layui-td-gray">标题<font>*</font></td>
+						<td><input type="text" class="layui-input img-name-input" name="img_title[]" value="${res.name}" placeholder="" autocomplete="off"></td>
+						<td class="layui-td-gray">排序</td>
+						<td style="width:60px"><input type="text" name="img_sort[]" value="" placeholder="" autocomplete="off" class="layui-input"></td>
+					</tr>
+					<tr>
+						<td class="layui-td-gray" style="vertical-align:top;">简介</td>
+						<td colspan="3">
+							<textarea name="img_desc[]" value="" placeholder="" class="layui-textarea" style="min-height:75px;"></textarea>
+							<input type="hidden" name="img_file[]" class="img-file-input" value="${res.id}">
+							<input type="hidden" name="img_filepath[]" class="img-filepath-input" value="${res.filepath}">
+							<input type="hidden" name="img_name[]" class="img-name-input" value="${res.name}">
+							<input type="hidden" name="img_link[]"  class="img-link-input" value="">
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="gallery-thumb">
+				<img src="${res.filepath}" class="img-filepath">
+			</div>
+			<div class="layui-btn-group">
+				<span class="layui-btn layui-btn-xs item-edit" title="编辑" data-id="${id}">编辑</span>
+				<span class="layui-btn layui-btn-xs layui-btn-danger item-del" data-id="${id}" title="删除">删除</span>
+			</div>
+		</div>`);
+			}
+			else{
+				$('#item_'+id).find('.img-filepath').attr('src',res.filepath);
+				$('#item_'+id).find('.img-name-input').val(res.name);
+				$('#item_'+id).find('.img-filepath-input').val(res.filepath);
+				$('#item_'+id).find('.img-name-input').val(res.name);
+				$('#item_'+id).find('.img-file-input').val(res.id);
+			}
+		}
+	}
+</script>
+{/block}
+<!-- /脚本 -->

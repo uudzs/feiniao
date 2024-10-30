@@ -1,0 +1,95 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑银行卡</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">卡号<font>*</font></td>
+			<td><input type="text" name="card_no"  lay-verify="required" lay-reqText="请完善卡号" value="{$detail.card_no}" autocomplete="off" placeholder="请输入卡号" class="layui-input"></td>
+			<td class="layui-td-gray-2">用户</td>
+			<td>{$detail.nickname}</td>
+			<td class="layui-td-gray-2">银行名称</td>
+			<td><input type="text" name="bank_name"  value="{$detail.bank_name}" autocomplete="off" placeholder="请输入银行名称" class="layui-input"></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">银行地址</td>
+			<td><input type="text" name="bank_address"  value="{$detail.bank_address}" autocomplete="off" placeholder="请输入银行地址" class="layui-input"></td>
+			<td class="layui-td-gray-2">卡主姓名</td>
+			<td><input type="text" name="full_name"  value="{$detail.full_name}" autocomplete="off" placeholder="请输入卡主姓名" class="layui-input"></td>
+			<td class="layui-td-gray-2">卡主电话</td>
+			<td><input type="text" name="mobile"  value="{$detail.mobile}" autocomplete="off" placeholder="请输入卡主电话" class="layui-input"></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">卡片状态</td>
+			<td>
+				<input type="radio" name="status" value="0" title="禁止" {eq name="$detail.status" value="0"} checked{/eq}>
+				<input type="radio" name="status" value="1" title="正常" {eq name="$detail.status" value="1"} checked{/eq}>
+			</td><td class="layui-td-gray-2">认证状态</td>
+			<td>
+				<input type="radio" name="auth_status" value="0" title="未认证" {eq name="$detail.auth_status" value="0"} checked{/eq}>
+				<input type="radio" name="auth_status" value="1" title="已认证" {eq name="$detail.auth_status" value="1"} checked{/eq}>
+			</td><td class="layui-td-gray-2">备注</td>
+			<td><input type="text" name="remark"  value="{$detail.remark}" autocomplete="off" placeholder="请输入备注" class="layui-input"></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">卡片图片</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_card_image">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_card_image">
+						<img src="{$detail.card_image}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="card_image" value="{$detail.card_image}" >
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="user_id" value="{$detail.user_id}"/>
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		
+		//上传卡片图片
+		var upload_card_image = layui.upload.render({
+			elem: '#upload_btn_card_image',
+			url: '{:url("api/upload")}',
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_card_image input').attr('value', res.data.filepath);
+				$('#upload_box_card_image img').attr('src', res.data.filepath);
+			}
+		});
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('bank_card/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

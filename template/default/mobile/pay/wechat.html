@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <title>{:get_system_config('web','title')}</title>		
+    <meta name="keywords" content="{:get_system_config('web','keywords')}"/>
+    <meta name="description" content="{:get_system_config('web','desc')}"/>
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="{__STATIC__}/font-awesome/css/font-awesome.min.css?v={:get_system_config('web','version')}" />
+    <link rel="stylesheet" href="{__STATIC__}/bui/css/bui.css?v={:get_system_config('web','version')}" />
+    <link rel="stylesheet" href="{__MOBILE__}/default/css/style.css?v={:get_system_config('web','version')}" />
+    <script>
+        var tokenurl = "{:furl('v1/gettoken', [], true, 'api')}";
+        var loginurl = "{:furl('login', [], true, 'home')}";
+        var sessionname = "{:get_config('app.session_user')}";
+    </script>
+    <script src="{__STATIC__}/bui/js/zepto.js?v={:get_system_config('web','version')}"></script>
+    <script src="{__STATIC__}/bui/js/bui.js?v={:get_system_config('web','version')}"></script>
+    {if condition="isWeChat()"}
+        <script src="https://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
+    {/if}
+</head>
+<body>
+<style>
+.container {
+    display: flex;
+    width: 100%;
+    height: 80vh;
+    align-items: center;
+    justify-content: center;
+    font-size: .3rem;
+    flex-direction: column;
+}
+.container i {
+    font-size: 1rem;
+    color: #03d1a1;
+}
+.container h3 {
+    padding: .2rem 0;
+    text-align: center;
+    font-size: .3rem;
+}
+.container .btn {
+    color: #fff;
+    background: #03d1a1;
+    border-radius: .1rem;
+    border: 0;
+    padding: .12rem .5rem;
+    margin-top: .2rem;
+}
+</style>
+<div class="bui-page bui-box-vertical">
+    <main>
+        <div class="container">
+            <i class="fa fa-meh-o" aria-hidden="true"></i>
+            <h3 class="section-title">{$msg}</h3>
+            <a href="{$url}" class="btn">点击前往</a>
+        </div>
+    </main>
+</div>
+<script type="text/javascript" charset="utf-8">
+wx.config({
+    debug: false, // 开启调试模式
+    appId: '{$jssdk.appId}', // 必填，公众号的唯一标识
+    timestamp: '{$jssdk.timestamp}', // 必填，生成签名的时间戳
+    nonceStr: '{$jssdk.nonceStr}', // 必填，生成签名的随机串
+    signature: '',// 必填，签名，
+    jsApiList: ['chooseWXPay']// 必填，需要使用的JS接口列表，这里只写支付的
+});
+var storage = bui.storage();
+var token = storage.get('token', 0);
+wx.ready(() => {
+    var uiLoading = bui.loading({autoClose: false, text: '请稍候……'});
+    wx.chooseWXPay({
+        appId: '{$jssdk.appId}', //公众号ID
+        timestamp: '{$jssdk.timestamp}', //时间戳
+        nonceStr: '{$jssdk.nonceStr}', //随机串
+        package: '{$jssdk.package}',
+        signType: '{$jssdk.signType}', //微信签名方式
+        paySign: '{$jssdk.paySign}', //微信签名
+        success: res => {
+            uiLoading.show();
+            var timer = bui.timer({
+                type: "number",
+                time: 3,
+                onProcess: (time) => {},
+                onEnd: () => {
+                    bui.ajax({
+                        headers: { Token: token },
+                        url: "{:furl('v1/getorder', [], true, 'api')}",
+                        method: "POST",
+                        data: {id: '{$jssdk.oid}'},
+                        dataType: "json",
+                        success: function (result) {
+                            if(result.code == 0 && parseInt(result.data.paid) == 1) {
+                                uiLoading.hide();
+                                bui.hint({
+                                    content:"支付成功",
+                                    position:"center",
+                                    onClose: function onClose(e) {
+                                        //window.history.go(-1);
+                                         window.history.back();
+                                    }
+                                })
+                            } else {
+                                bui.hint(result.msg);
+                            }
+                        },
+                        fail: function (err) {
+                            bui.hint({
+                                content:"支付失败",
+                                position:"center",
+                            })
+                            console.error("请求失败:", err);
+                        }
+                    });
+                }
+            })
+            timer.start();            
+        },
+        cencel: res => {
+            bui.hint({
+                content:"取消支付",
+                position:"center",
+            })
+        },
+        fail: err => {
+            bui.hint({
+                content:"支付失败。",
+                position:"center",
+            })
+        }
+    });
+});
+
+// if (typeof WeixinJSBridge == "undefined") {
+//     if(document.addEventListener) {
+//          document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+//     } else if (document.attachEvent) {
+//          document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+//          document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+//     } else {
+//         onBridgeReady();
+//     }
+// }
+// function onBridgeReady() {
+//     WeixinJSBridge.invoke('getBrandWCPayRequest', {
+//         "appId": '$jssdk.appId', //公众号ID，由商户传入
+//         "timeStamp": '$jssdk.timeStamp', //时间戳，自1970年以来的秒数
+//         "nonceStr": '$jssdk.nonceStr', //随机串
+//         "package": '$jssdk.package',
+//         "signType": '$jssdk.signType', //微信签名方式
+//         "paySign": '$jssdk.paySign' //微信签名
+//     }, function(res) {
+//         if (res.err_msg == "get_brand_wcpay_request:ok") {
+//             alert('支付成功')
+//             console.log('成功')
+//         } else {
+//             alert('支付失败')
+//             console.log('支付失败，请重新尝试！')
+//         }
+//     })
+// }   
+</script>
+<script>
+    
+</script>

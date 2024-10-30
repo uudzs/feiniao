@@ -1,0 +1,180 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '我的';
+$conf = get_system_config('vip');
+$withdraw = get_system_config('withdraw');
+{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/my.css" />
+
+<div class="avatar">
+    <div class="bui-btn bui-box">
+        <div class="bui-thumbnail"><a href="{:furl('profile', [], true, 'home')}"><img src="{__IMG__}/logo-ico.png" b-src="user.userinfo.headimgurl"></a></div>
+        <div class="span1">
+            <a href="{:furl('profile', [], true, 'home')}"><h3 class="item-title" b-text="user.userinfo.nickname">登录</h3></a>
+            <p class="item-text" b-click="user.copyTextToClipboard(user.userinfo.qrcode_invite)">邀请码：<span b-text="user.userinfo.qrcode_invite">未登录</span><i class="fa fa-clipboard" aria-hidden="true"></i></p>
+        </div>
+        <a href="{:furl('profile', [], true, 'home')}"><i class="icon-listright"></i></a>
+    </div>
+</div>
+{eq name="$conf.open" value="1"}
+<div class="vip" onclick="return window.location.href='{:furl('vip', [], true, 'home')}'">
+    <div class="bui-btn bui-box">
+        <div class="icon"><i class="fa fa-user-circle-o"></i></div>
+        <div class="span1">VIP</div>
+        <div class="item-text">独享更多权益</div>
+        <i class="icon-listright"></i>
+    </div>
+</div>
+{/eq}
+<div class="goldcoin">
+    <ul>
+        <li onclick="return window.location.href='{:furl('coinlog', [], true, 'home')}'">
+            <h5>可用金币</h5>
+            <h3 b-text="user.userinfo.coin">0</h3>
+        </li>
+        <li>
+            <h5>累积提现</h5>
+            <h3 b-text="user.userinfo.withdrawn">0</h3>
+        </li>
+    </ul>
+    <div class="withdraw">
+        <span class="go">兑换比</span>
+        <span>{$withdraw.ratio}金币 = 1元</span>
+        {eq name="$withdraw.open" value="1"}
+        <span onclick="return window.location.href='{:furl('withdraw', [], true, 'home')}'">
+            提现<i class="icon-listright"></i>
+        </span>
+        {/eq}      
+    </div>
+</div>
+
+<ul class="bui-list menu-list">
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('order', [], true, 'home')}'">
+        <i class="fa fa-bars" aria-hidden="true"></i>
+        <div class="span1">订单</div>
+        <i class="icon-listright"></i>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('myinvite', [], true, 'home')}'">
+      <i class="fa fa-user-o" aria-hidden="true"></i>
+        <div class="span1">邀请</div>
+        <i class="icon-listright"></i>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('becomeauthor', [], true, 'home')}'">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        <div class="span1">作者</div>
+        <i class="icon-listright"></i>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('service', [], true, 'home')}'">
+        <i class="fa fa-smile-o" aria-hidden="true"></i>
+        <div class="span1">客服</div>
+        <i class="icon-listright"></i>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('about', [], true, 'home')}'">
+        <i class="fa fa-globe" aria-hidden="true"></i>
+        <div class="span1">关于</div>
+        <i class="icon-listright"></i>
+    </li>
+</ul>
+{/block}
+{block name="script"}
+<script>
+  bui.ready(function () {
+    $(".bui-navbar").hide();
+    $(".bui-bar-right a").attr('href', "{:furl('profile', [], true, 'home')}").find('i').removeClass('icon-search').addClass("icon-setting");
+    $(".bui-bar-left").css('visibility', 'hidden');
+    var bs = bui.store({
+      el: ".bui-page",
+      scope: "user",
+      data: {
+        userinfo: {},
+      },
+      methods: {
+        searchbarInit() {
+          let that = this;
+          return bui.searchbar({
+            id: "#searchbar",
+            callback: function (ui, keyword) {
+              if(keyword) {
+                uiStorage.remove("keywords",keyword);
+                uiStorage.set("keywords", keyword);
+                that.keywords = uiStorage.get("keywords").reverse()
+              }
+              sl.init({
+                page: 1,
+                data: {
+                  client: 5,
+                  "keywords": keyword
+                }
+              }).reload();
+            },
+            onInput: function (ui, keyword) {
+              // 输入实时搜索
+            },
+            onRemove: function (ui, keyword) {
+              sl.init({
+                page: 1,
+                data: {
+                  client: 5,
+                  "keywords": ''
+                }
+              }).reload();
+            }           
+          });
+        },
+        async copyTextToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                const success = await document.execCommand('copy');
+                if (success) {
+                    bui.hint('复制成功');
+                } else {
+                    bui.hint('复制失败');
+                }
+            } catch (error) {
+                bui.hint('复制失败');
+            }
+            document.body.removeChild(textarea);
+        },
+        clear() {
+          this.keywords = [];
+          uiStorage.remove("keywords");
+        },
+        clickitem(text) {
+          $("#searchbar input").val(text);
+          $(".bui-input").find('.icon-removefill').remove();
+          $(".bui-input").append("<i class='icon-removefill'>");
+          sl.init({
+            page: 1,
+            data: {
+              client: 5,
+              "keywords": text
+            }
+          }).reload();
+        }
+      },
+      watch: {},
+      computed: {},
+      templates: {},
+      mounted: function () {
+        var that = this;
+        searchbar = that.searchbarInit();
+        post("{:furl('v1/mine', [], true, 'api')}", {}, function(result) {
+            if(result.code == 0) {
+              that.userinfo = result.data.userinfo || []
+            } else {
+                $(".goldcoin").hide();
+                bui.hint(result.msg);
+            }
+        });
+      }
+    });
+  })
+</script>
+{/block}

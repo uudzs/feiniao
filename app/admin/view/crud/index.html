@@ -1,0 +1,55 @@
+{extend name="common/base" /}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <table class="layui-table layui-form">
+        <thead>
+			<tr>
+				<th colspan="7" class="red" style="text-align:left; line-height:1.8">
+					使用【<strong>一键CRUD生成代码</strong>】功能可以帮你完成 <strong>60%</strong> 以上的开发工作，只有系统的超级管理员才可以使用该功能，使用前请先<strong>新建数据表</strong>
+				</th>
+			</tr>
+			<tr>
+				<th style="text-align:center;">ID编号</th>
+				<th style="text-align:center;">表前缀</th>
+				<th>数据表名</th>
+				<th style="text-align:center;">数据量</th>
+				<th style="text-align:center;">创建时间</th>
+				<th>数据表注释</th>
+				<th style="text-align:center;">操作</th>
+			</tr>
+        </thead>
+        <tbody>
+        {volist name="table_info" id="v"}
+        <tr>
+            <td style="text-align:center;">{$i}</td>
+            <td style="text-align:center;">{$prefix}</td>
+            <td>{$v.title}</td>
+            <td style="text-align:center;">{$v.Rows}</td>
+            <td style="text-align:center;">{$v.Create_time}</td>
+            <td>{$v.Comment}</td>
+            <td style="text-align:center;">
+				{eq name="$v.crud" value="0"}
+                <a href="{:url('crud/table')}?name={$v.Name}" class="layui-btn layui-btn-xs">一键CRUD生成代码</a>
+				{else/}
+				已生成CRUD <a href="{:url('crud/table')}?name={$v.Name}" class="layui-btn layui-btn-normal layui-btn-xs">详细</a>
+				{/eq}
+            </td>
+        </tr>
+        {/volist}
+        </tbody>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var tool = layui.tool;		
+	}
+</script>
+{/block}
+<!-- /脚本 -->

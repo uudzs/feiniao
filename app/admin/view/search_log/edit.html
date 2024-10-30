@@ -1,0 +1,56 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑搜索</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">类型<font>*</font></td>
+			<td>
+				<input type="radio" name="type" value="0" title="选项一" {eq name="$detail.type" value="1"} checked{/eq}>
+				<input type="radio" name="type" value="1" title="选项二" {eq name="$detail.type" value="2"} checked{/eq}>
+			</td><td class="layui-td-gray-2">客户端</td>
+			<td>
+				<input type="radio" name="client" value="0" title="选项一" {eq name="$detail.client" value="1"} checked{/eq}>
+				<input type="radio" name="client" value="1" title="选项二" {eq name="$detail.client" value="2"} checked{/eq}>
+			</td><td class="layui-td-gray-2">搜索词</td>
+			<td><input type="text" name="keyword"  value="{$detail.keyword}" autocomplete="off" placeholder="请输入搜索词" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">搜索人</td>
+			<td><input type="text" name="user_id"  value="{$detail.user_id}" autocomplete="off" placeholder="请输入搜索人" class="layui-input"></td><td class="layui-td-gray-2">结果数</td>
+			<td><input type="text" name="resnum"  value="{$detail.resnum}" autocomplete="off" placeholder="请输入结果数" class="layui-input"></td><td colspan='2'></td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		
+		
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('search_log/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

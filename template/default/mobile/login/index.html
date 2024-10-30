@@ -1,0 +1,194 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '登录';
+{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/login.css" />
+<style>
+.bui-dialog-fullscreen .bui-dialog-main {
+    text-align: left;
+}
+</style>
+<div class="container">
+    <div class="subtitle logo">
+        <h1>{:get_system_config('web','title')}</h1>
+    </div>
+    <div class="login-form">
+        <div class="subtitle">快捷登录</div>
+        <ul class="bui-list">
+            <li class="bui-btn bui-box">
+                <div class="span1">
+                    <div class="bui-input user-input">
+                        <i class="icon-phone">&#xe603;</i>
+                        <input type="text" name="mobile" placeholder="手机号码" value="18910328479" b-model="login.userinfo.mobile" b-blur="login.check" rule="^\d{11}" tip="请输入正确的手机号码">
+                        <i class="icon-remove" b-show="login.userinfo.mobile" b-click="login.clear('userinfo.mobile')"></i>
+                    </div>
+                </div>
+            </li>
+            <li class="bui-btn bui-box">
+                <div class="span1">
+                    <div class="bui-input">
+                        <i class="icon-safe"></i>
+                        <input type="text" name="code" placeholder="验证码" value="446772" b-model="login.userinfo.code" maxlength="6">
+                        <i class="icon-remove" b-show="login.userinfo.code" b-click="login.clear('userinfo.code')"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="btn-getcode primary" b-text="login.codetext" b-class="login.disabled" b-click="login.getcode">获取验证码</div>
+                </div>
+            </li>
+        </ul>        
+        <div class="container">
+            <div class="bui-btn ring primary loginbtn" b-click="login.sign">立即登录</div>
+            <div class="bui-box-center">
+                <label><input type="checkbox" class="bui-choose" b-model="login.agree">同意</label> <span b-click="login.agreement">《用户协议》</span><span b-click="login.privacy">《隐私政策》</span>
+            </div>
+        </div>
+    </div>
+</div>
+{php}
+$agreement = model('pages')->where(['status' => 1, 'name' => 'agreement'])->value('content');
+$privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('content');
+{/php}
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+
+        $(".footer").hide();
+        $(".bui-navbar").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+        
+        var refererUrl = '{$refererUrl}';
+
+        // 初始化数据行为存储
+        var bs = bui.store({
+            el: `.login-form`,
+            scope: "login",
+            data: {
+                userinfo: {
+                    mobile: "",
+                    code: ""
+                },
+                remember: false,
+                agree: false,
+                auto: false,
+                disabled: false,
+                codetext: "获取验证码",
+            },
+            methods: {
+                agreement(e) {
+                    var uiDialog = bui.popover({
+                        content:`{$agreement|raw}`,
+                        title:"《用户协议》",
+                        onClickMain:function(e){
+                            uiDialog.close();
+                        }
+                    })
+                },
+                privacy(e) {
+                    var uiDialog = bui.popover({
+                        content:`{$privacy|raw}`,
+                        title:"《隐私政策》",
+                        onClickMain:function(e){
+                            uiDialog.close();
+                        }
+                    })
+                },
+                 sign(e) {
+                    var that = this;
+                    let userinfo = that.userinfo;
+                    // 检测是否为空
+                    let canSign = that.checkEmpty(userinfo);
+                    if (!canSign) {
+                        return bui.hint("必填项为空！");;
+                    }
+                    if(!that.agree) return bui.hint('请选同意相关协议！');
+                    // 登陆
+                    var invite_code = getCookie(sessioninvitename);
+                    var postData = {"mobile": that.userinfo.mobile, "code": that.userinfo.code, "invite_code": invite_code};
+                    post("{:furl('v1/login', [], true, 'api')}", postData, function(result) {
+                        if(parseInt(result.code) === 0) {
+                            storage.set("token", result.data.token);
+                            window.location.href = refererUrl;
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                    return false;
+                },
+                checkEmpty(userinfo) {
+                    for (let keyname in userinfo) {
+                        if (userinfo[keyname] == "") {
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                check(e) {
+                    // 校验
+                    let val = e.target.value;
+                    let rule = e.target.getAttribute('rule');
+                    let tip = e.target.getAttribute('tip');
+                    let name = e.target.getAttribute('name');
+                    if (rule && new RegExp(rule).test(val)) {
+                        return true;
+                    } else {
+                        // 清空输入值
+                        this.setState(`userinfo.${name}`, "");
+                        tip && bui.hint(tip);
+                        return false;
+                    }
+                },
+                getcode(e) {
+                    var that = this;
+                    if (that.disabled) {
+                        return;
+                    }                    
+                    if (!that.disabled) {
+                        if(!that.userinfo.mobile) return bui.hint('请输入手机号！');
+                        if (!(/^1\d{10}$/.test(that.userinfo.mobile))) {
+                            return bui.hint('手机号不正确！');
+                        }
+                        if(!that.agree) return bui.hint('请选同意相关协议！');
+                        var postData = {mobile: that.userinfo.mobile};
+                        post("{:furl('v1/smssend', [], true, 'api')}", postData, function(result) {
+                            if(result.code == 0) {
+                                // 禁止点击，直到计时器恢复
+                                that.disabled = true;
+                                    var timer = bui.timer({
+                                        type: "number",
+                                        time: 60,
+                                        onProcess: (time) => {
+                                            that.codetext = time.value + "秒后重新获取";
+                                        },
+                                        onEnd: () => {
+                                            that.disabled = false;
+                                            that.codetext = "重新获取验证码";
+                                        }
+                                    })
+                                    timer.start();
+                            } else {
+                                bui.hint(result.msg);
+                            }
+                        });                      
+                    }
+                },
+                clear(str) {
+                    // 清空值
+                    this.setState(str, "");
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                // 数据解析后执行
+            }
+        })
+    })
+</script>
+{/block}

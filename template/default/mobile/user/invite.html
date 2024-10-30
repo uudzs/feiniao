@@ -1,0 +1,181 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '我的邀请';{/php}
+{include file="common/header"/}
+<style>
+.invite {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.invite .input {
+    width: 100%;
+    display: block;
+    clear: both;
+    text-align: center;
+    margin-top: .5rem;
+}
+.invite .input input {
+    width: 80%;
+    border-radius: .5rem;
+    border: 1px solid #ccc;
+    padding: .2rem .5rem;
+    text-align: center;
+}
+.invite .input .subbtn {
+    width: 80%;
+    border-radius: .5rem;
+    padding: .2rem .5rem;
+    text-align: center;
+    background: #03d1a1;
+    border: 0;
+    color: #fff;
+    font-size: .28rem;
+}
+.invite .tips {
+    margin: .5rem 0;
+    width: 100%;
+}
+.invite .tips .span1 {
+    width: 80%;
+    margin: 0 auto;
+    text-align: left;
+}
+#scrollList .desc {
+    height: 1.2rem;
+    line-height: .4rem;
+    color: #666;
+    overflow: hidden;
+}
+#scrollList .bui-thumbnail {
+    width: 1rem;
+}
+#scrollList .bui-thumbnail img {
+    border-radius: 50%;
+    border: #ebebeb 1px solid;
+}
+#scrollList .reg_time {
+    margin-bottom: 0;
+}
+</style>
+
+<div id="scrollList" class="bui-scroll">
+    <div class="bui-scroll-head"></div>
+    <div class="bui-scroll-main">
+        <ul class="bui-list"></ul>
+    </div>
+    <div class="bui-scroll-foot"></div>
+</div>
+
+<div id="uiDialog" class="bui-dialog">
+    <div class="bui-dialog-head">绑定我的邀请</div>
+    <div class="bui-dialog-main">
+        <div class="invite">            
+            <div class="input">
+                <input type="text" value="" placeholder="请输入对方的邀请码" b-model="invite.code">
+            </div>
+            <div class="input">
+                <button class="subbtn" b-click="invite.invitesubmit">提交</button>
+            </div>
+            <div class="tips">
+                <div class="span1">
+                    <h3 class="item-title">说明：</h3>
+                    <p class="item-text">这里输入成为自己上级的邀请码，每个账号只可绑定一次邀请码，并且绑定后不可更改，请确认绑定信息是否准确。</p>            
+                </div>
+            </div>
+        </div>      
+    </div>   
+    <div class="bui-dialog-close"><i class="icon-close"></i></div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").html('<span class="bui-btn" b-click="invite.add()">绑定邀请</span>');
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "invite",
+            data: {
+                userinfo: {},
+                code: ''
+            },
+            methods: {
+                add: function() {
+                    this.uiDialog.open();
+                },
+                invitelist: function (e) {
+                    var that = this;
+                    bui.list({
+                        headers: { Token: token },
+                        id: "#scrollList",
+                        url: "{:furl('v1/myinvite', [], true, 'api')}",
+                        pageSize: 10,
+                        data: {},
+                        field: {
+                            page: "page",
+                            size: "limit",
+                            data: "data.data"
+                        },
+                        template: function (data) {
+                            if(data.length <= 0) return `<div class="span1 bui-align-center"><p class="item-text">暂无数据</p></div>`;
+                            var html = "";
+                            data.forEach(function(el, index) {
+                                html +=`<li class="bui-btn bui-box">                        
+                                            <div class="bui-thumbnail"><img src="${el.headimgurl}" onerror="javascript:this.src='{__ASSETS__}/init/images/data-none.png';this.onerror=null;"></div>
+                                            <div class="span1">
+                                                <h3 class="item-title">${el.nickname}</h3>
+                                                <p class="item-text reg_time">注册时间：${el.register_time}</p>
+                                            </div>                        
+                                        </li>`
+                            });
+                            return html;
+                        },
+                        onLoaded: function onLoaded(r) {
+                            if(parseInt(r.code) > 400) {
+                                gettoken();
+                            }
+                        },
+                    });
+                },
+                invitesubmit: function (e) {
+                    if(!this.code) return bui.hint("请输入对方的邀请码！");
+                    if(parseInt(this.userinfo.inviter) > 0) return bui.hint("已经有邀请人了！");
+                    var that = this;
+                    post("{:furl('v1/bindinvitecode', [], true, 'api')}", {code: that.code}, function(result) {
+                        if(result.code == 0) {
+                            bui.hint(result.msg);
+                            that.code = '';
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                var that = this;                
+                post("{:furl('v1/mine', [], true, 'api')}", {}, function(result) {
+                    if(result.code == 0) {
+                        that.userinfo = result.data.userinfo || []
+                        if(parseInt(result.data.userinfo.inviter) > 0) {
+                            $(".bui-bar-right").css('visibility', 'hidden');
+                        }
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+                that.invitelist();
+                that.uiDialog = bui.dialog({
+                    id: "#uiDialog"
+                });
+            }
+        });
+    })
+</script>
+{/block}

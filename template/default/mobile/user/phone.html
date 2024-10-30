@@ -1,0 +1,220 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '手机设定';{/php}
+{include file="common/header"/}
+<style>
+    .mobile-form {
+        background-color: #fff;
+        -webkit-border-radius: .2rem;
+        border-radius: .2rem;
+        padding: .5rem .3rem;
+        padding-bottom: 0;
+    }
+
+    .mobile-form .subtitle {
+        font-size: .36rem;
+        margin-bottom: .2rem;
+    }
+
+    .mobile-form .bui-list {
+        overflow: hidden;
+    }
+
+    .mobile-form .bui-list .bui-btn {
+        border: 0;
+        padding: 0;
+        margin-bottom: .3rem;
+    }
+
+    .mobile-form .bui-input {
+        border: 1px solid #f1f0f0;
+        padding: .15rem .1rem;
+    }
+
+    .mobile-form .bui-btn.primary {
+        margin-bottom: .5rem;
+        background: #03d1a1;
+        border: 0;
+    }
+
+    .mobile-form .btn-getcode.disabled {
+        background-color: #f1f0f0;
+        color: #ccc;
+    }
+
+    .bui-btn-text,
+
+    .mobile-form label {
+        color: #666;
+    }
+
+    .btn-getcode {
+        padding: 0 .3rem;
+        height: .86rem;
+        line-height: .86rem;
+        margin-left: .2rem;
+        background: #03d1a1;
+        border: 0;
+    }
+
+    .login-item {
+        color: #666;
+        width: 1.6rem;
+        padding: .2rem 0
+    }
+
+    .login-item img {
+        width: .88rem;
+    }
+
+    .container-xy {
+        padding: 0;
+    }
+
+    .divider {
+        font-size: .26rem;
+        padding-bottom: .3rem;
+    }
+</style>
+<div class="mobile-form">
+    <div class="divider bui-box-align-middle" b-show="phone.userinfo.mobile">
+        当前手机号：<span b-text="phone.userinfo.mobile"></span>，正在修改手机号。
+    </div>
+    <ul class="bui-list">
+        <li class="bui-btn bui-box clearactive">
+            <div class="span1">
+                <div class="bui-input">
+                    <i class="fa fa-unlock-alt" aria-hidden="true"></i>
+                    <input type="text" name="securitypwd" placeholder="安全密码" b-model="phone.info.securitypwd" tip="请输入安全密码">
+                    <i class="icon-remove" b-show="phone.info.securitypwd" b-click="phone.clear('info.securitypwd')" style="display: none;"></i>
+                </div>
+            </div>
+        </li>
+        <li class="bui-btn bui-box clearactive">
+            <div class="span1">
+                <div class="bui-input">
+                    <i class="icon-phone"></i>
+                    <input type="text" name="mobile" placeholder="新手机号码" b-model="phone.info.mobile" b-blur="phone.check" rule="^\d{11}" tip="请输入正确的手机号码">
+                    <i class="icon-remove" b-show="phone.info.mobile" b-click="phone.clear('info.mobile')" style="display: none;"></i>
+                </div>
+            </div>
+        </li>
+        <li class="bui-btn bui-box clearactive">
+            <div class="span1">
+                <div class="bui-input">
+                    <i class="icon-safe"></i>
+                    <input type="text" name="code" placeholder="验证码" b-model="phone.info.code" maxlength="6">
+                    <i class="icon-remove" b-show="phone.info.code" b-click="phone.clear('info.code')"
+                        style="display: none;"></i>
+                </div>
+            </div>
+            <div>
+                <div class="btn-getcode round primary" b-text="phone.codetext" b-class="phone.disabled"
+                    b-click="phone.getcode">获取验证码</div>
+            </div>
+        </li>
+    </ul>
+    <div class="container-xy">
+        <div class="bui-btn round primary" b-click="phone.submit">确定</div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "phone",
+            data: {
+                userinfo: {},
+                info: {
+                    mobile: "",
+                    code: "",
+                    securitypwd: ''
+                },
+                codetext: "获取验证码",
+                disabled: !1,
+            },
+            methods: {
+                submit: function (t) {
+                    var that = this;
+                    var e = that.info;
+                    if (!e.securitypwd) return bui.hint("安全密码不能为空！");
+                    if (!e.mobile) return bui.hint("手机号不能为空！");
+                    if (!e.code) return bui.hint("验证码不能为空！");
+                    post("{:furl('v1/mobile', [], true, 'api')}", { mobile: e.mobile, code: e.code,securitypwd: e.securitypwd }, function (result) {
+                        if (result.code == 0) {
+                            bui.hint({
+                                content: result.msg,
+                                onClose: function onClose(e) {
+                                    bui.back();
+                                }
+                            })
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    })
+                },
+                check: function (t) {
+                    var e = t.target.value
+                        , i = t.target.getAttribute("rule")
+                        , n = t.target.getAttribute("tip")
+                        , t = t.target.getAttribute("name");
+                    return !(!i || !new RegExp(i).test(e)) || (this.setState("info.".concat(t), ""),
+                        n && bui.hint(n),
+                        !1)
+                },
+                getcode: function (t) {
+                    var e = this;
+                    if (!e.info.mobile) return bui.hint("请先填写手机号！");
+                    post("{:furl('v1/smssend', [], true, 'api')}", { mobile: e.info.mobile }, function (result) {
+                        if (result.code == 0) {
+                            e.disabled = !0;
+                            bui.timer({
+                                type: "number",
+                                time: 60,
+                                onProcess: function (t) {
+                                    e.codetext = t.value + "秒后重新获取"
+                                },
+                                onEnd: function () {
+                                    e.disabled = !1,
+                                        e.codetext = "重新获取验证码"
+                                }
+                            }).start()
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    })
+                },
+                clear: function (t) {
+                    this.setState(t, "")
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                var that = this;
+                post("{:furl('v1/mine', [], true, 'api')}", {}, function (result) {
+                    if (result.code == 0) {
+                        that.userinfo = result.data.userinfo || []
+                        if (parseInt(result.data.userinfo.setspwd) === 1) {
+                            bui.alert("请先设置安全密码", function (e) {
+                                window.location.href = '{:furl("security")}';
+                            }, { autoClose: false })
+                        }
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+            }
+        });
+    })
+</script>
+{/block}

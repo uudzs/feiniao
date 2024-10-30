@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    {php}
+	$systemconf = get_system_config('web');
+	{/php}
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    {block name="title"}
+        <title>{$systemconf.title}</title>		
+    {/block}
+    {block name="keywords"}
+        <meta name="keywords" content="{$systemconf.keywords}"/>
+        <meta name="description" content="{$systemconf.desc}"/>
+    {/block}
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    {block name="css"}
+        <link rel="stylesheet" href="{__STATIC__}/font-awesome/css/font-awesome.min.css?v={$systemconf.version}" />
+        <link rel="stylesheet" href="{__STATIC__}/bui/css/bui.css?v={$systemconf.version}" />
+        <link rel="stylesheet" href="{__MOBILE__}/default/css/style.css?v={$systemconf.version}" />
+    {/block}
+    {block name="style"}{/block}
+    {block name="js"}
+        <script>
+            var tokenurl = "{:furl('v1/gettoken', [], true, 'api')}";
+            var loginurl = "{:furl('login', [], true, 'home')}";
+            var sessionname = "{:get_config('app.session_user')}";
+            var sessioninvitename = "{:get_config('app.session_invite')}";
+        </script>
+        <script src="{__STATIC__}/bui/js/zepto.js?v={$systemconf.version}"></script>
+        <script src="{__STATIC__}/bui/js/bui.js?v={$systemconf.version}"></script>
+        <script src="{__MOBILE__}/default/js/init.js?v={$systemconf.version}"></script>
+        {if condition="isWeChat()"}
+            <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js" type="text/javascript" charset="utf-8"></script>
+            {notempty name="$appconfig"}
+                <script type="text/javascript" charset="utf-8">                
+                    wx.config({$appconfig});                
+                </script>
+            {/notempty}
+        {/if}
+    {/block}
+</head>
+<body>
+	<!-- 主体 -->
+	{block name="body"}{/block}
+	<!-- /主体 -->
+
+	<!-- 底部 -->
+	{block name="footer"}
+	    {include file="common/footer" /}
+	{/block}
+	<!-- /底部 -->
+	
+	<!-- 脚本 -->
+	{block name="script"}{/block}
+	<!-- /脚本 -->
+	
+	<!-- 统计代码 -->
+	{block name="code"}<div style="display: none;">{$systemconf.code}</div>{/block}
+	<!-- /统计代码 -->
+</body>
+</html>

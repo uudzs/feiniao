@@ -1,0 +1,211 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="withdraw" lay-filter="withdraw"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">操作</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#withdraw',
+			title: '提现列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("withdraw/datalist")}',
+			page: true,
+			limit: 20,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'nickname',
+					title: '提现人',
+					align: 'center',
+					width: 200
+				},{
+					field: 'tax',
+					title: '税',
+					align: 'center',
+					width: 100
+				},{
+					field: 'card_no',
+					title: '收款账号',
+					align: 'center',
+					width: 250
+				},{
+					field: 'bank_name',
+					title: '银行名称',
+					align: 'center',
+					width: 200
+				},{
+					field: 'card_image',
+					title: '卡片图片',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.card_image ? '<img src="' + d.card_image + '" width="80" onclick="showBigImage(this)">' : '--';
+					}
+				},{
+					field: 'bank_address',
+					title: '银行地址',
+					align: 'center',
+					width: 300
+				},{
+					field: 'full_name',
+					title: '卡主姓名',
+					align: 'center',
+					width: 100
+				},{
+					field: 'mobile',
+					title: '卡主电话',
+					align: 'center',
+					width: 120
+				},{
+					field: 'money',
+					title: '提现额',
+					align: 'center',
+					width: 120
+				},{
+					field: 'coin',
+					title: '金币',
+					align: 'center',
+					width: 120
+				},{
+					field: 'status',
+					title: '状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.status) === 1 ? '<button type="button" class="layui-btn layui-btn-xs">成功</button>' : (parseInt(d.status) === 2 ? '<button type="button" class="layui-btn layui-btn-primary layui-btn-xs layui-btn-disabled">拒绝</button>' : '<button type="button" class="layui-btn layui-btn-xs layui-btn-normal">待审</button>');
+					}
+				},{
+					field: 'admin_id',
+					title: '操作员',
+					align: 'center',
+					width: 200,
+					templet:function(d) {
+						return d.admin_id ? d.admin_nickname : '--';
+					}
+				},{
+					field: 'notes',
+					title: '备注',
+					align: 'center',
+					width: 200,
+					templet:function(d) {
+						return d.notes ? d.notes : '--';
+					}
+				},{
+					field: 'create_time',
+					title: '创建时间',
+					align: 'center',
+					width: 150
+				},{
+					field: 'update_time',
+					title: '更新时间',
+					align: 'center',
+					width: 150
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 100,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(withdraw)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('withdraw/add')}");
+				return false;
+			}
+		});
+
+		window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+
+		//监听表格行工具事件
+		table.on('tool(withdraw)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side('{:url("withdraw/read")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side('{:url("withdraw/edit")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('withdraw/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

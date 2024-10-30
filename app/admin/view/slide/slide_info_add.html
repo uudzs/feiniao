@@ -1,0 +1,134 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+.show {
+  display: table-row;
+}
+.hide {
+  display: none;
+}
+</style>
+<form class="layui-form p-4">
+  <h3 class="pb-3">幻灯片</h3>
+  <table class="layui-table layui-table-form">
+    <tr>
+      <td class="layui-td-gray">标题<font>*</font></td>
+      <td>
+        <input type="hidden" name="id" value="{$id}" />
+        <input type="text" name="title" lay-verify="required" lay-reqText="请输入标题" autocomplete="off" placeholder="请输入标题" class="layui-input" {notempty name="$slide_info.title" }value="{$slide_info.title}" {/notempty}>
+      </td>      
+    </tr>
+    <tr>
+      <td class="layui-td-gray">链接</td>
+      <td>
+        <input type="text" name="src" autocomplete="off" placeholder="请输入链接" class="layui-input" {notempty name="$slide_info.src" }value="{$slide_info.src}" {/notempty}>
+      </td>
+    </tr>
+    <tr>
+      <td class="layui-td-gray">状态<font>*</font></td>
+      <td>
+        {if condition="$id eq 0"}
+        <input type="radio" name="status" value="1" title="正常" checked>
+        <input type="radio" name="status" value="-1" title="禁用">
+        {else/}
+        <input type="radio" name="status" value="1" title="正常" {eq name="$slide_info.status" value="1" }checked{/eq}>
+        <input type="radio" name="status" value="-1" title="禁用" {eq name="$slide_info.status" value="-1" }checked{/eq}>
+        {/if}
+      </td>
+    </tr>
+    <tr>
+      <td class="layui-td-gray">排序</td>
+      <td><input type="text" name="sort" placeholder="请输入排序，数字" autocomplete="off" class="layui-input" {notempty name="$slide_info.sort" }value="{$slide_info.sort}" {/notempty}></td>
+    </tr>
+    <tr>
+      <td class="layui-td-gray">类型</td>
+      <td>
+        {if condition="$id eq 0"}
+        <input type="radio" name="type" value="1" title="图片" checked lay-filter="radioType">
+        <input type="radio" name="type" value="2" title="代码" lay-filter="radioType">
+        {else/}
+        <input type="radio" name="type" value="1" title="图片" {eq name="$slide_info.type" value="1"}checked{/eq} lay-filter="radioType">
+        <input type="radio" name="type" value="2" title="代码" {eq name="$slide_info.type" value="2"}checked{/eq} lay-filter="radioType">
+        {/if}
+      </td>
+    </tr>
+    <tr id="typeimg" {notempty name="$slide_info.type"}{eq name="$slide_info.type" value="1"}class="show"{else/}class="hide"{/eq}{else/}class="show"{/notempty}>
+      <td class="layui-td-gray">图片</td>
+      <td>
+        <div class="layui-upload">
+          <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" id="uploadBtn">选择要上传的图片</button>
+          <div class="layui-upload-list" id="demo1" style="width: 100%; overflow:hidden;">
+            <img {notempty name="$slide_info.img"}src="{:get_file($slide_info.img)}"{else/}src=""{/notempty} style="max-width: 120px;" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';"/>
+            <input type="hidden" name="img" {notempty name="$slide_info.img"}value="{$slide_info.img}"{/notempty}>
+          </div>
+        </div>
+      </td>
+    </tr>
+    <tr id="typecode" {notempty name="$slide_info.type"}{eq name="$slide_info.type" value="2"}class="show"{else/}class="hide"{/eq}{else/}class="hide"{/notempty}>
+      <td class="layui-td-gray">代码</td>
+      <td>
+        <textarea name="desc" placeholder="请输入代码" class="layui-textarea">{notempty name="$slide_info.desc" }{$slide_info.desc}{/notempty}</textarea>
+      </td>
+    </tr>
+  </table>
+
+  <div style="padding: 10px 0">
+    <input type="hidden" name="slide_id" value="{$slide_id}">
+    <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+  </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+  const moduleInit = ['tool'];
+  function feiniaoInit() {
+    var form = layui.form, tool = layui.tool, upload = layui.upload;
+
+    // 指定事件
+    form.on('radio(radioType)', function(data){
+      if(this.value == 1) {
+        $("#typecode").addClass('hide');
+        $("#typeimg").removeClass('hide').addClass('show');
+      }
+      if(this.value == 2) {
+        $("#typeimg").addClass('hide');
+        $("#typecode").removeClass('hide').addClass('show');
+      }
+    });
+
+    //头像上传
+    var uploadInst = upload.render({
+      elem: '#uploadBtn'
+      , url: '{:url("api/upload")}'
+      , done: function (res) {
+        //如果上传失败
+        if (res.code == 1) {
+          return layer.msg('上传失败');
+        }
+        //上传成功
+        $('#demo1 input').attr('value', res.data.id);
+        $('#demo1 img').attr('src', res.data.filepath);
+      }
+    });
+
+    //监听提交
+    form.on('submit(webform)', function (data) {
+      let callback = function (e) {
+        layer.msg(e.msg);
+        if (e.code == 0) {
+          parent.layui.tool.close(1000);
+        }
+      }
+      tool.post("{:url('slide/slide_info_add')}", data.field, callback);
+      return false;
+    });
+  }
+
+</script>
+{/block}
+<!-- /脚本 -->

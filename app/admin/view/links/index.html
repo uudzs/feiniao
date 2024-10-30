@@ -1,0 +1,120 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="ID/名称" class="layui-input" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="link" lay-filter="link"></table>
+</div>
+
+<script type="text/html" id="status">
+	<i class="layui-icon {{#  if(d.status == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
+</script>
+
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+    <button class="layui-btn layui-btn-sm" lay-event="add">+ 添加友情链接</button>
+  </div>
+</script>
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table, tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#link',
+			title: '友情链接列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("links/index")}', //数据接口
+			page: false, //开启分页
+			cols: [
+				[
+					{
+						field: 'id',
+						title: 'ID号',
+						align: 'center',
+						width: 80
+					}, {
+						field: 'name',
+						title: '网站名称',
+						width: 240
+					}, {
+						field: 'src',
+						title: '网站链接'
+					}, {
+						field: 'sort',
+						title: '排序',
+						width: 80,
+						align: 'center'
+					}, {
+						field: 'right',
+						title: '操作',
+						toolbar: '#barDemo',
+						width: 100,
+						align: 'center'
+					}
+				]
+			]
+		});
+
+		//表头工具栏事件
+		table.on('toolbar(link)', function (obj) {
+			if (obj.event === 'add') {
+				tool.side("{:url('links/add')}");
+				return;
+			}
+		});
+
+		//监听行工具事件
+		table.on('tool(link)', function (obj) {
+			var data = obj.data;
+			if (obj.event === 'edit') {
+				tool.side('{:url("links/add")}?id=' + obj.data.id);
+				return;
+			}
+			if (obj.event === 'del') {
+				layer.confirm('确定要删除该数据吗？', {
+					icon: 3,
+					title: '提示'
+				}, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('links/delete')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+		});
+
+		//监听搜索提交
+		form.on('submit(webform)', function (data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

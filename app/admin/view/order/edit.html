@@ -1,0 +1,71 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑订单</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">订单商品总数</td>
+			<td><input type="text" name="total_num"  value="{$detail.total_num}" autocomplete="off" placeholder="请输入订单商品总数" class="layui-input"></td>
+			<td class="layui-td-gray-2">订单总价</td>
+			<td><input type="text" name="total_price"  value="{$detail.total_price}" autocomplete="off" placeholder="请输入订单总价" class="layui-input"></td>
+			<td class="layui-td-gray-2">实际支付金额</td>
+			<td><input type="text" name="pay_price"  value="{$detail.pay_price}" autocomplete="off" placeholder="请输入实际支付金额" class="layui-input"></td>
+		</tr>		
+		<tr>
+			<td class="layui-td-gray-2">支付状态</td>
+			<td>
+				<input type="radio" name="paid" value="0" title="未支付" {eq name="$detail.paid" value="0"} checked{/eq}>
+				<input type="radio" name="paid" value="1" title="已支付" {eq name="$detail.paid" value="1"} checked{/eq}>
+			</td>		
+			<td class="layui-td-gray-2">支付方式</td>
+			<td>
+				<input type="radio" name="pay_type" value="weixin" title="微信" {eq name="$detail.pay_type" value="weixin"} checked{/eq}>
+				<input type="radio" name="pay_type" value="alipay" title="支付宝" {eq name="$detail.pay_type" value="alipay"} checked{/eq}>
+			</td>
+			<td class="layui-td-gray-2">订单状态</td>
+			<td>
+				<input type="radio" name="status" value="0" title="待发货" {eq name="$detail.status" value="0"} checked{/eq}>
+				<input type="radio" name="status" value="1" title="待收货" {eq name="$detail.status" value="1"} checked{/eq}>
+				<input type="radio" name="status" value="2" title="已收货" {eq name="$detail.status" value="2"} checked{/eq}>
+				<input type="radio" name="status" value="3" title="待评价" {eq name="$detail.status" value="3"} checked{/eq}>
+				<input type="radio" name="status" value="-1" title="已退款" {eq name="$detail.status" value="-1"} checked{/eq}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">管理员备注</td>
+			<td colspan="5"><input type="text" name="remark"  value="{$detail.remark}" autocomplete="off" placeholder="请输入管理员备注" class="layui-input"></td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="order_id" value="{$detail.order_id}"/>
+		<input type="hidden" name="user_id" value="{$detail.user_id}"/>
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		//监听提交
+		form.on('submit(webform)', function (data) {			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('order/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

@@ -1,0 +1,21 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">点赞详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">用户ID</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">作品ID</td>
+			<td>{$detail.book_id}</td><td class="layui-td-gray-2">章节ID</td>
+			<td>{$detail.chapter_id}</td>
+		</tr><tr><td class="layui-td-gray-2">点赞日期</td>
+			<td>{$detail.like_date|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">IP</td>
+			<td>{$detail.ip}</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td><td colspan='4'></td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

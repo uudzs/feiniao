@@ -1,0 +1,233 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '设置';{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/my.css" />
+<link rel="stylesheet" href="{__MOBILE__}/default/css/profile.css" />
+<script src="{__MOBILE__}/default/js/cropper/cropper.min.js"></script>
+<link rel="stylesheet" href="{__MOBILE__}/default/js/cropper/cropper.min.css" />
+<div class="avatar" b-click="user.upavatar">
+    <div class="bui-btn bui-box">
+        <div class="bui-thumbnail"><img src="{__IMG__}/logo-ico.png" b-src="user.userinfo.headimgurl"></div>
+        <div class="span1"></div>
+        <div class="item-text">点击修改头像</div>
+        <i class="icon-listright"></i>
+    </div>
+</div>
+
+<ul class="bui-list menu-list">
+    <li class="bui-btn bui-box">
+        <div class="span1">个人信息</div>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('nickname', [], true, 'home')}'">
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+        <div class="span1">昵称</div>
+        <i class="icon-listright"></i>
+    </li>    
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('phone', [], true, 'home')}'">
+        <i class="fa fa-tablet" aria-hidden="true"></i>
+        <div class="span1">手机</div>
+        <i class="icon-listright"></i>
+    </li>
+</ul>
+
+<ul class="bui-list menu-list">
+    <li class="bui-btn bui-box">
+        <div class="span1">隐私安全</div>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('realnameauth', [], true, 'home')}'">
+        <i class="fa fa-id-card-o" aria-hidden="true"></i>
+        <div class="span1">实名认证</div>
+        <i class="icon-listright"></i>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('bankcard', [], true, 'home')}'">
+        <i class="fa fa-credit-card" aria-hidden="true"></i>
+        <div class="span1">收款账号</div>
+        <i class="icon-listright"></i>
+    </li>
+    <li class="bui-btn bui-box" onclick="return window.location.href='{:furl('security', [], true, 'home')}'">
+        <i class="fa fa-key" aria-hidden="true"></i>
+        <div class="span1">安全密码</div>
+        <i class="icon-listright"></i>
+    </li> 
+</ul>
+<div class="bui-btn logout" b-click="user.logout()">退出登录</div>
+
+<div class="bui-dialog">
+    <div class="bui-dialog-head" b-text="user.title"></div>
+    <div class="bui-dialog-main">
+        <img b-src="user.image" class="avatarbigger">
+    </div>
+    <div class="bui-dialog-foot">
+        <div class="bui-box">
+            <div class="bui-btn span1" b-click="user.close">取消</div>
+            <div class="bui-btn-submit span1 primary-reverse" b-click="user.submit">确定</div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var uiUpload = bui.upload();
+        var uiDialog = null;
+        var cropper = null;
+        var image = $(".bui-dialog img")[0];
+        var croppable = false;
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "user",
+            data: {
+                image: ``,
+                title: "头像设置",
+                userinfo: {},
+                dialog: null,
+                width: 90,  // 展示大小
+                height: 90,
+                cropwidth: 120, // 裁剪大小
+                cropheight: 120,
+            },
+            methods: {
+                refresh() {
+                    console.log('refresh',refresh);
+                    bui.refresh();
+                },
+                upavatar() {
+                    uiUpload.add({
+                        "from": "photo",
+                        "onSuccess": function (val, data) {
+                            var done = function (url) {
+                                image.src = url;
+                                uiDialog.open();
+                            };
+                            var reader;
+                            var file = val;
+                            var url;
+                            if (URL) {
+                                done(URL.createObjectURL(file));
+                            } else if (FileReader) {
+                                reader = new FileReader();
+                                reader.onload = function (e) {
+                                    done(reader.result);
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                        }
+                    })
+                },
+                submit(e) {
+                    if (!croppable) {
+                        return;
+                    }
+                    let that = this;
+                    var canvas;
+                    canvas = cropper.getCroppedCanvas({
+                        width: that.cropwidth,
+                        height: that.cropheight,
+                    });
+                    that.image = canvas.toDataURL();
+                    canvas.toBlob(function (blob) {
+                        var formData = new FormData();
+                        formData.append('image', blob, 'image.png');
+                        uiUpload.start({
+                            url: "{:furl('v1/upload', [], true, 'api')}",
+                            data: formData,
+                            headers: { Token: token },
+                            onSuccess: function (res) {                                    
+                                if (parseInt(res.code) == 0) {
+                                    post("{:furl('v1/avatar', [], true, 'api')}", {"avatar": res.data.filepath}, function (r) {
+                                        bui.hint(r.msg);
+                                        if (r.code == 0) {
+                                            that.userinfo.headimgurl = res.data.filepath;
+                                            uiDialog.close();
+                                        }
+                                    });
+                                } else {
+                                    bui.hint(res.msg);
+                                }
+                            },
+                            onFail: function (res) {
+                                bui.hint('上传失败！');
+                            }
+                        })
+                    })
+                },
+                close(e) {
+                    uiDialog.close();
+                },
+                dialogInit() {
+                    uiDialog = bui.dialog({
+                        id: `.bui-dialog`,
+                        fullscreen: true,
+                        useBox: true,
+                        mask: false,
+                    });
+                    uiDialog.on("open", function () {
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+                        cropper = new Cropper(image, {
+                            aspectRatio: 1,
+                            viewMode: 1,
+                            ready: function () {
+                                croppable = true;
+                            },
+                        });
+                    })
+                    return uiDialog;
+                },
+                logout() {
+                    var dialog = bui.dialog();
+                        dialog.create({
+                            title:"退出提示", 
+                            zIndex: 400,
+                            height: 150,
+                            autoClose: false,
+                            mask: true,
+                            render: true,
+                            content:"确定要退出登录吗？",
+                            buttons: ["确定","取消"],
+                            callback: function callback(e) {
+                                if(e.target.innerText === '取消') {
+                                    dialog.close();
+                                }
+                                if(e.target.innerText === '确定') {
+                                    token = '';
+                                    storage.remove("token");
+                                    if(isWeChat()) {
+                                        delCookie(sessionname);
+                                    }
+                                    bui.refresh();
+                                }
+                            },
+                        }).open();
+                        return false;
+                }
+            },
+            watch: {
+            },
+            computed: {
+            },
+            templates: {},
+            mounted: function () {
+                var that = this;
+                post("{:furl('v1/mine', [], true, 'api')}", {}, function (result) {
+                    if (result.code == 0) {
+                        that.userinfo = result.data.userinfo || []
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+                that.dialog = that.dialogInit();
+            }
+        });
+    })
+</script>
+{/block}

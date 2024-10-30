@@ -1,0 +1,174 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">微信配置</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">开启状态</td>
+			<td colspan="3">
+                {empty name="$config.official_open"}
+					<input type="radio" name="official_open" value="2" title="禁止">
+					<input type="radio" name="official_open" value="1" title="开启" checked>
+                {else/}
+					<input type="radio" name="official_open" value="2" title="禁止"{eq name="$config.official_open" value="2"} checked{/eq}>
+					<input type="radio" name="official_open" value="1" title="开启"{eq name="$config.official_open" value="1"} checked{/eq}>
+				{/empty}
+            </td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">公众号appid</td>
+			<td>
+				<input type="text" name="appid" autocomplete="off" placeholder="请输入appID" class="layui-input" {notempty name="$config.appid"} value="{$config.appid}" {/notempty}>
+			</td>
+			<td class="layui-td-gray">公众号appsecret</td>
+			<td>
+				<input type="text" name="appsecret" autocomplete="off" placeholder="请输入secretey" class="layui-input" {notempty name="$config.appsecret"} value="{$config.appsecret}" {/notempty}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">Token</td>
+			<td>
+				<input type="hidden" value="{$id}" name="id">
+				<input type="text" name="token" autocomplete="off" placeholder="请输入Token" class="layui-input" {notempty name="$config.token"} value="{$config.token}" {/notempty}>
+			</td>
+			<td class="layui-td-gray">EncodingAESKey</td>
+			<td>
+				<input type="text" name="aes_key" autocomplete="off" placeholder="兼容与安全模式下请一定要填写" class="layui-input" {notempty name="$config.aes_key"} value="{$config.aes_key}" {/notempty}>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="4"><hr></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">开启状态</td>
+			<td colspan="3">
+                {empty name="$config.pay_open"}
+					<input type="radio" name="pay_open" value="2" title="禁止">
+					<input type="radio" name="pay_open" value="1" title="开启" checked>
+                {else/}
+					<input type="radio" name="pay_open" value="2" title="禁止"{eq name="$config.pay_open" value="2"} checked{/eq}>
+					<input type="radio" name="pay_open" value="1" title="开启"{eq name="$config.pay_open" value="1"} checked{/eq}>
+				{/empty}
+            </td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">支付商户号</td>
+			<td>
+				<input type="text" name="mchid" autocomplete="off" placeholder="请输入微信支付商户号" class="layui-input" {notempty name="$config.mchid"} value="{$config.mchid}" {/notempty}>
+			</td>
+			<td class="layui-td-gray">支付API密钥</td>
+			<td>
+				<input type="text" name="secrect_key" autocomplete="off" placeholder="请输入微信支付API密钥" class="layui-input" {notempty name="$config.secrect_key"} value="{$config.secrect_key}" {/notempty}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">支付证书cert</td>
+			<td>
+				<div class="layui-input-inline" style="width: 80%;">
+					<input type="text" name="cert_url" autocomplete="off" readonly placeholder="请上传支付证书cert路径" class="layui-input" {notempty name="$config.cert_url"} value="{$config.cert_url}" {/notempty}>
+				</div>
+				<div class="layui-input-inline">
+					<button type="button" class="layui-btn" id="cert_path" lay-data="{accept: 'file'}">上传</button>
+				</div>		
+			</td>
+			<td class="layui-td-gray">支付证书key</td>
+			<td>
+				<div class="layui-input-inline" style="width: 80%;">
+					<input type="text" name="key_url" autocomplete="off" readonly placeholder="请上传支付证书key路径" class="layui-input" {notempty name="$config.key_url"} value="{$config.key_url}" {/notempty}>
+				</div>
+				<div class="layui-input-inline">
+					<button type="button" class="layui-btn" id="key_path" lay-data="{accept: 'file'}">上传</button>
+				</div>		
+			</td>			
+		</tr>
+		<tr>
+			<td colspan="4"><hr></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">开启状态</td>
+			<td colspan="3">
+                {empty name="$config.xcx_open"}
+					<input type="radio" name="xcx_open" value="2" title="禁止">
+					<input type="radio" name="xcx_open" value="1" title="开启" checked>
+                {else/}
+					<input type="radio" name="xcx_open" value="2" title="禁止"{eq name="$config.xcx_open" value="2"} checked{/eq}>
+					<input type="radio" name="xcx_open" value="1" title="开启"{eq name="$config.xcx_open" value="1"} checked{/eq}>
+				{/empty}
+            </td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">小程序appid</td>
+			<td>
+				<input type="text" name="xcx_appid" autocomplete="off" placeholder="请输入小程序appid" class="layui-input" {notempty name="$config.xcx_appid"} value="{$config.xcx_appid}" {/notempty}>
+			</td>
+			<td class="layui-td-gray-3">小程序appsecret</td>
+			<td>
+				<input type="text" name="xcx_appsecret" autocomplete="off" placeholder="请输入小程序appsecret" class="layui-input" {notempty name="$config.xcx_appsecret"} value="{$config.xcx_appsecret}" {/notempty}>
+			</td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+
+		//上传文件
+		var cert_path = layui.upload.render({
+			elem: '#cert_path',
+			url: '{:url("api/upload")}',
+			data: {type: "cert"},
+			accept: 'file', //普通文件
+			exts: 'pem|p12|crt|jks|der|key', //只允许上传的类型
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('input[name="cert_url"]').val(res.data.filepath);
+			}
+		});
+
+		//上传文件
+		var key_path = layui.upload.render({
+			elem: '#key_path',
+			url: '{:url("api/upload")}',
+			data: {type: "cert"},
+			accept: 'file', //普通文件
+			exts: 'pem|p12|crt|jks|der|key', //只允许上传的类型
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('input[name="key_url"]').val(res.data.filepath);
+			}
+		});
+
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

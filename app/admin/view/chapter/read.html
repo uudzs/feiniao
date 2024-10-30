@@ -1,0 +1,93 @@
+{extend name="common/base"/}
+{block name="style"}
+<style type="text/css">
+.editormd-code-toolbar select {display: inline-block}
+.editormd li {list-style: inherit;}
+.editor {
+	line-height: 2;
+	max-height: 50rem;
+	overflow-y: auto;
+	font-size: 1.0rem;
+}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<style>
+.layui-textarea {
+	height: auto !important;
+	line-height: 2.5;
+	font-size: 1.2rem;
+}
+</style>
+<form class="layui-form p-4">
+	<h3 class="pb-3">章节内容</h3>
+	<table class="layui-table layui-table-form">		
+		<tr>
+			<td>
+				<div class="editor">{$chapter.info|raw}</div>
+			</td>
+		</tr>
+	</table>
+	<div class="pt-3">
+		<input type="hidden" name="id" value="{$chapter.id}"/>
+		{if $chapter.verify != 1}
+			<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="adopt">通过</button>
+		{/if}
+		<button class="layui-btn layui-btn-danger" lay-submit="" lay-filter="refuse">拒绝</button>
+		<button class="layui-btn layui-btn-primary" lay-submit="" lay-filter="closes">关闭</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+
+		var form = layui.form, tool = layui.tool;
+
+		//监听提交
+		form.on('submit(adopt)', function (data) {			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('chapter/read')}", data.field, callback);
+			return false;
+		});
+
+		//监听拒绝
+		form.on('submit(refuse)', function (data) {
+			layer.prompt({title: "拒绝理由"}, function(val, index) {
+				if (val == '') {
+					layer.msg('拒绝理由为空');
+					return false;
+				}
+				data.field.verifyresult = val;
+				let callback = function (e) {
+					layer.msg(e.msg);
+					if (e.code == 0) {
+						tool.sideClose(1000);
+					}
+				}
+				tool.post("{:url('chapter/read')}", data.field, callback);
+				return false;
+			});
+			return false;			
+		});
+
+		//监听关闭
+		form.on('submit(closes)', function (data) {
+			tool.sideClose(100);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

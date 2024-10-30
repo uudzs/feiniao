@@ -1,0 +1,185 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">新建订单</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">商品id</td>
+			<td><input type="text" name="pid"  value="" autocomplete="off" placeholder="请输入商品id" class="layui-input"></td><td class="layui-td-gray-2">订单号<font>*</font></td>
+			<td><input type="text" name="order_id"  lay-verify="required" lay-reqText="请完善订单号" value="" autocomplete="off" placeholder="请输入订单号" class="layui-input"></td><td class="layui-td-gray-2">三方订单号</td>
+			<td><input type="text" name="trade_no"  value="" autocomplete="off" placeholder="请输入三方订单号" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">用户id<font>*</font></td>
+			<td><input type="text" name="user_id"  lay-verify="required" lay-reqText="请完善用户id" value="" autocomplete="off" placeholder="请输入用户id" class="layui-input"></td><td class="layui-td-gray-2">详细地址</td>
+			<td><input type="text" name="user_address"  value="" autocomplete="off" placeholder="请输入详细地址" class="layui-input"></td><td class="layui-td-gray-2">商品类型</td>
+			<td><input type="text" name="product_type"  value="" autocomplete="off" placeholder="请输入商品类型" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">运费金额</td>
+			<td><input type="text" name="freight_price"  value="" autocomplete="off" placeholder="请输入运费金额" class="layui-input"></td><td class="layui-td-gray-2">订单商品总数</td>
+			<td><input type="text" name="total_num"  value="" autocomplete="off" placeholder="请输入订单商品总数" class="layui-input"></td><td class="layui-td-gray-2">订单总价</td>
+			<td><input type="text" name="total_price"  value="" autocomplete="off" placeholder="请输入订单总价" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">邮费</td>
+			<td><input type="text" name="total_postage"  value="" autocomplete="off" placeholder="请输入邮费" class="layui-input"></td><td class="layui-td-gray-2">实际支付金额</td>
+			<td><input type="text" name="pay_price"  value="" autocomplete="off" placeholder="请输入实际支付金额" class="layui-input"></td><td class="layui-td-gray-2">支付邮费</td>
+			<td><input type="text" name="pay_postage"  value="" autocomplete="off" placeholder="请输入支付邮费" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">抵扣金额</td>
+			<td><input type="text" name="deduction_price"  value="" autocomplete="off" placeholder="请输入抵扣金额" class="layui-input"></td><td class="layui-td-gray-2">支付状态</td>
+			<td>
+				<input type="radio" name="paid" value="0" title="选项一">
+				<input type="radio" name="paid" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">支付时间</td>
+			<td><input type="text" name="pay_time"  value="" readonly id="laydate_pay_time" autocomplete="off" placeholder="请选择" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">支付方式</td>
+			<td>
+				<input type="radio" name="pay_type" value="0" title="选项一">
+				<input type="radio" name="pay_type" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">订单状态（-1 </td>
+			<td>
+				<input type="radio" name="status" value="0" title="选项一">
+				<input type="radio" name="status" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">退款状态</td>
+			<td>
+				<input type="radio" name="refund_status" value="0" title="选项一">
+				<input type="radio" name="refund_status" value="1" title="选项二">
+			</td>
+		</tr>
+				<tr><td class="layui-td-gray-2">退款申请类型</td>
+			<td>
+				<input type="radio" name="refund_type" value="0" title="选项一">
+				<input type="radio" name="refund_type" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">退货快递单号</td>
+			<td><input type="text" name="refund_express"  value="" autocomplete="off" placeholder="请输入退货快递单号" class="layui-input"></td><td class="layui-td-gray-2">退货快递名称</td>
+			<td><input type="text" name="refund_express_name"  value="" autocomplete="off" placeholder="请输入退货快递名称" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">退款图片</td>
+			<td><input type="text" name="refund_reason_wap_img"  value="" autocomplete="off" placeholder="请输入退款图片" class="layui-input"></td><td class="layui-td-gray-2">退款用户说明</td>
+			<td><input type="text" name="refund_reason_wap_explain"  value="" autocomplete="off" placeholder="请输入退款用户说明" class="layui-input"></td><td class="layui-td-gray-2">退款时间</td>
+			<td><input type="text" name="refund_reason_time"  value="" readonly id="laydate_refund_reason_time" autocomplete="off" placeholder="请选择" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">前台退款原因</td>
+			<td><input type="text" name="refund_reason_wap"  value="" autocomplete="off" placeholder="请输入前台退款原因" class="layui-input"></td><td class="layui-td-gray-2">不退款的理由</td>
+			<td><input type="text" name="refund_reason"  value="" autocomplete="off" placeholder="请输入不退款的理由" class="layui-input"></td><td class="layui-td-gray-2">退款金额</td>
+			<td><input type="text" name="refund_price"  value="" autocomplete="off" placeholder="请输入退款金额" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">快递名称/送货人姓名</td>
+			<td><input type="text" name="delivery_name"  value="" autocomplete="off" placeholder="请输入快递名称/送货人姓名" class="layui-input"></td><td class="layui-td-gray-2">快递公司编码</td>
+			<td><input type="text" name="delivery_code"  value="" autocomplete="off" placeholder="请输入快递公司编码" class="layui-input"></td><td class="layui-td-gray-2">发货类型</td>
+			<td>
+				<input type="radio" name="delivery_type" value="0" title="选项一">
+				<input type="radio" name="delivery_type" value="1" title="选项二">
+			</td>
+		</tr>
+				<tr><td class="layui-td-gray-2">快递单号/手机号</td>
+			<td><input type="text" name="delivery_id"  value="" autocomplete="off" placeholder="请输入快递单号/手机号" class="layui-input"></td><td class="layui-td-gray-2">快递单任务id</td>
+			<td><input type="text" name="kuaidi_task_id"  value="" autocomplete="off" placeholder="请输入快递单任务id" class="layui-input"></td><td class="layui-td-gray-2">快递单订单号</td>
+			<td><input type="text" name="kuaidi_order_id"  value="" autocomplete="off" placeholder="请输入快递单订单号" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">虚拟发货内容</td>
+			<td><input type="text" name="fictitious_content"  value="" autocomplete="off" placeholder="请输入虚拟发货内容" class="layui-input"></td><td class="layui-td-gray-2">使用积分</td>
+			<td><input type="text" name="use_integral"  value="" autocomplete="off" placeholder="请输入使用积分" class="layui-input"></td><td class="layui-td-gray-2">是否删除</td>
+			<td>
+				<input type="radio" name="is_del" value="0" title="选项一">
+				<input type="radio" name="is_del" value="1" title="选项二">
+			</td>
+		</tr>
+				<tr><td class="layui-td-gray-2">管理员备注</td>
+			<td><input type="text" name="remark"  value="" autocomplete="off" placeholder="请输入管理员备注" class="layui-input"></td><td class="layui-td-gray-2">配送方式 1=快递 ，2=门店自提</td>
+			<td>
+				<input type="radio" name="shipping_type" value="0" title="选项一">
+				<input type="radio" name="shipping_type" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">支付渠道(0微信公众号1微信小程序)</td>
+			<td>
+				<input type="radio" name="is_channel" value="0" title="选项一">
+				<input type="radio" name="is_channel" value="1" title="选项二">
+			</td>
+		</tr>
+				<tr><td class="layui-td-gray-2">消息提醒</td>
+			<td>
+				<input type="checkbox" name="is_remind" value="1" title="选项一" lay-skin="primary" />
+				<input type="checkbox" name="is_remind" value="2" title="选项二" lay-skin="primary" />
+			</td><td class="layui-td-gray-2">后台是否删除</td>
+			<td>
+				<input type="checkbox" name="is_system_del" value="1" title="选项一" lay-skin="primary" />
+				<input type="checkbox" name="is_system_del" value="2" title="选项二" lay-skin="primary" />
+			</td><td class="layui-td-gray-2">用户访问端标识</td>
+			<td><input type="text" name="channel_type"  value="" autocomplete="off" placeholder="请输入用户访问端标识" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">订单面单打印信息</td>
+			<td><input type="text" name="express_dump"  value="" autocomplete="off" placeholder="请输入订单面单打印信息" class="layui-input"></td><td class="layui-td-gray-2">虚拟商品类型</td>
+			<td>
+				<input type="radio" name="virtual_type" value="0" title="选项一">
+				<input type="radio" name="virtual_type" value="1" title="选项二">
+			</td><td class="layui-td-gray-2">虚拟商品信息</td>
+			<td><input type="text" name="virtual_info"  value="" autocomplete="off" placeholder="请输入虚拟商品信息" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">备注</td>
+			<td colspan="5"><textarea name="mark"  placeholder="请输入备注" class="layui-textarea"></textarea></td>
+		</tr><tr><td class="layui-td-gray-2">快递单号图片</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_kuaidi_label">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_kuaidi_label">
+						<img src="" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="kuaidi_label" value="" >
+					</div>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<div class="pt-3">
+		<input type="hidden" name="id" value="0"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		//日期选择
+		layui.laydate.render({
+			elem: '#laydate_pay_time' //指定元素
+		});//日期选择
+		layui.laydate.render({
+			elem: '#laydate_refund_reason_time' //指定元素
+		});
+		//上传快递单号图片
+		var upload_kuaidi_label = layui.upload.render({
+			elem: '#upload_btn_kuaidi_label',
+			url: '{:url("api/upload")}',
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_kuaidi_label input').attr('value', res.data.filepath);
+				$('#upload_box_kuaidi_label img').attr('src', res.data.filepath);
+			}
+		});
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('order/add')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

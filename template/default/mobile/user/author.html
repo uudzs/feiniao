@@ -1,0 +1,159 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}$site_title = '成为作者';{/php}
+{include file="common/header"/}
+<style>
+    .author {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+    .author .input {
+        width: 100%;
+        display: block;
+        clear: both;
+        text-align: center;
+        margin-top: .5rem;
+    }
+    .author .input input {
+        width: 80%;
+        border-radius: .5rem;
+        border: 1px solid #ccc;
+        padding: .2rem .5rem;
+        text-align: center;
+    }
+    .author .input .subbtn {
+        width: 80%;
+        border-radius: .5rem;
+        padding: .2rem .5rem;
+        text-align: center;
+        background: #03d1a1;
+        border: 0;
+        color: #fff;
+        font-size: .28rem;
+    }
+    .author .tips {
+        margin-top: .5rem;
+        width: 100%;
+    }
+    .author .tips .span1 {
+        width: 80%;
+        margin: 0 auto;
+        text-align: left;
+    }
+    .authsuccess {
+        text-align: center;
+        height: 80vh;
+        padding-top: 20vh;
+        color: #03d1a1;
+    }
+    .authsuccess i {
+        font-size: 2rem;        
+    }
+    .authsuccess span {
+        display: block;
+        margin-top: .5rem;
+        font-size: .3rem;
+    }
+</style>
+<div class="author" b-if="(author.userinfo.author_id <= 0)">
+    <div class="input">
+        <input type="text" value="" placeholder="请输入笔名" b-model="author.nickname">
+    </div>
+    <div class="input">
+        <input type="text" value="" placeholder="请输入登录手机" b-model="author.mobile">
+    </div>
+    <div class="input">
+        <input type="text" value="" placeholder="请输入登录密码" b-model="author.password">
+    </div>
+    <div class="input">
+        <button class="subbtn" b-click="author.authorsubmit">提交</button>
+    </div>
+    <div class="tips">
+        <div class="span1">
+            <h3 class="item-title">说明：</h3>
+            <p class="item-text">建议使用手机号作为作家中心登录手机，严禁使用色情、暴力、广告宣传或不适合公众观赏的笔名，请认真填写。</p>
+        </div>
+    </div>
+</div>
+<div b-else class="authsuccess author">
+    <i class="fa fa-check-circle" aria-hidden="true"></i>
+    <span>已成为作者，请前往电脑端登录操作。</span>
+    <span>{:furl('login/index', [], true, 'author')}</span>
+    <div class="input">
+        <button class="subbtn" b-click="author.copyTextToClipboard('{:furl('login/index', [], true, 'author')}')">复制网址</button>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "author",
+            data: {
+                userinfo: {},
+                nickname: '',
+                mobile: '',
+                password: '',
+            },
+            methods: {
+                async copyTextToClipboard(text) {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        const success = await document.execCommand('copy');
+                        if (success) {
+                            bui.hint('复制成功');
+                        } else {
+                            bui.hint('复制失败');
+                        }
+                    } catch (error) {
+                        bui.hint('复制失败');
+                    }
+                    document.body.removeChild(textarea);
+                },
+                authorsubmit: function (e) {
+                    var that = this;
+                    if (!that.nickname) return bui.hint("请输入笔名！");
+                    if (!that.mobile) return bui.hint("请输入登录手机！");
+                    if (!that.password) return bui.hint("请输入登录密码！");
+                    post("{:furl('v1/regauthor', [], true, 'api')}", { "nickname": that.nickname, "mobile": that.mobile, "password": that.password }, function (result) {                        
+                        if (result.code == 0) {
+                            bui.hint({
+                                content: result.msg,
+                                onClose: function onClose(e) {
+                                    bui.refresh();
+                                }
+                            })                            
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                var that = this;
+                post("{:furl('v1/mine', [], true, 'api')}", {}, function (result) {
+                    if (result.code == 0) {
+                        that.userinfo = result.data.userinfo || []
+                    } else {
+                        bui.hint(result.msg);
+                    }
+                });
+            }
+        });
+    })
+</script>
+{/block}

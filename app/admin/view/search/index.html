@@ -1,0 +1,93 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="关键字名称" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="search" lay-filter="search"></table>
+</div>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table, tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#search',
+			title: '关键字搜索列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("search/index")}',
+			page: true, //开启分页
+			limit: 20,
+			cols: [
+				[{
+					field: 'id',
+					width: 90,
+					title: 'ID号',
+					align: 'center'
+				}, {
+					field: 'title',
+					title: '关键字名称'
+				}, {
+					field: 'times',
+					width: 100,
+					title: '搜索次数',
+					align: 'center'
+				}, {
+					width: 80,
+					title: '操作',
+					align: 'center',
+					templet: function (d) {
+						var html = '';
+						var delBtn = '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>';
+						return delBtn;
+					}
+				}]
+			]
+		});
+
+		//监听搜索提交
+		form.on('submit(webform)', function (data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+
+		//删除
+		table.on('tool(search)', function (obj) {
+			if (obj.event === 'del') {
+				layer.confirm('确定要删除吗?', {
+					icon: 3,
+					title: '提示'
+				}, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('search/delete')}", { id: obj.data.id }, callback);
+					layer.close(index);
+				});
+			}
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

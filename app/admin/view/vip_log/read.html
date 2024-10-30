@@ -1,0 +1,24 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">VIP详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">用户ID</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">级别</td>
+			<td>{$detail.level}</td><td class="layui-td-gray-2">订单ID</td>
+			<td>{$detail.order_id}</td>
+		</tr><tr><td class="layui-td-gray-2">过期时间</td>
+			<td>{$detail.expire_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">IP</td>
+			<td>{$detail.ip}</td>
+		</tr><tr><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td><td colspan='4'></td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

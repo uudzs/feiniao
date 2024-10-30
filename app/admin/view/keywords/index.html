@@ -1,0 +1,124 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="关键字名称" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="keywords" lay-filter="keywords"></table>
+</div>
+
+<script type="text/html" id="status">
+	<i class="layui-icon {{#  if(d.status == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
+</script>
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+	<button class="layui-btn layui-btn-sm" lay-event="add">+ 添加关键字</button>
+  </div>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#keywords',
+			title: '关键字列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("keywords/index")}',
+			page: true, //开启分页				
+			limit: 20,
+			cols: [
+				[{
+					field: 'id',
+					width: 80,
+					title: 'ID编号',
+					align: 'center'
+				}, {
+					field: 'sort',
+					width: 80,
+					title: '排序',
+					align: 'center',
+					edit: "text"
+				}, {
+					field: 'title',
+					title: '关键字名称',
+					edit: "text"
+				}, {
+					field: 'status',
+					width: 80,
+					title: '状态',
+					templet: '#status',
+					align: 'center'
+				}, {
+					width: 100,
+					title: '操作',
+					align: 'center',
+					templet: function (d) {
+						var html = '<div class="layui-btn-group"><button class="layui-btn layui-btn-xs" lay-event="edit">编辑</button><button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</button></div>';
+						return html;
+					}
+				}]
+			]
+		});
+
+		//监听搜索提交
+		form.on('submit(webform)', function (data) {
+			if (data.field.keywords) {
+				layui.pageTable.reload({
+					where: {
+						keywords: data.field.keywords
+					},
+					page: {
+						curr: 1
+					}
+				});
+			} else {
+				location.reload();
+			}
+			return false;
+		});
+
+		//表头工具栏事件
+		table.on('toolbar(keywords)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('keywords/add')}");
+				return;
+			}
+		});
+		//监听行工具事件
+		table.on('tool(keywords)', function (obj) {
+			var data = obj.data;
+			if (obj.event === 'edit') {
+				tool.side('{:url("keywords/add")}?id='+obj.data.id);
+				return;
+			}
+			if (obj.event === 'del') {
+				layer.confirm('确定要删除吗?', {
+					icon: 3,
+					title: '提示'
+				}, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('keywords/delete')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

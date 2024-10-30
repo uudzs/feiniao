@@ -1,0 +1,75 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑用户信息</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">用户等级<font>*</font></td>
+			<td>				
+				<select name="level" lay-verify="required" lay-reqText="请选择用户等级">
+				<option value="">请选择用户等级</option>
+				{volist name="levels" id="v"}
+				<option value="{$v.id}" {eq name="$user.level" value="$v.id"}selected{/eq}>{$v.title}</option>
+				{/volist}
+			  </select>
+			</td>
+			<td class="layui-td-gray">用户昵称<font>*</font></td>
+			<td>
+				<input type="text" name="nickname" placeholder="请输入用户昵称"	autocomplete="off" class="layui-input" value="{$user.nickname}" lay-verify="required" lay-reqText="请输入用户昵称">
+			</td>			
+		</tr>
+		<tr>
+			<td class="layui-td-gray">真实姓名</td>
+			<td>
+				<input type="text" name="name" placeholder="请输入真实姓名"	autocomplete="off" class="layui-input" value="{$user.name}">
+			</td>
+			<td class="layui-td-gray">实名认证</td>
+			<td>
+				<input type="radio" name="realname_status" value="0" title="不通过" {eq name="$user.realname_status" value="0"}checked{/eq}>
+				<input type="radio" name="realname_status" value="1" title="通过" {eq name="$user.realname_status" value="1"}checked{/eq}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">手机号码</td>
+			<td>
+				<input type="text" name="mobile" placeholder="请输入手机"	autocomplete="off" class="layui-input" value="{$user.mobile}">
+			</td>
+			<td class="layui-td-gray">手机认证</td>
+			<td>
+				<input type="radio" name="mobile_status" value="0" title="不通过" {eq name="$user.mobile_status" value="0"}checked{/eq}>
+				<input type="radio" name="mobile_status" value="1" title="通过" {eq name="$user.mobile_status" value="1"}checked{/eq}>
+			</td>
+		</tr>		
+	</table>
+
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$user.id}">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var tool = layui.tool, form = layui.form;
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);					
+				}
+			}
+			tool.post("{:url('user/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

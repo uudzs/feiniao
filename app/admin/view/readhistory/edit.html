@@ -1,0 +1,55 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑阅读记录</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">用户ID<font>*</font></td>
+			<td><input type="text" name="user_id"  lay-verify="required" lay-reqText="请完善用户ID" value="{$detail.user_id}" autocomplete="off" placeholder="请输入用户ID" class="layui-input"></td><td class="layui-td-gray-2">IP</td>
+			<td><input type="text" name="ip"  value="{$detail.ip}" autocomplete="off" placeholder="请输入IP" class="layui-input"></td><td class="layui-td-gray-2">作品ID<font>*</font></td>
+			<td><input type="text" name="book_id"  lay-verify="required" lay-reqText="请完善作品ID" value="{$detail.book_id}" autocomplete="off" placeholder="请输入作品ID" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">添加时间<font>*</font></td>
+			<td><input type="text" name="chapter_id"  lay-verify="required" lay-reqText="请完善添加时间" value="{$detail.chapter_id}" autocomplete="off" placeholder="请输入添加时间" class="layui-input"></td><td class="layui-td-gray-2">章节位置坐标</td>
+			<td><input type="text" name="position"  value="{$detail.position}" autocomplete="off" placeholder="请输入章节位置坐标" class="layui-input"></td><td class="layui-td-gray-2">阅读次数</td>
+			<td><input type="text" name="readnum"  value="{$detail.readnum}" autocomplete="off" placeholder="请输入阅读次数" class="layui-input"></td>
+		</tr>
+				<tr><td class="layui-td-gray-2">作品名称</td>
+			<td><input type="text" name="title"  value="{$detail.title}" autocomplete="off" placeholder="请输入作品名称" class="layui-input"></td><td colspan='4'></td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+		
+		
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('readhistory/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

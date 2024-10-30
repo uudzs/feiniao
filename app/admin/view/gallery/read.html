@@ -1,0 +1,135 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+	.upload-img {
+		width: 120px;
+		height: 90px;
+		overflow: hidden;
+		position: relative;
+		border: 1px solid #eee;
+		padding: 1px;
+		margin: 5px;
+		float: left;
+	}
+
+	.upload-close {
+		position: absolute;
+		top: 1px;
+		right: 1px;
+	}
+
+	.layui-upload-add {
+		position: relative;
+		margin:12px 0;
+		padding:16px 0;
+		font-size:14px;
+		box-sizing: border-box;
+		border: 1px solid #eee;
+		background-color: #fff;
+		text-align: center;
+		cursor: pointer;
+		color: #999;
+	}
+	.layui-upload-add .layui-icon{font-size:52px; color:#3c9cff}
+	.gallery-item{background-color:#fff; padding:12px 12px 0; margin:12px 0; box-sizing: border-box;border: 1px solid #eee;}
+	.img-filepath{max-width: 200px;max-height: 150px;}
+	.list-text{font-size:12px; padding:12px 12px 0 0;color:#969696;}
+	.list-text span{color:#646464;}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-3">
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">图集标题</td>
+			<td>{$detail.title}</td>
+			<td class="layui-td-gray">所属分类</td>
+			<td>
+				{volist name=":set_recursion(get_gallery_cate())" id="v"}
+				{eq name="$detail.cate_id" value="$v.id" }{$v.title}{/eq}
+				{/volist}
+			</td>
+			<td class="layui-td-gray">图集状态</td>
+			<td>
+				{eq name="$detail.status" value="1" }正常{/eq}
+				{eq name="$detail.status" value="0" }下架{/eq}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">关键字</td>
+			<td>
+				{$detail.keyword_names}
+			</td>
+			<td class="layui-td-gray">属性</td>
+			<td>
+				{eq name="$detail.type" value="1" }精华{/eq}
+				{eq name="$detail.type" value="2" }热门{/eq}
+				{eq name="$detail.type" value="3" }推荐{/eq}
+			</td>
+			<td class="layui-td-gray">首页显示</td>
+			<td>
+				{eq name="$detail.is_home" value="1"}是{/eq}
+				{eq name="$detail.is_home" value="0"}否{/eq}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">作者/来源</td>
+			<td>{$detail.origin}</td>
+			<td class="layui-td-gray">来源链接</td>
+			<td>{$detail.origin_url}</td>
+			<td class="layui-td-gray">排序</td>
+			<td>{$detail.sort}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">图集简介</td>
+			<td colspan="3">{$detail.desc}</td>
+			<td class="layui-td-gray">封面图</td>
+			<td>
+				<img src="{$detail.thumb|get_file}" style="width:200px;max-width:200px" />
+			</td>
+		</tr>
+	</table>
+	
+	<div id="imgList">
+		{volist name="$detail.gallery_array" id="vo"}
+		<div class="layui-row gallery-item" id="item_{$vo.id}">
+			<div class="layui-col-md3">
+				<img src="{$vo.filepath}" class="img-filepath">
+				<p class="py-2">名称：{$vo.name}</p>
+			</div>
+			<div class="layui-col-md9">
+			<table class="layui-table layui-table-form">
+				<tr>
+					<td class="layui-td-gray">标题</td>
+					<td colspan="3">{$vo.title}</td>
+				</tr>
+				<tr>
+					<td class="layui-td-gray">摘要</td>
+					<td colspan="3">{$vo.desc}</td>
+				</tr>
+				<tr>
+					<td class="layui-td-gray">链接</td>
+					<td>{$vo.link}</td>
+					<td class="layui-td-gray">排序</td>
+					<td>{$vo.sort}</td>
+				</tr>
+			</table>
+			</div>
+		</div>
+		{/volist}	
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+	
+	}
+</script>
+{/block}
+<!-- /脚本 -->

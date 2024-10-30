@@ -1,0 +1,198 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">编辑广告</h3>
+	<table class="layui-table layui-table-form">
+
+		<tr>
+			<td class="layui-td-gray-2">标题<font>*</font></td>
+			<td><input type="text" name="title" id="title" lay-verify="required" lay-reqText="请完善标题" value="{$detail.title}" autocomplete="off" placeholder="请输入标题" class="layui-input"></td>
+			<td class="layui-td-gray-2">标题颜色</td>
+			<td>
+				<div class="layui-input-inline" style="width: 120px;">
+					<input type="text" name="color" value="{$detail.color}" readonly autocomplete="off" placeholder="请选择标题颜色" class="layui-input" id="color">
+				</div>
+				<div class="layui-inline">
+					<div id="title-color-btn"></div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">广告位置<font>*</font></td>
+			<td>
+				<select name="adver_id" lay-verify="required" lay-reqText="请完善广告位置">
+					<option value="">请选择分类</option>
+					{volist name=":set_recursion(get_adspace())" id="v"}
+					<option value="{$v.id}" {eq name="$detail.adver_id" value="$v.id"}selected{/eq}>{$v.title}</option>
+					{/volist}
+				</select>
+			</td>
+			<td class="layui-td-gray-2">类型</td>
+			<td>
+				<input type="radio" name="type" value="1" title="作品"{eq name="$detail.type" value="1"} checked{/eq}>
+				<input type="radio" name="type" value="3" title="链接"{eq name="$detail.type" value="3"} checked{/eq}>
+				<input type="radio" name="type" value="6" title="内容"{eq name="$detail.type" value="6"} checked{/eq}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">链接地址</td>
+			<td><input type="text" name="link"  value="{$detail.link}" autocomplete="off" placeholder="请输入链接地址" class="layui-input"></td>
+			<td class="layui-td-gray-2">作品</td>
+			<td>
+				<input type="hidden" name="books" id="books" value="{$detail.books}"/>
+				<input type="text" id="setbook" value="" autocomplete="off" readonly placeholder="请选择作品" class="layui-input">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">排序</td>
+			<td>
+				<div class="layui-input-inline" style="width: 120px;">
+					<input type="text" name="level" value="{$detail.level}" autocomplete="off" placeholder="请输入序号" class="layui-input">
+				</div>
+				<div class="layui-inline">
+					<i class="layui-icon layui-icon-tips-fill"></i>数值越大越靠前
+				</div>
+			</td>
+			<td class="layui-td-gray-2">状态</td>
+			<td>
+				<input type="radio" name="status" value="1" title="正常"{eq name="$detail.status" value="1"} checked{/eq}>
+				<input type="radio" name="status" value="0" title="禁止"{eq name="$detail.status" value="0"} checked{/eq}>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">开始时间</td>
+			<td>
+				{if $detail.start_time > 0}
+					<input type="text" name="start_time" value="{$detail.start_time|time_format=###,'Y-m-d'}" readonly id="laydate_start_time" autocomplete="off" placeholder="请选择" class="layui-input">
+				{else/}
+					<input type="text" name="start_time" value="" readonly id="laydate_start_time" autocomplete="off" placeholder="请选择" class="layui-input">
+				{/if}
+			</td>
+			<td class="layui-td-gray-2">结束时间</td>
+			<td>
+				{if $detail.end_time > 0}
+					<input type="text" name="end_time" value="{$detail.end_time|time_format=###,'Y-m-d'}" readonly id="laydate_end_time" autocomplete="off" placeholder="请选择" class="layui-input">
+				{else/}
+				<input type="text" name="end_time" value="" readonly id="laydate_end_time" autocomplete="off" placeholder="请选择" class="layui-input">
+				{/if}
+			</td>
+		</tr>		
+		<tr>
+			<td class="layui-td-gray-2">图片地址</td>
+			<td colspan="3" style="vertical-align:top">
+				<div class="layui-upload">
+					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_images">选择上传图片</button>
+					<div class="layui-upload-list" id="upload_box_images">
+						<img src="{$detail.images}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="images" value="{$detail.images}" >
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">描述</td>
+			<td colspan="3"><input type="text" name="introduction" id="introduction" value="{$detail.introduction}" autocomplete="off" placeholder="请输入描述" maxlength="250" class="layui-input"></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">内容</td>
+			<td colspan="3">
+				<textarea class="layui-textarea" id="advshtml">{$detail.advshtml}</textarea>
+			</td>
+		</tr>
+	</table>
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool','tinymce'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool, colorpicker = layui.colorpicker;
+
+		$(document).on('click', '#setbook', function() {
+			tool.side("{:url('book/booklist')}");
+			return false;
+		});
+
+		var editor = layui.tinymce;
+		var edit = editor.render({
+			selector: "#advshtml",
+			height: 500
+		});
+
+		//作品回调
+		window.get_book_data = function (v) {
+			$("#title").val(v.title);
+			$("#setbook").val(v.title);	
+			$("#books").val(v.id);
+			$("#introduction").val(v.remark);
+			$('#upload_box_images input').attr('value', v.cover);
+			$('#upload_box_images img').attr('src', v.cover);			
+		}
+
+		// 渲染
+		colorpicker.render({
+			elem: '#title-color-btn',
+			color: '{$detail.color}',
+			done: function(color){
+				$('#color').val(color);
+			}
+		});
+
+		//日期选择
+		layui.laydate.render({
+			elem: '#laydate_start_time' //指定元素
+		});
+		
+		//日期选择
+		layui.laydate.render({
+			elem: '#laydate_end_time' //指定元素
+		});
+
+		//上传图片地址
+		var upload_images = layui.upload.render({
+			elem: '#upload_btn_images',
+			url: "{:url('api/upload')}",
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#upload_box_images input').attr('value', res.data.filepath);
+				$('#upload_box_images img').attr('src', res.data.filepath);
+			}
+		});
+
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			data.field.advshtml = tinyMCE.editors['advshtml'].getContent();
+			if (data.field.type == 1 && parseInt(data.field.books) <= 0) {
+				layer.msg('请选择作品');
+				return false;
+			}
+			if (data.field.type == 3 && data.field.link == '') {
+				layer.msg('请填写链接地址');
+				return false;
+			}
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('advsr/edit')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

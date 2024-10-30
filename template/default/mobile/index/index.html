@@ -1,0 +1,218 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '首页';
+$pageconf = get_system_config('page');
+{/php}
+{include file="common/header"/}
+<link rel="stylesheet" href="{__MOBILE__}/default/css/index.css" />
+<div id="slide" class="bui-slide bui-slide-skin01"></div>
+<div class="bui-box edit-title">
+  <div class="bui-label">编辑推荐</div>
+  <div class="span1"></div>
+  <div class="refresh" b-click="index.refresh()">换一批<i class="icon-refresh"></i></div>
+</div>
+<div class="bui-box edit-list">
+  <ul class="bui-list-pic bui-fluid-space-3" b-template="index.tplEditor(index.editlist)"></ul>
+</div>
+<div class="bui-box banner" b-template="index.tplBanner(index.bannerlist)"></div>
+<div class="new-book">
+  <div class="bui-box">
+    <div class="span1">新书上架</div>
+    <a class="more" href="{:furl('booklist', [], true, 'home')}">更多<i class="icon-listright"></i></a>
+  </div>
+  <ul class="bui-list bui-list-thumbnail newbooktop" b-template="index.tplNewbooktop(index.newbooktop)"></ul>
+  <div class="bui-list-pic bui-fluid-space-3 newbooklist" b-template="index.tplNewbook(index.newbooklist)"></div>
+</div>
+<div class="hottop bui-scroll" id="toplist">
+  <div class="section-title">热度榜单</div>
+  <div class="bui-scroll-main">
+    <ul class="bui-list bui-list-thumbnail"></ul>
+  </div>
+</div>
+{/block}
+{block name="script"}
+<script>  
+  bui.ready(function () {
+    $('.bui-bar-left').css('visibility', 'hidden');
+    var bs = bui.store({
+        el: ".bui-page",
+        scope: "index",
+        data: {
+          slidepid: parseInt("{$pageconf.mobile_slide}"),
+          editpage: 1,
+          slide: null,
+          editlist: [],
+          editpid: parseInt("{$pageconf.mobile_edit}"),
+          bannerlist: [],
+          bannerpid: parseInt("{$pageconf.mobile_banner}"),
+          newbooklist: [],
+          newbookpid: parseInt("{$pageconf.mobile_newbook}"),
+          newbooktop: []
+        },
+        methods: {
+          refresh() {
+            bui.hint("提醒内容");
+            var that = this;
+            that.editpage++;
+            post("{:furl('/v1/advert', [], true, 'api')}", { pid: that.editpid, page: that.editpage }, function(result) {
+                if(result.code == 0) {
+                  that.editlist = result.data;
+                } else {
+                    bui.hint(result.msg);
+                }
+            });
+          },
+          async init() {
+            var that = this;            
+            let pids = [that.slidepid,that.editpid,that.bannerpid,that.newbookpid].join(',')
+            await post("{:furl('/v1/advert', [], true, 'api')}", { pid: pids }, function(result) {
+                if(result.code == 0) {
+                  that.editlist = result.data[that.editpid]; //编辑推荐
+                  that.bannerlist = result.data[that.bannerpid]; //banner
+                  //新书
+                  if(result.data[that.newbookpid]) {
+                    if(result.data[that.newbookpid].length > 0) that.newbooktop = [result.data[that.newbookpid][0]];
+                    if(result.data[that.newbookpid].length > 1) that.newbooklist = result.data[that.newbookpid].slice(1);  
+                  }
+                  // 轮播
+                  if (result.data[that.slidepid].length > 0) {
+                    var data = [];
+                    result.data[that.slidepid].forEach(function (el, index) {
+                      data.push({
+                        title: el.name,
+                        image: el.images,
+                        url: el.url
+                      })
+                    });
+                    that.slide.option("data", data).start();
+                  } else {
+                    $("#slide").hide();
+                  }
+                } else {
+                    bui.hint(result.msg);
+                }
+            });          
+            bui.list({
+              headers: { Token: token },
+              id: "#toplist",
+              url: "{:furl('/v1/booklist', [], true, 'api')}",
+              pageSize: 10,
+              data: { order: 'hits DESC' },
+              field: {
+                  page: "page",
+                  size: "data.total",
+                  data: "data.data"
+              },
+              template: function (data) {
+                  if(data.length <= 0) return $("#toplist").hide();
+                  var html = "";
+                  data.forEach(function(el, index) {
+                      html +=`<li class="bui-btn bui-box">                        
+                                <div class="bui-thumbnail"><a href="${el.url}"><img src="${el.cover}"></a></div>
+                                <div class="span1">
+                                  <a href="${el.url}">
+                                    <h3 class="item-title">${el.title}</h3>
+                                    <p class="item-text desc">${el.remark}</p>
+                                    <p class="item-text author">${el.author}</p>
+                                  </a>
+                                </div>                        
+                              </li>`
+                  });
+                  return html;   
+              },
+              onLoaded: function onLoaded(r) {
+                  if(parseInt(r.code) > 400) {
+                      gettoken();
+                  }
+              },
+            });            
+          },
+        },
+        watch: {},
+        computed: {},
+        templates: {
+          tplEditor(data) {
+            var that = this;
+            let html = "";         
+            if (data.length > 0) {
+              $.each(data, function(index, el) {
+                if(el.isendpage) that.editpage = 0;
+                html += `<li>
+                            <div class="bui-pic">
+                              <a href="${el.url}">
+                                <div class="bui-pic-img"><img src="${el.images}" alt="${el.title}" width="${el.width}" height="${el.height}"></div>
+                                <div class="bui-pic-title">${el.title}</div>
+                              </a>
+                            </div>
+                        </li>`;
+              });
+            }
+            return html;
+          },
+          tplBanner(data) {
+            let html = "";         
+            if (data.length > 0) {
+              $.each(data, function(index, el) {
+                html += `<a href="${el.url}"><img src="${el.images}" alt="${el.title}"></a>`;
+              });
+            }
+            return html;
+          },
+          tplNewbooktop(data) {
+            let html = "";         
+            if (data.length > 0) {
+              $.each(data, function(index, el) {
+                html += `<li class="bui-btn bui-box">                          
+                            <div class="bui-thumbnail"><a href="${el.url}"><img src="${el.images}" alt="${el.title}"></a></div>
+                            <div class="span1">
+                              <a href="${el.url}">
+                              <h3 class="item-title">${el.title}</h3>
+                              <p class="item-text"><i class="icon-user"></i> ${el.author}</p>
+                              <p class="item-text desc">${el.introduction}</p>
+                              <p class="item-text">${el.genre} · ${el.finish}</p>
+                              </a>
+                            </div>
+                            <span class="price">
+                              <div class="bui-btn primary small ring">阅读</div>
+                            </span>                          
+                          </li>`;
+              });
+            }
+            return html;
+          },
+          tplNewbook(data) {
+            let html = "";         
+            if (data.length > 0) {
+              $.each(data, function(index, el) {
+                html += `<div class="span1">
+                            <div class="bui-pic">
+                                <a href="${el.url}">
+                                  <div class="bui-pic-img"><img src="${el.images}" alt="${el.title}"></div>
+                                  <div class="bui-pic-title">${el.title}</div>
+                                </a>
+                            </div>
+                        </div>`;
+              });
+            }
+            return html;
+          }
+        },
+        mounted: function(){
+          // 轮播
+          this.slide = bui.slide({
+            id: "#slide",
+            width: "100%",
+            height: 380,
+            autopage: true,
+            data: []
+          });
+          this.init();
+        }
+    })
+    return bs;
+  })
+</script>
+{/block}

@@ -1,0 +1,283 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '提现';
+$conf = get_system_config('withdraw');
+{/php}
+{include file="common/header"/}
+<style>
+.amount-box {
+    display: flex;
+    flex-direction: column;
+    margin-top: .2rem;
+    background: #f7f7f7;
+    border-radius: .1rem;
+    padding: .3rem;
+}
+.amount-box .head {
+    margin-bottom: .2rem;
+    display: flex;
+    justify-content: space-between;
+    font-size: .24rem;
+}
+.amount-box .coin {
+    display: block;
+}
+.amount-box .coin input {
+    border-radius: .1rem;
+    text-align: center;
+    padding: .2rem 0;
+    font-size: .5rem;
+    color: #03d1a1;
+    font-weight: 600;
+}
+.bank {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .3rem;
+    background: #f7f7f7;
+    border-radius: .1rem;
+    padding: .3rem;
+}
+.bank .right {
+    display: flex;
+}
+.final-amount {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .3rem;
+    background: #f7f7f7;
+    border-radius: .1rem;
+    padding: .3rem;
+}
+.final-amount .money {
+    background: #03d1a1;
+    color: #fff;
+    border-radius: .1rem;
+    padding: .05rem .2rem;
+}
+.propose {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .3rem;
+}
+.propose button {
+    background: #03d1a1;
+    color: #fff;
+    border-radius: .1rem;
+}
+.tips {
+    display: block;
+    margin-top: .3rem;
+    line-height: .5rem;
+    font-size: .25rem;
+}
+.tips .title {
+    font-size: .28rem;
+}
+.prohibit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+    flex-direction: column;
+}
+.prohibit i {
+    font-size: 4em;
+    color: #ff0b0b;
+}
+.prohibit h3 {
+    font-size: .4rem;
+    color: #03d1a1;
+    padding-top: .5rem;
+}
+</style>
+{eq name="$conf.open" value="1"}
+    <div class="amount-box">
+        <div class="head">
+            <span>可提现金币：<span b-text="withdraw.userinfo.coin"></span></span>        
+            <span>{$conf.ratio}金币 = 1元</span>
+        </div>
+        <div class="coin">
+            <input type="number" class="bui-input" b-model="withdraw.amount" value="" placeholder="请输入提现金币数">
+        </div>
+    </div>
+
+    <div class="bank">
+        <span>提现银行卡</span>
+        <div class="right" b-click="withdraw.bankopen()">
+            <div class="item-text" b-text="withdraw.card_no"></div>
+            <i class="icon-listright"></i>
+        </div>
+    </div>
+
+    <div class="final-amount">
+        <span class="tax">税点: {$conf.tax}</span>
+        <span>最终到账: <span b-text="withdraw.vitalFinal()" class="money"></span></span>    
+    </div>
+
+    <div class="propose">
+        <button class="bui-btn" b-click="withdraw.propose()">立即提现</button>
+    </div>
+    
+    <div class="tips">
+        <div class="title">说明</div>
+        <hr>
+        <div class="span1">
+            每次提现不得低于{$conf.price_min}元，不得高于{$conf.price_max}元。
+        </div>
+        <div class="span1">
+            {:nl2br($conf.description)}
+        </div>
+    </div>
+    <div id="uiDialog" class="bui-dialog">
+        <div class="bui-dialog-head">选择收款银行卡</div>
+        <div class="bui-dialog-main">
+          <ul class="bui-list" b-template="withdraw.cardTpl(withdraw.bankcard)"></ul>
+            <div class="bui-dialog-foot">
+                <div class="bui-box">
+                    <div class="span1 propose" onclick="return window.location.href='{:furl('bankcard', [], true, 'home')}'">
+                        <button class="bui-btn"><i class="fa fa-plus-square-o" aria-hidden="true"></i> 添加银行卡</button>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>        
+        <div class="bui-dialog-close"><i class="icon-close"></i></div>
+    </div>
+{else/}
+    <div class="prohibit">
+        <i class="fa fa-frown-o" aria-hidden="true"></i>
+        <h3>禁止提现</h3>
+    </div>    
+{/eq}
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right a").attr('href', "{:furl('withdrawlog', [], true, 'home')}").html('提现记录');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "withdraw",
+            data: {
+                userinfo: {},
+                amount: 0,
+                tax: parseFloat("{$conf.tax}"),
+                ratio: parseInt("{$conf.ratio}"),
+                price_min: parseFloat("{$conf.price_min}"),
+                price_max: parseFloat("{$conf.price_max}"),
+                final_amount: 0,
+                bankcard: [],             
+                card_id: 0,
+                card_no: '请选择'
+            },
+            methods: {
+                bankopen: function() {
+                    var that = this;
+                    post("{:furl('v1/bankcard', [], true, 'api')}", {"auth_status": 1}, function (result) {
+                        if (result.code == 0) {
+                            that.bankcard = result.data || [];
+                            that.uiDialog.open();
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });                    
+                },
+                propose: function () {
+                    var that = this;
+                    if(!that.card_id || that.card_id == 0) return bui.hint("请选择提现银行卡");
+                    if(that.amount > that.userinfo.coin) {
+                        return bui.hint("最多可提现" + that.userinfo.coin + '金币');
+                    }
+                    if(that.price_min > 0 && that.final_amount < that.price_min) {
+                        return bui.hint("最低提现" + that.price_min + '元');
+                    }
+                    if(that.price_max > 0 && that.final_amount > that.price_max) {
+                        return bui.hint("最多提现" + that.price_max + '元');
+                    }
+                    bui.prompt({
+                        content:"请输入安全密码",
+                        height: 320,
+                        callback: function(e){ 
+                            var text = $(e.target).text();                            
+                            if(text == "确定") {
+                                if(!this.value()) {
+                                    return bui.hint('请输入安全密码');
+                                }
+                                post("{:furl('v1/withdrawapply', [], true, 'api')}", { "card_id": that.card_id, "amount": that.amount, "securitypass":this.value() }, function (result) {
+                                    if (result.code == 0) {
+                                        bui.hint({
+                                            content: result.msg,
+                                            onClose: function onClose(e) {
+                                                bui.refresh();
+                                            }
+                                        })
+                                    } else {
+                                        bui.hint(result.msg);
+                                    }
+                                });                                
+                            } else {
+                                this.close();
+                            }
+                            return false;
+                        }
+                    })                   
+                },
+                mine: function() {
+                    var that = this;
+                    post("{:furl('v1/mine', [], true, 'api')}", {}, function (result) {
+                        if (result.code == 0) {
+                            that.userinfo = result.data.userinfo || [];
+                            that.amount = result.data.userinfo.coin || 0;
+                        } else {
+                            bui.hint(result.msg);
+                        }
+                    });
+                },
+                cardChecked: function(key) {
+                    this.card_id = this.bankcard[key].id;
+                    this.card_no = this.bankcard[key].card_no;
+                    this.uiDialog.close();
+                }
+            },
+            watch: {},
+            computed: {         
+                vitalFinal: function() {
+                    if(this.amount > this.userinfo.coin) {
+                        bui.hint("最多可提现" + this.userinfo.coin);
+                        this.amount = this.userinfo.coin;
+                    }
+                    var ds = parseFloat(this.amount / this.ratio);
+                    this.final_amount =  (ds - (ds * this.tax).toFixed(2)).toFixed(2)
+                    return this.final_amount;                 
+                }
+            },
+            templates: {
+                cardTpl: function(data) {
+                    var html = "";
+                    data.forEach(function (item, i) {
+                        html += `<li class="bui-btn bui-box bui-btn-line" b-click="withdraw.cardChecked(${i})">
+                                    <div class="span1">
+                                        <label for="interest_${item.id}">${item.card_no}</label>
+                                    </div>
+                                    <input id="interest_${item.id}" type="radio" class="bui-choose" name="card" value="${item.id}">
+                                </li>`
+                    });
+                    return html;
+                }
+            },
+            mounted: function () {
+                this.mine();
+                this.uiDialog = bui.dialog({
+                    id: "#uiDialog"
+                });
+            }
+        });
+    })
+</script>
+{/block}

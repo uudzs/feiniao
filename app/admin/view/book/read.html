@@ -1,0 +1,70 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">作品详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">作品名称</td>
+			<td>{$detail.title}</td><td class="layui-td-gray-2">作者</td>
+			<td>{$detail.author}</td><td class="layui-td-gray-2">大纲时间</td>
+			<td>{$detail.outlinetime|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">风格</td>
+			<td>
+			{eq name="$detail.style" value="1"}选项一{/eq}
+			{eq name="$detail.style" value="2"}选项二{/eq}
+			</td><td class="layui-td-gray-2">结局</td>
+			<td>
+			{eq name="$detail.ending" value="1"}选项一{/eq}
+			{eq name="$detail.ending" value="2"}选项二{/eq}
+			</td><td class="layui-td-gray-2">大类</td>
+			<td>
+			{eq name="$detail.genre" value="1"}选项一{/eq}
+			{eq name="$detail.genre" value="2"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">小类</td>
+			<td>
+			{eq name="$detail.subgenre" value="1"}选项一{/eq}
+			{eq name="$detail.subgenre" value="2"}选项二{/eq}
+			</td><td class="layui-td-gray-2">完结状态0连载1完结</td>
+			<td>
+				{eq name="$detail.isfinish" value="0"}选项一{/eq}
+				{eq name="$detail.isfinish" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">作品标签</td>
+			<td>{$detail.label}</td>
+		</tr><tr><td class="layui-td-gray-2">自定义标签</td>
+			<td>{$detail.label_custom}</td><td class="layui-td-gray-2">流量</td>
+			<td>{$detail.hits}</td><td class="layui-td-gray-2">总字数</td>
+			<td>{$detail.words}</td>
+		</tr><tr><td class="layui-td-gray-2">分享标题</td>
+			<td>{$detail.sharetitle}</td><td class="layui-td-gray-2">分享简介</td>
+			<td>{$detail.sharedesc}</td><td class="layui-td-gray-2">是否上架</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">编辑人员</td>
+			<td>{$detail.editor}</td><td class="layui-td-gray-2">是否签约</td>
+			<td>
+				{eq name="$detail.issign" value="0"}选项一{/eq}
+				{eq name="$detail.issign" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td><td colspan='4'></td>
+		</tr><tr><td class="layui-td-gray-2">简介</td>
+			<td colspan="5">{$detail.remark}</td>
+		</tr><tr><td class="layui-td-gray-2">大纲</td>
+			<td colspan="5">{$detail.outline}</td>
+		</tr><tr><td class="layui-td-gray-2">封面图片</td>
+			<td colspan="5">
+				<img src="{$detail.cover}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr><tr><td class="layui-td-gray-2">分享图片</td>
+			<td colspan="5">
+				<img src="{$detail.shareimage}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px; max-width:200px" />
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

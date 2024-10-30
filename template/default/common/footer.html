@@ -1,0 +1,58 @@
+<div class="footer-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-4 col-md-4">
+				<div class="logo-part">
+					<div class="footer-logo">
+						<a href="{:url('/')}"><img src="{$conf.logo}" alt="{$conf.title}"></a>
+					</div>
+					<p>{:nl2br(get_system_config('other','servicedescription'))}</p>					
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-2">
+				<div class="company-part">
+					<h6>{$conf.title}</h6>
+					<ul>
+						{foreach name=":get_navs('footer_nav')" item="a"}
+							<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+						{/foreach}
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3">
+				<div class="help-part">
+					<h6>帮助中心</h6>
+					<ul>
+						{foreach name=":get_navs('footer_help')" item="a"}
+							<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+						{/foreach}
+					</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3">
+				<div class="resources-part">
+					<h6>违法和不良信息举报</h6>
+					<ul>
+						{php}$other = get_system_config('other');{/php}
+						<li>{$other.srevicetel|default='无'}</li>
+						<li>{$other.sreviceemail|default='无'}</li>
+						<li><a href="{:url('report')}" class="main-btn">在线举报</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="copy-right">
+				<p>
+					{:get_system_config('web','copyright')}
+					{notempty name=":get_system_config('web','beian')"}
+						<a target="_blank" rel="nofollow" href="http://www.beian.gov.cn/portal/registerSystemInfo">{:get_system_config('web','beian')}</a>
+					{/notempty}
+					{notempty name=":get_system_config('web','icp')"}
+						<a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{:get_system_config('web','icp')}</a>
+					{/notempty}
+				</p>
+			</div>
+		</div>
+	</div>
+</div>

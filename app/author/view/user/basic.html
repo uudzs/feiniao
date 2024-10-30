@@ -1,0 +1,782 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+.upload-avatar {
+    position: relative;    
+}                                    
+.upload-avatar input {
+    position: absolute;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    bottom: 0;
+    left: 0;
+}
+.upload-box .file {
+    position: relative;
+    display: inline-block;
+    border: 1px dashed #DEDEDE;
+    border-radius: 4px;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    background-color: #fff;
+    vertical-align: top;
+}                                    
+.upload-box .file input {
+    position: absolute;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+}                                    
+.upload-box .file:hover {
+    border: 1px dashed #3a75dc;
+}
+.form img {
+    max-width: 500px;
+}
+</style>
+{/block}
+
+<!-- 主体 -->
+{block name="body"}
+	{include file="common/header" nav='info' /}
+    <!-- Popup CSS -->
+    <link href="{__STATIC__}/author/css/magnific-popup.css" rel="stylesheet">
+    <link href="{__STATIC__}/author/css/bootstrap-tagsinput.css" rel="stylesheet">
+    <div class="row page-titles">
+        <div class="col-md-5 align-self-center">
+            <h3 class="text-themecolor">基本信息</h3>
+        </div>
+        <div class="col-md-7 align-self-center">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+                <li class="breadcrumb-item active">基本信息</li>
+            </ol>
+        </div>
+    </div>
+
+	<div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-4 col-xlg-3 col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <center class="m-t-30"> <img src="{$userInfo['headimg']}" onerror="this.src='/static/home/images/logo-ico.png'" class="img-circle useravatar" width="100" height="100">
+                            <h4 class="card-title m-t-10">{$userInfo['nickname']}</h4>
+                            <h6 class="card-subtitle">注册时间：{$userInfo.create_time|date='Y-m-d H:i:s'}</h6>
+                            <div class="row text-center justify-content-md-center">
+                                <div class="upload-avatar btn btn-success btn-sm"><i class="ti-image"></i> 上传头像<input type="file" name="file" accept="image/*" id="uploadavatar"></div>
+                            </div>
+                        </center>
+                    </div>
+                    <div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h4>头像说明</h4>
+                        <p style="margin-bottom: 0;font-size: 90%;">提示：1. 建议400X400像素，不超过40KB的JPG图片；<br>
+                            严禁上传色情、暴力、广告宣传或不适合公众观赏的图片，一经发现即做禁书处理；
+                        </p>                        
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-xlg-9 col-md-7">
+                <div class="card card-outline-info">
+                    <div class="card-header">
+                        <h4 class="m-b-0 text-white">基本信息设置</h4>
+                    </div>
+                    <div class="card-body">
+                        <code>实名认证涉及稿费发放，请务必认真填写与作者本人匹配的真实信息，否则将导致发放失败。</code>
+                        <form class="form" id="profile">
+                            <input type="hidden" name="headimg" id="headimg" value="{$userInfo['headimg']}">                            
+                            <div class="form-group m-t-20">
+                                <label class="col-md-12">笔名</label>
+                                <div class="col-md-12">
+                                    {eq name="userInfo.nicknamemodify" value="1"}
+                                        <input type="text" placeholder="请填写笔名，不可重复" name="nickname" value="{$userInfo['nickname']}" class="form-control" maxlength="32">
+                                        <code>修改后不可再次自行修改，请认真填写。</code>
+                                    {else/}
+                                        <div class="form-control" readonly style="display: block;">{$userInfo['nickname']|default="暂无"}</div>
+                                    {/eq}                                    
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="example-email" class="col-md-12">手机</label>
+                                <div class="col-md-12">
+                                    <div class="form-control" readonly style="display: block;">{$userInfo['mobile']|default="暂无"}</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">邮箱</label>
+                                <div class="col-md-12">
+                                    <input type="text" value="{$userInfo['email']}" name="email" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">QQ</label>
+                                <div class="col-md-12">
+                                    <input type="text" value="{$userInfo['qq']}" name="qq" class="form-control">
+                                </div>
+                            </div>
+                            <code>签约信息（为生成签约协约必要信息，请认真填写）请填写以下信息，* 为必填项</code>
+                            <hr class="m-t-0 m-b-20">
+                            <div class="form-group m-t-20">
+                                <label class="col-md-12">姓名</label>
+                                <div class="col-md-12">
+                                    {eq name="userInfo.authstate" value="1"}
+                                        <div class="form-control" readonly style="display: block;">{$userInfo['true_name']|default="暂无"}</div>                                       
+                                    {else/}
+                                        <input type="text" placeholder="请填写真实姓名" name="true_name" value="{$userInfo['true_name']}" class="form-control">
+                                    {/eq}                                    
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">性别</label>
+                                <div class="col-md-12">
+                                    <div class="radio-list">
+                                        <label class="custom-control custom-radio">
+                                            <input id="sex1" name="sex" value="1" type="radio" {eq name="userInfo['sex']" value="1"}checked{/eq} class="custom-control-input" {eq name="userInfo.authstate" value="1"}disabled{/eq}>
+                                            <span class="custom-control-indicator"></span>
+                                            <span class="custom-control-description">男</span>
+                                        </label>
+                                        <label class="custom-control custom-radio">
+                                            <input id="sex2" name="sex" value="2" type="radio" {eq name="userInfo['sex']" value="2"}checked{/eq} class="custom-control-input" {eq name="userInfo.authstate" value="1"}disabled{/eq}>
+                                            <span class="custom-control-indicator"></span>
+                                            <span class="custom-control-description">女</span>
+                                        </label>
+                                        <label class="custom-control custom-radio">
+                                            <input id="sex2" name="sex" value="" type="radio" {eq name="userInfo['sex']" value=""}checked{/eq} class="custom-control-input" {eq name="userInfo.authstate" value="1"}disabled{/eq}>
+                                            <span class="custom-control-indicator"></span>
+                                            <span class="custom-control-description">保密</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group m-t-20">
+                                <label class="col-md-12">身份证号</label>
+                                <div class="col-md-12">
+                                    {eq name="userInfo.authstate" value="1"}
+                                        <div class="form-control" readonly style="display: block;">{$userInfo['idcard']|default="暂无"}</div>
+                                    {else/}
+                                        <input type="text" placeholder="请填写身份证号" name="idcard" value="{$userInfo['idcard']}" class="form-control">                                        
+                                    {/eq}                                    
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">身份证正面</label>
+                                <div class="col-md-12">                                    
+                                    <div class="col-sm-6 p-l-0 p-r-0">
+                                        <img src="{:get_file($userInfo['idcardpos'])}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" alt="身份证正面" id="idcardposimage">
+                                    </div>
+                                    <input type="hidden" name="idcardpos" value="{$userInfo['idcardpos']}"> 
+                                    <div class="col-sm-6 p-l-0 p-r-0 m-t-20">
+                                        <div class="upload-box">
+                                            <div class="file">
+                                                <i class="ti-plus"></i>
+                                                <input type="file" name="file" accept="image/*" id="idcardpos">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">身份证反面</label>
+                                <div class="col-md-12">
+                                    <div class="col-sm-6 p-l-0 p-r-0">
+                                        <img src="{:get_file($userInfo['idcardside'])}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" alt="身份证反面" id="idcardsideimage">
+                                    </div>
+                                    <input type="hidden" name="idcardside" value="{$userInfo['idcardside']}"> 
+                                    <div class="col-sm-6 p-l-0 p-r-0 m-t-20">
+                                        <div class="upload-box">
+                                            <div class="file">
+                                                <i class="ti-plus"></i>
+                                                <input type="file" name="file" accept="image/*" id="idcardside">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">居住地址</label>
+                                <div class="col-md-12">
+                                    <div class="col-sm-3 p-l-0 p-r-0 d-inline-block">
+                                        <select name="province" id="province" class="form-control" >
+                                            <option value="">--请选择--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3 d-inline-block">
+                                        <select name="city" id="city" class="form-control">
+                                         <option value="">--请选择--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3 p-l-0 p-r-0 d-inline-block">
+                                        <select name="county" id="county" class="form-control">
+                                         <option value="">--请选择--</option>
+                                        </select>
+                                    </div>                                    
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <input placeholder="请填写除省市县外的详细地址信息" class="form-control" type="text" name="address" value="{$userInfo['address']}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">邮编</label>
+                                <div class="col-md-12">
+                                    <input type="text" placeholder="请填写邮编" value="{$userInfo['postcode']}" name="postcode" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">银行开户地</label>
+                                <div class="col-md-12">
+                                    <div class="col-sm-3 p-l-0 p-r-0 d-inline-block">
+                                        <select name="bankprovince" id="bankprovince" class="form-control" {eq name="userInfo.bankstate" value="1"}disabled{/eq}>
+                                            <option value="">--请选择--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3 d-inline-block">
+                                        <select name="bankcity" id="bankcity" class="form-control" {eq name="userInfo.bankstate" value="1"}disabled{/eq}>
+                                         <option value="">--请选择--</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3 p-l-0 p-r-0 d-inline-block">
+                                        <select name="bankcounty" id="bankcounty" class="form-control" {eq name="userInfo.bankstate" value="1"}disabled{/eq}>
+                                         <option value="">--请选择--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">开户银行</label>
+                                <div class="col-md-12">
+                                    <input type="text" placeholder="精确至分行,如:中国交通银行上海虹口支行" {eq name="userInfo.bankstate" value="1"}readonly{/eq} value="{$userInfo['bankdeposit']}" name="bankdeposit" class="form-control">
+                                </div>
+                            </div>                            
+                            <div class="form-group m-t-20">
+                                <label class="col-md-12">银行卡号</label>
+                                <div class="col-md-12">
+                                    {eq name="userInfo.bankstate" value="1"}
+                                        <div class="form-control" readonly style="display: block;">{$userInfo['bankcard']|default="暂无"}</div>
+                                    {else/}
+                                        <input type="text" placeholder="请仔细核对卡号" name="bankcard" value="{$userInfo['bankcard']}" class="form-control">                                        
+                                    {/eq}                                    
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">银行卡正面</label>
+                                <div class="col-md-12">
+                                    <div class="col-sm-6 p-l-0 p-r-0">
+                                        <img src="{:get_file($userInfo['bankcardphoto'])}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" alt="银行卡正面" id="bankcardphotoimage">
+                                    </div>
+                                    <input type="hidden" name="bankcardphoto" value="{$userInfo['bankcardphoto']}"> 
+                                    <div class="col-sm-6 p-l-0 p-r-0 m-t-20">
+                                        <div class="upload-box">
+                                            <div class="file">
+                                                <i class="ti-plus"></i>
+                                                <input type="file" name="file" accept="image/*" id="bankcardphoto">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <code class="form-control-feedback m-t-20 d-block">上传图片，请露出证件的四个边角，并且上传后能清晰的看到文字，请确认后再进行保存</code>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">工作单位</label>
+                                <div class="col-md-12">
+                                    <input type="text" placeholder="如暂时没有可不填" value="{$userInfo['workunit']}" name="workunit" class="form-control">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-12">固定电话</label>
+                                <div class="col-md-12">
+                                    <input type="text" placeholder="如暂时没有可不填" value="{$userInfo['telephone']}" name="telephone" class="form-control">
+                                </div>
+                            </div>                            
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-success saveprofile">保存</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>                     
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<!-- Magnific popup JavaScript -->
+<script type="text/javascript" src="{__STATIC__}/author/js/jquery.magnific-popup.min.js"></script>
+<!-- ============================================================== -->
+<script type="text/javascript" src="{__STATIC__}/author/js/bootstrap-tagsinput.min.js"></script>
+<script type="text/javascript" src="{__STATIC__}/author/js/address.js"></script>
+<script>
+$(window).on('load', function() {
+    var sign_count = parseInt('{$sign}');
+    var authstate = parseInt("{$userInfo['authstate']}");
+    var bankstate = parseInt("{$userInfo['bankstate']}");
+    var province = "{$userInfo['province']}";
+    var city = "{$userInfo['city']}";
+    var county = "{$userInfo['county']}";
+    var card = '{$userInfo["bankcard"]}';
+    var pcode = '';
+    var poption = "<option value=''>--请选择--</option>";
+
+    var bankprovince = "{$userInfo['bankprovince']}";
+    var bankcity = "{$userInfo['bankcity']}";
+    var bankcounty = "{$userInfo['bankcounty']}";
+    var html = "<option value=''>--请选择--</option>";
+    var provincecode = '';
+    $("#bankprovince").empty();
+    $("#province").empty();
+    $.each(pdata,function(idx, item) {
+        if (parseInt(item.level) == 0) {
+            if(province == item.names) {
+                pcode = item.code;
+                poption += "<option value="+item.code+" selected>"+ item.names +"</option> ";
+            } else {
+                poption += "<option value="+item.code+">"+ item.names +"</option> ";
+            }
+            if(bankprovince == item.names) {
+                provincecode = item.code;
+                html += "<option value="+item.code+" selected>"+ item.names +"</option> ";
+            } else {
+                html += "<option value="+item.code+">"+ item.names +"</option> ";
+            }
+        }
+    });
+    $("#province").append(poption);
+    $("#bankprovince").append(html);
+    var ccode = '';    
+    if(pcode) {
+        var coption = "";
+        $("#city").empty();
+        $.each(pdata,function(idx,item){
+            var code = pcode.substring(0,2);
+            if (parseInt(item.level) == 1 && code == item.code.substring(0,2)) {
+                if(city == item.names) {
+                    ccode = item.code;
+                    coption += "<option value="+item.code+" selected>"+ item.names +"</option> ";
+                } else {
+                    coption += "<option value="+item.code+">"+ item.names +"</option> ";
+                }
+            }
+        });
+        $("#city").append(coption);
+    }
+    if(ccode) {
+        var ccoption = "<option value=''>--请选择--</option>";
+        $("#county").empty();
+        $.each(pdata,function(idx,item){
+            var code = ccode.substring(0,4);
+            if (parseInt(item.level) == 2 && code == item.code.substring(0,4)) {
+                if(county == item.names) {
+                    ccoption += "<option value="+item.code+" selected>"+ item.names +"</option> ";
+                } else {
+                    ccoption += "<option value="+item.code+">"+ item.names +"</option> ";
+                }
+            }
+        });
+        $("#county").append(ccoption);
+    }
+    $("#province").change(function() {
+        if ($(this).val() == "") return;
+        $("#city").empty();
+        $("#county").empty();
+        var code = $(this).find("option:selected").val();
+        code = code.substring(0,2);
+        var html = "<option value=''>--请选择--</option>";
+        $("#county").append(html);
+        $.each(pdata,function(idx,item){
+            if (parseInt(item.level) == 1 && code == item.code.substring(0,2)) {
+                html += "<option value="+item.code+">"+ item.names +"</option> ";
+            }
+        });
+        $("#city").append(html);
+    });
+    $("#city").change(function() {
+        if ($(this).val() == "") return;
+        $("#county").empty();
+        var code = $(this).find("option:selected").val();
+        code = code.substring(0,4);
+        var html = "<option value=''>--请选择--</option>";
+        $.each(pdata,function(idx,item){
+            if (parseInt(item.level) == 2 && code == item.code.substring(0,4)) {
+                html +="<option value="+item.code+" >"+ item.names +"</option> ";
+            }
+        });
+        $("#county").append(html);
+    });
+    var citycode = '';
+    if(provincecode) {
+        var html = "";
+        $("#bankcity").empty();
+        $.each(pdata,function(idx,item){
+            var code = provincecode.substring(0,2);
+            if (parseInt(item.level) == 1 && code == item.code.substring(0,2)) {
+                if(bankcity == item.names) {
+                    citycode = item.code;
+                    html += "<option value="+item.code+" selected>"+ item.names +"</option> ";
+                } else {
+                    html += "<option value="+item.code+">"+ item.names +"</option> ";
+                }
+            }
+        });
+        $("#bankcity").append(html);
+    }
+    if(citycode) {
+        var html = "<option value=''>--请选择--</option>";
+        $("#bankcounty").empty();
+        $.each(pdata,function(idx,item){
+            var code = citycode.substring(0,4);
+            if (parseInt(item.level) == 2 && code == item.code.substring(0,4)) {
+                if(bankcounty == item.names) {
+                    html += "<option value="+item.code+" selected>"+ item.names +"</option> ";
+                } else {
+                    html += "<option value="+item.code+">"+ item.names +"</option> ";
+                }
+            }
+        });
+        $("#bankcounty").append(html);
+    }
+    $("#bankprovince").change(function() {
+        if ($(this).val() == "") return;
+        $("#bankcity").empty();
+        $("#bankcounty").empty();
+        var code = $(this).find("option:selected").val();
+        code = code.substring(0,2);
+        var html = "<option value=''>--请选择--</option>";
+        $("#bankcounty").append(html);
+        $.each(pdata,function(idx,item){
+            if (parseInt(item.level) == 1 && code == item.code.substring(0,2)) {  
+                html += "<option value="+item.code+">"+ item.names +"</option> ";
+            }
+        });
+        $("#bankcity").append(html);
+    });
+    $("#bankcity").change(function() {
+        if ($(this).val() == "") return;
+        $("#bankcounty").empty();
+        var code = $(this).find("option:selected").val();
+        code = code.substring(0,4);
+        var html = "<option value=''>--请选择--</option>";
+        $.each(pdata,function(idx,item){
+            if (parseInt(item.level) == 2 && code == item.code.substring(0,4)) {
+                html +="<option value="+item.code+" >"+ item.names +"</option> ";
+            }
+        });
+        $("#bankcounty").append(html);
+    });
+   
+    //身份证正面
+    $('#idcardpos').on('change', function(e) {
+        var obj = this;      
+        var imgSize = this.files[0].size;
+        if (imgSize > 1024 * 1024 * 10) { //1M
+            swal("错误提示", "上传图片不能超过500KB", "error");
+            return false;
+        };
+        if (this.files[0].type != 'image/png' && this.files[0].type != 'image/jpeg' && this.files[0].type != 'image/gif') {
+            swal("错误提示", "图片上传格式不正确", "error");
+            return false;
+        }
+        var imgFile = this.files[0];
+        var formFile = new FormData();
+        formFile.append('file', imgFile);
+        $.ajax({
+            url: "{:url('api/upload')}",
+            type: 'POST',
+            data: formFile,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // traditional:true,
+            dataType:'json',
+            success: function(res) {
+                console.log(res);
+                if(res.code == 0) {
+                    obj.value = '';
+                    $("#idcardposimage").attr('src', res.data.filepath);
+                    $("input[name='idcardpos']").attr('value', res.data.filepath);
+                } else {
+                    obj.value = '';
+                    swal("错误提示", res.msg, "error");
+                }
+            }
+        });
+    });
+
+    //身份证反面
+    $('#idcardside').on('change', function(e) {
+        var obj = this;      
+        var imgSize = this.files[0].size;
+        if (imgSize > 1024 * 1024 * 10) { //1M
+            swal("错误提示", "上传图片不能超过500KB", "error");
+            return false;
+        };
+        if (this.files[0].type != 'image/png' && this.files[0].type != 'image/jpeg' && this.files[0].type != 'image/gif') {
+            swal("错误提示", "图片上传格式不正确", "error");
+            return false;
+        }
+        var imgFile = this.files[0];
+        var formFile = new FormData();
+        formFile.append('file', imgFile);
+        $.ajax({
+            url: "{:url('api/upload')}",
+            type: 'POST',
+            data: formFile,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // traditional:true,
+            dataType:'json',
+            success: function(res) {
+                console.log(res);
+                if(res.code == 0) {
+                    obj.value = '';
+                    $("#idcardsideimage").attr('src', res.data.filepath);
+                    $("input[name='idcardside']").attr('value', res.data.filepath);
+                } else {
+                    obj.value = '';
+                    swal("错误提示", res.msg, "error");
+                }
+            }
+        });
+    });
+
+    //银行卡正面
+    $('#bankcardphoto').on('change', function(e) {
+        var obj = this;      
+        var imgSize = this.files[0].size;
+        if (imgSize > 1024 * 1024 * 10) { //1M
+            swal("错误提示", "上传图片不能超过500KB", "error");
+            return false;
+        };
+        if (this.files[0].type != 'image/png' && this.files[0].type != 'image/jpeg' && this.files[0].type != 'image/gif') {
+            swal("错误提示", "图片上传格式不正确", "error");
+            return false;
+        }
+        var imgFile = this.files[0];
+        var formFile = new FormData();
+        formFile.append('file', imgFile);
+        $.ajax({
+            url: "{:url('api/upload')}",
+            type: 'POST',
+            data: formFile,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // traditional:true,
+            dataType:'json',
+            success: function(res) {
+                console.log(res);
+                if(res.code == 0) {
+                    obj.value = '';
+                    $("#bankcardphotoimage").attr('src', res.data.filepath);
+                    $("input[name='bankcardphoto']").attr('value', res.data.filepath);
+                } else {
+                    obj.value = '';
+                    swal("错误提示", res.msg, "error");
+                }
+            }
+        });
+    });
+
+    //上传头像
+    $('#uploadavatar').on('change', function(e) {
+        var obj = this;      
+        var imgSize = this.files[0].size;
+        if (imgSize > 1024 * 1024 * 10) { //1M
+            swal("错误提示", "上传图片不能超过500KB", "error");
+            return false;
+        };
+        if (this.files[0].type != 'image/png' && this.files[0].type != 'image/jpeg' && this.files[0].type != 'image/gif') {
+            swal("错误提示", "图片上传格式不正确", "error");
+            return false;
+        }
+        var imgFile = this.files[0];
+        var formFile = new FormData();
+        formFile.append('file', imgFile);
+        $.ajax({
+            url: "{:url('api/upload')}",
+            type: 'POST',
+            data: formFile,
+            async: true,
+            cache: false,
+            contentType: false,
+            processData: false,
+            // traditional:true,
+            dataType:'json',
+            success: function(res) {
+                console.log(res);
+                if(res.code == 0) {
+                    obj.value = '';
+                    swal({
+                        title: "上传成功",
+                        text: "请点保存应用更改！",
+                        timer: 2000,
+                        type: "success",
+                        showConfirmButton: false
+                    });
+                    $(".useravatar").attr('src', res.data.filepath);
+                    $("#headimg").val(res.data.filepath);
+                } else {
+                    obj.value = '';
+                    swal("错误提示", res.msg, "error");
+                }
+            }
+        });
+    });
+
+    //建立可存取到file的url
+    function getObjectURL(file) {
+        var url = null;
+        if (window.createObjectURL != undefined) { // basic
+            url = window.createObjectURL(file);
+        } else if (window.URL != undefined) { // mozilla(firefox)
+            url = window.URL.createObjectURL(file);
+        } else if (window.webkitURL != undefined) { // webkit or chrome
+            url = window.webkitURL.createObjectURL(file);
+        }
+        return url;
+    };
+
+    //保存
+    $(".saveprofile").bind("click", function() {
+        var inputValues = $('#profile').serializeArray();
+        var formData = [];
+        $.each(inputValues, function (index, field) {
+            formData[field.name] = field.value;
+        });
+        if(sign_count > 0) {
+            swal("错误提示", "有银行卡协议未签署完成，不允许修改！", "error");
+            return false;
+        }
+        var urlstr = $('#profile').serialize();
+        formData.province = $("#province option:selected").text();
+        formData.city = $("#city option:selected").text();
+        formData.county = $("#county option:selected").text();
+        formData.bankprovince = $("#bankprovince option:selected").text();
+        formData.bankcity = $("#bankcity option:selected").text();
+        formData.bankcounty = $("#bankcounty option:selected").text();
+        urlstr += ('&province=' + formData.province + '&city=' + formData.city + '&county=' + formData.county + '&bankprovince=' + formData.bankprovince + '&bankcity=' + formData.bankcity + '&bankcounty=' + formData.bankcounty);
+        var reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/;
+        if(!reg.test(formData.email)) {
+            swal("错误提示", "邮箱格式不正确", "error");
+            return false;
+        }
+        if(authstate !== 1) {
+            var regName =/^[\u4e00-\u9fa5]{2,4}$/;
+            if(!regName.test(formData.true_name)) {
+                swal("错误提示", "真实姓名填写有误", "error");
+                return false;
+            }
+            var regIdNo = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+            if(!regIdNo.test(formData.idcard)) {
+                swal("错误提示", "身份证号填写有误", "error");
+                return false;
+            }
+        }
+        var num = /^\d*$/; //全数字
+        if(bankstate !== 1) {
+            if(escape(formData.bankdeposit).indexOf("%u")<0) {
+                swal("错误提示", "开户银行不正确", "error");
+                return false;
+            }
+            if(!formData.bankcard){
+                swal("错误提示", "请填写银行卡号", "error");
+                return false;
+            }            
+            if(!num.exec(formData.bankcard)) {
+                swal("错误提示", "银行卡号必须全为数字", "error");
+                return false;
+            }
+        }
+        if(!formData.qq) {
+            swal("错误提示", "请填写qq号", "error");
+            return false;
+        }
+        if(!num.exec(formData.qq)) {
+            swal("错误提示", "qq号必须全为数字", "error");
+            return false;
+        }
+        //修改银行卡
+        if(bankstate!==1 && card.length > 0 && card !== formData.bankcard) {
+            swal({
+                title: "信息确认",
+                text: "由于您正在更改银行信息，将会触发相关的变更协议，您确定要进行更改吗？",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{:url('user/save')}",
+                        data: urlstr,
+                        type: 'post',
+                        async: false,
+                        success: function (res) {
+                            if (res.code === 0) {
+                                swal({
+                                    title: res.msg,
+                                    text: "请稍候……",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 2000);                                
+                            } else {
+                                swal("修改失败", res.msg, "error");
+                            }
+                        }
+                    })
+                }
+            });
+        } else {
+            $.ajax({
+                url: "{:url('user/save')}",
+                data: urlstr,
+                type: 'post',
+                async: false,
+                success: function (res) {
+                    if (res.code === 0) {
+                        swal({
+                            title: res.msg,
+                            text: "请稍候……",
+                            timer: 2000,
+                            type: "success",
+                            showConfirmButton: false
+                        });
+                        setTimeout(function () {
+                            location.reload();
+                        }, 2000);                                
+                    } else {
+                        swal("修改失败", res.msg, "error");
+                    }
+                }
+            })
+        }
+    });
+});
+</script>
+{/block}
+<!-- /脚本 -->

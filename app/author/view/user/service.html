@@ -1,0 +1,95 @@
+{extend name="common/base"/}
+{block name="style"}{/block}
+<!-- 主体 -->
+{block name="body"}
+{php}
+$conf = get_system_config('other');
+$agreement = get_system_config('agreement');
+{/php}
+	{include file="common/header" nav='info' /}	
+	<div class="row page-titles">
+		<div class="col-md-5 align-self-center">
+			<h3 class="text-themecolor">客服服务</h3>
+		</div>
+		<div class="col-md-7 align-self-center">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+				<li class="breadcrumb-item active">客服服务</li>
+			</ol>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<!-- ============================================================== -->
+		<!-- Start Page Content -->
+		<!-- ============================================================== -->
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+		
+				</div>
+			</div>
+		</div>
+		<!-- ============================================================== -->
+		<!-- End PAge Content -->
+		<!-- ============================================================== -->
+		<!-- ============================================================== -->
+		<!-- Right sidebar -->
+		<!-- ============================================================== -->
+		<!-- .right-sidebar -->
+		<div class="right-sidebar">
+		
+		</div>
+		<!-- ============================================================== -->
+		<!-- End Right sidebar -->
+		<!-- ============================================================== -->
+		<div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="m-b-0">联系方式</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12">
+                                <div class="alert">
+                                    <p class="lead">
+                                    {php}
+                                        $content = model('pages')->where(['status' => 1, 'name' => 'about'])->value('content');
+                                    {/php}
+                                    {notempty name="$content"} 
+                                        {:nl2br($content)}
+                                    {/notempty}</p>
+                                </div>                               
+                            </div>
+                            <div class="col-lg-12 col-md-12">                   
+                                <div class="alert">
+                                    <p class="lead">客服电话</p>                                    
+                                    <p>{$conf.srevicetel|default='无'}</p>
+                                </div>                                
+                            </div>
+                            <div class="col-lg-12 col-md-12">                   
+                                <div class="alert">
+                                    <p class="lead">客服邮箱</p>                                    
+                                    <p>{$conf.sreviceemail|default='无'}</p>
+                                </div>                                
+                            </div>                            
+                            <div class="col-lg-12 col-md-12">                
+                                <div class="alert">
+                                    <p class="lead">客服说明</p>                                    
+                                    <p>{$conf.servicedescription|raw}</p>
+                                </div>                                
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+{/block}
+<!-- /脚本 -->

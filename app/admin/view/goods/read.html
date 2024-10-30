@@ -1,0 +1,122 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+	.upload-img {
+		width: 120px;
+		height: 90px;
+		overflow: hidden;
+		position: relative;
+		border: 1px solid #eee;
+		padding: 1px;
+		margin: 5px;
+		float: left;
+	}
+
+	.upload-close {
+		position: absolute;
+		top: 1px;
+		right: 1px;
+	}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">商品详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray">商品标题</td>
+			<td colspan="5">{$detail.title}</td>
+			<td class="layui-td-gray">商品分类</td>
+			<td>{$detail.cate_name}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">关键字</td>
+			<td colspan="5">{$detail.keyword_names}</td>
+			<td class="layui-td-gray" rowspan="3">缩略图<font>*</font></td>
+			<td rowspan="3" style="vertical-align:top">
+				<img src="{$detail.thumb|get_file}" style="width:200px;max-width:200px" />
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">商品卖点</td>
+			<td colspan="5">{$detail.tips}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray" style="vertical-align:top;">商品简介</td>
+			<td colspan="5">{$detail.desc}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">商品标签</td>
+			<td colspan="8">
+				<input type="checkbox" name="tag_values[]" title="正品保证" lay-skin="primary" disabled value="1" {eq
+					name="$detail.tag1" value="1" }checked{/eq} />
+				<input type="checkbox" name="tag_values[]" title="一年保修" lay-skin="primary" disabled value="2" {eq
+					name="$detail.tag2" value="1" }checked{/eq} />
+				<input type="checkbox" name="tag_values[]" title="七天退换（拆封后不支持）" lay-skin="primary" disabled value="3" {eq
+					name="$detail.tag3" value="1" }checked{/eq} />
+				<input type="checkbox" name="tag_values[]" title="赠运费险" lay-skin="primary" disabled value="4" {eq
+					name="$detail.tag4" value="1" }checked{/eq} />
+				<input type="checkbox" name="tag_values[]" title="闪电发货" lay-skin="primary" disabled value="5" {eq
+					name="$detail.tag5" value="1" }checked{/eq} />
+				<input type="checkbox" name="tag_values[]" title="售后无忧" lay-skin="primary" disabled value="6" {eq
+					name="$detail.tag6" value="1" }checked{/eq} />
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">市场价格</td>
+			<td>{$detail.base_price}</td>
+			<td class="layui-td-gray">实际价格</td>
+			<td>{$detail.price}</td>
+			<td class="layui-td-gray">商品库存</td>
+			<td>{$detail.stocks}</td>
+			<td class="layui-td-gray">是否包邮</td>
+			<td>
+				{eq name="$detail.is_mail" value="1"}是{/eq}
+				{eq name="$detail.is_mail" value="0"}否{/eq}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">商品属性</td>
+			<td>
+				{eq name="$detail.type" value="1" }精华{/eq}
+				{eq name="$detail.type" value="2" }热门{/eq}
+				{eq name="$detail.type" value="3" }推荐{/eq}
+			</td>
+			<td class="layui-td-gray">首页显示</td>
+			<td>
+				{eq name="$detail.is_home" value="1"}是{/eq}
+				{eq name="$detail.is_home" value="0"}否{/eq}
+			</td>
+			<td class="layui-td-gray">排序</td>
+			<td>{$detail.sort}</td>
+			<td class="layui-td-gray">状态</td>
+			<td>
+				{eq name="$detail.status" value="1" }正常{/eq}
+				{eq name="$detail.status" value="0" }下架{/eq}
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">商品图集</td>
+			<td colspan="7">
+				<div class="layui-upload">
+					<div class="layui-upload-list">
+						{notempty name="detail.banner"}
+						{volist name="detail.banner_array" id="vo"}
+						<div class="upload-img img-cover" id="uploadImg{$vo}"><div class="gg-img-cover cover-4-3"><img src="{$vo|get_file}"></div></div>
+						{/volist}
+						{/notempty}
+					</div>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">商品介绍</td>
+			<td colspan="7">
+				{$detail.content|raw}
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

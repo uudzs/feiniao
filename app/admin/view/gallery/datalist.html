@@ -1,0 +1,153 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline">
+			<select name="cate_id">
+				<option value="">请选择图集分类</option>
+				{volist name=":set_recursion(get_gallery_cate())" id="v"}
+				<option value="{$v.id}">{$v.title}</option>
+				{/volist}
+			</select>
+		</div>
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="ID/标题/分类/摘要" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="gallery" lay-filter="gallery"></table>
+</div>
+
+<script type="text/html" id="status">
+	<i class="layui-icon {{#  if(d.status == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
+</script>
+<script type="text/html" id="is_home">
+	<i class="layui-icon {{#  if(d.is_home == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
+</script>
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+    <span class="layui-btn layui-btn-sm tab-a" data-title="添加图集" data-href="{:url('gallery/add')}">+ 添加图集</span>
+  </div>
+</script>
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="view">查看</a><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#gallery',
+			title: '图集列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("gallery/datalist")}', //数据接口
+			page: true, //开启分页
+			limit: 20,
+			cols: [
+				[ //表头
+					{
+						field: 'id',
+						title: '编号',
+						align: 'center',
+						width: 80
+					}, {
+						field: 'cate_title',
+						title: '分类',
+						width: 200
+					}, {
+						field: 'title',
+						title: '标题'
+					},{
+						field: 'count',
+						title: '图片数',
+						align: 'center',
+						width: 80
+					},{
+						field: 'sort',
+						title: '排序',
+						align: 'center',
+						width: 80
+					}, {
+						field: 'status',
+						title: '状态',
+						toolbar: '#status',
+						align: 'center',
+						width: 66
+					}, {
+						field: 'is_home',
+						title: '首页显示',
+						toolbar: '#is_home',
+						align: 'center',
+						width: 90
+					},{
+						field: 'admin_name',
+						title: '创建人',
+						align: 'center',
+						width: 90
+					},{
+						field: 'create_time',
+						title: '创建时间',
+						align: 'center',
+						width: 150
+					}, {
+						field: 'right',
+						title: '操作',
+						toolbar: '#barDemo',
+						width: 150,
+						align: 'center'
+					}
+				]
+			]
+		});
+
+		//监听行工具事件
+		table.on('tool(gallery)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'view') {
+				tool.side('{:url("gallery/read")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.tabAdd('{:url("gallery/edit")}?id='+obj.data.id,'编辑图集'+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('gallery/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+		});
+
+		//监听搜索提交
+		form.on('submit(webform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords,
+					cate_id: data.field.cate_id
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

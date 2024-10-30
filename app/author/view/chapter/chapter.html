@@ -1,0 +1,584 @@
+{extend name="common/base"/}
+{block name="style"}
+<link href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
+<style>
+    .note-editing-area {
+        width: 100%;
+    }
+
+    .note-editing-area .note-editable {
+        padding: 10px;
+        overflow: auto;
+        color: #000;
+        background-color: #fff;
+    }
+
+    .chaptercontent {
+        line-height: 2.5rem;
+        min-height: 60rem;
+    }
+
+    .draft {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 10rem;
+        height: 600px;
+        overflow-y: auto;
+        width: 100%;
+        z-index: 99;
+        border: 1px solid rgba(0, 0, 0, .15) !important;
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, .5) !important;
+    }
+
+    .draft h3 {
+        display: inline-block;
+    }
+</style>
+{/block}
+
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='info' /}
+<div class="row page-titles">
+    <div class="col-md-5 align-self-center">
+        <h3 class="text-themecolor">章节发布</h3>
+    </div>
+    <div class="col-md-7 align-self-center">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{:url('user/index')}">作家中心</a></li>
+            <li class="breadcrumb-item"><a href="{:url('book/index')}">作品列表</a></li>
+            <li class="breadcrumb-item"><a href="{:url('book/detail',array('id'=>$book['id']))}">作品详情</a></li>
+            <li class="breadcrumb-item active">章节发布</li>
+        </ol>
+    </div>
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-outline-info">
+                <div class="card-header">
+                    <h4 class="m-b-0 text-white" style="display: inline-block;">章节发布</h4>
+                    <button class="btn btn-success btn-sm draft-box" style="float: right;" type="button">草稿箱</button>
+                </div>
+                <div class="card-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label>章节名称</label>
+                            <div class="input-group">
+                                <div class="input-group-addon chapstitle">{$info.chapstitle}</div>
+                                <input type="hidden" id="bid" name="bid" value="{$book.id}">
+                                <input type="hidden" id="id" name="id" value="{$info.cid}">
+                                <input type="hidden" id="chaps" name="chaps" value="{$info.chaps}">
+                                <input type="hidden" id="draftid" name="draftid" value="{$info.draftid}">
+                                <input type="text" class="form-control" id="title" name="title" value="{$info.title}" placeholder="系统自动生成章节序号，无需重复编号，章节名称请不要重复。">
+                            </div>
+                        </div>
+                        <div class="form-group m-b-0">
+                            <label>章节内容</label>
+                            <textarea class="form-control chaptercontent" placeholder="
+以下内容严禁创作，请作者们注意并遵守：
+
+一、反对宪法确定的基本原则的；
+二、危害国家统一、主权和领土完整的；
+三、泄露国家秘密、危害国家安全或者损害国家荣誉和利益的；
+四、煽动民族仇恨、民族歧视，破坏民族团结，或者侵害民族风俗、习惯的；
+五、宣扬邪教、迷信的；
+六、散布谣言，扰乱社会秩序，破坏社会稳定的；
+七、宣扬淫秽、色情、赌博、暴力或者教唆犯罪的；
+八、侮辱或者诽谤他人，侵害他人合法权益的；
+九、危害社会公德或者民族优秀文化传统的；
+十、有法律、行政法规和国家规定禁止的其他内容的。" onfocus="this.placeholder=''" maxlength="10000" name="info" id="info">{$info.content}</textarea>
+                            <small class="form-text word-count pull-left">字数统计： 0</small>
+                            <small class="form-text pull-right autosave-datetime">自动保存时间： --</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card draft">
+                <div class="card-body">
+                    <div class="inline-editor">
+                        <h3>草稿箱</h3><span class="btn btn-sm btn-success pull-right draft-close"><i class="ti-close"></i>
+                            关闭</span>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>章节名称</th>
+                                        <th>字数</th>
+                                        <th>时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {notempty name="draftchapter"}
+                                    {volist name="$draftchapter" id="v"}
+                                    <tr>
+                                        <td>{$v.title}</td>
+                                        <td>{$v.wordnum}</td>
+                                        <td>{$v.create_time}</td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="text-inverse p-r-10 draftuse"
+                                                data-toggle="tooltip" data-id="{$v.id}" title=""
+                                                data-original-title="使用"><i class="ti-marker-alt"></i></a>
+                                            <a href="javascript:void(0)" class="text-inverse draftdel" title=""
+                                                data-toggle="tooltip" data-id="{$v.id}" data-original-title="删除"><i
+                                                    class="ti-trash"></i></a>
+                                        </td>
+                                    </tr>
+                                    {/volist}
+                                    {else/}
+                                    <tr>
+                                        <td colspan="4">草稿箱为空</td>
+                                    </tr>
+                                    {/notempty}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    {eq name="book.isfinish" value="2"}
+                        <div class="click2edit m-b-40">完结作品禁止修改</div>
+                    {else/}
+                        <div class="click2edit m-b-40">立即发布即时上架，定时发布则固定时间才会上架显示，只可定时大于当前的时间。</div>
+                        <button class="btn btn-success btn-rounded chapter_save" type="button">立即发布</button>
+                        <button class="btn btn-info btn-rounded" type="datetime-local" data-toggle="modal" data-target="#timedRelease" data-whatever="@mdo"><i class="ti-time"></i> 定时发布</button>
+                        <div class="modal fade" id="timedRelease" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel1">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title" id="exampleModalLabel1">定时发布</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                                aria-hidden="true">&times;</span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="trial_time" class="control-label">发布时间</label>
+                                                <input class="form-control" type="datetime-local"
+                                                    value="{:date('Y-m-d H:i:s')}" id="trial_time">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                        <button type="button" class="btn btn-success trial_save">发布</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/eq}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var content_num = 0;
+    jQuery(document).ready(function () {
+
+        $('.draft-box').click(function () {
+            $('.draft').show().removeClass('bounceInDown animated').addClass('bounceInDown animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                $(this).removeClass('bounceInDown animated');
+            });
+        });
+
+        $('.draft-close').click(function () {
+            $('.draft').show().removeClass('bounceOutUp animated').addClass('bounceOutUp animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                $(this).removeClass('bounceOutUp animated').hide();
+            });
+        });
+
+        //定时发布提交
+        $('.trial_save').click(function () {
+            var trial_time = $("#trial_time").val();
+            var title = $("#title").val();
+            var bid = $("#bid").val();
+            var id = $("#id").val();
+            var draftid = $("#draftid").val();
+            var info = $("#info").val();
+            var chaps = $("#chaps").val();
+            if (!bid) {
+                swal("错误提示", "作品ID不存在", "error");
+                return false;
+            }
+            if (!title) {
+                swal("错误提示", "未设置章节名称", "error");
+                return false;
+            }
+            if (!info) {
+                swal("错误提示", "未设置章节内容", "error");
+                return false;
+            }
+            if (info.length < 1000) {
+                swal("错误提示", "章节内容不能少于1000字", "error");
+                return false;
+            }
+            if (info.length > 10000) {
+                swal("错误提示", "章节内容字数大于10000字，无法发布。", "error");
+                return false;
+            }
+            if (!trial_time) {
+                swal("错误提示", "未设置发布时间", "error");
+                return false;
+            }
+            var date1 = new Date();
+            var date2 = new Date(trial_time);
+            if (date1 > date2) {
+                swal("错误提示", "发布时间发须大于当前时间", "error");
+                return false;
+            }
+            swal({
+                title: "确定要定时发布吗？",
+                text: "定时发布只会在设定的定时时间才会上架显示。",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{:url('chapter/timerrelease')}",
+                        data: { "id": id, "bid": bid, "title": title, "content": info, "draftid": draftid, "chaps": chaps, "trial_time": trial_time },
+                        type: 'post',
+                        async: false,
+                        beforeSend: function() {
+                            // 禁用按钮
+                            $(this).prop('disabled', true);
+                        },
+                        complete: function() {
+                            // 重新启用按钮
+                            $(this).prop('disabled', false);
+                        },
+                        success: function (res) {
+                            if (parseInt(res.code) === 0) {
+                                swal({
+                                    title: res.msg,
+                                    text: "请稍候……",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function () {
+                                    window.location.href = "{:url('chapter/index',array('bid'=>$book['id']))}";
+                                }, 2000);
+                            } else {
+                                if (parseInt(res.code) === 7) {
+                                    swal({
+                                        title: res.msg,
+                                        text: res.data.data,
+                                        type: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#DD6B55",
+                                        confirmButtonText: "确定发布",
+                                        cancelButtonText: "取消发布",
+                                        closeOnConfirm: false,
+                                        closeOnCancel: true
+                                    }, function (isConfirm) {
+                                        if (isConfirm) {
+                                            $.ajax({
+                                                url: "{:url('chapter/timerrelease')}",
+                                                data: { "id": id, "bid": bid, "title": title, "content": info, "draftid": draftid, "chaps": chaps, "trial_time": trial_time, "adopt": 1 },
+                                                type: 'post',
+                                                async: false,
+                                                success: function (r) {
+                                                    if (r.code === 0) {
+                                                        swal({
+                                                            title: r.msg,
+                                                            text: "请稍候……",
+                                                            timer: 2000,
+                                                            type: "success",
+                                                            showConfirmButton: false
+                                                        });
+                                                        setTimeout(function () {
+                                                            window.location.href = "{:url('chapter/index',array('bid'=>$book['id']))}";
+                                                        }, 2000);
+                                                    } else {
+                                                        swal("发布失败", r.msg, "error");
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    });
+                                } else if (parseInt(res.code) === 5) {
+                                    swal(res.msg, res.data.data, "error");
+                                } else {
+                                    swal(res.msg, '请重试', "error");
+                                }
+                            }
+                        }
+                    })
+                }
+            });
+        });
+
+        //正式发布
+        $('.chapter_save').click(function () {
+            var title = $("#title").val();
+            var bid = $("#bid").val();
+            var id = $("#id").val();
+            var draftid = $("#draftid").val();
+            var info = $("#info").val();
+            var chaps = $("#chaps").val();
+            if (!bid) {
+                swal("错误提示", "作品ID不存在", "error");
+                return false;
+            }
+            if (!title) {
+                swal("错误提示", "未设置章节名称", "error");
+                return false;
+            }
+            if (!info) {
+                swal("错误提示", "未设置章节内容", "error");
+                return false;
+            }
+            if (content_num < 1000) {
+                swal("错误提示", "章节内容不能少于1000字", "error");
+                return false;
+            }
+            if (content_num > 10000) {
+                swal("错误提示", "章节内容字数大于10000字，无法发布。", "error");
+                return false;
+            }
+            swal({
+                title: "确定要发布吗？",
+                text: "发布后会即时公开显示。",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "{:url('chapter/release')}",
+                        data: { "id": id, "bid": bid, "title": title, "content": info, "draftid": draftid, "chaps": chaps },
+                        type: 'post',
+                        async: false,
+                        beforeSend: function() {
+                            // 禁用按钮
+                            $(this).prop('disabled', true);
+                        },
+                        complete: function() {
+                            // 重新启用按钮
+                            $(this).prop('disabled', false);
+                        },
+                        success: function (res) {
+                            if (parseInt(res.code) === 0) {
+                                swal({
+                                    title: res.msg,
+                                    text: "请稍候……",
+                                    timer: 2000,
+                                    type: "success",
+                                    showConfirmButton: false
+                                });
+                                setTimeout(function () {
+                                    window.location.href = "{:url('chapter/index',array('bid'=>$book['id']))}";
+                                }, 2000);
+                            } else {
+                                if (parseInt(res.code) === 7) {
+                                    swal({
+                                        title: res.msg,
+                                        text: res.data.data,
+                                        type: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonColor: "#DD6B55",
+                                        confirmButtonText: "确定发布",
+                                        cancelButtonText: "取消发布",
+                                        closeOnConfirm: false,
+                                        closeOnCancel: true
+                                    }, function (isConfirm) {
+                                        if (isConfirm) {
+                                            $.ajax({
+                                                url: "{:url('chapter/release')}",
+                                                data: { "id": id, "bid": bid, "title": title, "content": info, "draftid": draftid, "chaps": chaps, "adopt": 1 },
+                                                type: 'post',
+                                                async: false,
+                                                success: function (r) {
+                                                    if (r.code === 0) {
+                                                        swal({
+                                                            title: r.msg,
+                                                            text: "请稍候……",
+                                                            timer: 2000,
+                                                            type: "success",
+                                                            showConfirmButton: false
+                                                        });
+                                                        setTimeout(function () {
+                                                            window.location.href = "{:url('chapter/index',array('bid'=>$book['id']))}";
+                                                        }, 2000);
+                                                    } else {
+                                                        swal("发布失败", r.msg, "error");
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    });
+                                } else if (parseInt(res.code) === 5) {
+                                    swal(res.msg, res.data.data, "error");
+                                } else {
+                                    swal(res.msg, '请重试', "error");
+                                }
+                            }
+                        }
+                    })
+                }
+            });
+        });        
+
+        //统计内容字数
+        $("#info").keyup(function () {
+            statisticswords($(this).val());
+        });
+
+        //使用草稿箱章节
+        $('.draft').on('click', '.draftuse', function () {
+            let id = $(this).data('id');
+            if (id) {
+                $.ajax({
+                    url: "{:url('chapter/getdraftcontent')}",
+                    data: { id: id },
+                    type: 'post',
+                    async: false,
+                    success: function (res) {
+                        if (res.code === 0) {
+                            $("#info").val(res.data.content);
+                            $("#title").val(res.data.title);
+                            $("#draftid").val(res.data.id);
+                            statisticswords(res.data.content);
+                        } else {
+                            layer.msg(res.msg);
+                        }
+                    }
+                })
+            }
+        });
+
+        //删除草稿箱章节
+        $('.draft').on('click', '.draftdel', function () {
+            let id = $(this).data('id');
+            let draftid = $("#draftid").val();
+            var obj = $(this);
+            if (id) {
+                if (parseInt(draftid) !== parseInt(id)) {
+                    swal({
+                        title: "确定要删除？",
+                        text: "删除后将不可恢复。",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "确定",
+                        cancelButtonText: "取消",
+                        closeOnConfirm: false,
+                        closeOnCancel: true
+                    }, function (isConfirm) {
+                        if (isConfirm) {
+                            $.ajax({
+                                url: "{:url('chapter/deldraft')}",
+                                data: { id: id },
+                                type: 'post',
+                                async: false,
+                                success: function (res) {
+                                    if (res.code === 0) {
+                                        swal({
+                                            title: res.msg,
+                                            text: "请稍候……",
+                                            timer: 2000,
+                                            type: "success",
+                                            showConfirmButton: false
+                                        });
+                                        obj.parent().parent().remove();
+                                    } else {
+                                        swal("删除失败", res.msg, "error");
+                                    }
+                                }
+                            })
+                        }
+                    });
+                } else {
+                    swal({
+                        title: "禁止删除",
+                        text: "当前编辑章节用到了此草稿章节。",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            }
+        });
+
+        window.statisticswords = function (content) {
+            $.ajax({
+                url: "{:url('chapter/wordcount')}",
+                data: { content: content },
+                type: 'post',
+                async: false,
+                success: function (res) {
+                    if (res.code === 0) {
+                        content_num = res.data;
+                        $(".word-count").text('字数统计：' + res.data + ' 字');
+                    } else {
+                        layer.msg(res.msg);
+                    }
+                }
+            })
+        }
+
+        window.autosavedraft = function () {
+            var title = $("#title").val();
+            var bid = $("#bid").val();
+            var id = $("#id").val();
+            var draftid = $("#draftid").val();
+            var info = $("#info").val();
+            var chaps = $("#chaps").val();
+            $.ajax({
+                url: "{:url('chapter/autosavedraft')}",
+                data: { "id": id, "bid": bid, "title": title, "content": info, "draftid": draftid, "chaps": chaps },
+                type: 'post',
+                async: false,
+                success: function (r) {
+                    if (r.code === 0) {
+                        if (parseInt(r.data.tid) > 0) {
+                            $("#draftid").val(r.data.tid);
+                        }                        
+                        $(".autosave-datetime").text('自动保存时间： ' + r.data.datetime);
+                    } else {
+                        console.log('自动保存失败', r.msg);
+                    }
+                }
+            })
+        }
+
+        statisticswords($("#info").val());
+
+        setInterval(function () {
+            autosavedraft()
+        }, 10000)
+
+        window.onbeforeunload = function () {
+            autosavedraft()
+        };
+
+        $('#timedRelease').on('show.bs.modal', function(){
+            var $this = $(this);
+            var $modal_dialog = $this.find('.modal-dialog');
+            $this.css('display', 'block');
+            $modal_dialog.css({'margin-top': Math.max(0, ($(window).height() - $modal_dialog.height()) / 2) });        
+        });
+
+    });
+</script>
+{/block}
+<!-- /脚本 -->

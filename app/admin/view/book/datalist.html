@@ -1,0 +1,388 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+.laytable-cell-1-0-1 {
+	width: 250px!important;
+}
+.layui-upload {
+	padding: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+.layui-upload .cover {
+	margin-bottom: 20px;
+}
+.layui-upload-list {
+	width: 90px;
+	border: solid 1px #ccc;
+	height: 90px;
+}
+.layui-upload-img {
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+</style>
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="book" lay-filter="book"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-group">
+		<span class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add" data-title="添加作品">添加作品</span>
+		<span class="layui-btn layui-btn-sm" lay-event="import" data-title="导入作品">导入作品</span>
+  	</div>
+</script>
+
+<script type="text/html" id="barDemo">	
+<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="chapter">章节</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+<script type="text/html" id="statusTpl">
+	<input type="checkbox" name="status" value="{{d.status}}" lay-skin="switch" lay-text="上架|下架" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
+</script>
+
+<script type="text/html" id="showTpl">
+	<input type="checkbox" name="ishow" value="{{d.ishow}}" lay-skin="switch" lay-text="显示|隐藏" lay-filter="isshow" {{ d.ishow == 1 ? 'checked' : '' }}>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table, tool = layui.tool, form = layui.form, element = layui.element, upload = layui.upload;
+		layui.pageTable = table.render({
+			elem: '#book',
+			title: '作品表列表',
+			toolbar: '#toolbarDemo',
+			url: "{:url('book/datalist')}",
+			id: 'booklist',
+			page: true,
+			limit: 20,
+			//height: 'full-35',
+     		//lineStyle: 'height: auto;', // 定义表格的多行样式
+			//cellMinWidth: 300,
+			cols: [
+				[
+				{
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 60
+				},{
+					field: 'title',
+					title: '作品名称',
+					align: 'center',
+					style:'width: 250px;'
+				},{
+					field: 'author',
+					title: '作者',
+					align: 'center',
+					width: 200
+				},{
+					field: 'cover',
+					title: '封面图片',
+					align: 'center',
+					width: 100,
+					event: 'uploadCover',
+					style:'cursor: pointer;',
+					templet:function(d) {
+						return d.cover ? '<img src="' + d.cover + '" width="80">' : '--';
+					}
+				},{
+					field: 'style',
+					title: '风格',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.style ? d.style : '--';
+					}
+				},{
+					field: 'ending',
+					title: '结局',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return d.ending ? d.ending : '--';
+					}
+				},{
+					field: 'bigcatetitle',
+					title: '大类',
+					align: 'center',
+					width: 100
+				},{
+					field: 'sellcatetitle',
+					title: '小类',
+					align: 'center',
+					width: 100
+				},{
+					field: 'isfinish',
+					title: '完结状态',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseInt(d.isfinish) ? (parseInt(d.isfinish) === 2 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>') : '--';
+					}
+				},{
+					field: 'finishtime',
+					title: '完结时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.finishtime ? layui.util.toDateString((parseInt(d.finishtime) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--';
+					}
+				},{
+					field: 'words',
+					title: '总字数',
+					align: 'center',
+					width: 80
+				},{
+					field: 'lastmonthwords',
+					title: '上月更新字数',
+					align: 'center',
+					width: 120
+				},{
+					field: 'chapters',
+					title: '总章节数',
+					align: 'center',
+					width: 80
+				},{
+					field: 'label',
+					title: '作品标签',
+					align: 'center',
+					width: 300
+				},{
+					field: 'label_custom',
+					title: '自定义标签',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.label_custom ? d.label_custom : '--';
+					}
+				},{
+					field: 'status',
+					title: '是否上架',
+					align: 'center',
+					width: 80,
+					templet: '#statusTpl',
+					unresize: true
+				},{
+					field: 'issign',
+					title: '是否签约',
+					align: 'center',
+					width: 80,
+					templet: function(d) {
+						return parseInt(d.issign) == 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'editor',
+					title: '编辑人员',
+					align: 'center',
+					width: 120
+				},{
+					field: 'create_time',
+					title: '创建时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.create_time ? d.create_time : '--';
+					}
+				},{
+					field: 'update_time',
+					title: '更新时间',
+					align: 'center',
+					width: 150,
+					templet:function(d) {
+						return d.update_time ? d.update_time : '--';
+					}
+				},
+				{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 150,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(book)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('book/add')}");
+				return false;
+			} else if(obj.event === 'import') {
+				tool.side("{:url('book/import')}");
+				return false;
+			}
+		});
+
+		//监听性别操作
+		form.on('switch(status)', function(obj) {
+			var id = obj.othis.parents('tr').find("td:first").text();
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					obj.update({
+						status: obj.elem.checked  === true ? 1 : 0,
+					});
+				}
+			}
+			tool.post("{:url('book/savefield')}", {id: id, status: (obj.elem.checked  === true ? 1 : 0)}, callback);
+			return false;
+		});
+
+		//监听表格行工具事件
+		table.on('tool(book)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side("{:url('book/read')}?id="+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side("{:url('book/edit')}?id="+obj.data.id);
+			}
+			else if (obj.event === 'chapter') {
+				tool.side("{:url('chapter/datalist')}?bid="+obj.data.id+'&title='+obj.data.title);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('book/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			else if (obj.event === 'uploadCover') {
+				//页面层
+				layer.open({
+					title: '上传封面', //不显示标题
+					type: 1,
+					skin: 'layui-layer-rim', //加上边框
+					area: ['500px', '700px'], //宽高
+					btnAlign: 'c',
+					btn: ['保存','关闭'], //按钮
+					content: '<div class="layui-upload">' + (data.cover ? '<img class="cover" src="' + data.cover + '" style="width: 200px;">' : '') + '<button type="button" class="layui-btn" id="uploadcover">上传封面</button><div class="layui-upload-list"><img class="layui-upload-img" id="cover"><p id="coverText"></p>' +
+						'</div><div style="width: 90px;"><div class="layui-progress layui-progress-big" lay-showpercent="yes" lay-filter="coverprogress"><div class="layui-progress-bar" lay-percent=""></div></div></div></div>',
+					btn1: function(index) {
+						layer.confirm('确定要保存？', {
+							btn: ['确定','取消'] //按钮
+						}, function() {
+							let callback = function (e) {
+								layer.msg(e.msg);
+								if (e.code == 0) {
+									//同步更新缓存对应的值
+									obj.tr.find('td[data-field=cover]').attr('data-content', $('#cover').attr('src'));  // 这句代码是必要的
+									obj.update({
+										cover: $('#cover').attr('src'),
+									});
+									layer.msg('保存成功！', {icon: 1, time: 500}, function() {
+										layer.close(index);
+									});
+								}
+							}
+							tool.post("{:url('book/savefield')}", {id: data.id, cover: $('#cover').attr('src')}, callback);
+							return false;							
+						}, function() {
+							layer.close(index);
+						});
+					}
+				});
+				//常规使用 - 普通图片上传
+				var uploadInst = upload.render({
+					elem: '#uploadcover',
+					url: "{:url('api/upload')}",
+					before: function(obj) {
+						//预读本地文件示例，不支持ie8
+						obj.preview(function(index, file, result) {
+							$('#cover').attr('src', result); //图片链接（base64）
+						});				
+						element.progress('coverprogress', '0%'); //进度条复位
+					},
+					done: function(res) {
+						//如果上传失败
+						if(res.code > 0){
+							return layer.msg('上传失败');
+						}
+						$('#cover').attr('src', res.data.filepath); //图片链接
+						$('#coverText').html(''); //置空上传失败的状态
+					},
+					error: function() {
+						//演示失败状态，并实现重传
+						var coverText = $('#coverText');
+						coverText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs cover-reload">重试</a>');
+						coverText.find('.cover-reload').on('click', function() {
+							uploadInst.upload();
+						});
+					},
+					//进度条
+					progress: function(n, elem, e) {
+						element.progress('coverprogress', n + '%'); //可配合 layui 进度条元素使用
+					}
+				});
+			}
+			return false;
+		});
+
+		$(document).on('click', '#cover', function() {
+			if($(this).attr('src')) {
+				layer.open({
+					type: 1,
+					title: false,
+					closeBtn: true,
+					shadeClose: true, //点击阴影关闭
+					area: [$(this).width + 'px', $(this).height + 'px'], //宽高
+					content: "<img src=" + $(this).attr('src') + " />"
+				});
+			}
+		});
+
+		window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

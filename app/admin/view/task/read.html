@@ -1,0 +1,31 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">任务详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">用户ID</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">任务类型</td>
+			<td>
+				{eq name="$detail.type" value="0"}选项一{/eq}
+				{eq name="$detail.type" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">任务ID</td>
+			<td>{$detail.taskid}</td>
+		</tr><tr><td class="layui-td-gray-2">日期</td>
+			<td>{$detail.task_date|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">任务名称</td>
+			<td>{$detail.title}</td>
+		</tr><tr><td class="layui-td-gray-2">奖励</td>
+			<td>{$detail.reward}</td><td class="layui-td-gray-2">IP</td>
+			<td>{$detail.ip}</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time}</td>
+		</tr><tr><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time}</td><td colspan='4'></td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

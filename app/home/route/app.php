@@ -1,0 +1,50 @@
+<?php
+
+use think\facade\Route;
+
+Route::rule('/$', 'index/index', 'GET|POST')->name('/');
+Route::rule('cate-<id>', 'book/cate', 'GET|POST')->name('book_cates');
+Route::rule('book-:id', 'book/detail', 'GET|POST')->name('book_detail');
+Route::rule('booklist', 'book/list', 'GET|POST')->name('booklist');
+Route::rule('author-:id', 'author/detail', 'GET|POST')->name('author_detail');
+Route::rule('chapter-:id', 'chapter/detail', 'GET|POST')->name('chapter_detail');
+Route::group('notice', function () {
+    Route::rule('/', 'info/index', 'GET|POST')->name('notice');
+    Route::rule('/<page>', 'info/index', 'GET|POST')->pattern(['page' => '\d+'])->name('notice');
+});
+Route::rule('page-<name>', 'pages/detail', 'GET|POST')->pattern(['name' => '\w+'])->name('pages');
+Route::rule('notice-:id', 'info/detail', 'GET|POST')->name('notice_detail');
+Route::rule('news-:id', 'article/detail', 'GET|POST')->name('news_detail');
+Route::rule('login$', 'login/index', 'GET|POST')->name('login');
+Route::rule('search', 'search/index', 'GET|POST')->name('search');
+Route::rule('my$', 'user/index', 'GET|POST')->name('my');
+Route::rule('message$', 'message/index', 'GET|POST')->name('message');
+Route::rule('profile$', 'user/profile', 'GET|POST')->name('profile');
+Route::rule('realnameauth$', 'user/realnameauth', 'GET|POST')->name('realnameauth');
+Route::rule('invite', 'invite/index', 'GET|POST')->name('invite');
+Route::rule('myinvite', 'user/invite', 'GET|POST')->name('myinvite');
+Route::rule('i/<name>', 'invite/index', 'GET|POST')->pattern(['name' => '\w+'])->name('inviteurl');
+Route::rule('task', 'task/index', 'GET|POST')->name('task');
+Route::rule('bookshelf$', 'bookshelf/index', 'GET|POST')->name('bookshelf');
+Route::rule('readlog$', 'user/readlog', 'GET|POST')->name('readlog');
+Route::rule('nickname$', 'user/nickname', 'GET|POST')->name('nickname');
+Route::rule('phone$', 'user/phone', 'GET|POST')->name('phone');
+Route::rule('security$', 'user/security', 'GET|POST')->name('security');
+Route::rule('service$', 'user/service', 'GET|POST')->name('service');
+Route::rule('about$', 'user/about', 'GET|POST')->name('about');
+Route::rule('agreement$', 'user/agreement', 'GET|POST')->name('agreement');
+Route::rule('privacy$', 'user/privacy', 'GET|POST')->name('privacy');
+Route::rule('vip$', 'vip/index', 'GET|POST')->name('vip');
+Route::rule('viplog$', 'vip/log', 'GET|POST')->name('viplog');
+Route::rule('coinlog$', 'coin/index', 'GET|POST')->name('coinlog');
+Route::rule('withdraw$', 'withdraw/index', 'GET|POST')->name('withdraw');
+Route::rule('withdrawlog$', 'withdraw/log', 'GET|POST')->name('withdrawlog');
+Route::rule('bankcard$', 'user/bankcard', 'GET|POST')->name('bankcard');
+Route::rule('order$', 'order/index', 'GET|POST')->name('order');
+Route::rule('wechatpay$', 'pay/wechat', 'GET|POST')->name('wechatpay');
+Route::rule('alipaypay$', 'pay/alipay', 'GET|POST')->name('alipaypay');
+Route::rule('becomeauthor$', 'user/author', 'GET|POST')->name('becomeauthor');
+Route::rule('report$', 'user/report', 'GET|POST')->name('report');
+Route::rule('wechat_oauth_callback', 'login/wechat_oauth_callback', 'GET|POST')->name('wechat_oauth_callback');
+Route::rule('wechat_pay_callback', 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
+Route::rule('alipay_h5_pay_callback', 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');

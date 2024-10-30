@@ -1,0 +1,122 @@
+.bui-page {
+    background: #f2f2f2;
+}
+
+.bui-page header {
+    background: #fff;
+}
+
+.bui-page main {
+    padding: .3rem;
+}
+
+.bui-bar .bui-bar-left {
+    overflow: unset;
+}
+
+.bui-page main .avatar .bui-btn {
+    border: 0;
+    border-radius: .15rem;
+    background: #fff;
+    padding: .3rem;
+}
+
+.bui-page main .avatar .bui-btn .item-title {
+    margin-bottom: .2rem;
+}
+
+.bui-page main .avatar .bui-btn .bui-thumbnail {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.bui-page main .avatar .bui-btn .bui-thumbnail img {
+    border-radius: 50%;
+    height: 100%;
+}
+
+.bui-page main .avatar .bui-btn .span1 .fa-clipboard {
+    color: #03d1a1;
+    margin-left: .2rem;
+}
+
+.vip {
+    width: 100%;
+    background: url("../image/vip.png") center center no-repeat;
+    background-size: 100%;
+    border-radius: .15rem;
+    margin-top: .25rem;
+    padding: .05rem 0;
+}
+
+.vip .bui-btn {
+    background: none;    
+    border: 0;
+    padding: .05rem .3rem;
+}
+
+.vip .bui-btn .item-text {
+    color: #9b7c4c;
+}
+
+.vip .bui-btn .icon {
+    margin-right: 0;
+    color: #333;
+}
+
+.vip .bui-btn .span1 {
+    color: #333;
+}
+
+.vip .bui-btn .icon-listright {
+    color: #9b7c4c;
+}
+
+.goldcoin {
+    border-radius: .15rem;
+    padding: .2rem;
+    color: #dfdfdf;
+    background: url("../image/goldcoin_bg.png") center center no-repeat;
+    margin-bottom: .25rem;
+    margin-top: .25rem;
+}
+
+.goldcoin ul {
+    display: flex;
+    justify-content: space-around;
+}
+
+.goldcoin ul li {
+    width: 50%;
+    text-align: center;
+    padding:0 .3rem .2rem .3rem;
+}
+
+.goldcoin ul li:first-child {
+    border-right: 1px solid #555555;
+    width: calc(50% - 1px);
+}
+
+.goldcoin ul li h3 {
+    color: #ffcd81;
+    font-size: .3rem;
+    margin-top: .1rem;
+}
+
+.goldcoin .withdraw {
+    border-top: 1px solid #555555;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .2rem 0 0 0;
+    font-size: .28rem;
+}
+.goldcoin .withdraw .go {
+    /* border: 1px solid #03d1a1; */
+    overflow: hidden;
+    border-radius: .2rem;
+    text-align: center;
+    color: #03d1a1;
+    font-size: .28rem;
+    padding: .02rem .05rem;
+}

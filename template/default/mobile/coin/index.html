@@ -1,0 +1,94 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '金币流水';
+{/php}
+{include file="common/header"/}
+<style>
+.bui-btn .bui-thumbnail, [class^=bui-btn] .bui-thumbnail {
+    width: 1rem;
+}
+.bui-btn .price {
+    color: #03d1a1;
+}
+</style>
+<div id="scrollList" class="bui-scroll">
+    <div class="bui-scroll-head"></div>
+    <div class="bui-scroll-main">
+        <ul class="bui-list"></ul>
+    </div>
+    <div class="bui-scroll-foot"></div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "coin",
+            data: {
+                all: [],
+                success: [],
+                fail: [],
+            },
+            methods: {      
+                coinlist: function (e) {
+                    var that = this;
+                    bui.list({
+                        headers: { Token: token },
+                        id: "#scrollList",
+                        url: "{:furl('v1/coinlist', [], true, 'api')}",
+                        pageSize: 10,
+                        data: { order: 'create_time DESC' },
+                        field: {
+                            page: "page",
+                            size: "limit",
+                            data: "data.data"
+                        },
+                        template: function (data) {
+                            var html = "";
+                            data.forEach(function(el, index) {
+                                html += `<li class="bui-btn bui-box">`
+                                    if(parseInt(el.type) == 1) {
+                                        html += `<div class="bui-thumbnail"><img src="{__MOBILE__}/default/image/coin_plus.png"></div>`
+                                    } else {
+                                        html += `<div class="bui-thumbnail"><img src="{__MOBILE__}/default/image/coin_reduce.png"></div>`
+                                    }
+                                    html += `<div class="span1">
+                                        <h3 class="item-title">${el.title}</h3>
+                                        <p class="item-text">余额：${el.balance}</p>
+                                        <p class="item-text">时间：${el.create_time}</p>
+                                    </div>`
+                                    if(parseInt(el.type) == 1) {
+                                        html += `<span class="price">+${el.amount}</span>`
+                                    } else {
+                                        html += `<span class="price">-${el.amount}</span>`
+                                    }
+                                html += `</li>`
+                            });
+                            return html;
+                        },
+                        onLoaded: function onLoaded(r) {
+                            if(parseInt(r.code) > 400) {
+                                gettoken();
+                            }
+                        },
+                    });
+                },               
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                this.coinlist();               
+            }
+        });
+    })
+</script>
+{/block}

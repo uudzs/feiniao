@@ -1,0 +1,39 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">单页面详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">页面名称</td>
+			<td>{$detail.title}</td><td class="layui-td-gray-2">图集相册</td>
+			<td>{$detail.banner}</td><td class="layui-td-gray-2">阅读量</td>
+			<td>{$detail.read}</td>
+		</tr><tr><td class="layui-td-gray-2">排序</td>
+			<td>{$detail.sort}</td><td class="layui-td-gray-2">URL文件名</td>
+			<td>{$detail.name}</td><td class="layui-td-gray-2">前端模板</td>
+			<td>
+			{eq name="$detail.template" value="1"}选项一{/eq}
+			{eq name="$detail.template" value="2"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">创建人</td>
+			<td>{$detail.admin_id}</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time}</td><td colspan='2'></td>
+		</tr><tr><td class="layui-td-gray-2">页面摘要</td>
+			<td colspan="5">{$detail.desc}</td>
+		</tr><tr><td class="layui-td-gray-2">缩略图</td>
+			<td colspan="5" style="vertical-align:top">
+				<div class="layui-upload" style="text-align:center;">
+					<div class="layui-upload-list">
+						<img src="{$detail.thumb}" width="100" style="width:200px; max-width:200px" />
+					</div>
+				</div>
+			</td>
+		</tr><tr><td class="layui-td-gray-2">内容描述</td>
+			<td colspan="5">
+				{$detail.content}
+			</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

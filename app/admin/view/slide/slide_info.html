@@ -1,0 +1,129 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<table class="layui-hide" id="slide_info" lay-filter="slide_info"></table>
+</div>
+
+<script type="text/html" id="status">
+	<i class="layui-icon {{#  if(d.status == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
+</script>
+<script type="text/html" id="toolbarDemo">
+  <div class="layui-btn-container">
+	<button class="layui-btn layui-btn-sm add-menu">+ 添加轮播</button>
+	<button class="layui-btn layui-btn-primary layui-btn-sm add-back">返回</button>
+  </div>
+</script>
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><button class="layui-btn layui-btn-xs" lay-event="edit">编辑</button><button class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</button></a>
+</script>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var slide_id = '{$slide_id}';
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table, tool = layui.tool;
+		layui.pageTable = table.render({
+			elem: '#slide_info',
+			title: '轮播列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("slide/slide_info")}', //数据接口				
+			where: {
+				id: slide_id
+			},
+			page: false, //开启分页				
+			cols: [
+				[
+					{
+						field: 'id',
+						title: 'ID号',
+						align: 'center',
+						width: 80
+					}, {
+						field: 'sort',
+						title: '排序',
+						align: 'center',
+						width: 80
+					}, {
+						field: 'title',
+						title: '标题',
+						width: 300
+					}, {
+						field: 'type',
+						title: '类型',
+						width: 100,
+						align: 'center',
+						templet: function (d) {
+							return d.type == 1 ? '图片' : '代码';
+						}
+					}, {
+						field: 'img',
+						title: '图片',
+						width: 136,
+						align: 'center',
+						templet: function (d) {
+							var html = d.filepath ? '<img src="' + d.filepath + '" style="max-width: 100px;" />' : '--';
+							return html;
+						}
+					}, {
+						field: 'desc',
+						title: '代码'
+					}, {
+						field: 'status',
+						title: '状态',
+						toolbar: '#status',
+						align: 'center',
+						width: 80
+					}, {
+						field: 'right',
+						title: '操作',
+						toolbar: '#barDemo',
+						width: 100,
+						align: 'center'
+					}
+				]
+			]
+		});
+
+		//表头工具栏事件
+		$('body').on('click', '.add-menu', function () {
+			tool.side("{:url('slide/slide_info_add')}?sid=" + slide_id);
+			return;
+		});
+
+		//监听返回
+		$('body').on('click', '.add-back', function () {
+			history.back(-1);
+			return false;
+		});
+		//监听行工具事件
+		table.on('tool(slide_info)', function (obj) {
+			var data = obj.data;
+			if (obj.event === 'edit') {
+				tool.side('{:url("slide/slide_info_add")}?id=' + obj.data.id);
+				return;
+			}
+			if (obj.event === 'del') {
+				layer.confirm('确定删除该轮播数据吗？', {
+					icon: 3,
+					title: '提示'
+				}, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('slide/slide_info_delete')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

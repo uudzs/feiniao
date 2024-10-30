@@ -1,0 +1,39 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">广告位详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">名称</td>
+			<td>{$detail.title}</td><td class="layui-td-gray-2">展示频道</td>
+			<td>
+				{eq name="$detail.channel" value="0"}选项一{/eq}
+				{eq name="$detail.channel" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">广告类型</td>
+			<td>
+				{eq name="$detail.type" value="0"}选项一{/eq}
+				{eq name="$detail.type" value="1"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">轮播</td>
+			<td>
+				{eq name="$detail.swiper" value="0"}选项一{/eq}
+				{eq name="$detail.swiper" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">宽度</td>
+			<td>{$detail.width}</td><td class="layui-td-gray-2">高度</td>
+			<td>{$detail.height}</td>
+		</tr><tr><td class="layui-td-gray-2">状态</td>
+			<td>
+				{eq name="$detail.status" value="0"}选项一{/eq}
+				{eq name="$detail.status" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">显示条数</td>
+			<td>{$detail.viewnum}</td><td class="layui-td-gray-2">添加时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td>
+		</tr><tr><td class="layui-td-gray-2">修改时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td><td colspan='4'></td>
+		</tr><tr><td class="layui-td-gray-2">备注</td>
+			<td colspan="5">{$detail.remarks}</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

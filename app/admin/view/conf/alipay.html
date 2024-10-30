@@ -1,0 +1,147 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">支付宝设置</h3>
+	<table class="layui-table layui-table-form">
+        <tr>
+			<td class="layui-td-gray-2">开启状态</td>
+			<td>
+                {empty name="$config.open"}
+                    <input type="radio" name="open" value="2" title="禁止">
+                    <input type="radio" name="open" value="1" title="开启" checked>
+                {else/}
+                    <input type="radio" name="open" value="2" title="禁止"{eq name="$config.open" value="2"} checked{/eq}>
+                    <input type="radio" name="open" value="1" title="开启"{eq name="$config.open" value="1"} checked{/eq}>
+                {/empty}
+            </td>
+		</tr>
+        <tr>
+			<td colspan="4"><hr></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">APPID<font>*</font></td>
+			<td>
+				<input type="hidden" name="id" value="{$id}">
+				<input type="text" name="appid" lay-verify="required" autocomplete="off" placeholder="请输入appid" lay-reqText="请输入appid" class="layui-input" {notempty name="$config.appid"} value="{$config.appid}"{/notempty}>
+			</td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">公钥<font>*</font></td>
+			<td><textarea name="public" placeholder="请填写公钥" class="layui-textarea">{notempty name="$config.public"}{$config.public}{/notempty}</textarea></td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">私钥<font>*</font></td>
+			<td><textarea name="private" placeholder="请填写私钥" class="layui-textarea">{notempty name="$config.private"}{$config.private}{/notempty}</textarea></td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">应用公钥证书</td>
+			<td>
+				<div class="layui-input-inline" style="width: 80%;">
+					<input type="text" name="public_cert" autocomplete="off" readonly placeholder="请上传应用公钥证书" class="layui-input" {notempty name="$config.public_cert"} value="{$config.public_cert}"{/notempty}>
+				</div>
+				<div class="layui-input-inline">
+					<button type="button" class="layui-btn" id="public_cert" lay-data="{accept: 'file'}">上传</button>
+				</div>		
+			</td>
+        </tr>
+        <tr>
+			<td class="layui-td-gray">支付宝公钥证书</td>
+			<td>
+				<div class="layui-input-inline" style="width: 80%;">
+					<input type="text" name="alipay_public_cert_path" autocomplete="off" readonly placeholder="请上传支付宝公钥证书" class="layui-input" {notempty name="$config.alipay_public_cert_path"} value="{$config.alipay_public_cert_path}"{/notempty}>
+				</div>
+				<div class="layui-input-inline">
+					<button type="button" class="layui-btn" id="alipay_public_cert_path" lay-data="{accept: 'file'}">上传</button>
+				</div>		
+			</td>
+        </tr>
+        <tr>
+			<td class="layui-td-gray">支付宝根证书</td>
+			<td>
+				<div class="layui-input-inline" style="width: 80%;">
+					<input type="text" name="alipay_root_cert_path" autocomplete="off" readonly placeholder="请上传支付宝根证书" class="layui-input" {notempty name="$config.alipay_root_cert_path"} value="{$config.alipay_root_cert_path}"{/notempty}>
+				</div>
+				<div class="layui-input-inline">
+					<button type="button" class="layui-btn" id="alipay_root_cert_path" lay-data="{accept: 'file'}">上传</button>
+				</div>		
+			</td>
+        </tr>
+	</table>
+	<div class="py-3">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+        //上传文件
+		var public_cert = layui.upload.render({
+			elem: '#public_cert',
+			url: '{:url("api/upload")}',
+			data: {type: "cert"},
+			accept: 'file', //普通文件
+			exts: 'pem|p12|crt|jks|der|key', //只允许上传的类型
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('input[name="public_cert"]').val(res.data.filepath);
+			}
+		});
+        //上传文件
+		var alipay_public_cert_path = layui.upload.render({
+			elem: '#alipay_public_cert_path',
+			url: '{:url("api/upload")}',
+			data: {type: "cert"},
+			accept: 'file', //普通文件
+			exts: 'pem|p12|crt|jks|der|key', //只允许上传的类型
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('input[name="alipay_public_cert_path"]').val(res.data.filepath);
+			}
+		});
+        //上传文件
+		var alipay_root_cert_path = layui.upload.render({
+			elem: '#alipay_root_cert_path',
+			url: '{:url("api/upload")}',
+			data: {type: "cert"},
+			accept: 'file', //普通文件
+			exts: 'pem|p12|crt|jks|der|key', //只允许上传的类型
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('input[name="alipay_root_cert_path"]').val(res.data.filepath);
+			}
+		});
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});		
+	}
+</script>
+{/block}
+<!-- /脚本 -->

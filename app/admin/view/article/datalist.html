@@ -1,0 +1,175 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline">
+			<select name="cate_id">
+				<option value="">请选择文章分类</option>
+				{volist name=":set_recursion(get_article_cate())" id="v"}
+				<option value="{$v.id}">{$v.title}</option>
+				{/volist}
+			</select>
+		</div>
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="article" lay-filter="article"></table>
+</div>
+
+<script type="text/html" id="status">
+	<i class="layui-icon {{#  if(d.status == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
+</script>
+<script type="text/html" id="is_home">
+	<i class="layui-icon {{#  if(d.is_home == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
+</script>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加文章表">+ 添加文章表</span>
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="read">查看</a><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#article',
+			title: '文章表列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("article/datalist")}',
+			page: true,
+			limit: 20,
+			cellMinWidth: 80,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'cate_title',
+					title: '文章分类',
+					align: 'center',
+					width: 120
+				},{
+					field: 'title',
+					title: '文章标题',
+				},{
+					field: 'read',
+					title: '阅读量',
+					align: 'center',
+					width: 90
+				},{
+					field: 'type_str',
+					title: '文章属性',
+					align: 'center',
+					width: 90
+				},{
+					field: 'is_home',
+					title: '是否首页显示',
+					toolbar: '#is_home',
+					align: 'center',
+					width: 100
+				},{
+					field: 'sort',
+					title: '排序',
+					align: 'center',
+					width: 80
+				},{
+					field: 'status',
+					title: '状态',
+					toolbar: '#status',
+					align: 'center',
+					width: 80
+				},{
+					field: 'admin_name',
+					title: '创建人',
+					align: 'center',
+					width: 100
+				},{
+					field: 'create_time',
+					title: '创建时间',
+					align: 'center',
+					width: 160
+				},{
+					fixed: 'right',
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 136,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(article)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('article/add')}");
+				return false;
+			}
+		});
+
+		//监听表格行工具事件
+		table.on('tool(article)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side('{:url("article/read")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side('{:url("article/edit")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('article/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords,
+					cate_id: data.field.cate_id
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="renderer" content="webkit"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	{block name="meta"}
+		<link rel="mobile-prefetch" href=""/>
+	{/block}
+	{block name="title"}
+		<title>作家中心-{:get_system_config('web','title')}</title>		
+	{/block}
+	{block name="keywords"}
+		<meta name="keywords" content="{:get_system_config('web','keywords')}"/>
+		<meta name="description" content="{:get_system_config('web','desc')}"/>
+	{/block}
+	{block name="css"}
+		<link href="{__STATIC__}/author/css/bootstrap.min.css?v={:get_system_config('web','version')}" rel="stylesheet">
+		<link href="{__STATIC__}/author/css/bootstrap-select.min.css?v={:get_system_config('web','version')}" rel="stylesheet">
+		<!-- Calendar CSS -->
+		<link href="{__STATIC__}/author/css/fullcalendar.css?v={:get_system_config('web','version')}" rel="stylesheet">
+		<!-- Custom CSS -->
+		<link href="{__STATIC__}/author/css/style.css?v={:get_system_config('web','version')}" rel="stylesheet">
+		<!-- You can change the theme colors from here -->
+		<link href="{__STATIC__}/author/css/blue.css?v={:get_system_config('web','version')}" id="theme" rel="stylesheet">
+		<!--alerts CSS -->
+		<link href="{__STATIC__}/author/css/sweetalert.css?v={:get_system_config('web','version')}" rel="stylesheet" type="text/css">
+	{/block}
+	{block name="style"}{/block}
+
+	{block name="js"}
+	<script src="{__STATIC__}/author/js/jquery.min.js"></script>
+	<script defer src="{__JS__}/layer/layer.js?v={:get_system_config('web','version')}"></script> 
+	<!-- Bootstrap tether Core JavaScript -->	
+	<script src="{__STATIC__}/author/js/popper.min.js?v={:get_system_config('web','version')}"></script>
+	<script src="{__STATIC__}/author/js/bootstrap.min.js?v={:get_system_config('web','version')}"></script>
+	<!-- slimscrollbar scrollbar JavaScript -->
+	<script src="{__STATIC__}/author/js/jquery.slimscroll.js?v={:get_system_config('web','version')}"></script>
+	<!--Wave Effects -->
+	<script src="{__STATIC__}/author/js/waves.js?v={:get_system_config('web','version')}"></script>
+	<!--Menu sidebar -->
+	<script src="{__STATIC__}/author/js/sidebarmenu.js?v={:get_system_config('web','version')}"></script>
+	<!--stickey kit -->
+	<script src="{__STATIC__}/author/js/sticky-kit.min.js?v={:get_system_config('web','version')}"></script>
+	<script src="{__STATIC__}/author/js/jquery.sparkline.min.js?v={:get_system_config('web','version')}"></script>
+	<!--Custom JavaScript -->
+	<script src="{__STATIC__}/author/js/custom.min.js?v={:get_system_config('web','version')}"></script>
+	<!-- ============================================================== -->
+	<!-- This page plugins -->
+	<!-- ============================================================== -->
+	<script src="{__STATIC__}/author/js/skycons.js?v={:get_system_config('web','version')}"></script>
+	<!-- Sweet-Alert  -->
+	<script src="{__STATIC__}/author/js/sweetalert.min.js?v={:get_system_config('web','version')}"></script>
+	<!-- ============================================================== -->
+	<!-- Style switcher -->
+	<!-- ============================================================== -->
+	<script src="{__STATIC__}/author/js/jQuery.style.switcher.js?v={:get_system_config('web','version')}"></script>
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	{/block}
+</head>
+<body class="fix-header card-no-border logo-center">
+	<!-- 主体 -->
+	{block name="body"}{/block}
+	<!-- /主体 -->
+
+	<!-- 底部 -->
+	{block name="footer"}
+		{include file="common/footer" /}
+	{/block}
+	<!-- /底部 -->
+	
+	<!-- 脚本 -->
+	{block name="script"}
+
+	{/block}
+	<!-- /脚本 -->
+	
+	<!-- 统计代码 -->
+	{block name="code"}{/block}
+	<!-- /统计代码 -->
+</body>
+</html>

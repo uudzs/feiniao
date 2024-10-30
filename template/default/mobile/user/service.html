@@ -1,0 +1,127 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = '客服';
+$conf = get_system_config('other');
+{/php}
+{include file="common/header"/}
+<style>
+.service {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+.service .sreviceqr {
+    font-size: 2rem;
+    margin-top: .5rem;
+    color: #03d1a1;
+}
+.service .list {
+    width: 100%;
+    display: block;
+    clear: both;
+    text-align: center;
+    margin-top: .5rem;
+    padding: .2rem;
+}
+.service .list ul {
+    border: #f2f2f2 solid 1px;
+    border-radius: .1rem;
+    padding: 0 .4rem .4rem .4rem;
+}
+.service .list ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: .4rem;
+    font-size: .3rem;
+}
+.service .list ul li span i {
+    margin-right: .2rem;
+}
+.service .list ul li i {
+    color: #03d1a1;
+}
+.service .tips {
+    margin-top: .5rem;
+    width: 100%;
+}
+.service .tips .span1 {
+    width: 90%;
+    margin: 0 auto;
+    line-height: .5rem;
+}
+</style>
+<div class="service">
+    {notempty name="$conf.sreviceqr"}    
+        <img src="{$conf.sreviceqr}" class="sreviceqr">
+    {/notempty}
+    <div class="tips">
+        <div class="span1">
+            {:nl2br($conf.servicedescription)}          
+        </div>
+    </div>
+    <div class="list">
+        <ul>
+            <li>
+                <span>
+                    <i class="fa fa-volume-control-phone" aria-hidden="true"></i>
+                    {$conf.srevicetel|default='无'}
+                </span>
+                <i class="fa fa-clipboard" b-click="service.copyTextToClipboard('{$conf.srevicetel}')"></i>
+            </li>
+            <li>
+                <span>
+                    <i class="fa fa-envelope-o" aria-hidden="true"></i>
+                    {$conf.sreviceemail|default='无'}
+                </span>
+                <i class="fa fa-clipboard" b-click="service.copyTextToClipboard('{$conf.sreviceemail}')"></i>
+            </li>
+        </ul>
+    </div>    
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-right").css('visibility', 'hidden');
+        var bs = bui.store({
+            el: ".bui-page",
+            scope: "service",
+            data: {
+                info: [],
+                code: ''
+            },
+            methods: {
+                async copyTextToClipboard(text) {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = text;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    try {
+                        const success = await document.execCommand('copy');
+                        if (success) {
+                            bui.hint('复制成功');
+                        } else {
+                            bui.hint('复制失败');
+                        }
+                    } catch (error) {
+                        bui.hint('复制失败');
+                    }
+                    document.body.removeChild(textarea);
+                },
+            },
+            watch: {},
+            computed: {},
+            templates: {},
+            mounted: function () {
+                var that = this;               
+            }
+        });
+    })
+</script>
+{/block}

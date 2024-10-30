@@ -1,0 +1,83 @@
+.wrapper, body {
+    background: #F8FAFC;
+}
+.header-area {
+    position: unset;
+    border: 0;
+}
+.infolist {
+    background-color: #fff;
+    padding: 30px;
+    margin: 0 auto;
+    border-radius: 10px;
+    -webkit-box-shadow: 0 0 3px rgba(26, 26, 26, .08);
+    box-shadow: 0 0 3px rgba(26, 26, 26, .08);
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.infolist a {
+    text-decoration: none;
+    color: #333;
+}
+.infolist .row {
+    margin-bottom: 30px;
+}
+.infolist .pic {
+    display: block;
+    height: 150px;
+    border-radius: 10px;
+}
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.infolist .tit {
+    padding-bottom: 10px;
+    font-size: 16px;
+    color: #000;
+    line-height: 32px;
+}
+.text-secondary {
+    color: #6c757d !important;
+}
+.infolist .desp {
+    color: #888;
+}
+.pagebar {
+    overflow: hidden;
+    clear: both;
+    width: 100%;
+}    
+.pagebar .pagination {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    padding-left: 0;
+    list-style: none;
+    border-radius: .25rem;
+}
+.pagebar .pagination li {
+    position: relative;
+    display: block;
+    padding: .5rem .75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+.pagebar .pagination .disabled {
+    font-family: "宋体";
+    color: #999;
+}
+.pagebar .pagination li:not(:disabled):not(.disabled) {
+    cursor: pointer;
+}
+.pagebar .pagination li.active {
+    color: #fff;
+    background: #333;
+    border: 1px solid #333;
+}

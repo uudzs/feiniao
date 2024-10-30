@@ -1,0 +1,25 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">搜索详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">类型</td>
+			<td>
+				{eq name="$detail.type" value="0"}选项一{/eq}
+				{eq name="$detail.type" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">客户端</td>
+			<td>
+				{eq name="$detail.client" value="0"}选项一{/eq}
+				{eq name="$detail.client" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">搜索词</td>
+			<td>{$detail.keyword}</td>
+		</tr><tr><td class="layui-td-gray-2">搜索人</td>
+			<td>{$detail.user_id}</td><td class="layui-td-gray-2">结果数</td>
+			<td>{$detail.resnum}</td><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->
