@@ -36,7 +36,7 @@ class Book extends BaseController
         }
         $uid = JWT_UID;
         $detail = Db::name('book')->where(['id' => $id])->find();
-        if ($detail) {
+        if ($detail) {            
             $detail['bigclassname'] = Db::name('category')->where(['id' => $detail['genre']])->value('name');
             $detail['smallclassname'] = Db::name('category')->where(['id' => $detail['subgenre']])->value('name');
             $detail['bigclassname'] = $detail['bigclassname'] ?: '-';

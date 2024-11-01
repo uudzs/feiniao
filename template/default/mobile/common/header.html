@@ -14,7 +14,7 @@
         <div class="bui-navbar">
             <ul class="bui-nav">
                 <li class="bui-btn {if condition="!isset($catid) || empty($catid)"} active{/if}"><a href="{:furl('/', [], true, 'home')}">首页</a></li>
-                {volist name=":model('category')->where(['status' => 1,'pid' => 0])->select()" id="vo"}
+                {volist name=":model('category')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
                 <li class="bui-btn {if condition="isset($catid) && $catid == $vo.id"} active{/if}"><a href="{:furl('book_cates', ['id'=>$vo.id], true, 'home')}">{$vo.name}</a></li>
                 {/volist}
             </ul>

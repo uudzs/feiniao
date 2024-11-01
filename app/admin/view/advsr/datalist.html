@@ -90,7 +90,7 @@
 					align: 'center',
 					width: 100,
 					templet:function(d) {
-						return parseInt(d.type) === 1 ? '作品' : (parseInt(d.type) === 2 ? '作者' : (parseInt(d.type) === 3 ? '链接' : '其他'));
+						return parseInt(d.type) === 1 ? '作品' : (parseInt(d.type) === 2 ? '作者' : (parseInt(d.type) === 3 ? '链接' :  (parseInt(d.type) === 6 ? '内容' : '其他')));
 					}
 				},{
 					field: 'link',

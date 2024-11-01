@@ -4,7 +4,8 @@
 {/block}
 <!-- 主体 -->
 {block name="body"}
-	{include file="common/header" nav='info' /}	
+	{include file="common/header" nav='info' /}
+
 	<section class="hero-area">
 		<div class="hero-circle">
 			<img class="circle-1" src="{__STATIC__}/home/image/top-circle-1.png" alt="messing">
@@ -27,132 +28,414 @@
 		</div>
 	</section>
 
+	<div class="container">
+		<section class="home-tap-link">
+			<div class="home-tap-link__left" >
+				<a href="javascript:;" title="大神" class="home-tap-link__left-item">
+					<div><img src="{__STATIC__}/home/image/4cda7fc.png" class="animation-img"></div><span>大神</span>
+				</a>
+				<a href="javascript:;" title="排行榜" class="home-tap-link__left-item">
+					<div><img src="{__STATIC__}/home/image/624b3b7.png" class="animation-img"></div><span>排行榜</span>
+				</a>
+				<a href="javascript:;" title="书库" class="home-tap-link__left-item" >
+					<div><img src="{__STATIC__}/home/image/f99bbe4.png" class="animation-img"></div><span>书库</span>
+				</a>
+			</div>
+			<div class="home-tap-link__center">
+				{volist name=":model('category')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
+					<a href="{:furl('book_cates', ['id'=>$vo.id], true, 'home')}" target="_blank" title="{$vo.name}" class="home-tap-link__center-item">{$vo.name}</a>
+                {/volist}
+			</div>
+			<div class="home-tap-link__right">
+				<a href="javascript:;" class="home-tap-link__right-item">我的书架</a>
+				<a href="javascript:;" class="home-tap-link__right-item">阅读记录</a>
+				<a href="javascript:;"  class="home-tap-link__right-item">投稿指南</a>
+				<a href="javascript:;" class="home-tap-link__right-item">完本专区</a>
+				<a href="javascript:;" class="home-tap-link__right-item">加入我们</a>
+				<a href="javascript:;" class="home-tap-link__right-item">帮助中心</a>
+			</div>
+		</section>
+	</div>
+
 	{php}$notice = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_notice'], 'type' => 6])->order('level desc')->limit(6)->select()->toArray();{/php}
 	{notempty name="notice"}
-	<section class="container">
-		<div class="home_notice">
-			<ul>
-				{volist name="$notice" id="v"}
-					{eq name="$key" value="0"}
-					<li class="first">
-						{notempty name="$v.images"}
-						<a href="{:url('notice_detail',['id' => $v['id']])}" target="_blank" title="{$v.title}">
-							<div class="thumbnail" style="background: url('{:get_file($v.images)}') no-repeat; background-size: cover;"></div>
-						</a>
-						{/notempty}
-						<h5><a href="{:url('notice_detail',['id' => $v['id']])}" target="_blank" title="{$v.title}"><font color="{$v.color}">{$v.title}</font></a></h5>
-						<p>{:dsubstr($v.introduction,130,'……')}</p>
-					</li>
-					{else/}
-						<li class="list"><a href="{:url('notice_detail',['id' => $v['id']])}" target="_blank" title="{$v.title}"><font color="{$v.color}">{:dsubstr($v.title,46)}</font></a><span>{:time_format($v.create_time,'m-d')}</span></li>
-					{/eq}
-				{/volist}
-			</ul>
+		<div class="container">
+			<section class="home-activities">
+				<div data-sa-c="{ event: 'clickRecommend' }" class="home-activities__main">
+					<div class="home-activities__main-list">
+						{volist name="$notice" id="v"}
+							<div class="home-activities__main-list-item">
+								<a href="{:url('notice_detail',['id' => $v['id']])}" target="_blank" title="{$v.title}" class="ellipsis global-hover home-activities__main-list-item_title">{:dsubstr($v.title,46)}</a><span>{:time_format($v.create_time,'m-d')}</span>
+							</div>
+						{/volist}						
+					</div>
+				</div>
+			</section>
 		</div>
-	</section>		
 	{/notempty}
 
-	<div class="card-area">
-		<div class="card-are-bg">
-			<div class="container">
-				<div class="row al-center">
-					<div class="col-lg-6 col-md-12 order-2 order-md-0">
-						<div class="all-card-item">
-							<div class="card-wrap">
-								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_1.png') no-repeat; background-size: cover;">
-									<h4>创作自由度高‌</h4>
-									<p>小说是一种自由的创作形式，可以自由地构建世界、塑造角色并展开故事情节。</p>
-								</div>
-								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_4.png') no-repeat; background-size: cover;">
-									<h4>提高写作能力‌</h4>
-									<p>通过不断的实践和反思，可以不断完善自己的文学技巧和风格。</p>
-								</div>
+	<div class="container">
+		<section class="editor-recommend">
+			<section class="common-module">
+				<div class="common-module__title"><span class="">主编力荐</span> </div>
+				<div>
+					<div class="editor-recommend__left">
+						{php}$home_editor_main = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_main']])->order('level desc')->find();{/php}
+						{notempty name="home_editor_main"}
+						{php}
+							$book = model('book')->where(['id' => $home_editor_main['books']])->find();
+							$link = url('book_detail', ['id' => $home_editor_main['books']]);					
+						{/php}
+						<div class="editor-recommend__left-coverImage global-book--shadow">
+							<div class="editor-recommend__left-coverImage-cover global-book--frame">
+								<a href="{$link}" target="_blank" title="{$home_editor_main.title}">
+									<img src="{$home_editor_main.images}" alt="{$home_editor_main.title}" class="animation-img editor-recommend__left-coverImage-img">
+								</a>
 							</div>
-							<div class="card-wrap">
-								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_3.png') no-repeat; background-size: cover;">
-									<h4>带来收益</h4>
-									<p>小说是一种受欢迎的文学形式，可以通过出版书籍、改编电影等方式获得收益。</p>
-								</div>
-								<div class="signle-card-item" style="background: url('{__STATIC__}/home/image/tone_2.png') no-repeat; background-size: cover;">
-									<h4>提升个人技能</h4>
-									<p>坚持阅读和撰写小说有助于提高个人的写作技能，叙事技巧和创意思维。</p>
-								</div>
-							</div>						
+							<div class="editor-recommend__left-coverImage-shadow global-radius"></div>
 						</div>
-					</div>
-					<div class="col-lg-6 col-md-12">
-						<div class="card-right-content">
-							<h3>成为{$conf.title}的签约作者<br>利用人工智能为您赋能</h3>
-							<p>让读者与作者都能赚到钱，并且支持两个角色同时从{$conf.title}赚钱，选择自己喜爱的小说类型和主题，让AI帮你构思和撰写，赚钱不再是梦想，只需轻松坐享其成。</p>
-							<div class="card-btn">								
-								{php}$aid = model('nav')->where(['status' => 1, 'name' => $pageconf['home_1_link_name']])->value('id');{/php}
-								{notempty name="aid"}
-								{php}$nav = model('nav_info')->where(['status' => 1, 'nav_id' => $aid])->find();{/php}
-								{notempty name="nav"}
-								<a href="{$nav.src}" class="main-btn"{eq name="nav.target" value="1"} target="_blank"{/eq}>了解更多详情</a>
-								{/notempty}
-								{/notempty}
-							</div>
+						<div class="editor-recommend__left-currInfo">
+							<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-title global-hover ellipsis-two-lines">
+								{$home_editor_main.title}
+							</a>
+							<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-author ellipsis global-hover">
+								{$book.author}
+							</a>
+							<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-desc ellipsis-two-lines">
+								{$home_editor_main.introduction}
+							</a>
 						</div>
+						{/notempty}
 					</div>
 				</div>
+			</section>
+			<div class="editor-recommend__center">
+				<div class="editor-recommend__center-recommend">
+					{php}$home_editor_images = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_images']])->order('level desc')->limit(6)->select()->toArray();{/php}
+					{notempty name="home_editor_images"}					
+					{volist name="$home_editor_images" id="v"}
+						{php}
+							$book = model('book')->where(['id' => $v['books']])->find();
+							$link = url('book_detail', ['id' => $v['books']]);				
+						{/php}
+						<div class="recommend-item">
+							<div class="recommend-img global-book--shadow">
+								<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-img--cover global-radius global-book--frame">
+									<img src="{$v.images}" alt="{$v.title}" class="animation-img">
+								</a>
+							</div>
+							<div class="recommend-content">
+								<div class="recommend-title ellipsis-two-lines global-hover">
+									<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-title ellipsis-two-lines global-hover">{$v.title}</a>
+								</div>
+								<div class="recommend-desc ellipsis-two-lines global-hover">
+									<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-desc ellipsis-two-lines global-hover">
+										{$v.introduction}
+									</a>
+								</div>
+								<div class="recommend-type ellipsis">
+									<a href="{$link}" title="{$book.author}" target="_blank" class="global-hover">{$book.author}</a>
+									<span>·</span>
+									<a href="{$link}" title="{$v.title}" target="_blank" class="global-hover">{$book.isfinish == 2 ? '完结' : '连载'}</a>
+								</div>
+							</div>
+						</div>
+					{/volist}
+					{/notempty}
+				</div>
 			</div>
-		</div>
+			<section class="zh-modules-rank editor-recommend__rank">
+				<div class="editor-recommend__rank-title"></div>
+				<div class="zh-modules-rank-box">
+					{php}$home_editor_top = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_top']])->order('level desc')->limit(10)->select()->toArray();{/php}
+					{notempty name="home_editor_top"}
+						{volist name="$home_editor_top" id="v"}
+							{php}$book = model('book')->where(['id' => $v['books']])->find();{/php}
+							<div class="zh-modules-rank-book">
+								{eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$v.title}"></div>{/eq}
+								{eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$v.title}"></div>{/eq}
+								{eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$v.title}"></div>{/eq}
+								{if condition="$key > 2 && $key < 9"}
+									<div class="book-rank--num"><span>0{$key+1}</span></div>
+								{/if}
+								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}								
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="{$v.title}" href="{:url('book_detail', ['id' => $v['books']])}" class="global-hover">{$v.title}</a></p>
+									<div class="editor-recommend__rank-text">{$book.isfinish == 2 ? '完结' : '连载'}</div>
+								</div>						
+							</div>
+						{/volist}
+					{/notempty}
+				</div>
+			</section>
+		</section>
 	</div>
 
-	<div class="cta-area">
-		<div class="container cta-bg">
-			<div class="cta-ring-img">
-				<div class="cta-ring-left">
-					<img src="{__STATIC__}/home/image/short-ring.svg" alt="messing">
+	{php}$home_banner_1 = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_banner_1']])->order('level desc')->find();{/php}
+	{notempty name="home_banner_1"}
+	<div class="container">
+		<a href="{$home_banner_1.link}" target="_blank" class="home-advertising">
+			<img src="{$home_banner_1.images}">
+		</a>
+	</div>
+	{/notempty}
+
+	<div class="container">
+		<section class="website-rank">
+			<div class="website-rank__main">
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/8df48f1.png');">
+						<div class="zh-modules-rank-box">
+							{php}$chapter_top = model('book')->where(['status' => 1])->order('chapters desc')->limit(10)->select()->toArray();{/php}
+							{notempty name="chapter_top"}
+							{volist name="$chapter_top" id="vo"}
+							{php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+							<div class="zh-modules-rank-book">
+								{eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+								{if condition="$key > 2 && $key < 9"}
+									<div class="book-rank--num"><span>0{$key+1}</span></div>
+								{/if}
+								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<div class="website-rank__rank-text">{$vo.chapters}</div>
+								</div>
+							</div>
+							{/volist}
+							{/notempty}
+						</div>
+					</section>
+				</div>
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/77e71dd.png');">
+						<div class="zh-modules-rank-box">
+							{php}$words_top = model('book')->where(['status' => 1])->order('words desc')->limit(10)->select()->toArray();{/php}
+							{notempty name="words_top"}
+							{volist name="$words_top" id="vo"}
+							{php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+							<div class="zh-modules-rank-book">
+								{eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+								{if condition="$key > 2 && $key < 9"}
+									<div class="book-rank--num"><span>0{$key+1}</span></div>
+								{/if}
+								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<div class="website-rank__rank-text">{:ceil($vo.words/10000)}万</div>
+								</div>
+							</div>
+							{/volist}
+							{/notempty}
+						</div>
+					</section>
+				</div>
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/b51874d.png');">
+						<div class="zh-modules-rank-box">
+							{php}$hits_top = model('book')->where(['status' => 1])->order('hits desc')->limit(10)->select()->toArray();{/php}
+							{notempty name="hits_top"}
+							{volist name="$hits_top" id="vo"}
+							{php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+							<div class="zh-modules-rank-book">
+								{eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+								{if condition="$key > 2 && $key < 9"}
+									<div class="book-rank--num"><span>0{$key+1}</span></div>
+								{/if}
+								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<div class="website-rank__rank-text">{$vo.hits > 0 ? $vo.hits : '--' }</div>
+								</div>
+							</div>
+							{/volist}
+							{/notempty}
+						</div>
+					</section>
+				</div>
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/9269490.png');">
+						<div class="zh-modules-rank-box">
+							{php}
+							$book_count = model('book')->where(['status' => 1, ['chapters', '>', 0]])->count();
+							$start = mt_rand(0, ($book_count - 10));
+							$rand_top = model('book')->where(['status' => 1, ['chapters', '>', 0]])->order('chapters desc')->limit($start, 10)->select()->toArray();
+							{/php}
+							{notempty name="rand_top"}
+							{volist name="$rand_top" id="vo"}
+							{php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+							<div class="zh-modules-rank-book">
+								{eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+								{eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+								{if condition="$key > 2 && $key < 9"}
+									<div class="book-rank--num"><span>0{$key+1}</span></div>
+								{/if}
+								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<div class="website-rank__rank-text">{$vo.chapters}</div>
+								</div>
+							</div>
+							{/volist}
+							{/notempty}
+						</div>
+					</section>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-lg-7 col-md-8 order-2 order-md-0">
-					<div class="cta-left">
-						<h4>阅读小说，轻松赚现金！</h4>
-						<p class="cta-top-text">让你在享受阅读乐趣的同时，轻松地通过{$conf.title}赚取收入。</p>
-					</div>
-				</div>
-				<div class="col-lg-5 col-md-4">
-					<div class="cta-right">
-						{php}$aid = model('nav')->where(['status' => 1, 'name' => $pageconf['home_2_link_name']])->value('id');{/php}
-						{notempty name="aid"}
-						{php}$nav = model('nav_info')->where(['status' => 1, 'nav_id' => $aid])->find();{/php}
-						{notempty name="nav"}
-						<a href="{$nav.src}" class="main-btn"{eq name="nav.target" value="1"} target="_blank"{/eq}>马上赚现金</a>
-						{/notempty}
-						{/notempty}
-					</div>
-				</div>
-			</div>				
-		</div>
+		</section>
 	</div>
+
+	{php}$home_banner_buttom = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_banner_buttom']])->order('level desc')->find();{/php}
+	{notempty name="home_banner_buttom"}
+	<div class="container">
+		<a href="{$home_banner_buttom.link}" target="_blank" class="home-advertising">
+			<img src="{$home_banner_buttom.images}">
+		</a>
+	</div>
+	{/notempty}
+
+	<div class="container">
+		<section class="novel-update">
+			<div class="zh-modules-nav">
+				<div class="zh-modules-nav-cont">
+					<div class="zh-modules-nav--item currTab"><span>最近更新</span></div>					
+					<div class="el-tabs__active-bar"></div>
+				</div>
+			</div>
+			<div class="novel-update__update-main">
+				<div class="el-table el-table--fit el-table--enable-row-hover el-table--enable-row-transition"
+					data-v-78500626="">
+					<div class="hidden-columns">
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+					<div class="el-table__header-wrapper">
+						<table cellspacing="0" cellpadding="0" border="0" class="el-table__header">
+							<colgroup>		
+								<col name="el-table_1_column_1" width="90">
+								<col name="el-table_1_column_2" width="300">
+								<col name="el-table_1_column_3" width="350">
+								<col name="el-table_1_column_4" width="100">
+								<col name="el-table_1_column_5" width="180">
+								<col name="el-table_1_column_6" width="180">
+								<col name="gutter" width="0">
+							</colgroup>
+							<thead class="has-gutter">
+								<tr class="">
+									<th colspan="1" rowspan="1" class="el-table_1_column_1     is-leaf el-table__cell">
+										<div class="cell">类别</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_2     is-leaf el-table__cell">
+										<div class="cell">书名</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_3     is-leaf el-table__cell">
+										<div class="cell">章节名称</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_4     is-leaf el-table__cell">
+										<div class="cell">字数</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_5     is-leaf el-table__cell">
+										<div class="cell">作者</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_6     is-leaf el-table__cell">
+										<div class="cell">更新时间</div>
+									</th>
+									<th class="el-table__cell gutter" style="width: 0px; display: none;"></th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+					<div class="el-table__body-wrapper is-scrolling-none">
+						<table cellspacing="0" cellpadding="0" class="el-table__body">
+							<colgroup>
+								<col name="el-table_1_column_1" width="90">
+								<col name="el-table_1_column_2" width="300">
+								<col name="el-table_1_column_3" width="350">
+								<col name="el-table_1_column_4" width="100">
+								<col name="el-table_1_column_5" width="180">
+								<col name="el-table_1_column_6" width="180">
+							</colgroup>
+							<tbody>
+								{php}
+								$book_count = model('book')->where(['status' => 1, ['chapters', '>', 0]])->count();
+								$start = mt_rand(0, ($book_count - 20));
+								$update_list = model('book')->where(['status' => 1, ['chapters', '>', 0]])->order('update_time desc')->limit($start, 20)->select()->toArray();
+								{/php}
+								{notempty name="update_list"}
+								{volist name="$update_list" id="vo"}
+								{php}
+								$link = url('book_detail', ['id' => $vo['id']]);								
+								$genrename = model('category')->where(['status' => 1, 'id' => $vo['genre']])->value('name');
+								$chapter = model('chapter')->where(['bookid' => $vo['id'],'status' => 1, ['verify', 'in', '0,1']])->order('update_time desc')->find();
+								$genrelink = url('book_cates', ['id' => $vo['genre']]);
+								$chapterlink = url('chapter_detail', ['id' => $chapter['id']]);
+								{/php}
+								<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="{$genrename}" href="{$genrelink}" target="_blank" class="table-list--type global-hover">{$genrename}</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="{$vo['title']}" href="{$link}" target="_blank" class="bookName global-hover update-bookName">{$vo['title']}</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="{$chapterlink}" target="_blank" title="{$chapter.title}" class="ellipsis chapter global-hover">{$chapter.title}</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												{:ceil($vo.words/10000)}万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">{$vo['author']}</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												{:time_format($chapter.create_time)}
+											</div>
+										</div>
+									</td>
+								</tr>
+								{/volist}
+								{/notempty}								
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
 	{php}$links = model('links')->where(['status' => 1, ['logo', '>', 0]])->order('sort desc')->select()->toArray();{/php}
 	{notempty name="links"}
-		<div class="platform-area">
-			<div class="container">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="platform-tittle">
-							<div class="section-tittle">
-								<h2>友情链接</h2>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="owl-carousel all-platform-itme">
-						{volist name="$links" id="v"}
-							<div class="platform">
-								<a href="{$v.src}"{eq name="$v.target" value="1"} target="_blank"{/eq}><img src="{:get_file($v.logo)}" alt="{$v.name}"></a>
-							</div>
-						{/volist}		
-					</div>
-				</div>
+	<div class="container comm_friendLnk">
+		<div class="comm_footer_partner">
+			<div class="partner-title">合作伙伴</div>
+			<div class="comm_footer_friendLnk">
+				{volist name="$links" id="v"}
+				<a href="{$v.src}"{eq name="$v.target" value="1"} target="_blank"{/eq}>{$v.name}</a>
+				{/volist}
 			</div>
 		</div>
+	</div>
 	{/notempty}
+
 {/block}
 <!-- /主体 -->
 
@@ -161,7 +444,8 @@
 	<!-- Main JS -->
 	<script src="{__STATIC__}/home/script/main.js?v={$conf.version}"></script>
     <script>
-		
+		$(document).ready(function() {
+		});
     </script>
 {/block}
 <!-- /脚本 -->

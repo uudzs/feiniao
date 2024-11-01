@@ -35,6 +35,72 @@
                     <div class="layui-form-mid layui-text-em">对应广告位ID</div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">首页主编力荐-主推</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_editor_main"}
+                            <input type="text" name="home_editor_main" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_editor_main" value="{$config.home_editor_main}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页主编力荐-多图</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_editor_images"}
+                            <input type="text" name="home_editor_images" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_editor_images" value="{$config.home_editor_images}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页主编力荐-排行</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_editor_top"}
+                            <input type="text" name="home_editor_top" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_editor_top" value="{$config.home_editor_top}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页中部通栏</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_banner_1"}
+                            <input type="text" name="home_banner_1" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_banner_1" value="{$config.home_banner_1}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页底部通栏</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_banner_buttom"}
+                            <input type="text" name="home_banner_buttom" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="home_banner_buttom" value="{$config.home_banner_buttom}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">头部搜索推荐</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.header_keywords"}
+                            <input type="text" name="header_keywords" value="" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {else/}
+                            <input type="text" name="header_keywords" value="{$config.header_keywords}" placeholder="请输入" autocomplete="off" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">对应广告位ID</div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">首页链接1号名称</label>
                     <div class="layui-input-inline layui-input-wrap">
                         {empty name="$config.home_1_link_name"}

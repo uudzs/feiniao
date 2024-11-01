@@ -9,3 +9,4 @@
 /public/.user.ini
 /public/storage/*
 /public/backup/*
+/config/database.php

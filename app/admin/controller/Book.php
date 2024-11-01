@@ -35,6 +35,7 @@ class Book extends BaseController
             if (!empty($param['subgenre'])) {
                 $where[] = ['subgenre', '=', $param['subgenre']];
             }
+            $param['order'] = 'words desc';
             $list = $this->model->getBookList($where, $param);
             $list = $list->toArray();
             $starttime = strtotime(date('Y-m-01', strtotime('-1 month', time()))); // 获取上个月的第一天

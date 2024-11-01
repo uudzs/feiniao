@@ -44,6 +44,9 @@ class Book extends BaseController
     {
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
+        if (intval($id) > 0) {
+            Db::name('book')->where('id', $id)->inc('hits')->update();
+        }
         View::assign('bid', $id);
         return view();
     }

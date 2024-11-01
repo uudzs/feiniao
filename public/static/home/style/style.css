@@ -1,6 +1,6 @@
 :root {
     --main-bg: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
-    --hover: #fff
+    --hover: #fff;
 }
 
 * {
@@ -24,7 +24,9 @@ h6 {
     margin: 0;
     font-family: 'Poppins', sans-serif;
 }
-
+a {
+    text-decoration: none;
+}
 img {
     max-width: 100%;
 }
@@ -79,16 +81,82 @@ a.creat-accout-btn:hover::before,
 
 /* header area */
 .header-area {
-    padding-top: 26px;
-    padding-bottom: 16px;
+    padding: 10px 0;
     position: absolute;
     width: 100%;
     z-index: 9;
     border-bottom: 1px solid rgba(225, 228, 237, 0.80);
 }
 
+.wrapper .header-fixd {
+    background-color: #fff;
+    left: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+}
+
 .header-area .row {
     align-items: center;
+}
+
+.header-area .row .header-right {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.comm_header_search_form {
+    position: relative
+}
+
+.comm_header_search {
+    min-width: 250px;
+    max-width: 298px;
+    flex-grow: 1;
+    height: 40px;
+    background-color: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    position: relative;
+    z-index: 8
+}
+
+.comm_header_search_opacity .comm_header_search {
+    background-color: rgba(255, 255, 255, .8)
+}
+
+.comm_header_search_white .comm_header_search {
+    background-color: #fff
+}
+
+.comm_header_search_ipt {
+    border: 0;
+    height: 40px;
+    line-height: 30px;
+    font-size: 14px;
+    font-weight: 400;
+    outline: 0;
+    flex-grow: 1;
+    background-color: transparent
+}
+
+.comm_header_search_subbtn {
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    background-image: url("../images/3696b94d.png");
+    background-size: 20px 20px;
+    border: 0;
+    outline: 0;
+    text-indent: -999px;
+    overflow: hidden;
+    cursor: pointer
 }
 
 .logo {
@@ -343,8 +411,8 @@ a.main-btn {
 
 .footer-area {
     background: #F8FAFC;
-    padding-top: 57px;
-    padding-bottom: 67px;
+    padding: 20px 0 10px 0;
+    border-top: 1px solid rgba(225, 228, 237, 0.80);
 }
 
 .logo-part p {
@@ -427,8 +495,8 @@ a.main-btn {
     line-height: 22px;
     color: #71717A;
     border-top: 1px solid #E2E8F0;
-    margin-top: 40px;
-    padding-top: 35px;
+    margin-top: 10px;
+    padding-top: 10px;
 }
 
 .copy-right p a {

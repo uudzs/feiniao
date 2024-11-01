@@ -3,7 +3,6 @@
 		<path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"></path>
 	</svg>
 </div>
-
 <div class="header-area">
 	<div class="container">
 		<div class="row">
@@ -12,7 +11,20 @@
 					<a href="{:url('/')}"><img src="{$conf.logo}" alt="{$conf.title}"></a>
 				</div>
 			</div>
-			<div class="col-lg-9 col-md-9">
+			<div class="col-lg-9 col-md-9 header-right">
+				<form id="commSearch" name="searchForm" class="comm_header_search_form" method="get" action="{:url('search')}" target="_blank">
+					<div class="comm_header_search_outer">
+						<div class="comm_header_search">							
+							{php}$header_keywords = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['header_keywords']])->order('level desc')->find();{/php}
+							{empty name="$header_keywords"}
+								<input class="comm_header_search_ipt" name="keyword" type="text" placeholder="" autocomplete="off" disableautocomplete="">
+							{else/}
+								<input class="comm_header_search_ipt" name="keyword" type="text" placeholder="{$header_keywords.title}" autocomplete="off" disableautocomplete="">
+							{/empty}
+							<button class="comm_header_search_subbtn">搜索</button>
+						</div>
+					</div>
+				</form>
 				<div class="top-manu">
 					<ul>
 						{foreach name=":get_navs($pageconf['home_nav'])" item="a"}
@@ -37,3 +49,8 @@
 		</div>
 	</div>
 </div>
+<script>
+jQuery(window).on("scroll", function() {
+	jQuery(this).scrollTop() > 1 ? jQuery(".header-area").addClass("header-fixd") : jQuery(".header-area").removeClass("header-fixd")
+})
+</script>

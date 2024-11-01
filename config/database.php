@@ -20,9 +20,9 @@ return [
             // 数据库名
             'database'           =>  'feiniao',
             // 用户名
-            'username'           =>  'root',
+            'username'           =>  'feiniao',
             // 密码
-            'password'           =>  '123456',
+            'password'           =>  'eMwmHZCTAN2Wetma',
             // 端口
             'hostport'           =>  '3306',
             // 数据库表前缀
