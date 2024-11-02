@@ -7,8 +7,10 @@ namespace app\home\controller;
 use app\home\BaseController;
 use EasyWeChat\Factory;
 use think\facade\Cookie;
+use think\facade\View;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use think\facade\Request;
 
 class Index extends BaseController
 {
@@ -65,6 +67,29 @@ class Index extends BaseController
                 }
             }
         }
-        return View();
+        if (Request::isMobile() || isWeChat()) {
+            return View();
+        } else {
+            $index_file = app()->getRootPath() . '/public/index_pc.' . config('view.view_suffix');
+            if (is_file($index_file)) {
+                $file_time =  filectime($index_file);
+                if ($file_time !== false) {
+                    if ((time() - $file_time) > 86400) {
+                        $content = View::fetch();
+                        $File = new \think\template\driver\File();
+                        $File->write($index_file, $content);
+                    }
+                }
+                $content = file_get_contents($index_file);
+                echo $content;
+                exit;
+            } else {
+                $content = View::fetch();
+                $File = new \think\template\driver\File();
+                $File->write($index_file, $content);
+                echo $content;
+                exit;
+            }
+        }
     }
 }
