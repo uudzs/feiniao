@@ -108,16 +108,20 @@ composer install
 
 6. **如果需要代安装服务，可通过QQ号或去官网得到微信联系方式进行沟通，开源不易，该服务为收费项目，特在此申明以免造成误解。**
 
-### 截图预览
+### PC端截图预览
+|页面截图      |
+| :--------: |
+|![页面截图](https://www.paheng.com/static/image/feiniao/pc_home.png "页面截图")|
 
+### 移动端截图预览
 |页面截图      |    页面截图|
 | :--------: | :--------:|
-| ![功能导图](https://www.paheng.com/static/image/feiniao/首页.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/首页2.png "功能导图")|
-|![功能导图](https://www.paheng.com/static/image/feiniao/首页3.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/书详情.png "功能导图")|
-|![功能导图](https://www.paheng.com/static/image/feiniao/首页3.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/书架.png "功能导图")|
-|![功能导图](https://www.paheng.com/static/image/feiniao/任务.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/邀请.png "功能导图")|
-|![功能导图](https://www.paheng.com/static/image/feiniao/VIP.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/我的.png "功能导图")|
-|![功能导图](https://www.paheng.com/static/image/feiniao/章节.png "功能导图")|![功能导图](https://www.paheng.com/static/image/feiniao/提现.png "功能导图")|
+| ![页面截图](https://www.paheng.com/static/image/feiniao/首页.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/首页2.png "页面截图")|
+|![页面截图](https://www.paheng.com/static/image/feiniao/首页3.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/书详情.png "页面截图")|
+|![页面截图](https://www.paheng.com/static/image/feiniao/首页3.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/书架.png "页面截图")|
+|![页面截图](https://www.paheng.com/static/image/feiniao/任务.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/邀请.png "页面截图")|
+|![页面截图](https://www.paheng.com/static/image/feiniao/VIP.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/我的.png "页面截图")|
+|![页面截图](https://www.paheng.com/static/image/feiniao/章节.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/提现.png "页面截图")|
 
 ### 特别感谢
 - 飞鸟阅读基于[勾股CMS](https://gitee.com/gouguopen/gougucms)二次开发完成，同样遵循Apache2开源协议发布。 
