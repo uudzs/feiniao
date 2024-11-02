@@ -8,6 +8,7 @@
 - 开发交流QQ3群：177260545
 
 ### 系统介绍
+- 飞鸟阅读小说内容管理系统是一套用于快速构建小说发布与阅读的小说内容管理平台。使用飞鸟阅读小说内容管理系统可以快速搭建一个完整的小说阅读网站，节省开发时间和成本。
 - 飞鸟阅读是一套基于ThinkPHP6 + MySql + Layui + BUI 开发的小说行业内容管理系统。
 - 飞鸟阅读针对小说行业增加了作家模块、并提供了创建作品，添加章节，定时发布，电子签约，实名认证，草稿箱等特有功能，以满足作者的创作需要。
 - 飞鸟阅读除具备通用型的后台权限管理功能外，还实现了作品管理，章节审核，章节去重等相关功能。
@@ -118,7 +119,7 @@ composer install
 | :--------: | :--------:|
 | ![页面截图](https://www.paheng.com/static/image/feiniao/首页.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/首页2.png "页面截图")|
 |![页面截图](https://www.paheng.com/static/image/feiniao/首页3.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/书详情.png "页面截图")|
-|![页面截图](https://www.paheng.com/static/image/feiniao/首页3.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/书架.png "页面截图")|
+|![页面截图](https://www.paheng.com/static/image/feiniao/设置.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/书架.png "页面截图")|
 |![页面截图](https://www.paheng.com/static/image/feiniao/任务.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/邀请.png "页面截图")|
 |![页面截图](https://www.paheng.com/static/image/feiniao/VIP.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/我的.png "页面截图")|
 |![页面截图](https://www.paheng.com/static/image/feiniao/章节.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/提现.png "页面截图")|
