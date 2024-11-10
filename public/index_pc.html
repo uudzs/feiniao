@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	
+		<link rel="mobile-prefetch" href=""/>
+	
+		
+		<title>飞鸟阅读</title>		
+	
+	
+		<meta name="keywords" content="飞鸟阅读"/>
+		<meta name="description" content="飞鸟阅读是一套基于ThinkPHP6 + Layui + MySql打造功能丰富的小说管理系统。          "/>
+	
+	
+		<link rel="stylesheet" href="/static/home/style/swap.css?v=2.0.38" rel="stylesheet">
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="/static/home/style/bootstrap.min.css?v=2.0.38">
+		 <!-- back to top button css -->
+		 <link rel="stylesheet" href="/static/home/style/backtotop.css?v=2.0.38">
+		<!-- Bootstrap Icon CSS -->
+		<link rel="stylesheet" href="/static/home/style/bootstrap-icons.css?v=2.0.38">
+		<!-- Animate CSS -->
+		<link rel="stylesheet" href="/static/home/style/animate.css?v=2.0.38">
+		<!-- Video Modal CSS -->
+		<link rel="stylesheet" href="/static/home/style/jquery.yu2fvl.css?v=2.0.38">
+		<!-- Owl Carousel CSS -->
+		<link rel="stylesheet" href="/static/home/style/owl.carousel.min.css?v=2.0.38">
+		<!-- mobila manu css -->
+		<link rel="stylesheet" href="/static/home/style/meanmenu.min.css?v=2.0.38">
+		<!-- Main Style CSS -->
+		<link rel="stylesheet" href="/static/home/style/style.css?v=2.0.38">
+		<!-- Responsive Style CSS -->
+		<link rel="stylesheet" href="/static/home/style/responsive.css?v=2.0.38">
+	
+	
+<link rel="stylesheet" href="/static/home/style/index.css?v=2.0.38">
+
+	
+		<!-- jQuery -->
+		<script src="/static/home/script/jquery-3.6.2.min.js?v=2.0.38"></script>
+		<!-- Bootstrap Popper JS -->
+		<script src="/static/home/script/popper.min.js?v=2.0.38"></script>
+		<!-- Bootstrap JS -->
+		<script src="/static/home/script/bootstrap.min.js?v=2.0.38"></script>
+		<!-- Video Modal JS -->
+		<script src="/static/home/script/jquery.yu2fvl.js?v=2.0.38"></script>
+		<!-- Wow JS -->
+		<script src="/static/home/script/wow.js?v=2.0.38"></script>
+		<!-- Counter JS -->
+		<script src="/static/home/script/jquery.counterup.min.js?v=2.0.38"></script>
+		<script src="/static/home/script/waypoints.2.0.3.min.js?v=2.0.38"></script>
+		<!-- Owl Carousel JS -->
+		<script src="/static/home/script/owl.carousel.min.js?v=2.0.38"></script>
+		<!-- mobile manu js -->
+		<script src="/static/home/script/jquery.meanmenu.js?v=2.0.38"></script>
+		<!-- back to top js -->
+		<script src="/static/home/script/backtotop.js?v=2.0.38"></script>		
+	
+</head>
+<body>
+	<div class="wrapper">
+		<!-- 主体 -->
+		
+	<div class="progress-wrap">
+	<svg class="progress-circle svg-content" width="100%" height="100%" viewbox="-1 -1 102 102">
+		<path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"></path>
+	</svg>
+</div>
+<div class="header-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 col-md-3">
+				<div class="logo">
+					<a href="/home/"><img src="/storage/202410/6750906c9bd369992d371566b239eee7.png" alt="飞鸟阅读"></a>
+				</div>
+			</div>
+			<div class="col-lg-9 col-md-9 header-right">
+				<form id="commSearch" name="searchForm" class="comm_header_search_form" method="get" action="/home/search.html" target="_blank">
+					<div class="comm_header_search_outer">
+						<div class="comm_header_search">							
+															<input class="comm_header_search_ipt" name="keyword" type="text" placeholder="西游，我体内有九只金乌" autocomplete="off" disableautocomplete="">
+														<button class="comm_header_search_subbtn">搜索</button>
+						</div>
+					</div>
+				</form>
+				<div class="top-manu">
+					<ul>
+														<li class="active"><a href="/" >首页</a></li>
+																					<li ><a href="/home/info.html" >公告</a></li>
+																					<li ><a href="/" >手机版</a></li>
+																			<li><a href="javascript:;" class="login-btn">登录</a></li>
+						<li><a href="/author/" class="creat-accout-btn" target="_blank">作家中心</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+jQuery(window).on("scroll", function() {
+	jQuery(this).scrollTop() > 1 ? jQuery(".header-area").addClass("header-fixd") : jQuery(".header-area").removeClass("header-fixd")
+})
+</script>
+
+	<section class="hero-area">
+		<div class="hero-circle">
+			<img class="circle-1" src="/static/home/image/top-circle-1.png" alt="messing">
+			<img class="circle-2" src="/static/home/image/top-circle-1.png" alt="messing">
+		</div>
+		<div class="container">
+			<div class="row slider_list owl-carousel">
+											<a href="" target="_blank"><img src="/storage/202411/e975da09edbcedd3a1cea8871aee4b08.png" alt="首页轮播1"></a>
+																		<a href="" target="_blank"><img src="/storage/202411/fe15f2ccec394b568c6a9fadb942a243.png" alt="作家创作"></a>
+															
+							</div>
+		</div>
+	</section>
+
+	<div class="container">
+		<div style="margin-top: 20px; background: #fbfcdd; padding-top: 20px; padding-bottom: 20px; text-align: center;color: #ff5e00;font-size: 15px;border-radius: 12px;">本站所有内容来自互联网，纯作为系统演示用，无任何其他商业用途，如对您的知识产权构成侵害，请及时联系我们，我们会第一时间积极配合处理。</div>		
+	</div>
+
+	<div class="container">
+		<section class="home-tap-link">
+			<div class="home-tap-link__left" >
+				<a href="javascript:;" title="大神" class="home-tap-link__left-item">
+					<div><img src="/static/home/image/4cda7fc.png" class="animation-img"></div><span>大神</span>
+				</a>
+				<a href="javascript:;" title="排行榜" class="home-tap-link__left-item">
+					<div><img src="/static/home/image/624b3b7.png" class="animation-img"></div><span>排行榜</span>
+				</a>
+				<a href="javascript:;" title="书库" class="home-tap-link__left-item" >
+					<div><img src="/static/home/image/f99bbe4.png" class="animation-img"></div><span>书库</span>
+				</a>
+			</div>
+			<div class="home-tap-link__center">
+									<a href="/home/cate-1.html" target="_blank" title="玄幻" class="home-tap-link__center-item">玄幻</a>
+                					<a href="/home/cate-2.html" target="_blank" title="奇幻" class="home-tap-link__center-item">奇幻</a>
+                					<a href="/home/cate-3.html" target="_blank" title="武侠" class="home-tap-link__center-item">武侠</a>
+                					<a href="/home/cate-4.html" target="_blank" title="仙侠" class="home-tap-link__center-item">仙侠</a>
+                					<a href="/home/cate-5.html" target="_blank" title="都市" class="home-tap-link__center-item">都市</a>
+                					<a href="/home/cate-6.html" target="_blank" title="历史" class="home-tap-link__center-item">历史</a>
+                					<a href="/home/cate-7.html" target="_blank" title="军事" class="home-tap-link__center-item">军事</a>
+                					<a href="/home/cate-8.html" target="_blank" title="游戏" class="home-tap-link__center-item">游戏</a>
+                					<a href="/home/cate-9.html" target="_blank" title="体育" class="home-tap-link__center-item">体育</a>
+                					<a href="/home/cate-10.html" target="_blank" title="科幻" class="home-tap-link__center-item">科幻</a>
+                					<a href="/home/cate-11.html" target="_blank" title="悬疑" class="home-tap-link__center-item">悬疑</a>
+                					<a href="/home/cate-12.html" target="_blank" title="同人" class="home-tap-link__center-item">同人</a>
+                					<a href="/home/cate-13.html" target="_blank" title="女生" class="home-tap-link__center-item">女生</a>
+                					<a href="/home/cate-14.html" target="_blank" title="其他" class="home-tap-link__center-item">其他</a>
+                			</div>
+			<div class="home-tap-link__right">
+				<a href="javascript:;" class="home-tap-link__right-item">我的书架</a>
+				<a href="javascript:;" class="home-tap-link__right-item">阅读记录</a>
+				<a href="javascript:;"  class="home-tap-link__right-item">投稿指南</a>
+				<a href="javascript:;" class="home-tap-link__right-item">完本专区</a>
+				<a href="javascript:;" class="home-tap-link__right-item">加入我们</a>
+				<a href="javascript:;" class="home-tap-link__right-item">帮助中心</a>
+			</div>
+		</section>
+	</div>
+
+			<div class="container">
+			<section class="home-activities">
+				<div data-sa-c="{ event: 'clickRecommend' }" class="home-activities__main">
+					<div class="home-activities__main-list">
+													<div class="home-activities__main-list-item">
+								<a href="/home/notice-859.html" target="_blank" title="飞鸟阅读男频快闪征文【薪火相传--玄幻收徒题材】" class="ellipsis global-hover home-activities__main-list-item_title">飞鸟阅读男频快闪征文【薪火相传--玄幻收徒题材】</a><span>10-21</span>
+							</div>
+													<div class="home-activities__main-list-item">
+								<a href="/home/notice-862.html" target="_blank" title="飞鸟阅读青鸾峰上插画征集活动" class="ellipsis global-hover home-activities__main-list-item_title">飞鸟阅读青鸾峰上插画征集活动</a><span>10-21</span>
+							</div>
+													<div class="home-activities__main-list-item">
+								<a href="/home/notice-861.html" target="_blank" title="飞鸟阅读2024第三届纵横中文网大神训练营" class="ellipsis global-hover home-activities__main-list-item_title">飞鸟阅读2024第三届纵横中文网大神训练营</a><span>10-21</span>
+							</div>
+													<div class="home-activities__main-list-item">
+								<a href="/home/notice-860.html" target="_blank" title="飞鸟阅读快闪征文【悔不当初--后悔流题材】" class="ellipsis global-hover home-activities__main-list-item_title">飞鸟阅读快闪征文【悔不当初--后悔流题材】</a><span>10-21</span>
+							</div>
+													<div class="home-activities__main-list-item">
+								<a href="/home/notice-863.html" target="_blank" title="主宰战场，跨服征战" class="ellipsis global-hover home-activities__main-list-item_title">主宰战场，跨服征战</a><span>10-21</span>
+							</div>
+													<div class="home-activities__main-list-item">
+								<a href="/home/notice-864.html" target="_blank" title="第五届百万奖金现实题材征文大赛" class="ellipsis global-hover home-activities__main-list-item_title">第五届百万奖金现实题材征文大赛</a><span>10-21</span>
+							</div>
+												
+					</div>
+				</div>
+			</section>
+		</div>
+	
+	<div class="container">
+		<section class="editor-recommend">
+			<section class="common-module">
+				<div class="common-module__title"><span class="">主编力荐</span> </div>
+				<div>
+					<div class="editor-recommend__left">
+												<div class="editor-recommend__left-coverImage global-book--shadow">
+							<div class="editor-recommend__left-coverImage-cover global-book--frame">
+								<a href="/home/book-1440.html" target="_blank" title="一个喷嚏毁灭一个魔法文明">
+									<img src="/storage/cover/1440/s96678.jpg" alt="一个喷嚏毁灭一个魔法文明" class="animation-img editor-recommend__left-coverImage-img">
+								</a>
+							</div>
+							<div class="editor-recommend__left-coverImage-shadow global-radius"></div>
+						</div>
+						<div class="editor-recommend__left-currInfo">
+							<a href="/home/book-1440.html" target="_blank" title="一个喷嚏毁灭一个魔法文明" class="currInfo-title global-hover ellipsis-two-lines">
+								一个喷嚏毁灭一个魔法文明							</a>
+							<a href="/home/book-1440.html" target="_blank" title="一个喷嚏毁灭一个魔法文明" class="currInfo-author ellipsis global-hover">
+								永远十六岁							</a>
+							<a href="/home/book-1440.html" target="_blank" title="一个喷嚏毁灭一个魔法文明" class="currInfo-desc ellipsis-two-lines">
+								《一个喷嚏毁灭一个魔法文明》是由永远十六岁所著的一部玄幻奇幻，转载网络，本站提供的一个喷嚏毁灭一个魔法文明txt全集仅供预览及交流学习使用，请勿用于商业用途。版权归原作者和出版社所有，请在下载后的24小时之内删除，如果喜欢。请支持正版！    &ldquo; 根据地球现代医学研究发现，一个健康的人身体里至少携带十四万种病毒，细菌的数量那就更多了。    如果这样一个人穿越到陌生的魔法世界，体内的细菌和病毒产生							</a>
+						</div>
+											</div>
+				</div>
+			</section>
+			<div class="editor-recommend__center">
+				<div class="editor-recommend__center-recommend">
+											<div class="recommend-item">
+							<div class="recommend-img global-book--shadow">
+								<a href="/home/book-313.html" target="_blank" title="九转修罗诀" class="recommend-img--cover global-radius global-book--frame">
+									<img src="/storage/cover/313/s125126.jpg" alt="九转修罗诀" class="animation-img">
+								</a>
+							</div>
+							<div class="recommend-content">
+								<div class="recommend-title ellipsis-two-lines global-hover">
+									<a href="/home/book-313.html" target="_blank" title="九转修罗诀" class="recommend-title ellipsis-two-lines global-hover">九转修罗诀</a>
+								</div>
+								<div class="recommend-desc ellipsis-two-lines global-hover">
+									<a href="/home/book-313.html" target="_blank" title="九转修罗诀" class="recommend-desc ellipsis-two-lines global-hover">
+										《九转修罗诀》是由李中有梦所著的一部玄幻奇幻，转载网络，本站提供的九转修罗诀txt全集仅供预览及交流学习使用，请勿用于商业用途。版权归原作者和出版社所有，请在下载后的24小时之内删除，如果喜欢。请支持正版！    （不废话，不圣母，不留情，不降智！真正杀伐果断!）林夜重生在万川大陆，神识连接一片无尽血海，一座血峰从海底探出，上面刻着灭圣级功法，九转修罗诀&hellip;&hellip;指碎四大圣地，剑戮诸天神尊！    凡挡									</a>
+								</div>
+								<div class="recommend-type ellipsis">
+									<a href="/home/book-313.html" title="李中有梦" target="_blank" class="global-hover">李中有梦</a>
+									<span>·</span>
+									<a href="/home/book-313.html" title="九转修罗诀" target="_blank" class="global-hover">连载</a>
+								</div>
+							</div>
+						</div>
+											<div class="recommend-item">
+							<div class="recommend-img global-book--shadow">
+								<a href="/home/book-248.html" target="_blank" title="极道剑尊" class="recommend-img--cover global-radius global-book--frame">
+									<img src="/storage/cover/248/s116604.jpg" alt="极道剑尊" class="animation-img">
+								</a>
+							</div>
+							<div class="recommend-content">
+								<div class="recommend-title ellipsis-two-lines global-hover">
+									<a href="/home/book-248.html" target="_blank" title="极道剑尊" class="recommend-title ellipsis-two-lines global-hover">极道剑尊</a>
+								</div>
+								<div class="recommend-desc ellipsis-two-lines global-hover">
+									<a href="/home/book-248.html" target="_blank" title="极道剑尊" class="recommend-desc ellipsis-two-lines global-hover">
+										《极道剑尊》是由人间又污秽了所著的一部玄幻奇幻，转载网络，本站提供的极道剑尊txt全集仅供预览及交流学习使用，请勿用于商业用途。版权归原作者和出版社所有，请在下载后的24小时之内删除，如果喜欢。请支持正版！    踏天骄，镇万道！问鼎极道，唯我剑尊！我这一剑平平无奇，但你们绝对会死！									</a>
+								</div>
+								<div class="recommend-type ellipsis">
+									<a href="/home/book-248.html" title="人间又污秽了" target="_blank" class="global-hover">人间又污秽了</a>
+									<span>·</span>
+									<a href="/home/book-248.html" title="极道剑尊" target="_blank" class="global-hover">连载</a>
+								</div>
+							</div>
+						</div>
+											<div class="recommend-item">
+							<div class="recommend-img global-book--shadow">
+								<a href="/home/book-1227.html" target="_blank" title="神话解析，知道剧情的我无敌了" class="recommend-img--cover global-radius global-book--frame">
+									<img src="/storage/cover/1227/s89864.jpg" alt="神话解析，知道剧情的我无敌了" class="animation-img">
+								</a>
+							</div>
+							<div class="recommend-content">
+								<div class="recommend-title ellipsis-two-lines global-hover">
+									<a href="/home/book-1227.html" target="_blank" title="神话解析，知道剧情的我无敌了" class="recommend-title ellipsis-two-lines global-hover">神话解析，知道剧情的我无敌了</a>
+								</div>
+								<div class="recommend-desc ellipsis-two-lines global-hover">
+									<a href="/home/book-1227.html" target="_blank" title="神话解析，知道剧情的我无敌了" class="recommend-desc ellipsis-two-lines global-hover">
+										《神话解析，知道剧情的我无敌了》是由金峰无缺所著的一部玄幻奇幻，转载网络，本站提供的神话解析，知道剧情的我无敌了txt全集仅供预览及交流学习使用，请勿用于商业用途。版权归原作者和出版社所有，请在下载后的24小时之内删除，如果喜欢。请支持正版！    引子    千年前，史无前列的大灾变席卷蓝星。    灾难小时候，大地出现了一个个奇异的碎片，碎片里是一个个的世界。    这些世界都不一样，有通过内									</a>
+								</div>
+								<div class="recommend-type ellipsis">
+									<a href="/home/book-1227.html" title="金峰无缺" target="_blank" class="global-hover">金峰无缺</a>
+									<span>·</span>
+									<a href="/home/book-1227.html" title="神话解析，知道剧情的我无敌了" target="_blank" class="global-hover">连载</a>
+								</div>
+							</div>
+						</div>
+											<div class="recommend-item">
+							<div class="recommend-img global-book--shadow">
+								<a href="/home/book-1206.html" target="_blank" title="脑海里飘来一座废品收购站" class="recommend-img--cover global-radius global-book--frame">
+									<img src="/storage/cover/1206/s61498.jpg" alt="脑海里飘来一座废品收购站" class="animation-img">
+								</a>
+							</div>
+							<div class="recommend-content">
+								<div class="recommend-title ellipsis-two-lines global-hover">
+									<a href="/home/book-1206.html" target="_blank" title="脑海里飘来一座废品收购站" class="recommend-title ellipsis-two-lines global-hover">脑海里飘来一座废品收购站</a>
+								</div>
+								<div class="recommend-desc ellipsis-two-lines global-hover">
+									<a href="/home/book-1206.html" target="_blank" title="脑海里飘来一座废品收购站" class="recommend-desc ellipsis-two-lines global-hover">
+										《脑海里飘来一座废品收购站》是由鬼谷仙师所著的一部玄幻奇幻，转载网络，本站提供的脑海里飘来一座废品收购站txt全集仅供预览及交流学习使用，请勿用于商业用途。版权归原作者和出版社所有，请在下载后的24小时之内删除，如果喜欢。请支持正版！    物品：雄鹰展翅图！介绍：唐府遗弃之物，唐寅闲暇所作&hellip;&hellip;完整度：20％修复需消耗财富值：50W。    &mdash;&mdash;陈牧羽，一个普普通通收破烂的，本以为一生注定平凡，没									</a>
+								</div>
+								<div class="recommend-type ellipsis">
+									<a href="/home/book-1206.html" title="鬼谷仙师" target="_blank" class="global-hover">鬼谷仙师</a>
+									<span>·</span>
+									<a href="/home/book-1206.html" title="脑海里飘来一座废品收购站" target="_blank" class="global-hover">连载</a>
+								</div>
+							</div>
+						</div>
+											<div class="recommend-item">
+							<div class="recommend-img global-book--shadow">
+								<a href="/home/book-209.html" target="_blank" title="柳无邪和徐凌雪的小说" class="recommend-img--cover global-radius global-book--frame">
+									<img src="/storage/cover/209/s13304.jpg" alt="柳无邪和徐凌雪的小说" class="animation-img">
+								</a>
+							</div>
+							<div class="recommend-content">
+								<div class="recommend-title ellipsis-two-lines global-hover">
+									<a href="/home/book-209.html" target="_blank" title="柳无邪和徐凌雪的小说" class="recommend-title ellipsis-two-lines global-hover">柳无邪和徐凌雪的小说</a>
+								</div>
+								<div class="recommend-desc ellipsis-two-lines global-hover">
+									<a href="/home/book-209.html" target="_blank" title="柳无邪和徐凌雪的小说" class="recommend-desc ellipsis-two-lines global-hover">
+										《柳无邪和徐凌雪的小说》是由铁马飞桥所著的一部玄幻奇幻，转载网络，本站提供的柳无邪和徐凌雪的小说txt全集仅供预览及交流学习使用，请勿用于商业用途。版权归原作者和出版社所有，请在下载后的24小时之内删除，如果喜欢。请支持正版！    天地皆灵，万物皆苟，无名天地之时，有名万物之母，此乃吞天神鼎，可凝精作物，并八荒之心。    得此鼎，吞四海，容八荒&hellip;&hellip;一代邪神，踏天之路！关注微信公众号搜索：《铁马									</a>
+								</div>
+								<div class="recommend-type ellipsis">
+									<a href="/home/book-209.html" title="铁马飞桥" target="_blank" class="global-hover">铁马飞桥</a>
+									<span>·</span>
+									<a href="/home/book-209.html" title="柳无邪和徐凌雪的小说" target="_blank" class="global-hover">连载</a>
+								</div>
+							</div>
+						</div>
+											<div class="recommend-item">
+							<div class="recommend-img global-book--shadow">
+								<a href="/home/book-1099.html" target="_blank" title="万古神帝飞天鱼" class="recommend-img--cover global-radius global-book--frame">
+									<img src="/storage/cover/1099/s2278.jpg" alt="万古神帝飞天鱼" class="animation-img">
+								</a>
+							</div>
+							<div class="recommend-content">
+								<div class="recommend-title ellipsis-two-lines global-hover">
+									<a href="/home/book-1099.html" target="_blank" title="万古神帝飞天鱼" class="recommend-title ellipsis-two-lines global-hover">万古神帝飞天鱼</a>
+								</div>
+								<div class="recommend-desc ellipsis-two-lines global-hover">
+									<a href="/home/book-1099.html" target="_blank" title="万古神帝飞天鱼" class="recommend-desc ellipsis-two-lines global-hover">
+										《万古神帝飞天鱼》是由飞天鱼所著的一部玄幻奇幻，转载网络，本站提供的万古神帝飞天鱼txt全集仅供预览及交流学习使用，请勿用于商业用途。版权归原作者和出版社所有，请在下载后的24小时之内删除，如果喜欢。请支持正版！    八百年前，明帝之子张若尘，被他的未婚妻池瑶公主杀死，一代天骄，就此陨落。    八百年后，张若尘重新活了过来，却发现曾经杀死他的未婚妻，      已经统一昆仑界，开辟出第一中央帝									</a>
+								</div>
+								<div class="recommend-type ellipsis">
+									<a href="/home/book-1099.html" title="飞天鱼" target="_blank" class="global-hover">飞天鱼</a>
+									<span>·</span>
+									<a href="/home/book-1099.html" title="万古神帝飞天鱼" target="_blank" class="global-hover">连载</a>
+								</div>
+							</div>
+						</div>
+														</div>
+			</div>
+			<section class="zh-modules-rank editor-recommend__rank">
+				<div class="editor-recommend__rank-title"></div>
+				<div class="zh-modules-rank-box">
+												<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/1940777.png" alt="长夜君主"></div>								
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="长夜君主" href="/home/book-1092.html" class="global-hover">长夜君主</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/e452c9d.png" alt="阴阳石"></div>								
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="阴阳石" href="/home/book-1128.html" class="global-hover">阴阳石</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/65b1446.png" alt="金刚不坏大寨主"></div>								
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="金刚不坏大寨主" href="/home/book-2097.html" class="global-hover">金刚不坏大寨主</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>04</span></div>
+																
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="大仙武" href="/home/book-441.html" class="global-hover">大仙武</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>05</span></div>
+																
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="镇妖博物馆" href="/home/book-1827.html" class="global-hover">镇妖博物馆</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>06</span></div>
+																
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="太古天圣" href="/home/book-1182.html" class="global-hover">太古天圣</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>07</span></div>
+																
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="极道武学修改器" href="/home/book-1373.html" class="global-hover">极道武学修改器</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>08</span></div>
+																
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="巫师：从骑士呼吸法开始肝经验" href="/home/book-661.html" class="global-hover">巫师：从骑士呼吸法开始肝经验</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>09</span></div>
+																
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="不灭剑帝" href="/home/book-1420.html" class="global-hover">不灭剑帝</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+													<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><span>10</span></div>								
+								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="我有一剑" href="/home/book-1160.html" class="global-hover">我有一剑</a></p>
+									<div class="editor-recommend__rank-text">连载</div>
+								</div>						
+							</div>
+															</div>
+			</section>
+		</section>
+	</div>
+
+		<div class="container">
+		<a href="/" target="_blank" class="home-advertising">
+			<img src="/storage/202411/db371d16585b3b3dfe22780e57b15bd8.png">
+		</a>
+	</div>
+	
+	<div class="container">
+		<section class="website-rank">
+			<div class="website-rank__main">
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('/static/home/image/8df48f1.png');">
+						<div class="zh-modules-rank-box">
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/1940777.png" alt="带着农场混异界"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="带着农场混异界" href="/home/book-63.html" class="global-hover">带着农场混异界</a></p>
+									<div class="website-rank__rank-text">14622</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/e452c9d.png" alt="都市极品医神"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="都市极品医神" href="/home/book-1368.html" class="global-hover">都市极品医神</a></p>
+									<div class="website-rank__rank-text">12211</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/65b1446.png" alt="校花的贴身高手"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="校花的贴身高手" href="/home/book-511.html" class="global-hover">校花的贴身高手</a></p>
+									<div class="website-rank__rank-text">11757</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>04</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="逆剑狂神" href="/home/book-140.html" class="global-hover">逆剑狂神</a></p>
+									<div class="website-rank__rank-text">11025</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>05</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="太古龙象诀" href="/home/book-1332.html" class="global-hover">太古龙象诀</a></p>
+									<div class="website-rank__rank-text">10291</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>06</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="百炼飞升录" href="/home/book-1283.html" class="global-hover">百炼飞升录</a></p>
+									<div class="website-rank__rank-text">7628</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>07</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="惊天剑帝" href="/home/book-14.html" class="global-hover">惊天剑帝</a></p>
+									<div class="website-rank__rank-text">7340</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>08</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="魔门败类" href="/home/book-1521.html" class="global-hover">魔门败类</a></p>
+									<div class="website-rank__rank-text">7058</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>09</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="不灭武尊" href="/home/book-1143.html" class="global-hover">不灭武尊</a></p>
+									<div class="website-rank__rank-text">6639</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><span>10</span></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="无敌升级王" href="/home/book-1023.html" class="global-hover">无敌升级王</a></p>
+									<div class="website-rank__rank-text">6438</div>
+								</div>
+							</div>
+																				</div>
+					</section>
+				</div>
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('/static/home/image/77e71dd.png');">
+						<div class="zh-modules-rank-box">
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/1940777.png" alt="带着农场混异界"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="带着农场混异界" href="/home/book-63.html" class="global-hover">带着农场混异界</a></p>
+									<div class="website-rank__rank-text">4968万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/e452c9d.png" alt="校花的贴身高手"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="校花的贴身高手" href="/home/book-511.html" class="global-hover">校花的贴身高手</a></p>
+									<div class="website-rank__rank-text">2427万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/65b1446.png" alt="逆剑狂神"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="逆剑狂神" href="/home/book-140.html" class="global-hover">逆剑狂神</a></p>
+									<div class="website-rank__rank-text">2337万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>04</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="太古龙象诀" href="/home/book-1332.html" class="global-hover">太古龙象诀</a></p>
+									<div class="website-rank__rank-text">2336万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>05</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="都市极品医神" href="/home/book-1368.html" class="global-hover">都市极品医神</a></p>
+									<div class="website-rank__rank-text">2334万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>06</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="异界最强赘婿" href="/home/book-754.html" class="global-hover">异界最强赘婿</a></p>
+									<div class="website-rank__rank-text">2318万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>07</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="生生不灭" href="/home/book-1045.html" class="global-hover">生生不灭</a></p>
+									<div class="website-rank__rank-text">2015万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>08</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="百炼飞升录" href="/home/book-1283.html" class="global-hover">百炼飞升录</a></p>
+									<div class="website-rank__rank-text">1774万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>09</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="雷武" href="/home/book-1036.html" class="global-hover">雷武</a></p>
+									<div class="website-rank__rank-text">1677万</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><span>10</span></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="惊天剑帝" href="/home/book-14.html" class="global-hover">惊天剑帝</a></p>
+									<div class="website-rank__rank-text">1587万</div>
+								</div>
+							</div>
+																				</div>
+					</section>
+				</div>
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('/static/home/image/b51874d.png');">
+						<div class="zh-modules-rank-box">
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/1940777.png" alt="地星复苏之昆仑大帝"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="地星复苏之昆仑大帝" href="/home/book-1992.html" class="global-hover">地星复苏之昆仑大帝</a></p>
+									<div class="website-rank__rank-text">1</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/e452c9d.png" alt="北美新神"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="北美新神" href="/home/book-256.html" class="global-hover">北美新神</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/65b1446.png" alt="长路漫漫"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="长路漫漫" href="/home/book-512.html" class="global-hover">长路漫漫</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>04</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="炼狱之劫" href="/home/book-768.html" class="global-hover">炼狱之劫</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>05</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="修仙：我连路人甲都不是" href="/home/book-1024.html" class="global-hover">修仙：我连路人甲都不是</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>06</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="扮演恶毒女配，男主对我深情沦陷" href="/home/book-1280.html" class="global-hover">扮演恶毒女配，男主对我深情沦陷</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>07</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="赤心巡天" href="/home/book-1536.html" class="global-hover">赤心巡天</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>08</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="修仙，从长生不死开始" href="/home/book-1792.html" class="global-hover">修仙，从长生不死开始</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>09</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="飞升仙界从电影导演做起" href="/home/book-2048.html" class="global-hover">飞升仙界从电影导演做起</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><span>10</span></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="悬壶济世，我只是想长生不老" href="/home/book-2304.html" class="global-hover">悬壶济世，我只是想长生不老</a></p>
+									<div class="website-rank__rank-text">--</div>
+								</div>
+							</div>
+																				</div>
+					</section>
+				</div>
+				<div>
+					<section class="zh-modules-rank website-rank__list" style="background-image:url('/static/home/image/9269490.png');">
+						<div class="zh-modules-rank-box">
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/1940777.png" alt="地星复苏之昆仑大帝"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="地星复苏之昆仑大帝" href="/home/book-1992.html" class="global-hover">地星复苏之昆仑大帝</a></p>
+									<div class="website-rank__rank-text">14</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/e452c9d.png" alt="校花嫌弃，却不知道我是仙帝"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="校花嫌弃，却不知道我是仙帝" href="/home/book-495.html" class="global-hover">校花嫌弃，却不知道我是仙帝</a></p>
+									<div class="website-rank__rank-text">14</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><img src="/static/home/image/65b1446.png" alt="九五至尊"></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="九五至尊" href="/home/book-30.html" class="global-hover">九五至尊</a></p>
+									<div class="website-rank__rank-text">13</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>04</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="灵兽帝国" href="/home/book-760.html" class="global-hover">灵兽帝国</a></p>
+									<div class="website-rank__rank-text">13</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>05</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="仙子是位符师" href="/home/book-305.html" class="global-hover">仙子是位符师</a></p>
+									<div class="website-rank__rank-text">12</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>06</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="吞天者" href="/home/book-855.html" class="global-hover">吞天者</a></p>
+									<div class="website-rank__rank-text">12</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>07</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="逆天小灵王" href="/home/book-365.html" class="global-hover">逆天小灵王</a></p>
+									<div class="website-rank__rank-text">12</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>08</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="庚古云中曲" href="/home/book-878.html" class="global-hover">庚古云中曲</a></p>
+									<div class="website-rank__rank-text">12</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+																	<div class="book-rank--num"><span>09</span></div>
+																<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="看弹幕，炮灰女配逆袭成功" href="/home/book-379.html" class="global-hover">看弹幕，炮灰女配逆袭成功</a></p>
+									<div class="website-rank__rank-text">12</div>
+								</div>
+							</div>
+														<div class="zh-modules-rank-book">
+								<div class="book-rank--num"><span>10</span></div>								<div class="book-rank--title">
+									<p class="book-rank--title-text ellipsis"><a title="与神共情" href="/home/book-913.html" class="global-hover">与神共情</a></p>
+									<div class="website-rank__rank-text">12</div>
+								</div>
+							</div>
+																				</div>
+					</section>
+				</div>
+			</div>
+		</section>
+	</div>
+
+		<div class="container">
+		<a href="/" target="_blank" class="home-advertising">
+			<img src="/storage/202411/ab0426f98354eb92c9fd01c023c1c19d.png">
+		</a>
+	</div>
+	
+	<div class="container">
+		<section class="novel-update">
+			<div class="zh-modules-nav">
+				<div class="zh-modules-nav-cont">
+					<div class="zh-modules-nav--item currTab"><span>最近更新</span></div>					
+					<div class="el-tabs__active-bar"></div>
+				</div>
+			</div>
+			<div class="novel-update__update-main">
+				<div class="el-table el-table--fit el-table--enable-row-hover el-table--enable-row-transition"
+					data-v-78500626="">
+					<div class="hidden-columns">
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+						<div></div>
+					</div>
+					<div class="el-table__header-wrapper">
+						<table cellspacing="0" cellpadding="0" border="0" class="el-table__header">
+							<colgroup>		
+								<col name="el-table_1_column_1" width="90">
+								<col name="el-table_1_column_2" width="300">
+								<col name="el-table_1_column_3" width="350">
+								<col name="el-table_1_column_4" width="100">
+								<col name="el-table_1_column_5" width="180">
+								<col name="el-table_1_column_6" width="180">
+								<col name="gutter" width="0">
+							</colgroup>
+							<thead class="has-gutter">
+								<tr class="">
+									<th colspan="1" rowspan="1" class="el-table_1_column_1     is-leaf el-table__cell">
+										<div class="cell">类别</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_2     is-leaf el-table__cell">
+										<div class="cell">书名</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_3     is-leaf el-table__cell">
+										<div class="cell">章节名称</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_4     is-leaf el-table__cell">
+										<div class="cell">字数</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_5     is-leaf el-table__cell">
+										<div class="cell">作者</div>
+									</th>
+									<th colspan="1" rowspan="1" class="el-table_1_column_6     is-leaf el-table__cell">
+										<div class="cell">更新时间</div>
+									</th>
+									<th class="el-table__cell gutter" style="width: 0px; display: none;"></th>
+								</tr>
+							</thead>
+						</table>
+					</div>
+					<div class="el-table__body-wrapper is-scrolling-none">
+						<table cellspacing="0" cellpadding="0" class="el-table__body">
+							<colgroup>
+								<col name="el-table_1_column_1" width="90">
+								<col name="el-table_1_column_2" width="300">
+								<col name="el-table_1_column_3" width="350">
+								<col name="el-table_1_column_4" width="100">
+								<col name="el-table_1_column_5" width="180">
+								<col name="el-table_1_column_6" width="180">
+							</colgroup>
+							<tbody>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="主角抢我未婚妻，我反手偷他家" href="/home/book-7.html" target="_blank" class="bookName global-hover update-bookName">主角抢我未婚妻，我反手偷他家</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-7.html" target="_blank" title="第1章 觉醒的炮灰男配！" class="ellipsis chapter global-hover">第1章 觉醒的炮灰男配！</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												139万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">惟一站</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2023-11-05 15:00:23											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="都拜师女主？那我只好独享女魔帝" href="/home/book-42.html" target="_blank" class="bookName global-hover update-bookName">都拜师女主？那我只好独享女魔帝</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-42.html" target="_blank" title="第1章 最强反派女魔帝，但很纯很憨" class="ellipsis chapter global-hover">第1章 最强反派女魔帝，但很纯很憨</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												140万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">静狐之心</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-01-05 12:55:46											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="转生大树，我打造不朽神国" href="/home/book-16.html" target="_blank" class="bookName global-hover update-bookName">转生大树，我打造不朽神国</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-16.html" target="_blank" title="第1章  转生成树" class="ellipsis chapter global-hover">第1章  转生成树</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												95万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">语成</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-06-03 14:39:26											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="小可怜是万人嫌，反派们带她发疯" href="/home/book-52.html" target="_blank" class="bookName global-hover update-bookName">小可怜是万人嫌，反派们带她发疯</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-52.html" target="_blank" title="第1章 被遗弃在秘境了" class="ellipsis chapter global-hover">第1章 被遗弃在秘境了</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												74万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">闪闪胖橘</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-02-20 14:36:43											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="剑道狂飙" href="/home/book-33.html" target="_blank" class="bookName global-hover update-bookName">剑道狂飙</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-33.html" target="_blank" title="第1章 不按套路来" class="ellipsis chapter global-hover">第1章 不按套路来</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												70万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">山泉农夫</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-03-01 06:07:56											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="星武纪元" href="/home/book-48.html" target="_blank" class="bookName global-hover update-bookName">星武纪元</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-48.html" target="_blank" title="关于更新量和更新时间。" class="ellipsis chapter global-hover">关于更新量和更新时间。</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												119万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">猪三不</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-05-28 04:06:57											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="超级反套路系统" href="/home/book-39.html" target="_blank" class="bookName global-hover update-bookName">超级反套路系统</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-35336.html" target="_blank" title="第3章生个娃娃最先急" class="ellipsis chapter global-hover">第3章生个娃娃最先急</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												166万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">佐佐先生</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2021-10-17 23:59:16											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="悟性逆天：错练邪功，法天象地" href="/home/book-35.html" target="_blank" class="bookName global-hover update-bookName">悟性逆天：错练邪功，法天象地</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-35.html" target="_blank" title="第1章 大药" class="ellipsis chapter global-hover">第1章 大药</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												63万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">剑飞暴雨中</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-06-19 21:43:10											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="我居然是终极大佬！" href="/home/book-12.html" target="_blank" class="bookName global-hover update-bookName">我居然是终极大佬！</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-12.html" target="_blank" title="第一章 青竹剑仙" class="ellipsis chapter global-hover">第一章 青竹剑仙</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												48万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">落叶挽不住剑</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-05-25 21:07:30											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="纯阳！" href="/home/book-47.html" target="_blank" class="bookName global-hover update-bookName">纯阳！</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-39169.html" target="_blank" title="第03章 凡俗蜉蝣，七十三代" class="ellipsis chapter global-hover">第03章 凡俗蜉蝣，七十三代</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												27万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">南北宗源</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-06-24 08:09:40											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="开局封王，从建立镇诡司开始" href="/home/book-51.html" target="_blank" class="bookName global-hover update-bookName">开局封王，从建立镇诡司开始</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-51.html" target="_blank" title="第1章 大炎天朝姜叶寒" class="ellipsis chapter global-hover">第1章 大炎天朝姜叶寒</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												208万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">爱吃馒头的面条</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2023-12-14 12:08:18											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="骑士王传说之幻刃圆舞曲" href="/home/book-61.html" target="_blank" class="bookName global-hover update-bookName">骑士王传说之幻刃圆舞曲</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-61.html" target="_blank" title="楔子" class="ellipsis chapter global-hover">楔子</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												171万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">旧烛残枫</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2022-04-28 11:02:17											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="宿命之环" href="/home/book-37.html" target="_blank" class="bookName global-hover update-bookName">宿命之环</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-37.html" target="_blank" title="欢迎收藏" class="ellipsis chapter global-hover">欢迎收藏</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												324万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">爱潜水的乌贼</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2023-02-27 20:04:33											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="凡人修仙，自创气血武道开始长生" href="/home/book-60.html" target="_blank" class="bookName global-hover update-bookName">凡人修仙，自创气血武道开始长生</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-60.html" target="_blank" title="第一章 刚穿越就杀人" class="ellipsis chapter global-hover">第一章 刚穿越就杀人</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												13万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">阳帆启航</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-04-09 07:59:48											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="至尊丹圣" href="/home/book-34.html" target="_blank" class="bookName global-hover update-bookName">至尊丹圣</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-34.html" target="_blank" title="第1章　挖金丹" class="ellipsis chapter global-hover">第1章　挖金丹</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												50万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">小生友才</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-06-27 00:05:18											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="洪荒：开局吞天魔功，我为妖帝！" href="/home/book-73.html" target="_blank" class="bookName global-hover update-bookName">洪荒：开局吞天魔功，我为妖帝！</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-73.html" target="_blank" title="第一卷 第1章 激活系统，兄恭弟谦！" class="ellipsis chapter global-hover">第一卷 第1章 激活系统，兄恭弟谦！</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												12万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">沽酒一杯</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-08-07 15:43:55											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="玄幻" href="/home/cate-1.html" target="_blank" class="table-list--type global-hover">玄幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="快穿之桃花精能有什么坏心思呢" href="/home/book-70.html" target="_blank" class="bookName global-hover update-bookName">快穿之桃花精能有什么坏心思呢</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-70.html" target="_blank" title="第1章弟弟别黑化(一)" class="ellipsis chapter global-hover">第1章弟弟别黑化(一)</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												168万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">沅烨</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2023-05-21 21:05:38											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="洪荒：人在截教，努力就能变强！" href="/home/book-79.html" target="_blank" class="bookName global-hover update-bookName">洪荒：人在截教，努力就能变强！</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-79.html" target="_blank" title="第1章 重生蜉蝣三千年 金手指终于来了" class="ellipsis chapter global-hover">第1章 重生蜉蝣三千年 金手指终于来了</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												122万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">仗剑听雨声</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-06-08 15:36:53											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="大夏明镜" href="/home/book-75.html" target="_blank" class="bookName global-hover update-bookName">大夏明镜</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-69138.html" target="_blank" title="第2章 少夫人，误会！" class="ellipsis chapter global-hover">第2章 少夫人，误会！</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												92万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">荣小荣</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2024-06-14 17:45:08											</div>
+										</div>
+									</td>
+								</tr>
+																<tr class="el-table__row">
+									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+										<div class="cell"><a title="奇幻" href="/home/cate-2.html" target="_blank" class="table-list--type global-hover">奇幻</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis"><a title="云其深" href="/home/book-36.html" target="_blank" class="bookName global-hover update-bookName">云其深</a></div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+										<div class="cell"><a href="/home/chapter-31503.html" target="_blank" title="第一章 行不更名坐不改姓" class="ellipsis chapter global-hover">第一章 行不更名坐不改姓</a></div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												462万字
+											</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis global-hover">楽屋律人</div>
+										</div>
+									</td>
+									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+										<div class="cell">
+											<div class="ellipsis">
+												2022-06-02 11:48:37											</div>
+										</div>
+									</td>
+								</tr>
+																								
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+		<div class="container comm_friendLnk">
+		<div class="comm_footer_partner">
+			<div class="partner-title">合作伙伴</div>
+			<div class="comm_footer_friendLnk">
+								<a href="https://www.xinghuonovel.com" target="_blank">星火阅读</a>
+								<a href="https://feiniao.paheng.net" target="_blank">飞鸟阅读</a>
+							</div>
+		</div>
+	</div>
+	
+
+		<!-- /主体 -->
+
+		<!-- 底部 -->
+		
+		<div class="footer-area">
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-4 col-md-4">
+				<div class="logo-part">
+					<div class="footer-logo">
+						<a href="/home/"><img src="/storage/202410/6750906c9bd369992d371566b239eee7.png" alt="飞鸟阅读"></a>
+					</div>
+					<p>服务时间:周一至周日 9:00--18:00<br />
+(不同产品服务时间会有所区别，具体以购买时的服务承诺为准)<br />
+在线服务: 微信关注公众号<br />
+人工服务时间:周一至周日早9点-晚18点，如果您有任务问题，可以联系我们！</p>					
+				</div>
+			</div>
+			<div class="col-lg-2 col-md-2">
+				<div class="company-part">
+					<h6>飞鸟阅读</h6>
+					<ul>
+													<li ><a href="/home/page-about.html"  target="_blank">关于我们</a></li>
+													<li ><a href="/home/page-agreement.html"  target="_blank">用户协议</a></li>
+													<li ><a href="/home/page-privacy.html"  target="_blank">隐私政策</a></li>
+													<li ><a href="/home/page-contactus.html"  target="_blank">联系我们</a></li>
+											</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3">
+				<div class="help-part">
+					<h6>帮助中心</h6>
+					<ul>
+													<li ><a href="/home/news-1.html"  target="_blank">怎么成为作者？</a></li>
+													<li ><a href="/home/news-2.html"  target="_blank">如何创建作品</a></li>
+													<li ><a href="/home/news-3.html"  target="_blank">怎么管理作品</a></li>
+													<li ><a href="/home//news-4.html"  target="_blank">怎么管理自己的账号</a></li>
+											</ul>
+				</div>
+			</div>
+			<div class="col-lg-3 col-md-3">
+				<div class="resources-part">
+					<h6>违法和不良信息举报</h6>
+					<ul>
+												<li>+86 400 888 8888</li>
+						<li>server@feiniao.com</li>
+						<li><a href="/home/report.html" class="main-btn">在线举报</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="copy-right">
+				<p>
+					Copyright © www.feiniao.com All Rights Reserved 版权所有 北京飞鸟阅读网络技术有限公司						<a target="_blank" rel="nofollow" href="http://www.beian.gov.cn/portal/registerSystemInfo">京A2-20180048-1</a>
+											<a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">京ICP备18034986号-1</a>
+									</p>
+			</div>
+		</div>
+	</div>
+</div>
+		
+		<!-- /底部 -->
+		
+		<!-- 脚本 -->
+		
+	<!-- Main JS -->
+	<script src="/static/home/script/main.js?v=2.0.38"></script>
+    <script>
+		$(document).ready(function() {
+		});
+    </script>
+
+		<!-- /脚本 -->
+		
+		<!-- 统计代码 -->
+		
+		<div style="display: none;"></div>
+		
+		<!-- /统计代码 -->
+	</div>
+</body>
+</html>

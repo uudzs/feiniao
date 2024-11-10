@@ -54,7 +54,6 @@ $pageconf = get_system_config('page');
         },
         methods: {
           refresh() {
-            bui.hint("提醒内容");
             var that = this;
             that.editpage++;
             post("{:furl('/v1/advert', [], true, 'api')}", { pid: that.editpid, page: that.editpage }, function(result) {

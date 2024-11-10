@@ -69,7 +69,7 @@
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">简介</td>
-			<td colspan="5"><textarea name="remark" placeholder="请输入简介" class="layui-textarea">{$detail.remark}</textarea></td>
+			<td colspan="5"><textarea name="remark" placeholder="请输入简介" class="layui-textarea">{notempty name="$detail.remark"}{$detail.remark}{/notempty}</textarea></td>
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">作品标签</td>
@@ -135,8 +135,8 @@
 				<div class="layui-upload">
 					<button type="button" class="layui-btn layui-btn-sm" id="upload_btn_cover">选择上传图片</button>
 					<div class="layui-upload-list" id="upload_box_cover">
-						<img src="{$detail.cover}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
-						<input type="hidden" name="cover" value="{$detail.cover}">
+						<img src="{notempty name="$detail.cover"}{$detail.cover}{/notempty}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" style="width:200px;max-width:200px" />
+						<input type="hidden" name="cover" value="{notempty name="$detail.cover"}{$detail.cover}{/notempty}">
 					</div>
 				</div>
 			</td>

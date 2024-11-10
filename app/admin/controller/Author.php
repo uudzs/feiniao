@@ -92,7 +92,6 @@ class Author extends BaseController
     public function edit()
     {
         $param = get_params();
-
         if (request()->isAjax()) {
             // 检验完整性
             try {
@@ -104,8 +103,20 @@ class Author extends BaseController
             if (isset($param["birth"])) {
                 $param["birth"] = $param["birth"] ? strtotime($param["birth"]) : 0;
             }
-            unset($param['file']);
-            $this->model->editAuthor($param);
+            $id = isset($param['id']) ? $param['id'] : 0;
+            $detail = $this->model->getAuthorById($id);
+            if (empty($detail)) {
+                return to_assign(1, '信息不存在');
+            }
+            if ($detail['nickname'] != $param['nickname']) {
+                $param['update_time'] = time();
+                Db::name('author')->where('id', $id)->strict(false)->field(true)->update($param);
+                Db::name('book')->where('authorid', $id)->update(['author' => $param['nickname']]);
+                return to_assign(0, '修改成功');
+            } else {
+                unset($param['file']);
+                $this->model->editAuthor($param);
+            }
         } else {
             $id = isset($param['id']) ? $param['id'] : 0;
             $detail = $this->model->getAuthorById($id);

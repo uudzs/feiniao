@@ -279,8 +279,17 @@ class Book extends BaseController
                 //逐行读取文件内容
                 $handle = fopen($realPath, 'r');
                 while (($line = fgets($handle)) !== false) {
+                    //作者：作者: 
                     if (strpos($line, ' 著') !== false) {
                         $author = explode(' 著', $line)[0];
+                    }
+                    if (strpos($line, '作者:') !== false) {
+                        $a = explode('作者:', $line);
+                        $author = isset($a[1]) ? $a[1] : '';
+                    }
+                    if (strpos($line, '作者：') !== false) {
+                        $a = explode('作者：', $line);
+                        $author = isset($a[1]) ? $a[1] : '';
                     }
                     if (preg_match_all("/([第]?[\d一二三四五六七八九零十百千]+[章])([^\r\n]+)/u", $line, $arr)) {
                         if ($title) {
@@ -306,6 +315,12 @@ class Book extends BaseController
                 }
                 if (empty($title)) {
                     return to_assign(1, '文件名称获取失败');
+                }
+                if (strpos($title, '《') !== false) {
+                    $parts = explode('《', $title);
+                    if (isset($parts[1]) && strpos($parts[1], '》') !== false) {
+                        $title = explode('》', $parts[1])[0];
+                    }
                 }
                 if (empty($author)) {
                     return to_assign(1, '作者获取失败');

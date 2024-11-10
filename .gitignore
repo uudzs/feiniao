@@ -9,4 +9,5 @@
 /public/.user.ini
 /public/storage/*
 /public/backup/*
-/config/database.php
+/addons/caiji/*
+/public/index_pc.html

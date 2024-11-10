@@ -36,7 +36,7 @@ class Book extends BaseController
         }
         $uid = JWT_UID;
         $detail = Db::name('book')->where(['id' => $id])->find();
-        if ($detail) {            
+        if ($detail) {
             $detail['bigclassname'] = Db::name('category')->where(['id' => $detail['genre']])->value('name');
             $detail['smallclassname'] = Db::name('category')->where(['id' => $detail['subgenre']])->value('name');
             $detail['bigclassname'] = $detail['bigclassname'] ?: '-';
@@ -49,6 +49,7 @@ class Book extends BaseController
             } else {
                 $words = $words . '字';
             }
+            $detail['cover'] = get_file($detail['cover']);
             $detail['issign'] = Db::name('author')->where(['id' => $detail['authorid']])->value('issign');
             $detail['words'] = $words;
             $detail['uptime'] = $detail['update_time'] ? date('Y-m-d H:i:s', $detail['update_time']) : date('Y-m-d H:i:s', $detail['create_time']);
@@ -86,6 +87,7 @@ class Book extends BaseController
                     $detail['chapter_url'] = 'javascript:;';
                 }
             }
+            $detail['chapter_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', $detail['chapter_url']);
             $detail['authorurl'] = (string) Route::buildUrl('author_detail', ['id' => $detail['authorid']]);
             if (!empty($last_chapter)) {
                 $detail['chaptertime'] = time_tran($last_chapter['create_time']);

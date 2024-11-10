@@ -6,9 +6,9 @@
 	<table class="layui-table layui-table-form">
 		<tr>
 			<td class="layui-td-gray-2">笔名<font>*</font></td>
-			<td><input type="text" name="nickname" readonly lay-verify="required" lay-reqText="请完善昵称" value="{notempty name="$detail.nickname"}{$detail.nickname}{/notempty}" autocomplete="off" placeholder="请输入昵称" class="layui-input"></td>
+			<td><input type="text" name="nickname" lay-verify="required" lay-reqText="请完善昵称" value="{notempty name="$detail.nickname"}{$detail.nickname}{/notempty}" autocomplete="off" placeholder="请输入昵称" class="layui-input"></td>
 			<td class="layui-td-gray-2">手机<font>*</font></td>
-			<td><input type="text" name="mobile" lay-verify="required" readonly lay-reqText="请完善手机" value="{notempty name="$detail.mobile"}{$detail.mobile}{/notempty}" autocomplete="off" placeholder="请输入手机" class="layui-input"></td>
+			<td><input type="text" name="mobile" lay-verify="required"  lay-reqText="请完善手机" {notempty name="$detail.mobile"}value="{$detail.mobile}" readonly{/notempty} autocomplete="off" placeholder="请输入手机" class="layui-input"></td>
 			<td class="layui-td-gray-2">姓名</td>
 			<td><input type="text" name="true_name" value="{notempty name="$detail.true_name"}{$detail.true_name}{/notempty}" autocomplete="off" placeholder="请输入姓名" class="layui-input"></td>
 			

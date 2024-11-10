@@ -132,8 +132,8 @@ class Index
             die;
         }
         for ($i = 0; $i < $chapter_Tables; $i++) {
-            $sql = "DROP TABLE IF EXISTS `" . $data['DB_PREFIX'] . "chapter_content_`" . $i . ";";
-            $link->query($sql);
+            //$sql = "DROP TABLE IF EXISTS `" . $data['DB_PREFIX'] . "chapter_content_`" . $i . ";";
+            //$link->query($sql);
             $sql = "CREATE TABLE `" . $data['DB_PREFIX'] . "chapter_content_" . $i . "` (
                 `sid` bigint(20) DEFAULT '0' COMMENT '章节ID',
                 `info` longtext COMMENT '章节内容',
@@ -167,8 +167,8 @@ class Index
         $event = "CREATE DEFINER=`".$data['DB_USER']."`@`localhost` EVENT `upBookWords` ON SCHEDULE EVERY 1 MINUTE STARTS '2021-03-27 15:19:16' ON COMPLETION NOT PRESERVE ENABLE COMMENT '更新作品字数' DO UPDATE `" . $data['DB_PREFIX'] . "book` SET words = (SELECT SUM(`wordnum`) FROM `" . $data['DB_PREFIX'] . "chapter` WHERE `bookid` = `" . $data['DB_PREFIX'] . "book`.id AND `verify` in(0,1))";
         $link->query($event);
         //开启事件
-        $sql = "SET GLOBAL event_scheduler = ON;";
-        $link->query($sql);        
+        //$sql = "SET GLOBAL event_scheduler = ON;";
+        //$link->query($sql);        
         $link->close();
         $db_str = "<?php
 return [
