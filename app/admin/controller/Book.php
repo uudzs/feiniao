@@ -35,7 +35,7 @@ class Book extends BaseController
             if (!empty($param['subgenre'])) {
                 $where[] = ['subgenre', '=', $param['subgenre']];
             }
-            $param['order'] = 'words desc';
+            $param['order'] = 'id desc';
             $list = $this->model->getBookList($where, $param);
             $list = $list->toArray();
             $starttime = strtotime(date('Y-m-01', strtotime('-1 month', time()))); // 获取上个月的第一天
@@ -103,7 +103,6 @@ class Book extends BaseController
             return view();
         }
     }
-
 
     /**
      * 编辑
@@ -279,6 +278,10 @@ class Book extends BaseController
                 //逐行读取文件内容
                 $handle = fopen($realPath, 'r');
                 while (($line = fgets($handle)) !== false) {
+                    $e = mb_detect_encoding($line, array('ASCII', 'GB2312', 'GBK', 'UTF-8'));
+                    if ($e != 'UTF-8') {
+                        $line = iconv($e, 'UTF-8', $line);
+                    }
                     //作者：作者: 
                     if (strpos($line, ' 著') !== false) {
                         $author = explode(' 著', $line)[0];
@@ -321,6 +324,9 @@ class Book extends BaseController
                     if (isset($parts[1]) && strpos($parts[1], '》') !== false) {
                         $title = explode('》', $parts[1])[0];
                     }
+                }
+                if (empty($title)) {
+                    return to_assign(1, '作品名称识别失败');
                 }
                 if (empty($author)) {
                     return to_assign(1, '作者获取失败');

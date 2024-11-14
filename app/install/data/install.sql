@@ -726,6 +726,7 @@ CREATE TABLE `fn_book` (
   `author` varchar(255) DEFAULT NULL COMMENT '作者',
   `authorid` int(10) NOT NULL DEFAULT '0' COMMENT '作者ID',
   `cover` varchar(255) CHARACTER SET utf8 DEFAULT NULL COMMENT '封面图片',
+  `filename` varchar(255) DEFAULT NULL COMMENT '文件名称',
   `localcover` tinyint(4) DEFAULT '0' COMMENT '是否为本地封面',
   `remark` text COMMENT '简介',
   `outline` text COMMENT '大纲',
@@ -760,7 +761,8 @@ CREATE TABLE `fn_book` (
   KEY `title` (`title`(191),`author`(191)),
   KEY `finishtime` (`finishtime`),
   KEY `idx_iswz_finishtime` (`isfinish`,`finishtime`) USING BTREE,
-  KEY `update_time` (`update_time`)
+  KEY `update_time` (`update_time`),
+  KEY `filename` (`filename`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='作品::crud';
 
 -- ----------------------------

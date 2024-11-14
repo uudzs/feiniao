@@ -6,7 +6,6 @@ namespace app\api\controller;
 
 use app\api\BaseController;
 use app\api\middleware\Auth;
-use think\facade\Db;
 
 class Contrab extends BaseController
 {
@@ -16,16 +15,25 @@ class Contrab extends BaseController
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => ['run']]
+        Auth::class => ['except' => ['run', 'caiji']]
     ];
+
+    /**
+     * Summary of caiji
+     * 采集任务
+     * @return void
+     */
+    public static function caiji()
+    {
+        $result = hook("caijiHook");
+    }
 
     /**
      * Summary of run
      * 计划任务
      * @return void
      */
-    public static function run()
-    {
-        // 计划任务
+    public static function run() {
+
     }
 }

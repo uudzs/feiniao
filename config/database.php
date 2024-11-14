@@ -18,17 +18,17 @@ return [
             // 服务器地址
             'hostname'           =>  '127.0.0.1',
             // 数据库名
-            'database'           =>  'feiniao',
+            'database'           =>  'feiniao_formal',
             // 用户名
-            'username'           =>  'feiniao',
+            'username'           =>  'feiniao_formal',
             // 密码
-            'password'           =>  'eMwmHZCTAN2Wetma',
+            'password'           =>  'ZHEZmMY3eapca8xJ',
             // 端口
             'hostport'           =>  '3306',
             // 数据库表前缀
             'prefix'             =>  'fn_',
             //章节分表数
-            'chapter_Tables'     =>  '15',
+            'chapter_Tables'     =>  '10',
             // 数据库连接参数
             'params'          => [],
             // 数据库编码默认采用utf8mb4

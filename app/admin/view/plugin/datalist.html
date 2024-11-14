@@ -5,9 +5,9 @@
 	<table class="layui-hide" id="list" lay-filter="list"></table>
 </div>
 <script type="text/html" id="toolbarDemo">
-  <div>
-  	<span class="red">插件市场即将推出。</span>
-  </div>
+	<div class="layui-btn-group">
+		<span class="layui-btn layui-btn-sm layui-bg-red" lay-event="addons" data-title="插件市场"><i class="layui-icon layui-icon-app"></i> 插件市场</span>
+  	</div>
 </script>
 <script type="text/html" id="plugin-status-switch">
 	<input type="checkbox" name="status" value="{{= d.status }}" title="开|关" lay-skin="switch" lay-filter="plugin-status" {{= d.status == 1 ? "checked" : "" }}>
@@ -83,8 +83,16 @@
 			}
 			return false;
 		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(list)', function(obj){
+			if(obj.event === 'addons') {
+				tool.side("https://www.paheng.com/forum-38-1.html");
+				return false;
+			}
+		});
 
-		table.on('tool(list)', function (obj) {
+		table.on('tool(list)', function (obj) {			
 			if (obj.event === 'config') {
 				tool.side("{:url('plugin/config')}?name="+obj.data.name);
 			}

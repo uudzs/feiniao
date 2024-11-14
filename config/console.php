@@ -20,6 +20,7 @@ return [
 		'crud-e' => 'app\crud\command\CrudEdit',
 		'crud-r' => 'app\crud\command\CrudRead',
 		'contrab' => 'app\command\Contrab',
+		'caiji' => 'app\command\Caiji',
     ],
 
 ];
