@@ -11,7 +11,6 @@ class Emptys extends BaseController
 
     public function miss()
     {
-        hook("makehtml");
         return view('404');
     }
 
