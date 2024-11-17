@@ -2,6 +2,4 @@
 
 use think\facade\Route;
 
-Route::get('think', function () {
-    return 'hello,ThinkPHP6!';
-});
+Route::miss('\app\home\controller\emptys::miss');

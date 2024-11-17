@@ -8,6 +8,7 @@ use app\home\BaseController;
 use app\admin\model\Advsr as AdvsrModel;
 use think\facade\Db;
 use think\facade\View;
+use think\facade\Request;
 
 class Info extends BaseController
 {
@@ -18,6 +19,9 @@ class Info extends BaseController
         $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
         $list = Db::name('advsr')->where(['status' => 1, 'adver_id' => get_system_config('page', 'home_notice'), 'type' => 6])->order('level desc')->paginate($rows, false, ['query' => $param]);
         View::assign('list', $list);
+        if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
         return view();
     }
 
@@ -29,6 +33,9 @@ class Info extends BaseController
         $advsr::where('id', $id)->inc('hits')->update();
         $detail = $advsr->getAdvsrById($id);
         View::assign('detail', $detail);
+        if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
         return view();
     }
 }

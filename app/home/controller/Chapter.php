@@ -38,6 +38,9 @@ class Chapter extends BaseController
         View::assign('id', $id);
         View::assign('bookid', $chapter['bookid']);
         View::assign('chapterlsit', $list);
+        if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
         return view();
     }
 

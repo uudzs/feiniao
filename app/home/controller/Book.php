@@ -7,6 +7,7 @@ namespace app\home\controller;
 use app\home\BaseController;
 use think\facade\Db;
 use think\facade\View;
+use think\facade\Request;
 
 class Book extends BaseController
 {
@@ -24,6 +25,9 @@ class Book extends BaseController
         View::assign('category', $category);
         View::assign('catid', $id);
         View::assign('id', $id);
+        if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
         return view();
     }
 
@@ -33,6 +37,9 @@ class Book extends BaseController
      */
     public function list()
     {
+        if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
         return view();
     }
 
@@ -48,6 +55,9 @@ class Book extends BaseController
             Db::name('book')->where('id', $id)->inc('hits')->update();
         }
         View::assign('bid', $id);
+        if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
         return view();
     }
 }

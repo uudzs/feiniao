@@ -84,7 +84,7 @@
 				<div class="common-module__title"><span class="">主编力荐</span> </div>
 				<div>
 					<div class="editor-recommend__left">
-						{php}$home_editor_main = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_main']])->order('level desc')->find();{/php}
+						{php}$home_editor_main = isset($pageconf['home_editor_main']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_main']])->order('level desc')->find() : '';{/php}
 						{notempty name="home_editor_main"}
 						{php}
 							$book = model('book')->where(['id' => $home_editor_main['books']])->find();
@@ -115,7 +115,7 @@
 			</section>
 			<div class="editor-recommend__center">
 				<div class="editor-recommend__center-recommend">
-					{php}$home_editor_images = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_images']])->order('level desc')->limit(6)->select()->toArray();{/php}
+					{php}$home_editor_images = isset($pageconf['home_editor_images']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_images']])->order('level desc')->limit(6)->select()->toArray() : '';{/php}
 					{notempty name="home_editor_images"}					
 					{volist name="$home_editor_images" id="v"}
 						{php}
@@ -151,7 +151,7 @@
 			<section class="zh-modules-rank editor-recommend__rank">
 				<div class="editor-recommend__rank-title"></div>
 				<div class="zh-modules-rank-box">
-					{php}$home_editor_top = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_top']])->order('level desc')->limit(10)->select()->toArray();{/php}
+					{php}$home_editor_top = isset($pageconf['home_editor_top']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_top']])->order('level desc')->limit(10)->select()->toArray() : '';{/php}
 					{notempty name="home_editor_top"}
 						{volist name="$home_editor_top" id="v"}
 							{php}$book = model('book')->where(['id' => $v['books']])->find();{/php}
@@ -175,7 +175,7 @@
 		</section>
 	</div>
 
-	{php}$home_banner_1 = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_banner_1']])->order('level desc')->find();{/php}
+	{php}$home_banner_1 = isset($pageconf['home_banner_1']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_banner_1']])->order('level desc')->find() : '';{/php}
 	{notempty name="home_banner_1"}
 	<div class="container">
 		<a href="{$home_banner_1.link}" target="_blank" class="home-advertising">
@@ -299,7 +299,7 @@
 		</section>
 	</div>
 
-	{php}$home_banner_buttom = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_banner_buttom']])->order('level desc')->find();{/php}
+	{php}$home_banner_buttom = isset($pageconf['home_banner_buttom']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_banner_buttom']])->order('level desc')->find() : '';{/php}
 	{notempty name="home_banner_buttom"}
 	<div class="container">
 		<a href="{$home_banner_buttom.link}" target="_blank" class="home-advertising">

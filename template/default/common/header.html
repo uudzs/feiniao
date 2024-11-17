@@ -15,7 +15,7 @@
 				<form id="commSearch" name="searchForm" class="comm_header_search_form" method="get" action="{:url('search')}" target="_blank">
 					<div class="comm_header_search_outer">
 						<div class="comm_header_search">							
-							{php}$header_keywords = model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['header_keywords']])->order('level desc')->find();{/php}
+							{php}$header_keywords = isset($pageconf['header_keywords']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['header_keywords']])->order('level desc')->find() : '';{/php}
 							{empty name="$header_keywords"}
 								<input class="comm_header_search_ipt" name="keyword" type="text" placeholder="" autocomplete="off" disableautocomplete="">
 							{else/}

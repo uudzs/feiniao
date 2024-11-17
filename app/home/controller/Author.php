@@ -7,6 +7,7 @@ namespace app\home\controller;
 use app\home\BaseController;
 use think\facade\Db;
 use think\facade\View;
+use think\facade\Request;
 
 class Author extends BaseController
 {
@@ -20,6 +21,9 @@ class Author extends BaseController
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         View::assign('id', $id);
+        if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
         return view();
     }
 }

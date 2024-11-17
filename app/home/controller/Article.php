@@ -1,5 +1,6 @@
 <?php
-declare (strict_types = 1);
+
+declare(strict_types=1);
 
 namespace app\home\controller;
 
@@ -7,11 +8,12 @@ use app\home\BaseController;
 use app\admin\model\Article as ArticleModel;
 use think\facade\Db;
 use think\facade\View;
+use think\facade\Request;
 
 class Article extends BaseController
 {
-    public function detail()
-    {
+	public function detail()
+	{
 		$param = get_params();
 		$id = isset($param['id']) ? intval($param['id']) : 0;
 		if (empty($id)) {
@@ -20,7 +22,7 @@ class Article extends BaseController
 		$detail = (new ArticleModel())->getArticleById($id);
 		if (empty($detail)) {
 			throw new \think\exception\HttpException(406, '找不到相关记录');
-		}		
+		}
 		ArticleModel::where('id', $param['id'])->inc('read')->update();
 		$keyword_array = Db::name('ArticleKeywords')
 			->field('i.aid,i.keywords_id,k.title')
@@ -34,6 +36,9 @@ class Article extends BaseController
 		View::assign('seokeywords', $detail['keyword_names']);
 		View::assign('seodescription', strip_tags($detail['desc']));
 		View::assign('detail', $detail);
-		return view();
-    }
+		if (!Request::isMobile() && !isWeChat()) {
+			hook("makehtml", ['content' => View::fetch()]);
+		}
+		return View();
+	}
 }
