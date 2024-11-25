@@ -36,22 +36,15 @@ class Book extends BaseController
         }
         $uid = JWT_UID;
         $detail = Db::name('book')->where(['id' => $id])->find();
+        $model_name = \think\facade\App::initialize()->http->getName();
         if ($detail) {
             $detail['bigclassname'] = Db::name('category')->where(['id' => $detail['genre']])->value('name');
             $detail['smallclassname'] = Db::name('category')->where(['id' => $detail['subgenre']])->value('name');
             $detail['bigclassname'] = $detail['bigclassname'] ?: '-';
             $detail['smallclassname'] = $detail['smallclassname'] ?: '-';
-            $words = intval($detail['words']);
-            if ($words > 1000 && $words < 10000) {
-                $words = sprintf("%.1f", $words / 1000) . '千字';
-            } else if ($words > 10000) {
-                $words = sprintf("%.1f", $words / 10000) . '万字';
-            } else {
-                $words = $words . '字';
-            }
             $detail['cover'] = get_file($detail['cover']);
             $detail['issign'] = Db::name('author')->where(['id' => $detail['authorid']])->value('issign');
-            $detail['words'] = $words;
+            $detail['words'] = wordCount($detail['words']);
             $detail['uptime'] = $detail['update_time'] ? date('Y-m-d H:i:s', $detail['update_time']) : date('Y-m-d H:i:s', $detail['create_time']);
             $detail['chapter'] = Db::name('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
             $first_chapter = $last_chapter = [];
@@ -59,7 +52,8 @@ class Book extends BaseController
                 $first_chapter = $detail['chapter'][0]; //第一章
                 $last_chapter = end($detail['chapter']); //最后一章
                 foreach ($detail['chapter'] as $k => $v) {
-                    $detail['chapter'][$k]['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $v['id']]);
+                    $url = (string) Route::buildUrl('chapter_detail', ['id' => $v['id']]);
+                    $detail['chapter'][$k]['chapter_url'] = str_replace($model_name, 'home', $url);
                     $detail['chapter'][$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
                 }
             }
@@ -71,9 +65,12 @@ class Book extends BaseController
                 $where['user_id'] = $uid;
                 $detail['fav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $detail['id']])->find();
                 $detail['fav'] = $detail['fav'] ?: '';
+                $detail['follow'] = Db::name('follow')->where(['user_id' => $uid, 'from_id' => $detail['authorid']])->find();
+                $detail['follow'] = $detail['follow'] ?: '';
             } else {
                 $where['ip'] = $ip;
-                $detail['fav'] = [];
+                $detail['fav'] = '';
+                $detail['follow'] = '';
             }
             //查询是否有该书记录
             $reads = Db::name('readhistory')->field('IF(update_time = 0, create_time, update_time) AS order_time,id,update_time,create_time,title,chapter_id,book_id')->where($where)->order('order_time desc')->find();
@@ -87,8 +84,8 @@ class Book extends BaseController
                     $detail['chapter_url'] = 'javascript:;';
                 }
             }
-            $detail['chapter_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', $detail['chapter_url']);
-            $detail['authorurl'] = (string) Route::buildUrl('author_detail', ['id' => $detail['authorid']]);
+            $detail['chapter_url'] = str_replace($model_name, 'home', $detail['chapter_url']);
+            $detail['authorurl'] = str_replace($model_name, 'home', (string) Route::buildUrl('author_detail', ['id' => $detail['authorid']]));
             if (!empty($last_chapter)) {
                 $detail['chaptertime'] = time_tran($last_chapter['create_time']);
             } else {

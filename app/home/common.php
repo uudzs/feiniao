@@ -51,7 +51,7 @@ if (!function_exists('furl')) {
                 }
             } else {
                 $rurl = (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(false);
-                if (strpos($rurl, $domain) !== false) {
+                if (strpos($rurl, (string) $domain) !== false) {
                     return $rurl;
                 }
                 $fChar = substr($url, 0, 1);

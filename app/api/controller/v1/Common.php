@@ -396,25 +396,52 @@ class Common extends BaseController
     public function login()
     {
         $param = get_params();
-        if (empty($param['mobile']) || empty($param['code'])) {
+        $username = isset($param['username']) ? trim($param['username']) : '';
+        $mobile = isset($param['mobile']) ? trim($param['mobile']) : '';
+        $password = isset($param['password']) ? trim($param['password']) : '';
+        $invite_code = isset($param['invite_code']) ? trim($param['invite_code']) : '';
+        if (empty($mobile) && empty($username)) {
             $this->apiError('参数错误');
         }
-        $mobile = trim($param['mobile']);
-        $invite_code = trim($param['invite_code']);
-        $code = intval($param['code']);
-        if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-            $this->apiError('手机号不正确');
+        if (empty($param['code'])) {
+            $this->apiError('参数错误');
         }
-        $verif = Db::name('sms_log')->where(array('account' => $mobile, 'code' => $code))->find();
-        if (empty($verif)) {
-            $this->apiError('短信未发送');
-        } else {
-            if ($verif['expire_time'] < time()) {
-                $this->apiError('短信已超时');
+        if (!empty($username) && empty($mobile)) {
+            $code = trim($param['code']);
+            if (!captcha_check($code)) {
+                $this->apiError('验证码错误');
+            }
+            if (empty($password)) {
+                $this->apiError('参数错误');
+            }
+        }
+        $user = [];
+        if ($mobile) {
+            $code = intval($param['code']);
+            if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
+                $this->apiError('手机号不正确');
+            }
+            $verif = Db::name('sms_log')->where(array('account' => $mobile, 'code' => $code))->find();
+            if (empty($verif)) {
+                $this->apiError('短信未发送');
+            } else {
+                if ($verif['expire_time'] < time()) {
+                    $this->apiError('短信已超时');
+                }
+            }
+            $user = Db::name('user')->where(['mobile' => $mobile])->find();
+        }
+        if ($username) {
+            $user = Db::name('user')->where(['username' => $username])->find();
+            if (empty($user)) {
+                $this->apiError('未找到此用户');
+            }
+            $pwd = set_password($password, $user['salt']);
+            if ($pwd !== $user['password']) {
+                $this->apiError('密码错误');
             }
         }
         // 校验
-        $user = Db::name('user')->where(['mobile' => $mobile])->find();
         if (empty($user)) {
             $session_invite = get_config('app.session_invite');
             $invite = Cookie::get($session_invite);

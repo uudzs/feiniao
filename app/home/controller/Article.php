@@ -14,6 +14,7 @@ class Article extends BaseController
 {
 	public function detail()
 	{
+		hook("runcache");
 		$param = get_params();
 		$id = isset($param['id']) ? intval($param['id']) : 0;
 		if (empty($id)) {
@@ -36,9 +37,7 @@ class Article extends BaseController
 		View::assign('seokeywords', $detail['keyword_names']);
 		View::assign('seodescription', strip_tags($detail['desc']));
 		View::assign('detail', $detail);
-		if (!Request::isMobile() && !isWeChat()) {
-			hook("makehtml", ['content' => View::fetch()]);
-		}
+		hook("makehtml", ['content' => View::fetch()]);
 		return View();
 	}
 }

@@ -16,6 +16,7 @@ Route::group('v1', function () {
     Route::rule('smssend', 'api/v1.common/smssend', 'GET|POST');
     Route::rule('gettoken', 'api/v1.common/token', 'GET|POST');
     Route::rule('favorites', 'api/v1.user/favorites', 'GET|POST');
+    Route::rule('follow', 'api/v1.user/follow', 'GET|POST');
     Route::rule('bookshelf', 'api/v1.user/bookshelf', 'GET|POST');
     Route::rule('delbookshelf', 'api/v1.user/delbookshelf', 'GET|POST');
     Route::rule('readlog', 'api/v1.user/readlog', 'GET|POST');

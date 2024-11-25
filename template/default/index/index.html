@@ -2,6 +2,13 @@
 {block name="style"}
 <link rel="stylesheet" href="{__STATIC__}/home/style/index.css?v={$conf.version}">
 {/block}
+{block name="title"}
+<title>{:get_seo_str('home','home_title')}</title>	
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{:get_seo_str('home','home_keywords')}"/>
+<meta name="description" content="{:get_seo_str('home','home_description')}"/>
+{/block}
 <!-- 主体 -->
 {block name="body"}
 	{include file="common/header" nav='info' /}
@@ -461,11 +468,34 @@
 <!-- /主体 -->
 
 <!-- 脚本 -->
-{block name="script"}
-	<!-- Main JS -->
-	<script src="{__STATIC__}/home/script/main.js?v={$conf.version}"></script>
+{block name="script"}	
     <script>
 		$(document).ready(function() {
+			$('.slider_list').owlCarousel({
+				loop: true,
+				autoplay: true,
+				autoplayTimeout: 5000,
+				dots: false,
+				nav: false,
+				navText: ["<i class='bi bi-arrow-left''></i>", "<i class='bi bi-arrow-right''></i>"],
+				responsive: {
+				0: {
+					items: 1
+				},
+				768: {
+					items: 1
+				},
+				992: {
+					items: 1
+				},
+				1000: {
+					items: 1
+				},
+				1920: {
+					items: 1
+				}
+				}
+			})
 		});
     </script>
 {/block}

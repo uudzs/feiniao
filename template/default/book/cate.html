@@ -2,10 +2,11 @@
 {block name="style"}
 {/block}
 {block name="title"}
-<title>敬请期待-{$conf.title}</title>
+<title>{:get_seo_str('classify','classify_title','',['cateid'=>$id])}</title>	
 {/block}
 {block name="keywords"}
-
+<meta name="keywords" content="{:get_seo_str('classify','classify_keywords','',['cateid'=>$id])}"/>
+<meta name="description" content="{:get_seo_str('classify','classify_description','',['cateid'=>$id])}"/>
 {/block}
 <!-- 主体 -->
 {block name="body"}

@@ -80,6 +80,27 @@ class Conf extends BaseController
         }
     }
 
+    public function test()
+    {
+        $param = get_params();
+        if (request()->isAjax()) {
+            $type = $param['type'];
+            unset($param['type']);
+            if (empty($type)) {
+                return to_assign(1, "参数为空");
+            }
+            $res = [];
+            foreach ($param as $key => $value) {
+                $res[$key] = '';
+                if (empty($value)) {
+                    continue;
+                }
+                $res[$key] = get_seo_str($type, $key, $value, []);
+            }
+            return table_assign(0, '', ['data' => implode('<hr class="layui-border-green">', $res)]);
+        }
+    }
+
     //编辑配置信息
     public function edit()
     {
@@ -103,10 +124,10 @@ class Conf extends BaseController
             $class = strtolower(app('request')->controller());
             $action = strtolower(app('request')->action());
             $template = $module . '/view/' . $class . '/' . $conf['name'] . '.html';
-            $config = [];   
+            $config = [];
             if ($conf['content']) {
                 $config = unserialize($conf['content']);
-            }            
+            }
             $themes = list_dir('template');
             if ($config && is_array($config) && !isset($config['template'])) {
                 $config['template'] = isset($themes[0]) ? $themes[0] : '';

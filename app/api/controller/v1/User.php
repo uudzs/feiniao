@@ -73,6 +73,50 @@ class User extends BaseController
     }
 
     /**
+     * 添加或取消关注
+     * Summary of favorites
+     * @return void
+     */
+    public function follow()
+    {
+        $param = get_params();
+        $from_id = isset($param['from_id']) ?  intval($param['from_id']) : 0; //ID
+        $type = isset($param['type']) ? intval($param['type']) : 1; //1作者2用户
+        if (empty(JWT_UID)) {
+            $this->apiError('请先登录', [], 99);
+        }
+        if (empty($from_id)) {
+            $this->apiError('参数错误');
+        }
+        if (JWT_UID == $from_id) {
+            $this->apiError('不能关注自己');
+        }
+        $user = Db::name('user')->where(['id' => JWT_UID])->find();
+        if (empty($user)) {
+            $this->apiError('用户不存在');
+        }
+        $follow = Db::name('follow')->where(['user_id' => JWT_UID, 'from_id' => $from_id])->find();
+        if (empty($follow)) {
+            $data = array(
+                "user_id" => JWT_UID,
+                "type" => $type,
+                "from_id" => $from_id,
+                "create_time" => time(),
+            );
+            $fid = Db::name('follow')->strict(false)->field(true)->insertGetId($data);
+            if ($fid != false) {
+                $this->apiSuccess('添加成功', ['fid' => $fid]);
+            } else {
+                $this->apiError('添加失败');
+            }
+        } else {
+            //取消关注！
+            Db::name('follow')->where(['user_id' => JWT_UID, 'from_id' => $from_id])->delete();
+            $this->apiSuccess('取消成功', []);
+        }
+    }
+
+    /**
      * 上传头像
      * Summary of avatar
      * @return void

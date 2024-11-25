@@ -13,9 +13,4 @@ class Emptys extends BaseController
     {
         return view('404');
     }
-
-    public function pageupdate()
-    {
-        return hook("makehtml", ['type' => 'update']);
-    }
 }

@@ -212,7 +212,7 @@ a.creat-accout-btn:hover::before,
     color: #fff;
 }
 
-.top-manu .creat-accout-btn {
+.creat-accout-btn {
     background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
     color: #fff !important;
     padding: 6px 13px;

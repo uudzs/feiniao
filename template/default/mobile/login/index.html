@@ -23,7 +23,7 @@ $site_title = '登录';
                 <div class="span1">
                     <div class="bui-input user-input">
                         <i class="icon-phone">&#xe603;</i>
-                        <input type="text" name="mobile" placeholder="手机号码" value="18910328479" b-model="login.userinfo.mobile" b-blur="login.check" rule="^\d{11}" tip="请输入正确的手机号码">
+                        <input type="text" name="mobile" placeholder="手机号码" value="" b-model="login.userinfo.mobile" b-blur="login.check" rule="^\d{11}" tip="请输入正确的手机号码">
                         <i class="icon-remove" b-show="login.userinfo.mobile" b-click="login.clear('userinfo.mobile')"></i>
                     </div>
                 </div>
@@ -32,7 +32,7 @@ $site_title = '登录';
                 <div class="span1">
                     <div class="bui-input">
                         <i class="icon-safe"></i>
-                        <input type="text" name="code" placeholder="验证码" value="446772" b-model="login.userinfo.code" maxlength="6">
+                        <input type="text" name="code" placeholder="验证码" value="" b-model="login.userinfo.code" maxlength="6">
                         <i class="icon-remove" b-show="login.userinfo.code" b-click="login.clear('userinfo.code')"></i>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\home\controller;
@@ -19,6 +20,7 @@ class Chapter extends BaseController
      */
     public function detail()
     {
+        hook("runcache");
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         if (empty($id)) {
@@ -38,10 +40,7 @@ class Chapter extends BaseController
         View::assign('id', $id);
         View::assign('bookid', $chapter['bookid']);
         View::assign('chapterlsit', $list);
-        if (!Request::isMobile() && !isWeChat()) {
-			hook("makehtml", ['content' => View::fetch()]);
-		}
+        hook("makehtml", ['content' => View::fetch()]);
         return view();
     }
-
 }

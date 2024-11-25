@@ -19,15 +19,14 @@ class Book extends BaseController
      */
     public function cate()
     {
+        hook("runcache");
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         $category = Db::name('category')->where(['id' => $id])->find();
         View::assign('category', $category);
         View::assign('catid', $id);
         View::assign('id', $id);
-        if (!Request::isMobile() && !isWeChat()) {
-			hook("makehtml", ['content' => View::fetch()]);
-		}
+        hook("makehtml", ['content' => View::fetch()]);
         return view();
     }
 
@@ -37,9 +36,8 @@ class Book extends BaseController
      */
     public function list()
     {
-        if (!Request::isMobile() && !isWeChat()) {
-			hook("makehtml", ['content' => View::fetch()]);
-		}
+        hook("runcache");
+        hook("makehtml", ['content' => View::fetch()]);
         return view();
     }
 
@@ -49,15 +47,14 @@ class Book extends BaseController
      */
     public function detail()
     {
+        hook("runcache");
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         if (intval($id) > 0) {
             Db::name('book')->where('id', $id)->inc('hits')->update();
         }
         View::assign('bid', $id);
-        if (!Request::isMobile() && !isWeChat()) {
-			hook("makehtml", ['content' => View::fetch()]);
-		}
+        hook("makehtml", ['content' => View::fetch()]);
         return view();
     }
 }

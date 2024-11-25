@@ -1,6 +1,13 @@
 {extend name="common/base"/}
 {block name="style"}
 {/block}
+{block name="title"}
+<title>{:get_seo_str('author','author_title','',['authorid'=>$id])}</title>	
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{:get_seo_str('author','author_keywords','',['authorid'=>$id])}"/>
+<meta name="description" content="{:get_seo_str('author','author_description','',['authorid'=>$id])}"/>
+{/block}
 {block name="body"}
 {php}
 $site_title = '作品列表';

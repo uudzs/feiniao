@@ -1,0 +1,591 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+.layui-input-wrap {
+    min-width: 75%;
+}
+.layui-text-em {
+    min-width: 20%;
+    color: #333!important;
+    text-align: right;
+}
+.layui-td-gray {
+    text-align: center;
+    min-width: 120px;
+}
+.test {
+    text-align: center;
+    min-width:auto;
+    max-width: 100px;
+}
+.layui-elem-quote code:not(.layui-code,.layui-code-wrap) {
+    margin: 0 3px;
+    padding: 3px 6px;
+    background-color: #d7eefc;
+    border-radius: 2px;
+    transition: all .3s;
+}
+</style>
+<form class="layui-form p-4">
+	<h3 class="pb-3">SEO配置</h3>
+    <blockquote class="layui-elem-quote">
+        <p>SEO标签：{:implode('、', get_seo_str('key'))}</p>
+        <p>{年份}标签对应显示为：{php}echo date('Y');{/php}， 会自动以获取当前年份显示。应用案例：{php}echo date('Y');{/php}年最新热门小说。</p>
+        <p>特殊标签：<code>{作品简介|len=50}</code>则表示只取简介前50个字，不设置长度会自动截取允许的最大字数，并且会过滤换行等特殊html标签，此标签不支持重复使用。</p>
+        <p>SEO说明：请对应填写，指定标签只能在指定页面才会生效，比如<code>{书名}</code>就不能用于栏目页或首页。</p>
+        <p>操作说明：点测试时需要保存公共标签的设置，不然测试结果还会返回旧的公共标签内容，如未更改公共标签可忽略。</p>
+    </blockquote>
+	<table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray">网站名</td>
+            <td colspan="2">
+                <div class="layui-input-inline">
+                    {empty name="$config.site_title"}
+                        <input type="text" value="" name="site_title" placeholder="请设置相关SEO内容" class="layui-input">
+                    {else/}
+                        <input type="text" value="{$config.site_title}" name="site_title" placeholder="请设置相关SEO内容" class="layui-input">
+                    {/empty}
+                </div>
+                <div class="layui-input-inline">这里的名称只用于SEO显示，不影响网站设置中的网站名称项，如这里为空会默认取网站设置中的网站名称。</div>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">作品是否加书名号</td>
+            <td colspan="2">
+                <div class="layui-input-inline">
+                    {empty name="$config.book_mark"}
+                        <input type="radio" name="book_mark" value="2" title="否">
+                        <input type="radio" name="book_mark" value="1" title="是" checked>
+                    {else/}
+                        <input type="radio" name="book_mark" value="2" title="否"{eq name="$config.book_mark" value="2"} checked{/eq}>
+                        <input type="radio" name="book_mark" value="1" title="是"{eq name="$config.book_mark" value="1"} checked{/eq}>
+                    {/empty}
+                </div>
+                <div class="layui-input-inline">如选是则所有作品称都会加上书名号，否则选否进行手动设置。</div>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">作品名分割符</td>
+            <td colspan="2">
+                <div class="layui-input-inline">
+                    {empty name="$config.book_split"}
+                        <input type="text" value="" name="book_split" placeholder="建议中英文逗号或横线来区分" class="layui-input">
+                    {else/}
+                        <input type="text" value="{$config.book_split}" name="book_split" placeholder="请设置相关SEO内容" class="layui-input">
+                    {/empty}
+                </div>
+                <div class="layui-input-inline">此设置只对{作者所有作品名}和{作品标签}标签有效。</div>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">域名</td>
+            <td colspan="2">
+                <div class="layui-input-inline">
+                    {empty name="$config.domain"}
+                        <input type="text" value="" name="domain" placeholder="对应{域名}标签" class="layui-input">
+                    {else/}
+                        <input type="text" value="{$config.domain}" name="domain" placeholder="对应{域名}标签" class="layui-input">
+                    {/empty}
+                </div>
+                <div class="layui-input-inline">对应{域名}标签内容。</div>
+            </td>
+        </tr>
+		<tr>
+			<td class="layui-td-gray">首页</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_title"}
+                            <input type="text" value="" name="home_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.home_title}" name="home_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_keywords"}
+                            <input type="text" value="" name="home_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.home_keywords}" name="home_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.home_description"}
+                            <input type="text" value="" name="home_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.home_description}" name="home_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="home">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">栏目页</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.classify_title"}
+                            <input type="text" value="" name="classify_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.classify_title}" name="classify_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.classify_keywords"}
+                            <input type="text" value="" name="classify_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.classify_keywords}" name="classify_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.classify_description"}
+                            <input type="text" value="" name="classify_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.classify_description}" name="classify_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="classify">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">书库</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.shuku_title"}
+                            <input type="text" value="" name="shuku_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.shuku_title}" name="shuku_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.shuku_keywords"}
+                            <input type="text" value="" name="shuku_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.shuku_keywords}" name="shuku_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.shuku_description"}
+                            <input type="text" value="" name="shuku_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.shuku_description}" name="shuku_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="shuku">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">排行</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.top_title"}
+                            <input type="text" value="" name="top_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.top_title}" name="top_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.top_keywords"}
+                            <input type="text" value="" name="top_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.top_keywords}" name="top_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.top_description"}
+                            <input type="text" value="" name="top_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.top_description}" name="top_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="top">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">全本</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.quanben_title"}
+                            <input type="text" value="" name="quanben_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.quanben_title}" name="quanben_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.quanben_keywords"}
+                            <input type="text" value="" name="quanben_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.quanben_keywords}" name="quanben_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.quanben_description"}
+                            <input type="text" value="" name="quanben_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.quanben_description}" name="quanben_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="quanben">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">书页</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.book_title"}
+                            <input type="text" value="" name="book_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.book_title}" name="book_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.book_keywords"}
+                            <input type="text" value="" name="book_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.book_keywords}" name="book_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.book_description"}
+                            <input type="text" value="" name="book_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.book_description}" name="book_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="book">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">作者</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.author_title"}
+                            <input type="text" value="" name="author_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.author_title}" name="author_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.author_keywords"}
+                            <input type="text" value="" name="author_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.author_keywords}" name="author_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.author_description"}
+                            <input type="text" value="" name="author_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.author_description}" name="author_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="author">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">目录页</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.chapter_list_title"}
+                            <input type="text" value="" name="chapter_list_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.chapter_list_title}" name="chapter_list_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.chapter_list_keywords"}
+                            <input type="text" value="" name="chapter_list_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.chapter_list_keywords}" name="chapter_list_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.chapter_list_description"}
+                            <input type="text" value="" name="chapter_list_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.chapter_list_description}" name="chapter_list_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="chapter_list">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">章节页</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.chapter_title"}
+                            <input type="text" value="" name="chapter_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.chapter_title}" name="chapter_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.chapter_keywords"}
+                            <input type="text" value="" name="chapter_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.chapter_keywords}" name="chapter_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.chapter_description"}
+                            <input type="text" value="" name="chapter_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.chapter_description}" name="chapter_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="chapter">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">邀请</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.invite_title"}
+                            <input type="text" value="" name="invite_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.invite_title}" name="invite_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.invite_keywords"}
+                            <input type="text" value="" name="invite_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.invite_keywords}" name="invite_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.invite_description"}
+                            <input type="text" value="" name="invite_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.invite_description}" name="invite_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="invite">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">任务</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.task_title"}
+                            <input type="text" value="" name="task_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.task_title}" name="task_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.task_keywords"}
+                            <input type="text" value="" name="task_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.task_keywords}" name="task_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.task_description"}
+                            <input type="text" value="" name="task_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.task_description}" name="task_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="task">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+	</table>
+	<div class="py-3">
+        <input type="hidden" name="id" value="{$id}">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});
+
+        //监听测试
+		form.on('submit(test)', function(data) {
+            var inputs = $(this).parents('tr').find('input');
+            var arr = {};
+            inputs.map(function() {
+                return arr[$(this).attr('name')] = $(this).val();
+            });
+            $.ajax({
+                url: "{:url('conf/test')}",
+                type: 'post',
+                data: arr,
+                async: true,
+                success: function(e) {
+                    if (e.code == 0) {
+                        var html = '';
+                        if(e.data.length>0){
+                            layer.open({
+                                type: 1, // page 层类型
+                                area: ['80%', '250px'],
+                                title: '测试结果每一项都加了随机，请忽略数据不一致的问题。',
+                                shade: 0.6, // 遮罩透明度
+                                shadeClose: true, // 点击遮罩区域，关闭弹层
+                                maxmin: true, // 允许全屏最小化
+                                anim: 0, // 0-6 的动画形式，-1 不开启
+                                content: '<div style="padding: 20px;">'+e.data+'</div>'
+                            });
+                        }else{
+                            $('.panel-more').remove();
+                        }
+                    } else {
+                        return layer.msg(e.msg);
+                    }
+                }
+            });
+            return false;
+		})
+	}
+</script>
+{/block}
+<!-- /脚本 -->

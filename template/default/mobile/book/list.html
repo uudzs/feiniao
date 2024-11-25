@@ -1,6 +1,13 @@
 {extend name="common/base"/}
 {block name="style"}
 {/block}
+{block name="title"}
+<title>{:get_seo_str('shuku','shuku_title')}</title>	
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{:get_seo_str('shuku','shuku_keywords')}"/>
+<meta name="description" content="{:get_seo_str('shuku','shuku_description')}"/>
+{/block}
 {block name="body"}
 {php}
 $site_title = '作品列表';

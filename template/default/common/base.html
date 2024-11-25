@@ -16,8 +16,8 @@
 		<title>{$conf.title}</title>		
 	{/block}
 	{block name="keywords"}
-		<meta name="keywords" content="{$conf.keywords}"/>
-		<meta name="description" content="{$conf.desc}"/>
+		<meta name="keywords" content="{$conf.title}"/>
+		<meta name="description" content="{$conf.title}"/>
 	{/block}
 	{block name="css"}
 		<link rel="stylesheet" href="{__STATIC__}/home/style/swap.css?v={$conf.version}" rel="stylesheet">
@@ -39,9 +39,18 @@
 		<link rel="stylesheet" href="{__STATIC__}/home/style/style.css?v={$conf.version}">
 		<!-- Responsive Style CSS -->
 		<link rel="stylesheet" href="{__STATIC__}/home/style/responsive.css?v={$conf.version}">
+		<!-- layui css -->
+		<link rel="stylesheet" href="{__ASSETS__}/layui/css/layui.css?v={$conf.version}">
 	{/block}
 	{block name="style"}{/block}
 	{block name="js"}
+		<script>
+			var tokenurl = "{:furl('v1/gettoken', [], true, 'api')}";
+			var loginurl = "{:furl('login', [], true, 'home')}";
+			var sessionname = "{:get_config('app.session_user')}";
+			var sessioninvitename = "{:get_config('app.session_invite')}";
+			var token;
+		</script>
 		<!-- jQuery -->
 		<script src="{__STATIC__}/home/script/jquery-3.6.2.min.js?v={$conf.version}"></script>
 		<!-- Bootstrap Popper JS -->
@@ -60,7 +69,11 @@
 		<!-- mobile manu js -->
 		<script src="{__STATIC__}/home/script/jquery.meanmenu.js?v={$conf.version}"></script>
 		<!-- back to top js -->
-		<script src="{__STATIC__}/home/script/backtotop.js?v={$conf.version}"></script>		
+		<script src="{__STATIC__}/home/script/backtotop.js?v={$conf.version}"></script>
+		<!-- layui js -->
+		<script src="{__ASSETS__}/layui/layui.js?v={$conf.version}"></script>
+		<!-- main js -->
+		<script src="{__STATIC__}/home/script/main.js?v={$conf.version}"></script>
 	{/block}
 </head>
 <body>

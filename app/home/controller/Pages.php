@@ -14,6 +14,7 @@ class Pages extends BaseController
 {
 	public function detail()
 	{
+		hook("runcache");
 		$param = get_params();
 		$name = isset($param['name']) ? trim($param['name']) : '';
 		if (empty($name)) {
@@ -40,9 +41,7 @@ class Pages extends BaseController
 		$detail['keyword_array'] = $keyword_array;
 		PagesModel::where('id', $detail['id'])->inc('read')->update();
 		View::assign('detail', $detail);
-		if (!Request::isMobile() && !isWeChat()) {
-			hook("makehtml", ['content' => View::fetch($detail['template'])]);
-		}
+		hook("makehtml", ['content' => View::fetch($detail['template'])]);
 		return view($detail['template']);
 	}
 }

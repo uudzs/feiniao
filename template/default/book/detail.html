@@ -1,22 +1,309 @@
 {extend name="common/base"/}
 {block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/book-detail.css?v={$conf.version}">
 {/block}
 {block name="title"}
-<title>敬请期待-{$conf.title}</title>
+<title>{:get_seo_str('book','book_title','',['bookid'=>$bid])}</title>	
 {/block}
 {block name="keywords"}
-
+<meta name="keywords" content="{:get_seo_str('book','book_keywords','',['bookid'=>$bid])}"/>
+<meta name="description" content="{:get_seo_str('book','book_description','',['bookid'=>$bid])}"/>
 {/block}
 <!-- 主体 -->
 {block name="body"}
 {include file="common/header" nav='index' /}
-<div class="container" style="display: flex; height: 60vh; align-items: center; justify-content: center;">
-敬请期待！
+<style>
+
+</style>
+<div class="container book-detail">
+    {php}$book = model('book')->where(['id'=>$bid, 'status' => 1])->find();{/php}
+    {notempty name="book"}
+        {php}
+        if($book['genre']) {
+            $genrename = model('category')->where(['status' => 1, 'id' => $book['genre']])->value('name');
+            $genrelink = url('book_cates', ['id' => $book['genre']]);
+        }
+        if($book['subgenre']) {
+            $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
+            $subgenrelink = url('book_cates', ['id' => $book['genre']]);
+        }
+        $author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();        
+        $chapterlist = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
+        if(!empty($chapterlist)) {
+            $last_chapter = end($chapterlist);
+            $new_chapter = array_reverse(array_slice($chapterlist, -6));
+            $front_chapter = array_slice($chapterlist, 0, 10);
+        } else {
+            $last_chapter = [];
+            $new_chapter = [];
+            $front_chapter = [];
+        }
+        if (!empty($book['remark'])) {
+            $book['remark'] = htmlspecialchars_decode($book['remark']);
+            $replace = array("&nbsp;", "<br>", "<br>");
+            $search = array(" ", "\n", '\n');
+            $book['remark'] = str_replace($search, $replace, $book['remark']);
+        }
+        $book_list = model('book')->field('id')->where(['status' => 1, 'authorid' => $book['authorid']])->select()->toArray();
+        if(!empty($book_list)) {
+            $book_count = count($book_list);            
+            $bids = array_column($book_list, 'id');
+            $bid_in = implode(',', $bids);
+            $fav_count = model('favorites')->where('pid','in',$bid_in)->count();
+        } else {
+            $book_count = 0;
+            $fav_count = 0;
+        }        
+        $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
+        $follow_count = model('follow')->where(['from_id' => $book['authorid']])->count();
+        {/php}
+        <div class="crumbs"><a href="{:url('/')}">首页</a>{notempty name="$genrename"}<a href="{$genrelink}">{$genrename}</a>{/notempty}{notempty name="$subgenrename"}<a href="{$subgenrelink}">{$subgenrename}</a>{/notempty}<h2>{$book.title}</h2></div>
+        <section class="header">
+            <div class="book-cover">
+                <img src="{:get_file($book.cover)}" class="book-cover__img" alt="{$book.title}">
+            </div>
+            <section class="book-info">
+                <h1 class="book-info__title">{$book.title}</h1>
+                <div class="book-info__meta"><a class="author book-info__author" href="{:url('author_detail',['id'=>$book['authorid']])}">{$book.author}</a>
+                    {eq name="$book.isfinish" value="2"}
+                    <div class="isfinish">完结</div>
+                    {/eq}
+                </div>
+                <p class="book-info__categories">
+                    {notempty name="$genrename"}
+                    <a class="category" href="{$genrelink}">{$genrename}</a>
+                    {/notempty}
+                    {notempty name="$subgenrename"}
+                    <a class="category" href="{$subgenrelink}">{$subgenrename}</a>
+                    {/notempty}
+                    <span>{:wordCount($book_words_count)}</span>
+                </p>
+                {notempty name="$last_chapter"}
+                <p class="book-info__time">
+                    <span>更新时间：{:time_format($last_chapter.create_time,'Y-m-d')}</span>
+                    <a class="book-info__lastChapter ypc-link" href="{:url('chapter_detail',['id'=>$last_chapter['id']])}" target="_blank"> 最新章节：{$last_chapter.title}</a>
+                </p>
+                {/notempty}
+                <div class="btn-box">
+                    <a href="javascript:;" class="creat-accout-btn"> 立即阅读 </a>
+                    <div class="btn-buttom favorites"><i class="bi bi-hdd-stack"></i>书架</div>
+                    <div class="btn-buttom"><i class="bi bi-cloud-arrow-down"></i>下载</div>
+                    <div class="btn-buttom"><i class="bi bi-headphones"></i>听书</div>
+                    <button class="ym-btn ym-btn-danger ym-btn-large mobile_watch">手机观看<div class="mobile_qrcode"></div></button>                    
+                </div>
+            </section>
+            <section class="author-info"  >
+                <a href="{:url('author_detail',['id'=>$book['authorid']])}" target="_blank" class="author-info--img">
+                    <img class="author-info-via" src="{:get_file($author.headimg)}" lazy="loaded">
+                </a>
+                <a href="{:url('author_detail',['id'=>$book['authorid']])}" target="_blank" class="author-info--name">{$book.author}</a>
+                {eq name="$author.issign" value="1"}
+                    <div class="author-info--badges">
+                        <span class="author-info--badges-sign"><img src="{__ASSETS__}/init/images/sign_ico.png" alt="签约作家"></span>
+                    </div>
+                {else/}
+                    <div class="author-info--badges" style="margin-bottom: 20px;"></div>
+                {/eq}
+                <div class="author-info--outputs" >
+                    <div>
+                        <span><b>{$book_count}</b></span>
+                        <p>作品数</p>
+                    </div>
+                    <div>
+                        <span><b>{$follow_count}</b></span>
+                        <p>粉丝数</p>
+                    </div>
+                    <div>
+                        <span><b>{$fav_count}</b></span>
+                        <p>收藏数</p>
+                    </div>
+                </div>
+                <div class="author-info--desc"><img src="{__STATIC__}/home/image/author-publicize.png"></div>
+                <div class="author-info--btn"><span><i class="bi bi-person-plus-fill"></i> 加关注</span></div>
+            </section>
+        </section>
+        <section class="detail-card detail-card-intro">
+            <p class="ypc-column-name">书籍简介</p>
+            <div class="intro">
+                <div class="intro-content">{$book.remark|raw}</div>            
+            </div>
+        </section>
+        {notempty name="$new_chapter"}
+        <section class="detail-card detail-card-catalogue">
+            <h2 class="ypc-column-name">最新章节</h2>
+            <ul class="catalogue">
+                {volist name="$new_chapter" id="v"}
+                    <li class="catalogue-list">
+                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
+                            <span class="catalogue-list__title">{$v.title}</span>
+                            <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
+                        </a>
+                    </li>
+                {/volist}
+            </ul>
+        </section>
+        {/notempty}
+        {php}
+        if($book['genre']) {
+            $similar = model('book')->field('id,cover,title')->where(['status' => 1, 'genre' => $book['genre']])->order('hits desc')->limit(8)->select()->toArray();
+        } else {
+            $similar = '';
+        }
+        {/php}
+        {notempty name="$similar"}
+            <section class="detail-card detail-card-hot">
+                <p class="ypc-column-name">同类热门书</p>
+                <ul class="hot">
+                    {volist name="$similar" id="v"}
+                        <li class="hot-list">
+                            <div class="book-vertical">
+                                <a href="{:url('book_detail',['id'=>$v['id']])}" title="{$v.title}">
+                                    <div class="cover w130" lazy="loading" style="background-image: url('{:get_file($v.cover)}');"></div>
+                                </a>
+                                <a title="{$v.title}" href="{:url('book_detail',['id'=>$v['id']])}">
+                                    <h4 class="book-title">{$v.title}</h4>
+                                </a>
+                            </div>
+                        </li>
+                    {/volist}
+                </ul>
+            </section>
+        {/notempty}
+        {notempty name="$front_chapter"}
+            <section class="detail-card detail-card-catalogue">
+                <div class="all">
+                    <p class="ypc-column-name">全部章节</p>
+                    <div class="link-entry all-chapter">查看全部</div>
+                </div>
+                <ul class="catalogue">
+                    {volist name="$front_chapter" id="v"}
+                        <li class="catalogue-list">
+                            <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
+                                <span class="catalogue-list__title">{$v.title}</span>
+                                <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
+                            </a>
+                        </li>
+                    {/volist}                   
+                </ul>
+            </section>
+        {/notempty}
+        {notempty name="$chapterlist"}
+        <div class="chapter-catalogue-box">
+            <ul>
+                {volist name="$chapterlist" id="v"}
+                <li><a href="{:url('chapter_detail',['id'=>$v['id']])}">{$v.title}</a></li>
+                {/volist}
+            </ul>
+        </div>
+        {/notempty}       
+        {php}
+        if($book['genre']) {
+            $new_book = model('book')->field('id,cover,title,author,authorid,words,remark,isfinish')->where(['status' => 1, 'genre' => $book['genre']])->order('create_time desc')->limit(9)->select()->toArray();
+        } else {
+            $new_book = '';
+        }
+        {/php}
+        {notempty name="$new_book"}
+        <section class="detail-card detail-card-recently">
+            <p class="ypc-column-name">最新上架</p>
+            <ul class="recently">
+                {volist name="$new_book" id="v"}
+                    <li class="recently-list">
+                        <div class="book-simple">
+                            <a href="{:url('book_detail',['id'=>$v['id']])}" title="{$v.title}">
+                                <div class="cover w90" lazy="loading" style="background-image: url('{:get_file($v.cover)}');"></div>
+                            </a>
+                            <div class="book-info">
+                                <div class="book-head">
+                                    <a href="{:url('book_detail',['id'=>$v['id']])}" title="{$v.title}">
+                                        <h4 class="book-title">{$v.title}</h4>
+                                    </a>
+                                </div>
+                                <div class="book-intro">{:dsubstr($v.remark,80)}</div>
+                                <div class="book-other">
+                                    <div class="book-survey">
+                                        <span class="author">{$v.author}</span>
+                                        <span class="rect">{eq name="v.isfinish" value="2"}完结{else/}连载{/eq}</span>
+                                        <span class="rect">{:wordCount($v.words)}</span>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {/volist}
+            </ul>
+        </section>
+        {/notempty}
+    {else/}
+        <div style="display: flex;justify-content: center;align-items: center;margin: 20rem auto;">
+            <img src="{__STATIC__}/home/images/logo-invite.png" alt="">
+            作品不存在！
+        </div>        
+    {/notempty}
 </div>
 {/block}
 <!-- 脚本 -->
 {block name="script"}
+<script src="{__STATIC__}/home/script/jquery.qrcode.min.js?v={$conf.version}"></script>
 <script>
+    $(window).on('load', function () {
+        var bookinfo = [];
+        $.postApi("{:furl('v1/bookdetail', ['id' => $bid], true, 'api')}", {}, function(result) {
+            if(result.code == 0) {
+                bookinfo = result.data || [];
+                if(bookinfo) {
+                    $('.creat-accout-btn').attr('href', bookinfo.chapter_url);
+                    if(bookinfo.fav.id > 0) {
+                        $('.favorites').html('<i class="bi bi-hdd-stack"></i>取消');
+                    }
+                    if(bookinfo.follow.id > 0) {
+                        $('.author-info--btn').html('<span><i class="bi bi-person-check-fill"></i> 已关注</span>');
+                    }
+                }
+            } else {
+                layer.msg(result.msg);
+            }
+        });
+        $('.mobile_qrcode').qrcode({
+            render: "canvas",// 可切换为 table，默认 canvas
+            width: 100,// 宽度，单位 px
+            height: 100,// 高度，单位 px            
+            correctLevel: 0,// 纠错等级 0 1 2 3
+            text: "{:url('book_detail',['id'=>$bid],true,true)}"
+        });
+        $('.favorites').on('click', function () {
+            var text = $(this).text().split(' ').join('');
+            $.postApi("{:furl('v1/favorites', [], true, 'api')}", {"bookid": bookinfo.id}, function(result) {
+                layer.msg(result.msg);
+                if(result.code == 0) {
+                    if(text == '书架') $('.favorites').html('<i class="bi bi-hdd-stack"></i>取消');
+                    if(text == '取消') $('.favorites').html('<i class="bi bi-hdd-stack"></i>书架');
+                }
+            });
+        })
+        $('.author-info--btn').on('click', function () {
+            var text = $(this).text().split(' ').join('');
+            $.postApi("{:furl('v1/follow', [], true, 'api')}", {"from_id": bookinfo.authorid, "type": 1}, function(result) {
+                layer.msg(result.msg);
+                if(result.code == 0) {
+                    if(text == '加关注') $('.author-info--btn').html('<span><i class="bi bi-person-check-fill"></i> 已关注</span>');
+                    if(text == '已关注') $('.author-info--btn').html('<span><i class="bi bi-person-plus-fill"></i> 加关注</span>');
+                }
+            });
+        })
+        $('.all-chapter').on('click', function () {
+            layer.open({
+                type: 1,
+                area: ['80%', '50%'],
+                title: '章节目录',
+                shade: 0.6,
+                shadeClose: true,
+                maxmin: true,
+                anim: 0,
+                content: '<div class="chapter-catalogue">' + $(".chapter-catalogue-box").html() + '</div>'
+            });
+        })
+    });
 </script>
 {/block}
 <!-- /脚本 -->

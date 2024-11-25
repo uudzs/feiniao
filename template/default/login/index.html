@@ -1,0 +1,154 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/login.css?v={$conf.version}">
+{/block}
+{block name="title"}
+<title>登录-{$conf.title}</title>	
+{/block}
+{block name="body"}
+<div class="main-body">
+    <div class="login-main">
+        <div class="login-top">
+            <span>{:get_system_config('web','title')}登录</span>
+            <span class="bg1"></span>
+            <span class="bg2"></span>
+        </div>
+        <div class="layui-form login-bottom">
+            <div class="center">
+                <div class="item">
+                    <span class="icon icon-2"></span>
+                    <input type="text" name="username" lay-verify="required" placeholder="请输入登录账号" maxlength="24">
+                </div>
+                <div class="item">
+                    <span class="icon icon-3"></span>
+                    <input type="password" name="password" lay-verify="required" placeholder="请输入密码" maxlength="20">
+                    <span class="bind-password icon icon-4"></span>
+                </div>
+                <div id="validatePanel" class="item" style="width: 137px;">
+                    <span class="icon icon-7"></span>
+                    <input type="text" name="captcha" placeholder="请输入验证码" maxlength="6">
+                    <img id="refreshCaptcha" class="validateImg" src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?seed='+Math.random()">
+                </div>
+                <div class="tip">
+                    <input type="checkbox" name="agree" lay-skin="primary" title="同意" lay-filter="agree">   
+                    <span class="agreement">《用户协议》</span><span class="privacy">《隐私政策》</span>
+                </div>
+            </div>
+            <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
+                <button class="login-btn" lay-submit="" lay-filter="login">立即登录</button>
+            </div>
+        </div>
+    </div>
+</div>
+{php}
+$agreement = model('pages')->where(['status' => 1, 'name' => 'agreement'])->value('content');
+$privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('content');
+{/php}
+{/block}
+{block name="script"}
+<script>
+    $(window).on('load', function () {
+        var refererUrl = '{$refererUrl}';
+        layui.use(['form', 'jquery'], function () {
+            var $ = layui.jquery,
+            form = layui.form,
+            layer = layui.layer;
+            var agree = false;
+            form.on('checkbox(agree)', function(data) {
+                if(data.elem.checked){
+                    agree = true;
+                } else {
+                    agree = false;
+                }
+            });
+            form.on('submit(login)', function (data) {
+                data = data.field;
+                if(!agree) {
+                    layer.msg('请先同意相关协议');
+                    return false;
+                }
+                if (data.username == '') {
+                    layer.msg('用户名不能为空');
+                    return false;
+                }
+                if (data.password == '') {
+                    layer.msg('密码不能为空');
+                    return false;
+                }
+                if (data.captcha == '') {
+                    layer.msg('验证码不能为空');
+                    return false;
+                }
+                let layerIndex = layer.load();
+                var invite_code = $.getCookie(sessioninvitename);
+                var postData = {"username": data.username, "password": data.password, "code": data.captcha, "invite_code": invite_code};
+                $.postApi("{:furl('v1/login', [], true, 'api')}", postData, function(result) {
+                    layer.close(layerIndex);
+                    layer.msg(result.msg);
+                    if(parseInt(result.code) == 0) {
+                        layui.data('feiniao', {
+                            key: 'token',
+                            value: result.data.token
+                        });
+                        window.location.href = refererUrl;
+                    } else {
+                        $('#refreshCaptcha').attr("src", "{:captcha_src()}" + "?" + Math.random());
+                    }
+                });                
+            });
+            return false;
+        });
+        $('.bind-password').on('click', function () {            
+            if ($(this).hasClass('icon-5')) {
+                $(this).removeClass('icon-5');
+                $("input[name='password']").attr('type', 'password');
+            } else {
+                $(this).addClass('icon-5');
+                $("input[name='password']").attr('type', 'text');
+            }
+        });
+        $('.agreement').on('click', function () {
+            layer.open({
+                type: 1,
+                area: ['80%', '50%'],
+                title: '用户协议',
+                shade: 0.6,
+                shadeClose: false,
+                maxmin: false,
+                btnAlign: 'c',
+                closeBtn: 0,
+                anim: 0,
+                content: `<div class="login_agreement">{$agreement|raw}</div>`,
+                btn: ['确定', '关闭'],
+                btn1: function(index, layero, that) {
+                    layer.close(index);
+                },
+                btn2: function(index, layero, that) {
+                    layer.close(index);
+                },
+            });
+        })        
+        $('.privacy').on('click', function () {
+            layer.open({
+                type: 1,
+                area: ['80%', '50%'],
+                title: '隐私政策',
+                shade: 0.6,
+                shadeClose: false,
+                maxmin: false,
+                btnAlign: 'c',
+                closeBtn: 0,
+                anim: 0,
+                content: `<div class="login_agreement">{$privacy|raw}</div>`,
+                btn: ['确定', '关闭'],
+                btn1: function(index, layero, that) {
+                    layer.close(index);
+                },
+                btn2: function(index, layero, that) {
+                    layer.close(index);
+                },
+            });
+        })        
+    });
+</script>
+{/block}

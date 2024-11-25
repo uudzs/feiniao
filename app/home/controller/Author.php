@@ -18,12 +18,11 @@ class Author extends BaseController
      */
     public function detail()
     {
+        hook("runcache");
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         View::assign('id', $id);
-        if (!Request::isMobile() && !isWeChat()) {
-			hook("makehtml", ['content' => View::fetch()]);
-		}
+        hook("makehtml", ['content' => View::fetch()]);
         return view();
     }
 }

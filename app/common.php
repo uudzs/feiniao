@@ -695,6 +695,7 @@ if (!function_exists('countWordsAndContent')) {
                 $str = preg_replace('/\s+/', '&nbsp;', $str);
                 $str = htmlspecialchars_decode($str);
                 $str = preg_replace("/\"/is", "", $str);
+                $str = str_replace('&emsp;', "", $str);
                 //$cnt = strip_tags(str_replace(array('&nbsp;'), "", $str));
                 $cnt = str_replace(array('&nbsp;', '<br>'), "", $str);
             }
@@ -1188,5 +1189,291 @@ if (!function_exists('model')) {
     function model($table)
     {
         return Db::name($table);
+    }
+}
+if (!function_exists('wordCount')) {
+    function wordCount($words)
+    {
+        if (!$words) return $words;
+        $words = intval($words);
+        if ($words > 1000 && $words < 10000) {
+            $words = sprintf("%.1f", $words / 1000) . '千字';
+        } else if ($words > 10000) {
+            $words = sprintf("%.1f", $words / 10000) . '万字';
+        } else {
+            $words = $words . '字';
+        }
+        return $words;
+    }
+}
+if (!function_exists('get_seo_str')) {
+    function get_seo_str($type, $name = '', $content = '', $data = [])
+    {
+        $tags = ['{网站名}', '{大类名}', '{小类名}', '{书名}', '{作品标签}', '{作品简介}', '{作品签约状态}', '{作者}', '{作者所有作品名}', '{作者注册时间}', '{作者签约状态}', '{点击量}', '{年份}', '{连载状态}', '{作品字数}', '{章节数}', '{章节名}', '{域名}', '{邀请金币}'];
+        if ($type == 'key') return $tags;
+        $system_config = get_system_config('web');
+        $seo_config = get_system_config('seo');
+        $site_title = (isset($seo_config['site_title']) && $seo_config['site_title']) ? $seo_config['site_title'] : $system_config['title'];
+        $domain = (isset($seo_config['domain']) && $seo_config['domain']) ? $seo_config['domain'] : '';
+        if (empty($content)) {
+            if (empty($type) || empty($name)) return $site_title;
+            if (!isset($seo_config[$name]) || empty($seo_config[$name])) return $site_title;
+            $content = $seo_config[$name];
+        }
+        if (empty($content)) return $site_title;
+        $year = date('Y');
+        $content = str_replace('{网站名}', $site_title, $content);
+        $content = str_replace('{年份}', $year, $content);
+        $content = str_replace('{域名}', $domain, $content);
+        switch ($type) {
+            case 'home':
+                # 首页
+                return $content;
+                break;
+            case 'classify':
+                # 栏目页
+                if (empty($data)) {
+                    $category = Db::name('category')->where("status", 1)->orderRaw('RAND()')->limit(1)->select()->toArray();
+                    $category = $category ? $category[0] : [];
+                }
+                if (isset($data['cateid']) && intval($data['cateid']) > 0) {
+                    $category = Db::name('category')->where(['id' => $data['cateid']])->find();
+                }
+                $genre = $subgenre = [];
+                if (!empty($category)) {
+                    if (intval($category['pid']) > 0) {
+                        $genre = Db::name('category')->where(['id' => $category['pid']])->find();
+                        $subgenre = $category;
+                    } else {
+                        $genre = $category;
+                    }
+                }
+                unset($category);
+                if (strpos($content, '{大类名}') !== false && $genre) {
+                    $content = str_replace('{大类名}', $genre['name'], $content);
+                } else {
+                    $content = str_replace('{大类名}', '', $content);
+                }
+                if (strpos($content, '{小类名}') !== false && $subgenre) {
+                    $content = str_replace('{小类名}', $subgenre['name'], $content);
+                } else {
+                    $content = str_replace('{小类名}', '', $content);
+                }
+                return $content;
+                break;
+            case 'shuku':
+                # 书库               
+                return $content;
+                break;
+            case 'top':
+                # 排行
+                return $content;
+                break;
+            case 'quanben':
+                # 全本
+                return $content;
+                break;
+            case 'invite':
+                # 邀请
+                if (strpos($content, '{邀请金币}') !== false) {
+                    $coin = get_system_config('reward', 'invite_reward');
+                    $content = str_replace('{邀请金币}', $coin, $content);
+                }
+                return $content;
+                break;
+            case 'task':
+                # 任务
+                return $content;
+                break;
+            case 'book':
+                # 书页
+                if (empty($data)) {
+                    $book = Db::name('book')->where("status", 1)->orderRaw('RAND()')->limit(1)->select()->toArray();
+                    $book = $book ? $book[0] : [];
+                }
+                if (isset($data['bookid']) && intval($data['bookid']) > 0) {
+                    $book = Db::name('book')->where(['id' => $data['bookid']])->find();
+                }
+                $content = seo_book_tag($content, $seo_config, $book);
+                return $content;
+                break;
+            case 'author':
+                # 作者
+                $author = [];
+                if (empty($data)) {
+                    $author = Db::name('author')->field('id,nickname,create_time,issign')->where("status", 1)->orderRaw('RAND()')->limit(1)->select()->toArray();
+                    $author = $author ? $author[0] : [];
+                }
+                if (isset($data['authorid']) && intval($data['authorid']) > 0) {
+                    $author = Db::name('author')->field('id,nickname,create_time,issign')->where(['id' => $data['authorid']])->find();
+                }
+                if (!empty($author)) {
+                    $content = str_replace('{作者}', $author['nickname'], $content);
+                    if (strpos($content, '{作者注册时间}') !== false) {
+                        $content = str_replace('{作者注册时间}', date('Y-m-d', $author['create_time']), $content);
+                    }
+                    if (strpos($content, '{作者签约状态}') !== false) {
+                        $content = str_replace('{作者签约状态}', (intval($author['issign']) == 1 ? '已签约' : '待签约'), $content);
+                    }
+                    if (strpos($content, '{作者所有作品名}') !== false) {
+                        $books = Db::name('book')->field('title')->where(['authorid' => $author['id']])->select()->toArray();
+                        $titles = [];
+                        foreach ($books as $k => $v) {
+                            if (intval($seo_config['book_mark']) == 1) {
+                                $titles[] = '《' . $v['title'] . '》';
+                            } else {
+                                $titles[] = $v['title'];
+                            }
+                        }
+                        $title_str = implode($seo_config['book_split'], $titles);
+                        $content = str_replace('{作者所有作品名}', $title_str, $content);
+                    }
+                } else {
+                    $content = str_replace('{作者}', '', $content);
+                    $content = str_replace('{作者注册时间}', '', $content);
+                    $content = str_replace('{作者签约状态}', '', $content);
+                    $content = str_replace('{作者所有作品名}', '', $content);
+                }
+                return $content;
+                break;
+            case 'chapter_list':
+                # 目录页
+                if (empty($data)) {
+                    $book = Db::name('book')->where("status", 1)->orderRaw('RAND()')->limit(1)->select()->toArray();
+                    $book = $book ? $book[0] : [];
+                }
+                if (isset($data['bookid']) && intval($data['bookid']) > 0) {
+                    $book = Db::name('book')->where(['id' => $data['bookid']])->find();
+                }
+                $content = seo_book_tag($content, $seo_config, $book);
+                return $content;
+                break;
+            case 'chapter':
+                # 章节页
+                if (empty($data)) {
+                    $chapter = Db::name('chapter')->where("status", 1)->orderRaw('RAND()')->limit(1)->select()->toArray();
+                    $chapter = $chapter ? $chapter[0] : [];
+                }
+                if (isset($data['chapterid']) && intval($data['chapterid']) > 0) {
+                    $chapter = Db::name('chapter')->where(['id' => $data['chapterid']])->find();
+                }
+                if (!empty($chapter)) {
+                    if (strpos($content, '{章节名}') !== false) {
+                        $content = str_replace('{章节名}', $chapter['title'], $content);
+                    }
+                    $book = Db::name('book')->where(['id' => $chapter['bookid']])->find();
+                    $content = seo_book_tag($content, $seo_config, $book);
+                } else {
+                    $content = str_replace('{章节名}', '', $content);
+                }
+                return $content;
+                break;
+            default:
+                return $content;
+                break;
+        }
+    }
+}
+if (!function_exists('seo_book_tag')) {
+    function seo_book_tag($content, $seo_config, $book)
+    {
+        if (!empty($book)) {
+            if (strpos($content, '{作品标签}') !== false) {
+                $label_str = '';
+                if (!empty($book['label'])) {
+                    $label =  explode(',', $book['label']);
+                    if (!empty($label)) {
+                        $label_str = implode($seo_config['book_split'], $book['label']);
+                    }
+                }
+                if (!empty($book['label_custom'])) {
+                    $label =  explode(',', $book['label_custom']);
+                    if (!empty($label)) {
+                        $label_str .= implode($seo_config['book_split'], $book['label_custom']);
+                    }
+                }
+                $content = str_replace('{作品标签}', $label_str, $content);
+            }
+            if (intval($seo_config['book_mark']) == 1) {
+                $content = str_replace('{书名}', ('《' . $book['title'] . '》'), $content);
+            } else {
+                $content = str_replace('{书名}', $book['title'], $content);
+            }
+            $content = str_replace('{作者}', $book['author'], $content);
+            list($num, $remark) = countWordsAndContent($book['remark']);
+            if ($num > 0) {
+                $remark = strip_tags($remark);
+                if (strpos($content, '{作品简介}') !== false) {
+                    $content = str_replace('{作品简介}', $remark, $content);
+                }
+                if (strpos($content, '{作品简介|len=') !== false) {
+                    $before = "{作品简介|len=";
+                    $end = "}";
+                    $pattern = "/" . $before . "(.*?)" . $end . "/U";
+                    preg_match_all($pattern, $content, $matches);
+                    if (isset($matches[1]) && isset($matches[1][1])) {
+                        $len = intval($matches[1][1]);
+                        if ($num > $len) {
+                            $remark = mb_substr($remark, 0, $len, 'UTF-8');
+                        }
+                        $content = preg_replace('/\{作品简介|len.*\}/i', $remark, $content);
+                    } else {
+                        $content = preg_replace('/\{作品简介|len.*\}/i', $remark, $content);
+                    }
+                }
+            }
+            if (strpos($content, '{大类名}') !== false) {
+                if (!empty($book['genre'])) {
+                    $category = Db::name('category')->where(['id' => $book['genre']])->value('name');
+                    $content = str_replace('{大类名}', $category, $content);
+                } else {
+                    $content = str_replace('{大类名}', '', $content);
+                }
+            }
+            if (strpos($content, '{小类名}') !== false) {
+                if (!empty($book['subgenre'])) {
+                    $category = Db::name('category')->where(['id' => $book['subgenre']])->value('name');
+                    $content = str_replace('{小类名}', $category, $content);
+                } else {
+                    $content = str_replace('{小类名}', '', $content);
+                }
+            }
+            if (strpos($content, '{点击量}') !== false) {
+                $content = str_replace('{点击量}', $book['hits'], $content);
+            }
+            if (strpos($content, '{章节数}') !== false) {
+                $content = str_replace('{章节数}', $book['chapters'], $content);
+            }
+            if (strpos($content, '{作品字数}') !== false) {
+                $content = str_replace('{作品字数}', (wordCount($book['words'])), $content);
+            }
+            if (strpos($content, '{连载状态}') !== false) {
+                $content = str_replace('{连载状态}', (intval($book['isfinish']) == 2 ? '完结' : '连载'), $content);
+            }
+            if (strpos($content, '{作品签约状态}') !== false) {
+                $content = str_replace('{作品签约状态}', (intval($book['issign']) == 1 ? '已签约' : '待签约'), $content);
+            }
+            if (strpos($content, '{作者签约状态}') !== false) {
+                $issign = Db::name('author')->where(['id' => $book['authorid']])->value('issign');
+                $content = str_replace('{作者签约状态}', (intval($issign) == 1 ? '已签约' : '待签约'), $content);
+            }
+        } else {
+            $content = str_replace('{作品标签}', '', $content);
+            $content = str_replace('{书名}', '', $content);
+            $content = str_replace('{作者}', '', $content);
+            $content = str_replace('{作品简介}', '', $content);
+            $content = str_replace('{大类名}', '', $content);
+            $content = str_replace('{小类名}', '', $content);
+            $content = str_replace('{点击量}', '', $content);
+            $content = str_replace('{章节数}', '', $content);
+            $content = str_replace('{作品字数}', '', $content);
+            $content = str_replace('{连载状态}', '', $content);
+            $content = str_replace('{作品签约状态}', '', $content);
+            $content = str_replace('{作者签约状态}', '', $content);
+            if (strpos($content, '{作品简介|len=') !== false) {
+                $content = preg_replace('/\{作品简介|len.*\}/i', '', $content);
+            }
+        }
+        return $content;
     }
 }

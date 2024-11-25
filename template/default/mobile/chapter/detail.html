@@ -1,6 +1,13 @@
 {extend name="common/base"/}
 {block name="style"}
 {/block}
+{block name="title"}
+<title>{:get_seo_str('chapter','chapter_title','',['chapterid'=>$id])}</title>	
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{:get_seo_str('chapter','chapter_keywords','',['chapterid'=>$id])}"/>
+<meta name="description" content="{:get_seo_str('chapter','chapter_description','',['chapterid'=>$id])}"/>
+{/block}
 {block name="body"}
 {php}$site_title = '章节阅读';{/php}
 {include file="common/header"/}
