@@ -14,7 +14,7 @@ class Pages extends BaseController
 {
 	public function detail()
 	{
-		hook("runcache");
+		$ismakecache = $this->usecache();
 		$param = get_params();
 		$name = isset($param['name']) ? trim($param['name']) : '';
 		if (empty($name)) {
@@ -41,7 +41,7 @@ class Pages extends BaseController
 		$detail['keyword_array'] = $keyword_array;
 		PagesModel::where('id', $detail['id'])->inc('read')->update();
 		View::assign('detail', $detail);
-		hook("makehtml", ['content' => View::fetch($detail['template'])]);
+		if ($ismakecache) $this->makecache(View::fetch());
 		return view($detail['template']);
 	}
 }

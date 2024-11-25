@@ -14,7 +14,7 @@ class Article extends BaseController
 {
 	public function detail()
 	{
-		hook("runcache");
+		$ismakecache = $this->usecache();
 		$param = get_params();
 		$id = isset($param['id']) ? intval($param['id']) : 0;
 		if (empty($id)) {
@@ -37,7 +37,7 @@ class Article extends BaseController
 		View::assign('seokeywords', $detail['keyword_names']);
 		View::assign('seodescription', strip_tags($detail['desc']));
 		View::assign('detail', $detail);
-		hook("makehtml", ['content' => View::fetch()]);
+		if ($ismakecache) $this->makecache(View::fetch());
 		return View();
 	}
 }

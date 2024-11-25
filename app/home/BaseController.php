@@ -58,14 +58,14 @@ abstract class BaseController
     protected function initialize()
     {
         $params = [
-            'current_url' => Request::url(false),// 获取当前的url，不包括域名
+            'current_url' => Request::url(false), // 获取当前的url，不包括域名
             'module' => \think\facade\App::initialize()->http->getName(),
             'controller' => app('request')->controller(),
-            'action' => app('request')->action(),           
+            'action' => app('request')->action(),
             'version' => get_config('webconfig.version'),
-        ];        
+        ];
         $domain_bind = get_config('app.domain_bind');
-        $params['domain_bind'] = $domain_bind ? array_flip($domain_bind) : [];        
+        $params['domain_bind'] = $domain_bind ? array_flip($domain_bind) : [];
         if (Request::isMobile() || isWeChat()) {
             View::config(['view_path' => CMS_ROOT . 'template/' . (get_system_config('web', 'template') ?: 'default') . '/mobile/']);
         } else {
@@ -78,6 +78,97 @@ abstract class BaseController
             // View::assign('appconfig', $appconfig);
         }
         View::assign('params', $params);
+    }
+
+    public function usecache()
+    {
+        $addonscnf = [];
+        $rootPath = app()->getRootPath();
+        $config_file = $rootPath . 'addons' . DIRECTORY_SEPARATOR . 'makehtml' . DIRECTORY_SEPARATOR . 'config.php';
+        if (is_file($config_file)) {
+            $addonscnf = (array) include $config_file;
+        }
+        if (!isset($addonscnf['open']['value']) || intval($addonscnf['open']['value']) != 1) return false;
+        if (!isset($addonscnf['autouptime']['value']) || intval($addonscnf['autouptime']['value']) <= 0) return false;
+        if (Request::isMobile()) {
+            $path = $rootPath . 'runtime/html/mobile/';
+        } else {
+            $path = $rootPath . 'runtime/html/pc/';
+        }
+        $view_suffix = get_config('view.view_suffix');
+        $current_url = Request::url();
+        if ($current_url) {
+            $filename = '';
+            $parts = parse_url($current_url);
+            $pathinfo = pathinfo($current_url);
+            if (isset($parts['path']) && $parts['path']) {
+                if ($parts['path'] == '/' || $parts['path'] == '/home/') {
+                    $pathinfo['basename'] = 'index.html';
+                    $pathinfo['extension'] = $view_suffix;
+                }
+            }
+            if (isset($pathinfo['extension']) && $pathinfo['extension'] != $view_suffix) {
+                return false;
+            }
+            if ($pathinfo['dirname']) {
+                $filename = $path . $pathinfo['dirname'] . '/' . $pathinfo['basename'];
+            }
+            if (is_file($filename)) {
+                $file_time =  filectime($filename);
+                if ($file_time !== false) {
+                    if ((time() - $file_time) < (intval($addonscnf['autouptime']['value']) * 60)) {
+                        echo file_get_contents($filename);
+                        exit;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public function makecache($content)
+    {
+        $addonscnf = [];
+        $rootPath = app()->getRootPath();
+        $config_file = $rootPath . 'addons' . DIRECTORY_SEPARATOR . 'makehtml' . DIRECTORY_SEPARATOR . 'config.php';
+        if (is_file($config_file)) {
+            $addonscnf = (array) include $config_file;
+        }
+        if (!isset($addonscnf['open']['value']) || intval($addonscnf['open']['value']) != 1) return false;
+        if (!isset($addonscnf['autouptime']['value']) || intval($addonscnf['autouptime']['value']) <= 0) return false;
+        if (Request::isMobile()) {
+            $path = $rootPath . 'runtime/html/mobile/';
+        } else {
+            $path = $rootPath . 'runtime/html/pc/';
+        }
+        $view_suffix = get_config('view.view_suffix');        
+        if (!empty($content)) {
+            $current_url = Request::url();
+            if ($current_url) {
+                $filename = '';
+                $parts = parse_url($current_url);
+                $pathinfo = pathinfo($current_url);
+                if (isset($parts['path']) && $parts['path']) {
+                    if ($parts['path'] == '/' || $parts['path'] == '/home/') {
+                        $pathinfo['basename'] = 'index.html';
+                        $pathinfo['extension'] = $view_suffix;
+                    }
+                }
+                if (isset($pathinfo['extension']) && $pathinfo['extension'] != $view_suffix) {
+                    return false;
+                }
+                if ($pathinfo['dirname']) {
+                    if (!createDirectory($path . $pathinfo['dirname'] . '/')) {
+                        return false;
+                    }
+                    $filename = $path . $pathinfo['dirname'] . '/' . $pathinfo['basename'];
+                }
+                $File = new \think\template\driver\File();
+                $File->write($filename, $content);
+                echo $content;
+                exit;
+            }
+        }
     }
 
     //页面跳转方法

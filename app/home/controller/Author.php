@@ -18,11 +18,10 @@ class Author extends BaseController
      */
     public function detail()
     {
-        hook("runcache");
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         View::assign('id', $id);
-        hook("makehtml", ['content' => View::fetch()]);
+        if ($this->usecache()) $this->makecache(View::fetch());
         return view();
     }
 }

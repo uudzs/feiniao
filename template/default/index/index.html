@@ -171,7 +171,7 @@
 								{/if}
 								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}								
 								<div class="book-rank--title">
-									<p class="book-rank--title-text ellipsis"><a title="{$v.title}" href="{:url('book_detail', ['id' => $v['books']])}" class="global-hover">{$v.title}</a></p>
+									<p class="book-rank--title-text ellipsis"><a title="{$v.title}" target="_blank" href="{:url('book_detail', ['id' => $v['books']])}" class="global-hover">{$v.title}</a></p>
 									<div class="editor-recommend__rank-text">{$book.isfinish == 2 ? '完结' : '连载'}</div>
 								</div>						
 							</div>
@@ -210,7 +210,7 @@
 								{/if}
 								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
 								<div class="book-rank--title">
-									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
 									<div class="website-rank__rank-text">{$vo.chapters}</div>
 								</div>
 							</div>
@@ -235,7 +235,7 @@
 								{/if}
 								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
 								<div class="book-rank--title">
-									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
 									<div class="website-rank__rank-text">{:ceil($vo.words/10000)}万</div>
 								</div>
 							</div>
@@ -260,7 +260,7 @@
 								{/if}
 								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
 								<div class="book-rank--title">
-									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
 									<div class="website-rank__rank-text">{$vo.hits > 0 ? $vo.hits : '--' }</div>
 								</div>
 							</div>
@@ -293,7 +293,7 @@
 								{/if}
 								{eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
 								<div class="book-rank--title">
-									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+									<p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
 									<div class="website-rank__rank-text">{$vo.chapters}</div>
 								</div>
 							</div>

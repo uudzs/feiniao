@@ -1477,3 +1477,18 @@ if (!function_exists('seo_book_tag')) {
         return $content;
     }
 }
+if (!function_exists('createDirectory')) {
+    function createDirectory($dir)
+    {
+        try {
+            if (!is_dir($dir)) {
+                if (!mkdir($dir, 0777, true)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+}

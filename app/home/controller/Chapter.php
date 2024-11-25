@@ -20,7 +20,7 @@ class Chapter extends BaseController
      */
     public function detail()
     {
-        hook("runcache");
+        $ismakecache = $this->usecache();
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         if (empty($id)) {
@@ -40,7 +40,7 @@ class Chapter extends BaseController
         View::assign('id', $id);
         View::assign('bookid', $chapter['bookid']);
         View::assign('chapterlsit', $list);
-        hook("makehtml", ['content' => View::fetch()]);
+        if ($ismakecache) $this->makecache(View::fetch());
         return view();
     }
 }

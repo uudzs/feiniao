@@ -19,14 +19,14 @@ class Book extends BaseController
      */
     public function cate()
     {
-        hook("runcache");
+        $ismakecache = $this->usecache();
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         $category = Db::name('category')->where(['id' => $id])->find();
         View::assign('category', $category);
         View::assign('catid', $id);
         View::assign('id', $id);
-        hook("makehtml", ['content' => View::fetch()]);
+        if ($ismakecache) $this->makecache(View::fetch());
         return view();
     }
 
@@ -36,8 +36,7 @@ class Book extends BaseController
      */
     public function list()
     {
-        hook("runcache");
-        hook("makehtml", ['content' => View::fetch()]);
+        if ($this->usecache()) $this->makecache(View::fetch());
         return view();
     }
 
@@ -47,14 +46,14 @@ class Book extends BaseController
      */
     public function detail()
     {
-        hook("runcache");
+        $ismakecache = $this->usecache();
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         if (intval($id) > 0) {
             Db::name('book')->where('id', $id)->inc('hits')->update();
         }
         View::assign('bid', $id);
-        hook("makehtml", ['content' => View::fetch()]);
+        if ($ismakecache) $this->makecache(View::fetch());
         return view();
     }
 }

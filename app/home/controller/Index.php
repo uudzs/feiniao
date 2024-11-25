@@ -68,8 +68,7 @@ class Index extends BaseController
                 }
             }
         }
-        hook("runcache");
-        hook("makehtml", ['content' => View::fetch()]);
+        if ($this->usecache()) $this->makecache(View::fetch());
         return View();
     }
 }
