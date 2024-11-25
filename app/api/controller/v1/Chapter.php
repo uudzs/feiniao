@@ -62,6 +62,7 @@ class Chapter extends BaseController
         $bookid = $book['id'];
         $chapter_id = $id;
         unset($chapter['info']);
+        $ip = request()->ip();
         if (!empty($uid)) {
             $member = Db::name('user')->where(array('id' => $uid))->find();
             if (!empty($member)) {
@@ -74,7 +75,7 @@ class Chapter extends BaseController
                         "book_id" => $bookid,
                         "chapter_id" => $chapter_id,
                         'read_date' => date('Y-m-d'),
-                        'ip' => request()->ip(),
+                        'ip' => $ip,
                         "title" => $chapter['title'],
                         "position" => '',
                         "readnum" => 1,
@@ -85,7 +86,7 @@ class Chapter extends BaseController
                         'update_time' => time(),
                         "position" => '',
                         'read_date' => date('Y-m-d'),
-                        'ip' => request()->ip(),
+                        'ip' => $ip,
                         "title" => $chapter['title'],
                         'readnum' => $readhistory['readnum'] + 1,
                     ]);
@@ -216,6 +217,32 @@ class Chapter extends BaseController
                     }
                 }
             }
+        } else {
+            //查询是否有该章节记录
+            $readhistory = Db::name('readhistory')->where(array('book_id' => $bookid, 'chapter_id' => $chapter_id, 'ip' => $ip))->find();
+            //增加阅读记录
+            if (empty($readhistory)) {
+                Db::name('readhistory')->strict(false)->field(true)->insertGetId([
+                    "user_id" => 0,
+                    "book_id" => $bookid,
+                    "chapter_id" => $chapter_id,
+                    'read_date' => date('Y-m-d'),
+                    'ip' => $ip,
+                    "title" => $chapter['title'],
+                    "position" => '',
+                    "readnum" => 1,
+                    "create_time" => time()
+                ]);
+            } else {
+                Db::name('readhistory')->where(['id' => $readhistory['id']])->update([
+                    'update_time' => time(),
+                    "position" => '',
+                    'read_date' => date('Y-m-d'),
+                    'ip' => $ip,
+                    "title" => $chapter['title'],
+                    'readnum' => $readhistory['readnum'] + 1,
+                ]);
+            }
         }
         //前一章
         $front = Db::name('chapter')->field('id,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '<', $chapter['chaps']]])->order('chaps DESC')->find();
@@ -237,11 +264,20 @@ class Chapter extends BaseController
         }
         $chapter['chaps'] = '第' . numConvertWord($chapter['chaps']) . '章';
         $total = Db::name('chapter')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->count();
-        $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $bookid])->count();
-        if ($total == 0 || $reads < 0) {
-            $chapter['speed'] = 0;
+        if ($uid) {
+            $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $bookid])->count();
+            if ($total == 0 || $reads < 0) {
+                $chapter['speed'] = 0;
+            } else {
+                $chapter['speed'] = round(($reads / $total) * 100, 2);
+            }
         } else {
-            $chapter['speed'] = round(($reads / $total) * 100, 2);
+            $reads = Db::name('readhistory')->where(['ip' => $ip, 'book_id' => $bookid])->count();
+            if ($total == 0 || $reads < 0) {
+                $chapter['speed'] = 0;
+            } else {
+                $chapter['speed'] = round(($reads / $total) * 100, 2);
+            }
         }
         $chapter['fav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $book['id']])->count();
         $result = [

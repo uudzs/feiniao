@@ -1684,6 +1684,7 @@ CREATE TABLE `fn_readhistory` (
   KEY `idx_a_u` (`book_id`,`user_id`) USING BTREE,
   KEY `idx_a_c_u` (`book_id`,`chapter_id`,`user_id`) USING BTREE,
   KEY `user_id` (`user_id`),
+  KEY `ip` (`ip`),
   KEY `create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='阅读记录::crud';
 
