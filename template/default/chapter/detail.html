@@ -1,5 +1,6 @@
 {extend name="common/base"/}
 {block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/chapter-detail.css?v={$conf.version}">
 {/block}
 {block name="title"}
 <title>{:get_seo_str('chapter','chapter_title','',['chapterid'=>$id])}</title>	
@@ -11,13 +12,355 @@
 <!-- 主体 -->
 {block name="body"}
 {include file="common/header" nav='index' /}
-<div class="container" style="display: flex; height: 60vh; align-items: center; justify-content: center;">
-敬请期待！
+<style>
+</style>
+{php}$book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();{/php}
+{notempty name="book"}
+{php}
+if($book['genre']) {
+    $genrename = model('category')->where(['status' => 1, 'id' => $book['genre']])->value('name');
+    $genrelink = url('book_cates', ['id' => $book['genre']]);
+}
+if($book['subgenre']) {
+    $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
+    $subgenrelink = url('book_cates', ['id' => $book['genre']]);
+}
+$chapterlist = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
+$author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();            
+$chapter = model('chapter')->where(['id'=>$id, 'status' => 1, ['verify', 'in', '0,1']])->find();            
+$book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
+{/php}
+{/notempty}
+<div class="reader" id="page_reader">
+    <div class="reader-crumb">
+        <a href="{:url('/')}">首页</a><span></span>
+        {notempty name="$genrename"}<a href="{$genrelink}">{$genrename}</a><span></span>{/notempty}
+        {notempty name="$subgenrename"}<a href="{$subgenrelink}">{$subgenrename}</a><span></span>{/notempty}
+        {$book.title}
+    </div>
+    <div class="reader-wrap">
+        <div class="reader-main">
+            <div class="reader-top">
+                <div class="bookimg"><a href="{:url('book_detail', ['id' => $book['id']])}"><img src="{:get_file($book.cover)}" alt="{$book.title}" onerror="this.src='{__STATIC__}/home/images/logo-ico.png'"><em></em></a></div>
+                <div class="name">{$book.title}</div>
+                <div class="au">{$book.author}</div>
+                <div class="tags">
+                    <span>{$genrename} <i>类型</i></span><i class="line"></i>
+                    <span>{:time_format($book.create_time,'Y-m-d')} <i>发布时间</i></span><i class="line"></i>
+                    <span>{:wordCount($book_words_count)} <i>字数</i></span>
+                </div>
+                <div class="other">
+                    <div class="b">版权所有 · 侵权必究</div>
+                </div>
+            </div>
+            <div class="reader-content" id="Jcontent">
+                <div class="reader-box">
+                    <div class="title">
+                        <div class="title_txtbox">{$chapter.title}</div>
+                    </div>
+                    <div class="bookinfo">
+                        <span>本章字数：<i>{$chapter.wordnum}</i></span>
+                        <span>更新时间：<i>{:time_format($chapter.create_time)}</i></span>
+                    </div>
+                    <div class="reader-line"></div>
+                    <div class="content"></div>
+                    <div class="btn-w">
+                        <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>       
+    </div>
+
+    <div class="gpd-right-menu fixed" id="Jadom_panel">
+        <div class="gpd-guidebar">
+            <div class="tooltip-wrapper"><button class="list"><i class="bi bi-justify"></i><span class="text">目录</span></button></div>
+            <div class="tooltip-wrapper"><button class="setting"><i class="bi bi-nut"></i><span class="text">设置</span></button></div>
+            <div class="tooltip-wrapper"><button class="listen"><i class="bi bi-music-note-list"></i><span class="text">听书</span></button></div>
+            <div class="tooltip-wrapper"><button class="like"><i class="bi bi-heart"></i><span class="text">点赞</span></button></div>
+            <div class="tooltip-wrapper"><button class="bookshelf"><i class="bi bi-bag-plus"></i><span class="text">书架</span></button></div>
+            <div class="tooltip-wrapper"><button class="addshelf btn_addshelf"><a href="{:url('book_detail', ['id' => $book['id']])}"><i class="bi bi-book"></i><span class="text">书详情</span></a></button></div>            
+        </div>
+        <div class="gpd-toast-mask" style="display: none;"></div>
+        <div class="gpd-reader-toast">
+            <div class="gpd-wrap catalog gpd-flt-catalog" style="display: none;">
+                <h3>章节目录</h3><div class="read-speed"><i style="width: 0%;"></i><font>阅读进度：0%</font></div>
+                <div class="panel-list-wrap catalog-scroll-wrap" id="JcatalogListWrap">
+                    <ul>
+                        {notempty name="$chapterlist"}
+                            {volist name="$chapterlist" id="v"}
+                            <li data-chapterid="{$v.id}" {eq name="$v['id']" value="$id"} class="active"{/eq}><a href="{:url('chapter_detail',['id'=>$v['id']])}"><span>{$v.title}</span></a></li>
+                            {/volist}
+                        {/notempty}
+                    </ul>
+                </div>
+            </div>
+            <div class="gpd-wrap gpd_flt_setting" data-pname="readerSetting" style="display: none;">
+                <h3>阅读设置</h3>
+                <div class="gpd-setLine gpd-setstyle">
+                    <div class="gpd-setName">阅读背景</div>
+                    <div class="gpd-setcon">
+                        <a class="sbs-1 fontskin" href="javascript:void(0)" data-skin="theme1" alt="白色"></a>
+                        <a class="sbs-2 fontskin" href="javascript:void(0)" data-skin="theme2" alt="蓝色"></a>
+                        <a class="sbs-3 fontskin" href="javascript:void(0)" data-skin="theme3" alt="绿色"></a>
+                        <a class="sbs-4 fontskin" href="javascript:void(0)" data-skin="theme4" alt="粉色"></a>
+                        <a class="sbs-5 fontskin" href="javascript:void(0)" data-skin="theme5" alt="灰色"></a>
+                        <a class="sbs-6 fontskin" href="javascript:void(0)" data-skin="theme6" alt="黄色"></a>
+                        <a class="sbs-7 fontskin" href="javascript:void(0)" data-skin="theme7" alt="黑色"><i class="bi bi-brightness-high"></i></a>
+                    </div>
+                </div>
+                <div class="gpd-setLine gpd-setfont">
+                    <div class="gpd-setName">正文字体</div>
+                    <div class="gpd-setcon">
+                        <a href="javascript:void(0)" class="sbf-1 fontface" data-font="fontfamily1">宋体</a>
+                        <a href="javascript:void(0)" class="sbf-2 fontface" data-font="fontfamily2">黑体</a>
+                        <a href="javascript:void(0)" class="sbf-3 fontface" data-font="fontfamily3">雅黑</a>
+                        <a href="javascript:void(0)" class="sbf-4 fontface" data-font="fontfamily4">楷体</a>
+                    </div>
+                </div>
+                <div class="gpd-setLine gpd-setsize">
+                    <div class="gpd-setName">字体大小</div>
+                    <div class="gpd-setcon">
+                        <div class="sbw-font">
+                            <a data-size="0" class="font_size setfont" href="javascript:void(0)">A-</a>
+                            <div class="nowfont" id="adom_reader_font_size"></div>
+                            <a data-size="1" class="font_size setfont" href="javascript:void(0)">A+</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="gpd-wrap gpd-listen-wrap" style="display:none">
+                <h3>听书阅读</h3>
+                <div class="tit">敬请期待！</div>
+                <div class="txt">尽在<i>{$conf.title}</i>听书</div>
+            </div>            
+        </div>
+    </div>
 </div>
 {/block}
 <!-- 脚本 -->
 {block name="script"}
 <script>
+$(window).on('load', function () {
+    var chapter_id = '{$id}';
+    var chapter_info = {};
+    var info = {};
+    var config = layui.data('feiniao').readconfig;
+    var fontsizes = [16, 18, 20, 22, 24, 26, 28, 30];
+    var isupperpage = false;
+    if(!config) {
+        config = {
+                "theme": "theme1",
+                "fontfamily": "fontfamily1",
+                "fontsize": 0,
+            };
+        //设置默认
+        layui.data('feiniao', {
+            key: 'readconfig',
+            value: config
+        });
+    }
+    //主题初始化
+    $('.wrapper').addClass(config.theme);
+    $('.gpd-setstyle .gpd-setcon').find('[data-skin="' + config.theme + '"]').addClass('active');
+    //字体初始化
+    $('.reader-box').attr('class', 'reader-box ' + config.fontfamily);
+    $('.gpd-setfont .gpd-setcon').find('[data-font="' + config.fontfamily + '"]').addClass('active');
+    //字号初始化
+    $('.reader-box').css('font-size', fontsizes[parseInt(config.fontsize)] + 'px');
+    $('#adom_reader_font_size').text(fontsizes[parseInt(config.fontsize)]);
+    //打开
+    $('.gpd-guidebar .tooltip-wrapper').on('click', function (obj, index) {
+        if($(this).index() < 3) {
+            $('.gpd-toast-mask').toggle();
+            $(".gpd-reader-toast").toggle();
+            $(".gpd-reader-toast .gpd-wrap:eq(" + $(this).index() + ")").toggle();
+        }
+    })
+    //书架
+    $('.bookshelf').on('click', function (obj, index) {
+        layer.msg('书架');
+        $.postApi("{:furl('v1/favorites', [], true, 'api')}", {bookid: chapter_info.bookid}, function(result) {
+            layer.msg(result.msg);
+            if(result.code == 0) {
+                if(parseInt(chapter_info.fav) > 0) {
+                    $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus');
+                } else {
+                    $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus-fill');                    
+                }
+            }
+        });
+    })
+    //点赞
+    $('.like').on('click', function (obj, index) {
+        if(!isupperpage && parseInt(chapter_info.like) > 0) return layer.msg('已点过赞了');
+        if(isupperpage && parseInt(info.like) > 0) return layer.msg('已点过赞了');
+        $.postApi("{:furl('v1/like', [], true, 'api')}", {book_id: chapter_info.bookid, chapter_id: (isupperpage == true ? info.id : chapter_info.id)}, function(result) {
+            layer.msg(result.msg);
+            if(result.code == 0) {
+                $('.like').find('i').attr('class','bi bi-heart-fill');
+            }
+        });
+    })
+    //关闭
+    $('.gpd-toast-mask').on('click', function (obj, index) {
+        $(this).hide();
+        $(".gpd-reader-toast").toggle();
+        $(".gpd-reader-toast .gpd-wrap").hide();
+    })
+    //主题
+    $('.gpd-setstyle .gpd-setcon a').on('click', function (obj, index) {
+        var skin = $(this).data('skin');
+        $('.fontskin').removeClass('active');
+        $(this).addClass('active');
+        $('.wrapper').attr('class', 'wrapper ' + skin);
+        config.theme = skin;
+        layui.data('feiniao', {
+            key: 'readconfig',
+            value: config
+        });
+    })
+    //字体
+    $('.fontface').on('click', function (obj, index) {
+        var fontfamily = $(this).data('font');
+        $('.fontface').removeClass('active');
+        $(this).addClass('active');        
+        config.fontfamily = fontfamily;
+        layui.data('feiniao', {
+            key: 'readconfig',
+            value: config
+        });
+        $('.reader-box').attr('class', 'reader-box ' + config.fontfamily);
+    })
+    //字号
+    $('.setfont').on('click', function (obj, index) {
+        var size = $(this).data('size');
+        if(parseInt(size) == 0) {
+            if(parseInt(config.fontsize) <= 0) return layer.msg('已达最小值');
+            config.fontsize--;         
+        }
+        if(parseInt(size) == 1) {
+            if(parseInt(config.fontsize) >= 7) return layer.msg('已达最大值');
+            config.fontsize++;           
+        }
+        layui.data('feiniao', {
+            key: 'readconfig',
+            value: config
+        });
+        $('.reader-box').css('font-size', fontsizes[config.fontsize] + 'px');
+        $('#adom_reader_font_size').text(fontsizes[config.fontsize]);
+    })
+    //初始化
+    $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
+        if(result.code == 0) {
+            chapter_info = result.data.data[0];
+            chapter_id = chapter_info.front_chapter;
+            $('.read-speed').find('i').css('width', chapter_info.speed + '%');
+            $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
+            $('.title_txtbox').html(chapter_info.title);
+            $('.content').html(chapter_info.content);
+            if(parseInt(chapter_info.like) > 0) {
+                $('.like').find('i').attr('class','bi bi-heart-fill');
+            } else {
+                $('.like').find('i').attr('class','bi bi-heart');
+            }
+            if(parseInt(chapter_info.fav) > 0) {
+                $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus-fill');
+            } else {
+                $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus');
+            }
+        } else {
+            layer.msg(result.msg);
+        }
+    });
+    //滚动
+    var isLoading = false;
+    $(window).scroll(function() {
+        if($(window).scrollTop() <= 0 && !isLoading) {
+            isLoading = true;
+            isupperpage = true;
+            upper_chapter();
+            isLoading = false;
+        } 
+        if(($(window).scrollTop() + $(window).height()) >= $(document).height() && !isLoading) {
+            isLoading = true;
+            isupperpage = false;
+            next_chapter();
+            isLoading = false;
+        }
+    });
+    //上一页
+    function upper_chapter() {
+        if(!chapter_id) return false;
+        $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
+            if(result.code == 0) {
+                info = result.data.data[0];
+                chapter_id = info.front_chapter;
+                $('#JcatalogListWrap ul li').removeClass('active');
+                $('#JcatalogListWrap ul').find('[data-chapterid="' + info.id + '"]').addClass('active');
+                var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]};">
+                                <div class="title">
+                                    <div class="title_txtbox">${info.title}</div>
+                                </div>
+                                <div class="bookinfo">
+                                    <span>本章字数：<i>${info.wordnum}</i></span>
+                                    <span>更新时间：<i>${info.create_time}</i></span>
+                                </div>
+                                <div class="reader-line"></div>
+                                <div class="content">${info.content}</div>
+                                <div class="btn-w">
+                                    <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
+                                </div>
+                            </div>`;
+                    $('#Jcontent').prepend(html);
+                    if(parseInt(info.like) > 0) {
+                        $('.like').find('i').attr('class','bi bi-heart-fill');
+                    } else {
+                        $('.like').find('i').attr('class','bi bi-heart');
+                    }
+            } else {
+                layer.msg(result.msg);
+            }
+        });
+    }
+    //下一页
+    function next_chapter() {
+        if(chapter_info && !chapter_info.after_chapter) return false;
+        if(chapter_info.after_chapter > 0) {
+            $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_info.after_chapter}, function(result) {
+                if(result.code == 0) {
+                    chapter_info = result.data.data[0];
+                    $('.read-speed').find('i').css('width', chapter_info.speed + '%');
+                    $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
+                    $('#JcatalogListWrap ul li').removeClass('active');
+                    $('#JcatalogListWrap ul').find('[data-chapterid="' + chapter_info.id + '"]').addClass('active');
+                    var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]};">
+                                    <div class="title">
+                                        <div class="title_txtbox">${chapter_info.title}</div>
+                                    </div>
+                                    <div class="bookinfo">
+                                        <span>本章字数：<i>${chapter_info.wordnum}</i></span>
+                                        <span>更新时间：<i>${chapter_info.create_time}</i></span>
+                                    </div>
+                                    <div class="reader-line"></div>
+                                    <div class="content">${chapter_info.content}</div>
+                                    <div class="btn-w">
+                                        <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
+                                    </div>
+                                </div>`;
+                    $('#Jcontent').append(html);
+                    if(parseInt(chapter_info.like) > 0) {
+                        $('.like').find('i').attr('class','bi bi-heart-fill');
+                    } else {
+                        $('.like').find('i').attr('class','bi bi-heart');
+                    }
+                } else {
+                    layer.msg(result.msg);
+                }
+            });
+        }
+    }
+});
 </script>
 {/block}
 <!-- /脚本 -->

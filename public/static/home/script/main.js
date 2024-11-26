@@ -4,15 +4,28 @@
   // WOW JS
   new WOW().init();
 
-  // // Window Loading JS
-  $(window).on('load', function () {
-    var localfeiniao = layui.data('feiniao');
-    token = localfeiniao.token;
-    console.log('token',token);   
-    if (!token) $.getToken();
-  });
-
   $.extend({
+    getMe: function(meurl, callback) {
+      try {
+        $.ajax({
+            headers: { Token: layui.data('feiniao').token },
+            url: meurl,
+            method: "POST",
+            data: {},
+            dataType: "json",
+            success: function (result) {
+              if(typeof callback === "function") {
+                  callback(result)
+              }              
+            },
+            error: function (xhr, status, error) {
+              console.error('发生错误:', error);
+            }
+        });
+      } catch (err) {  
+          console.error('发生错误:', err);
+      }
+    },
     postApi: function(url, data, callback) {
         try {
           $.ajax({

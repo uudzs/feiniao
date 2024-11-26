@@ -177,6 +177,16 @@ a.creat-accout-btn:hover::before,
     padding-right: 30px;
 }
 
+.top-manu li.loginstatus {
+    display: flex;
+    align-items: center;
+}
+
+.top-manu li.loginstatus img {
+    width: 20px;
+    border-radius: 50%;
+}
+
 .top-manu li.active a {
     color: #39F;
 }

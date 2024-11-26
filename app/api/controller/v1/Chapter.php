@@ -34,7 +34,7 @@ class Chapter extends BaseController
         if (empty($id)) {
             $this->apiError('参数为空');
         }
-        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum')->where(array('id' => $id))->find();
+        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->find();
         if (empty($chapter)) {
             $this->apiError('章节不存在！');
         }
@@ -61,6 +61,7 @@ class Chapter extends BaseController
         $chapter['content'] = str_replace($search, $replace, $chapter['info']);
         $bookid = $book['id'];
         $chapter_id = $id;
+        $today = date('Y-m-d'); // 当天日期
         unset($chapter['info']);
         $ip = request()->ip();
         if (!empty($uid)) {
@@ -280,6 +281,8 @@ class Chapter extends BaseController
             }
         }
         $chapter['fav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $book['id']])->count();
+        $chapter['like'] = Db::name('like_log')->where(['user_id' => $uid, 'book_id' => $book['id'], 'chapter_id' => $chapter_id, 'like_date' => $today])->count();
+        $chapter['create_time'] = time_format($chapter['create_time']);
         $result = [
             'data' => [$chapter],
             'total' => $total,

@@ -10,7 +10,7 @@ return array(
             1 => '是',
             0 => '否',
         ),
-        'value' => 1,
+        'value' => 0,
         'tips' => '如页面显示异常，请关闭该功能。',
     ),
     'autouptime' =>
