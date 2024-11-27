@@ -56,7 +56,9 @@
 	<!-- /脚本 -->
 	
 	<!-- 统计代码 -->
-	{block name="code"}<div style="display: none;">{$systemconf.code}</div>{/block}
+	{block name="code"}
+    <div style="display: none;">{$systemconf.code|raw}</div>
+    {/block}
 	<!-- /统计代码 -->
 </body>
 </html>

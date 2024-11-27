@@ -1,0 +1,246 @@
+.wrapper {
+    background: #f7f8fb;
+}
+.vem_people {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px 40px;
+    margin-top: 100px;
+}
+.vem_people .avatar {
+    flex-shrink: 0;
+    margin-right: 24px;
+    position: relative;
+    width: 90px;
+}
+.vem_people .avatar .el-image {
+    display: inline-block;
+    overflow: hidden;
+    border: 1px solid #dcdddf;
+    border-radius: 50%;
+    height: 90px;
+    position: relative;
+    width: 90px;
+}
+.el-image__inner {
+    opacity: 1;
+    vertical-align: top;
+}
+.vem_people .avatar img {
+    border: 1px solid #dcdddf;
+    border-radius: 50%;
+    height: 90px;
+    position: relative;
+    width: 90px;
+}
+.flex-grow {
+    flex-grow: 1;
+}
+.justify-between {
+    justify-content: space-between;
+}
+.items-center {
+    align-items: center;
+}
+.flex {
+    display: flex;
+}
+.vem_people .people_info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+.vem_people .people_info .umain {
+    margin-bottom: 8px;
+}
+.vem_people .people_info .umain .uname {
+    align-items: center;
+    display: flex;
+    margin-bottom: 8px;
+}
+.vem_people .people_info .umain h4 {
+    color: rgba(0, 0, 0, .85);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 34px;
+    margin-right: 8px;
+    text-align: left;
+}
+.vem_people .people_info .umain .uname .authorlevel {
+    display: block;
+    height: 28px;
+    margin-top: 3px;
+    width: 101px;
+}
+.vem_people .people_info .umain .uname .authorlevel img {
+    height: 28px;
+    width: auto;
+}
+.vem_people .follow-box {
+    color: #666;
+    font-family: PingFang SC, PingFang SC-Regular;
+    font-size: 12px;
+    line-height: 18px;
+}
+.vem_people .follow-box .follow {
+    background: #fff;
+    align-items: center;
+    border: 1px solid #e60000;
+    border-radius: 21px;
+    color: #e60000;
+    display: flex;
+    font-family: PingFang SC, PingFang SC-Medium;
+    font-size: 14px;
+    font-weight: 500;
+    justify-content: center;
+    padding: 5px 20px;
+}
+.vem_people .people_info .udata {
+    margin: 0;
+}
+.vem_people .people_info .udata .num {
+    align-items: center;
+    display: flex;
+}
+.vem_people .people_info .udata .num em {
+    border: 1px solid #d8d8d8;
+    height: 24px;
+    margin: 0 10px;
+    transform: scale(.5);
+    width: 1px;
+}
+.vem_people .people_info .udata .num span i {
+    color: #8d8e91;
+    font-size: 11px;
+    font-style: normal;
+    line-height: 16px;
+    margin-right: 8px;
+}
+.vem_people .people_info .udata .num span>span {
+    color: #2d3035;
+    font-family: DINPro, DINPro-Medium;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: left;
+}
+.peopletab {
+    background: #fff;
+    border-radius: 10px;
+    margin: 20px 0;
+    padding: 8px 40px;
+}
+.vcm_book_box {
+    align-items: center;
+    justify-content: space-between;
+    margin: 15px auto 25px;
+}
+.vcm_book_box .book_l {
+    flex-grow: 1;
+}
+.vcm_book_box .book_l .cover {
+    flex-shrink: 0;
+    margin-right: 16px;
+    width: 82px;
+}
+.vcm_book_box .book_l .cover img {
+    border-radius: 4px;
+    height: 110px;
+    width: 82px;
+    max-width: 100%;
+    display: block;
+    vertical-align: middle;
+}
+.vcm_book_box .book_l .info {
+    flex-grow: 1;
+}
+.vcm_book_box .book_l .info .name {
+    color: #222;
+    font-family: PingFang SC, PingFang SC-Medium;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 25px;
+    margin-bottom: 8px;
+}
+.vcm_book_box .book_l .info .status {
+    align-items: center;
+    color: #666;
+    display: flex;
+    font-family: PingFang SC, PingFang SC-Regular;
+    font-size: 12px;
+    line-height: 17px;
+    margin-bottom: 10px;
+}
+.vcm_book_box .book_l .info .status .sp {
+    margin: 0 8px;
+    overflow: hidden;
+}
+.vcm_book_box .book_l .info .status .sp {
+    border: 1px solid #dcdddf;
+    height: 9px;
+    width: 1px;
+}
+.vcm_book_box .book_l .info .status .dot {
+    margin: 0 8px;
+    overflow: hidden;
+}
+.vcm_book_box .book_l .info .status .dot {
+    background: #666;
+    border-radius: 4px;
+    height: 4px;
+    transform: scale(.5);
+    width: 4px;
+}
+.vcm_book_box .book_l .info .intro {
+    color: #666;
+    font-size: 14px;
+    height: 20px;
+    line-height: 20px;
+    margin-bottom: 10px;
+    max-width: 886px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.vcm_book_box .book_l .info .update {
+    display: flex;
+    align-items: center;
+}
+.vcm_book_box .book_l .info .update .ttit, .vcm_book_box .book_l .info .update .uptime {
+    color: #999;
+    font-size: 12px;
+    font-weight: 400;
+}
+.vcm_book_box .book_l .info .update .uptime {
+    margin-left: 10px;
+}
+.vcm_book_box .action .goread {
+    align-items: center;
+    border: 1px solid #e60000;
+    border-radius: 21px;
+    color: #e60000;
+    display: flex;
+    font-family: PingFang SC, PingFang SC-Medium;
+    font-size: 14px;
+    font-weight: 500;
+    height: 40px;
+    justify-content: center;
+    line-height: 20px;
+    width: 96px;
+}
+.peopletab h3 {
+    position: relative;
+    font-weight: 600;
+    font-size: 25px;
+    padding: 20px 0;
+}
+.peopletab h3:after {
+    background-color: #ececec;
+    height: 1px;
+    bottom: 0;
+    content: "";
+    left: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+}

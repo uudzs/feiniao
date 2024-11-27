@@ -1,0 +1,138 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/author-detail.css?v={$conf.version}">
+{/block}
+{block name="title"}
+<title>{:get_seo_str('author','author_title','',['authorid'=>$id])}</title>	
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{:get_seo_str('author','author_keywords','',['authorid'=>$id])}"/>
+<meta name="description" content="{:get_seo_str('author','author_description','',['authorid'=>$id])}"/>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index' /}
+{php}$author = model('author')->where(['id'=>$id, 'status' => 1])->find();{/php}
+{notempty name="$author"}
+{php}
+$book_list = model('book')->field('id,title,genre,subgenre,words,remark,isfinish,cover')->where(['status' => 1, 'authorid' => $author['id']])->select()->toArray();
+if(!empty($book_list)) {
+    foreach($book_list as $k => $v) {
+        if($v['genre']) {
+            $book_list[$k]['genre'] = model('category')->where(['status' => 1, 'id' => $v['genre']])->value('name');
+        }
+        if($v['subgenre']) {
+            $book_list[$k]['subgenre'] = model('category')->where(['status' => 1, 'id' => $v['subgenre']])->value('name');
+        }
+        if (!empty($v['remark'])) {
+            $remark = htmlspecialchars_decode($v['remark']);
+            $replace = array("&nbsp;", "<br>", "<br>");
+            $search = array(" ", "\n", '\n');
+            $book_list[$k]['remark'] = str_replace($search, $replace, $remark);
+        }
+        $book_list[$k]['chapter'] = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $v['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
+        $book_list[$k]['words'] = model('chapter')->where(['bookid' => $v['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
+    }
+    $book_count = count($book_list);            
+    $bids = array_column($book_list, 'id');
+    $bid_in = implode(',', $bids);
+    $fav_count = model('favorites')->where('pid','in',$bid_in)->count();
+} else {
+    $book_count = 0;
+    $fav_count = 0;
+}
+$follow_count = model('follow')->where(['from_id' => $author['id']])->count();
+{/php}
+    <div class="container">
+        <div class="flex vem_people justify-between items-center">
+            <div class="avatar">
+                <div class="el-image"><img src="{:get_file($author.headimg)}" class="el-image__inner"></div>
+            </div>
+            <div class="people_info flex-grow">
+                <div class="umain flex justify-between items-center">
+                    <div class="uname">
+                        <h4>{$author.nickname}</h4>{eq name="$author.issign" value="1"}<b class="authorlevel"><img src="{__ASSETS__}/init/images/sign_ico.png" alt="签约作家"></b>{/eq}
+                    </div>                
+                </div>
+                <div class="udata">
+                    <p class="num">
+                        <span><i>作品数</i><span>{$book_count}</span></span><em></em>
+                        <span><i>收藏数</i><span>{$fav_count}</span></span><em></em>
+                        <span><i>粉丝数</i><span class="fans">{$follow_count}</span></span>
+                    </p>
+                </div>
+            </div>
+            <div class="follow-box"> <button class="follow">关注</button> </div>
+        </div>
+        {notempty name="$book_list"}
+            <div id="vem_page_people" class="peopletab">  
+                <h3>作品</h3>
+                <div class="vcm_myPeoplebox">
+                    <div>
+                        <ul class="vabooks-list">
+                            {volist name="$book_list" id="v"}
+                            <li class="vcm_book_box flex">
+                                <div class="book_l flex">
+                                    <div class="cover"><a href="{:url('book_detail',['id'=>$v['id']])}" target="_blank"><img src="{:get_file($v.cover)}" alt="{$v.title}"></a></div>
+                                    <div class="info">
+                                        <h4 class="name"><a href="{:url('book_detail',['id'=>$v['id']])}" target="_blank">{$v.title}</a></h4>
+                                        <div class="status">
+                                            <div class="over">{eq name="$v.isfinish" value="2"}完结{else/}连载{/eq}</div><em class="sp"></em>
+                                            {notempty name="$v.genre"}<div class="cat">{$v.genre}</div><em class="dot"></em>{/notempty}
+                                            {notempty name="$v.subgenre"}<div class="cat">{$v.subgenre}</div><em class="dot"></em>{/notempty}
+                                            <div class="tnum">{:wordCount($v.words)}</div>
+                                        </div>
+                                        <div class="intro">{$v.remark|raw}</div>                                        
+                                        {notempty name="$v.chapter"}
+                                        <div class="update">
+                                            <span class="ttit">最新章节：</span>
+                                            <a href="{:url('chapter_detail',['id'=>$v['chapter']['id']])}" class="gonew" target="_blank">{$v.chapter.title}</a>
+                                            <div class="uptime">{:time_format($v.chapter.create_time,'Y-m-d')}</div>
+                                        </div>
+                                        {/notempty}
+                                    </div>
+                                </div>
+                                <div class="action"><a href="{:url('book_detail',['id'=>$v['id']])}" target="_blank" class="goread">立即阅读</a></div>
+                            </li>
+                            {/volist}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {/notempty}
+    </div>
+{else/}
+    <div style="display: flex;justify-content: center;align-items: center;margin: 20rem auto;">
+        <img src="{__STATIC__}/home/images/logo-invite.png" alt="">
+        作者不存在！
+    </div>        
+{/notempty}
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    $(window).on('load', function () {
+        $('.follow').on('click', function () {
+            var text = $(this).text().split(' ').join('');
+            var fans = parseInt($('.fans').text().split(' ').join(''));
+            $.postApi("{:furl('v1/follow', [], true, 'api')}", {"from_id": '{$id}', "type": 1}, function(result) {
+                layer.msg(result.msg);
+                if(result.code == 0) {
+                    if (typeof result.data.fid !== 'undefined' && result.data.fid !== null) {
+                        $('.follow').text('取关');
+                        fans++;
+                        $('.fans').text(fans);
+                    } else {
+                        $('.follow').text('关注');                        
+                        if(fans > 0 ) {
+                            fans--;
+                            $('.fans').text(fans)
+                        }
+                    }
+                }
+            });
+        })
+    });
+</script>
+{/block}
+<!-- /脚本 -->

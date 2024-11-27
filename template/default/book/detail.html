@@ -93,10 +93,10 @@
                 </div>
             </section>
             <section class="author-info"  >
-                <a href="{:url('author_detail',['id'=>$book['authorid']])}" target="_blank" class="author-info--img">
+                <a href="{:url('author_detail',['id'=>$book['authorid']])}" class="author-info--img">
                     <img class="author-info-via" src="{:get_file($author.headimg)}" lazy="loaded">
                 </a>
-                <a href="{:url('author_detail',['id'=>$book['authorid']])}" target="_blank" class="author-info--name">{$book.author}</a>
+                <a href="{:url('author_detail',['id'=>$book['authorid']])}" class="author-info--name">{$book.author}</a>
                 {eq name="$author.issign" value="1"}
                     <div class="author-info--badges">
                         <span class="author-info--badges-sign"><img src="{__ASSETS__}/init/images/sign_ico.png" alt="签约作家"></span>
