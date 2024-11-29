@@ -139,6 +139,40 @@ class Book extends BaseController
         if (isset($param['isfinish']) && !empty($param['isfinish'])) {
             $where[] = ['isfinish', '=', $param['isfinish']];
         }
+        if (isset($param['words']) && !empty($param['words'])) {
+            $words = intval($param['words']);
+            //300万字以上
+            if ($words == 1) {
+                $where[] = ['words', '>=', 10000 * 300];
+            }
+            //100万字以上
+            if ($words == 2) {
+                $where[] = ['words', '>=', 10000 * 100];
+            }
+            //50万字以上
+            if ($words == 3) {
+                $where[] = ['words', '>=', 10000 * 50];
+            }
+            //30万字以下
+            if ($words == 4) {
+                $where[] = ['words', '<=', 10000 * 30];
+            }
+            //30-50万字
+            if ($words == 5) {
+                $where[] = ['words', '>=', 10000 * 30];
+                $where[] = ['words', '<=', 10000 * 50];
+            }
+            //50-100万字
+            if ($words == 6) {
+                $where[] = ['words', '>=', 10000 * 50];
+                $where[] = ['words', '<=', 10000 * 100];
+            }
+            //100-300万字
+            if ($words == 7) {
+                $where[] = ['words', '>=', 10000 * 100];
+                $where[] = ['words', '<=', 10000 * 300];
+            }
+        }
         if (!isset($param['order']) || empty($param['order'])) {
             $param['order'] = 'sort DESC';
         }
@@ -155,6 +189,9 @@ class Book extends BaseController
                     continue;
                 }
                 $result['data'][$k]['headpic'] = get_file($author['headimg']);
+                $result['data'][$k]['cover_str'] = get_file($v['cover']);
+                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? '完结' : '连载';
+                $result['data'][$k]['words_str'] = intval($v['words']) > 0 ? wordCount($v['words']) : 0;
                 $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
                 $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['id']]));
             }

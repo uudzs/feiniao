@@ -1,5 +1,6 @@
 {extend name="common/base"/}
 {block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/cate.css?v={$conf.version}">
 {/block}
 {block name="title"}
 <title>{:get_seo_str('classify','classify_title','',['cateid'=>$id])}</title>	
@@ -11,13 +12,149 @@
 <!-- 主体 -->
 {block name="body"}
 {include file="common/header" nav='index' /}
-<div class="container" style="display: flex; height: 60vh; align-items: center; justify-content: center;">
-敬请期待！
+<div class="container">
+    <section class="books-default">
+        <section class="books-nav">
+            <div class="books-nav--list">
+                <div class="books-nav--item">
+                    <div class="books-nav--item-title">
+                        作品分类
+                    </div>
+                    <div class="books-nav--item-wrap">                       
+                        <a class="books-nav--item-nav global-hover-card currNavLink" href="javascript:;" data-genre="0"><span>全部</span></a>
+                        {volist name=":model('category')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
+                            <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-genre="{$vo.id}"><span>{$vo.name}</span></a>
+                        {/volist}                        
+                    </div>
+                </div>
+                <div class="books-nav--item">
+                    <div class="books-nav--item-title">
+                        作品字数
+                    </div>
+                    <div class="books-nav--item-wrap">
+                        <a class="books-nav--item-nav global-hover-card currNavLink" href="javascript:;" data-words="0"><span>全部</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-words="1"><span>300万字以上</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-words="2"><span>100万字以上</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-words="3"><span>50万字以上</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-words="4"><span>30万字以下</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-words="5"><span>30-50万字</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-words="6"><span>50-100万字</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-words="7"><span>100-300万字</span></a>
+                    </div>
+                </div>
+                <div class="books-nav--item">
+                    <div class="books-nav--item-title">
+                        更新状态
+                    </div>
+                    <div class="books-nav--item-wrap">
+                        <a class="books-nav--item-nav global-hover-card currNavLink" data-isfinish="0"><span>全部</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-isfinish="1"><span>连载中</span></a>
+                        <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-isfinish="2"><span>已完结</span></a>
+                    </div>
+                </div>                
+            </div>
+        </section>
+        <section class="nav-content">
+            <div class="nav-content--nav">
+                <div class="nav-content--navlist">
+                    <div class="nav-content--navlist-item nav-content--navlist-item-tar" href="javascript:;" data-order="hits desc"><span>热度最高</span></div>
+                    <div class="nav-content--navlist-item" href="javascript:;" data-order="words desc"><span>字数最多</span></div>
+                    <div class="nav-content--navlist-item" href="javascript:;" data-order="update_time desc"><span>最近更新</span></div>
+                </div>
+            </div>
+            <div class="nav-content--main">
+           
+            </div>
+            <div id="cateList"></div>
+        </section>
+    </section>
 </div>
 {/block}
 <!-- 脚本 -->
 {block name="script"}
 <script>
+$(window).on('load', function () {
+    layui.use(['form', 'jquery'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            laypage = layui.laypage,
+            layer = layui.layer;
+        var condition = {};
+        var page = 1;
+        function pageRender() {
+            $('.books-nav--item .books-nav--item-wrap .currNavLink').each(function() {
+            var data = $(this).data();
+                $.each(data, function(key, value) {
+                    condition[key] = value;
+                });
+            });
+            condition['order'] = $('.nav-content--navlist-item-tar').data('order');
+            condition['page'] = page; 
+            let layerIndex = layer.load();
+            $.postApi("{:furl('v1/booklist', [], true, 'api')}", condition, function(result) {               
+                layer.close(layerIndex); 
+                if(result.code == 0) {
+                    laypage.render({
+                        theme: '#148AFF',
+                        elem: 'cateList',
+                        limit: 20,
+                        curr: page,
+                        count: result.data.total,
+                        jump: function(obj, first) {
+                            if(!first) {
+                                page = obj.curr;
+                                pageRender()
+                            }
+                        }
+                    });
+                    makeHtml(result.data.data)
+                } else {
+                    return layer.msg(result.msg);
+                }
+            });
+        }
+        pageRender();
+        $('.books-nav--item .books-nav--item-wrap a').on('click', function () {
+            $(this).siblings().removeClass('currNavLink');
+            $(this).addClass('currNavLink');
+            page = 1;
+            pageRender();
+        })
+        $('.nav-content--navlist .nav-content--navlist-item').on('click', function () {
+            $(this).siblings().removeClass('nav-content--navlist-item-tar');
+            $(this).addClass('nav-content--navlist-item-tar');
+            page = 1;
+            pageRender();
+        })
+        function makeHtml(data) {
+            $('.nav-content--main').html('');
+            $.each(data, function(key, item) {
+                var html = `<div class="nav-content--main-item">
+                    <div class="nav-content--main-item-img global-book--shadow">
+                        <a href="${item.url}" target="_blank" title="${item.title}" class="nav-content--main-item-img-cover global-radius global-book--frame">
+                        <img alt="${item.title}" class="animation-img" src="${item.cover_str}" lazy="loaded">
+                        </a>
+                    </div>
+                    <div class="nav-content--main-item-content">
+                        <a href="${item.url}" target="_blank" title="${item.title}" class="nav-content--main-item-title ellipsis global-hover">${item.title}</a>
+                        <div class="nav-content--main-item-keywords ellipsis">
+                            <a href="${item.authorurl}" target="_blank" class="global-hover">${item.author}</a>
+                            <span>·</span>
+                            <span>${item.bigcatetitle}</span>
+                            <span>·</span>
+                            <span>${item.isfinish_str}</span>
+                            <span>·</span>
+                            <span>${item.words_str}</span>
+                        </div>
+                        <a href="${item.url}" target="_blank" title="${item.title}" class="nav-content--main-item-desc ellipsis-two-lines global-hover">${item.remark}</a>                       
+                    </div>
+                </div>`;
+                $('.nav-content--main').append(html);                
+            });
+            $('.progress-wrap').trigger('click');
+        }        
+    });
+});
 </script>
 {/block}
 <!-- /脚本 -->
