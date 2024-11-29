@@ -41,6 +41,16 @@ class Book extends BaseController
     }
 
     /**
+     * 全本
+     * Summary of list
+     */
+    public function quanben()
+    {
+        if ($this->usecache()) $this->makecache(View::fetch());
+        return view();
+    }
+
+    /**
      * 作品详情
      * Summary of detail
      */

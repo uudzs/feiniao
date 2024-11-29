@@ -3,7 +3,11 @@
 <link rel="stylesheet" href="{__STATIC__}/home/style/cate.css?v={$conf.version}">
 {/block}
 {block name="title"}
-<title>搜索{$keyword}-{$conf.title}</title>
+<title>{:get_seo_str('shuku','shuku_title')}</title>	
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{:get_seo_str('shuku','shuku_keywords')}"/>
+<meta name="description" content="{:get_seo_str('shuku','shuku_description')}"/>
 {/block}
 <!-- 主体 -->
 {block name="body"}
@@ -86,7 +90,6 @@ $(window).on('load', function () {
             });
             condition['order'] = $('.nav-content--navlist-item-tar').data('order');
             condition['page'] = page; 
-            condition['keywords'] = '{$keyword}'; 
             let layerIndex = layer.load();
             $.postApi("{:furl('v1/booklist', [], true, 'api')}", condition, function(result) {               
                 layer.close(layerIndex); 

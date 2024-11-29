@@ -5,7 +5,8 @@ use think\facade\Route;
 Route::rule('/$', 'index/index', 'GET|POST')->name('/');
 Route::rule('cate-<id>', 'book/cate', 'GET|POST')->name('book_cates');
 Route::rule('book-:id', 'book/detail', 'GET|POST')->name('book_detail');
-Route::rule('booklist', 'book/list', 'GET|POST')->name('booklist');
+Route::rule('shuku', 'book/list', 'GET|POST')->name('shuku');
+Route::rule('quanben', 'book/quanben', 'GET|POST')->name('quanben');
 Route::rule('author-:id', 'author/detail', 'GET|POST')->name('author_detail');
 Route::rule('chapter-:id', 'chapter/detail', 'GET|POST')->name('chapter_detail');
 Route::group('notice', function () {

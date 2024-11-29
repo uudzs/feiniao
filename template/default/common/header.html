@@ -12,7 +12,7 @@
 				</div>
 			</div>
 			<div class="col-lg-9 col-md-9 header-right">
-				<form id="commSearch" name="searchForm" class="comm_header_search_form" method="get" action="{:url('search')}" target="_blank">
+				<form id="commSearch" name="searchForm" class="comm_header_search_form" method="get" action="{:url('search')}">
 					<div class="comm_header_search_outer">
 						<div class="comm_header_search">							
 							{php}$header_keywords = isset($pageconf['header_keywords']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['header_keywords']])->order('level desc')->find() : '';{/php}
