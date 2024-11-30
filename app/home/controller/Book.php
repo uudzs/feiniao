@@ -42,9 +42,19 @@ class Book extends BaseController
 
     /**
      * 全本
-     * Summary of list
+     * Summary of quanben
      */
     public function quanben()
+    {
+        if ($this->usecache()) $this->makecache(View::fetch());
+        return view();
+    }
+
+    /**
+     * 排行
+     * Summary of rank
+     */
+    public function rank()
     {
         if ($this->usecache()) $this->makecache(View::fetch());
         return view();

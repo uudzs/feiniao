@@ -13,6 +13,7 @@ use think\facade\Route;
 use think\Image;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use think\captcha\facade\Captcha;
 
 class Common extends BaseController
 {
@@ -22,7 +23,7 @@ class Common extends BaseController
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => ['login', 'token', 'service']]
+        Auth::class => ['except' => ['login', 'token', 'service', 'captcha']]
     ];
 
     /**
@@ -118,6 +119,16 @@ class Common extends BaseController
         } else {
             return to_assign(1, '上传失败，请重试');
         }
+    }
+
+    /**
+     * 验证码
+     * Summary of captcha
+     * @return void
+     */
+    public function captcha()
+    {
+        return Captcha::create();
     }
 
     /**

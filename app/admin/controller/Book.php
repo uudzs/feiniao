@@ -440,7 +440,7 @@ class Book extends BaseController
             return to_assign(1, '作品不存在');
         }
         $chaptertable = calc_hash_db($book['id']); //章节内容表名
-        $chapter = Db::name('chapter')->where(['anid' => $book['id']])->select();
+        $chapter = Db::name('chapter')->where(['bookid' => $book['id']])->select();
         $chapter = $chapter ? $chapter->toArray() : [];
         foreach ($chapter as $k => $v) {
             Db::name('chapter')->where(['id' => $v['id']])->delete();

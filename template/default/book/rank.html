@@ -1,0 +1,261 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/rank.css?v={$conf.version}">
+{/block}
+{block name="title"}
+<title>{:get_seo_str('top','top_title')}</title>	
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="{:get_seo_str('top','top_keywords')}"/>
+<meta name="description" content="{:get_seo_str('top','top_description')}"/>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index' /}
+<div class="container ranks">
+    <section class="website-rank">
+        <div class="website-rank__main">
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/8df48f1.png');">
+                <div class="zh-modules-rank-box">
+                    {php}$chapter_top = model('book')->where(['status' => 1])->order('chapters desc')->limit(10)->select()->toArray();{/php}
+                    {notempty name="chapter_top"}
+                    {volist name="$chapter_top" id="vo"}
+                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    <div class="zh-modules-rank-book">
+                        {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+                        {if condition="$key > 2 && $key < 9"}
+                            <div class="book-rank--num"><span>0{$key+1}</span></div>
+                        {/if}
+                        {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                        <div class="book-rank--title">
+                            <p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+                            <div class="website-rank__rank-text">{$vo.chapters}</div>
+                        </div>
+                    </div>
+                    {/volist}
+                    {/notempty}
+                </div>
+            </section>
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/77e71dd.png');">
+                <div class="zh-modules-rank-box">
+                    {php}$words_top = model('book')->where(['status' => 1])->order('words desc')->limit(10)->select()->toArray();{/php}
+                    {notempty name="words_top"}
+                    {volist name="$words_top" id="vo"}
+                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    <div class="zh-modules-rank-book">
+                        {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+                        {if condition="$key > 2 && $key < 9"}
+                            <div class="book-rank--num"><span>0{$key+1}</span></div>
+                        {/if}
+                        {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                        <div class="book-rank--title">
+                            <p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+                            <div class="website-rank__rank-text">{:ceil($vo.words/10000)}万</div>
+                        </div>
+                    </div>
+                    {/volist}
+                    {/notempty}
+                </div>
+            </section>
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/b51874d.png');">
+                <div class="zh-modules-rank-box">
+                    {php}$hits_top = model('book')->where(['status' => 1])->order('hits desc')->limit(10)->select()->toArray();{/php}
+                    {notempty name="hits_top"}
+                    {volist name="$hits_top" id="vo"}
+                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    <div class="zh-modules-rank-book">
+                        {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+                        {if condition="$key > 2 && $key < 9"}
+                            <div class="book-rank--num"><span>0{$key+1}</span></div>
+                        {/if}
+                        {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                        <div class="book-rank--title">
+                            <p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+                            <div class="website-rank__rank-text">{$vo.hits > 0 ? $vo.hits : '--' }</div>
+                        </div>
+                    </div>
+                    {/volist}
+                    {/notempty}
+                </div>
+            </section>
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/9269490.png');">
+                <div class="zh-modules-rank-box">
+                    {php}
+                    $book_count = model('book')->where(['status' => 1, ['chapters', '>', 0]])->count();
+                    if($book_count > 10) {
+                        $start = mt_rand(0, ($book_count - 10));
+                    } else {
+                        $start = 0;
+                    }
+                    $rand_top = model('book')->where(['status' => 1, ['chapters', '>', 0]])->order('chapters desc')->limit($start, 10)->select()->toArray();
+                    {/php}
+                    {notempty name="rand_top"}
+                    {volist name="$rand_top" id="vo"}
+                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    <div class="zh-modules-rank-book">
+                        {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
+                        {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.title}"></div>{/eq}
+                        {if condition="$key > 2 && $key < 9"}
+                            <div class="book-rank--num"><span>0{$key+1}</span></div>
+                        {/if}
+                        {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                        <div class="book-rank--title">
+                            <p class="book-rank--title-text ellipsis"><a title="{$vo['title']}" target="_blank" href="{$link}" class="global-hover">{$vo['title']}</a></p>
+                            <div class="website-rank__rank-text">{$vo.chapters}</div>
+                        </div>
+                    </div>
+                    {/volist}
+                    {/notempty}
+                </div>
+            </section>
+        </div>
+    </section>
+    <section class="website-rank">
+        <div class="website-rank__main">
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/fans_top_bg.png');">
+                <div class="zh-modules-rank-box">
+                    {php}
+                        $followers = model('follow')
+                        ->field('from_id,type, COUNT(*) as followers')
+                        ->group('from_id')
+                        ->order('followers', 'DESC')
+                        ->limit(10)
+                        ->select()->toArray();
+                    {/php}
+                    {notempty name="followers"}
+                        {volist name="$followers" id="vo"}
+                            {php}
+                            if($vo['type'] == 1) {
+                                $user = model('author')->field('id,nickname')->where('id', $vo['from_id'])->find();
+                                $link = url('author_detail', ['id' => $user['id']]);
+                            } else {
+                                $user = model('user')->field('id,nickname')->where('id', $vo['from_id'])->find();
+                                $link = 'javascript:;';
+                            }
+                            {/php}
+                            <div class="zh-modules-rank-book">
+                                {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$user['nickname']}"></div>{/eq}
+                                {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$user['nickname']}"></div>{/eq}
+                                {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$user['nickname']}"></div>{/eq}
+                                {if condition="$key > 2 && $key < 9"}
+                                    <div class="book-rank--num"><span>0{$key+1}</span></div>
+                                {/if}
+                                {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                                <div class="book-rank--title">
+                                    <p class="book-rank--title-text ellipsis"><a title="{$user['nickname']}" target="_blank" href="{$link}" class="global-hover">{$user['nickname']}</a></p>
+                                    <div class="website-rank__rank-text">{$vo.followers}</div>
+                                </div>
+                            </div>
+                        {/volist}
+                    {/notempty}
+                </div>
+            </section>
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/fav_top_bg.png');">
+                <div class="zh-modules-rank-box">
+                    {php}
+                        $favorites = model('favorites')
+                        ->field('pid, COUNT(*) as favs')
+                        ->group('pid')
+                        ->order('favs', 'DESC')
+                        ->limit(10)
+                        ->select()->toArray();
+                    {/php}
+                    {notempty name="favorites"}
+                        {volist name="$favorites" id="vo"}
+                            {php}
+                                $book = model('book')->field('id,title')->where('id', $vo['pid'])->find();
+                                $link = url('book_detail', ['id' => $book['id']]);
+                            {/php}
+                            <div class="zh-modules-rank-book">
+                                {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$book.title}"></div>{/eq}
+                                {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$book.title}"></div>{/eq}
+                                {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$book.title}"></div>{/eq}
+                                {if condition="$key > 2 && $key < 9"}
+                                    <div class="book-rank--num"><span>0{$key+1}</span></div>
+                                {/if}
+                                {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                                <div class="book-rank--title">
+                                    <p class="book-rank--title-text ellipsis"><a title="{$book['title']}" target="_blank" href="{$link}" class="global-hover">{$book['title']}</a></p>
+                                    <div class="website-rank__rank-text">{$vo.favs}</div>
+                                </div>
+                            </div>
+                        {/volist}
+                    {/notempty}
+                </div>
+            </section>
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/create_top_bg.png');">
+                <div class="zh-modules-rank-box">
+                    {php}
+                    $books = model('book')
+                        ->field('authorid, COUNT(*) as booknum')
+                        ->group('authorid')
+                        ->order('booknum', 'DESC')
+                        ->limit(10)
+                        ->select()->toArray();
+                    {/php}
+                    {notempty name="books"}
+                        {volist name="$books" id="vo"}
+                            {php}
+                                $author = model('author')->field('id,nickname')->where('id', $vo['authorid'])->find();
+                                $link = url('author_detail', ['id' => $author['id']]);
+                            {/php}
+                            <div class="zh-modules-rank-book">
+                                {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$author.nickname}"></div>{/eq}
+                                {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$author.nickname}"></div>{/eq}
+                                {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$author.nickname}"></div>{/eq}
+                                {if condition="$key > 2 && $key < 9"}
+                                    <div class="book-rank--num"><span>0{$key+1}</span></div>
+                                {/if}
+                                {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                                <div class="book-rank--title">
+                                    <p class="book-rank--title-text ellipsis"><a title="{$author['nickname']}" target="_blank" href="{$link}" class="global-hover">{$author['nickname']}</a></p>
+                                    <div class="website-rank__rank-text">{$vo.booknum}</div>
+                                </div>
+                            </div>
+                        {/volist}
+                    {/notempty}
+                </div>
+            </section>
+            <section class="zh-modules-rank website-rank__list" style="background-image:url('{__STATIC__}/home/image/coin_top_bg.png');">
+                <div class="zh-modules-rank-box">
+                    {php}$coin_top = model('user')->field('id,nickname,coin')->where(['status' => 1])->order('coin desc')->limit(10)->select()->toArray();{/php}         
+                    {notempty name="coin_top"}
+                        {volist name="$coin_top" id="vo"}
+                            <div class="zh-modules-rank-book">
+                                {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.nickname}"></div>{/eq}
+                                {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.nickname}"></div>{/eq}
+                                {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$vo.nickname}"></div>{/eq}
+                                {if condition="$key > 2 && $key < 9"}
+                                    <div class="book-rank--num"><span>0{$key+1}</span></div>
+                                {/if}
+                                {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
+                                <div class="book-rank--title">
+                                    <p class="book-rank--title-text ellipsis"><a title="{$vo['nickname']}" href="javascript:;" class="global-hover">{$vo['nickname']}</a></p>
+                                    <div class="website-rank__rank-text">{$vo.coin > 0 ? $vo.coin : '--' }</div>
+                                </div>
+                            </div>
+                        {/volist}
+                    {/notempty}
+                </div>
+            </section>
+        </div>
+    </section>
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+$(window).on('load', function () {
+    layui.use(['form', 'jquery'], function () {      
+    });
+});
+</script>
+{/block}
+<!-- /脚本 -->

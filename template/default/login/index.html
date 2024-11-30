@@ -27,7 +27,7 @@
                 <div id="validatePanel" class="item" style="width: 137px;">
                     <span class="icon icon-7"></span>
                     <input type="text" name="captcha" placeholder="请输入验证码" maxlength="6">
-                    <img id="refreshCaptcha" class="validateImg" src="{:captcha_src()}" onclick="this.src='{:captcha_src()}?seed='+Math.random()">
+                    <img id="refreshCaptcha" class="validateImg" src="{:furl('v1/captcha', [], true, 'api')}" onclick="this.src='{:furl('v1/captcha', [], true, 'api')}?seed='+Math.random()">
                 </div>
                 <div class="tip">
                     <input type="checkbox" name="agree" lay-skin="primary" title="同意" lay-filter="agree">   
@@ -92,7 +92,7 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
                         });
                         window.location.href = refererUrl;
                     } else {
-                        $('#refreshCaptcha').attr("src", "{:captcha_src()}" + "?" + Math.random());
+                        $('#refreshCaptcha').attr("src", "{:furl('v1/captcha', [], true, 'api')}" + "?" + Math.random());
                     }
                 });                
             });
