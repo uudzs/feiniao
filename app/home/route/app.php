@@ -50,3 +50,4 @@ Route::rule('report$', 'user/report', 'GET|POST')->name('report');
 Route::rule('wechat_oauth_callback', 'login/wechat_oauth_callback', 'GET|POST')->name('wechat_oauth_callback');
 Route::rule('wechat_pay_callback', 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
 Route::rule('alipay_h5_pay_callback', 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');
+Route::miss('\app\home\controller\Emptys::miss');
