@@ -10,6 +10,7 @@ use app\admin\validate\BookValidate;
 use think\exception\ValidateException;
 use think\facade\Db;
 use think\facade\View;
+use Overtrue\Pinyin\Pinyin;
 
 class Book extends BaseController
 {
@@ -92,7 +93,20 @@ class Book extends BaseController
             if (isset($param["finishtime"])) {
                 $param["finishtime"] = $param["finishtime"] ? strtotime($param["finishtime"]) : 0;
             }
-            $this->model->addBook($param);
+            $param['create_time'] = time();
+            $filename = Pinyin::permalink($param['title'], '');
+            $book = Db::name('book')->where(['filename' => $filename])->find();
+            $param['filename'] = $filename;
+            $insertId = Db::name('book')->strict(false)->field(true)->insertGetId($param);
+            if ($insertId !== false) {
+                if (!empty($book)) {
+                    $filename = $filename . $insertId;
+                    Db::name('book')->where('id', $insertId)->strict(false)->field(true)->update(['filename' => $filename]);
+                }
+            }
+            add_log('add', $insertId, $param);
+            return to_assign(0, '操作成功', ['aid' => $insertId]);
+            //$this->model->addBook($param);
         } else {
             $result = hook("bookTagHook");
             $result = json_decode($result, true);
@@ -165,7 +179,20 @@ class Book extends BaseController
             if (empty(trim($label))) {
                 $param['label'] = '';
             }
-            $this->model->editBook($param);
+            if ($param['title'] != $book['title']) {
+                $filename = Pinyin::permalink($param['title'], '');
+                $filenamebook = Db::name('book')->where(['filename' => $filename, ['id', '<>', $book['id']]])->find();
+                if (!empty($filenamebook)) {
+                    $filename = $filename . $book['id'];
+                }
+                $param['filename'] = $filename;
+                $param['update_time'] = time();
+                Db::name('book')->where('id', $book['id'])->strict(false)->field(true)->update($param);
+                add_log('edit', $param['id'], $param);
+                return to_assign();
+            } else {
+                $this->model->editBook($param);
+            }
         } else {
             $id = isset($param['id']) ? $param['id'] : 0;
             $detail = $this->model->getBookById($id);

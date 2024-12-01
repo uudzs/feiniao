@@ -487,7 +487,12 @@ class User extends BaseController
         if (!empty($result['data'])) {
             foreach ($result['data'] as $k => $v) {
                 $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
-                $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['pid']]));
+                $book = Db::name('book')->where(['id' => $v['pid']])->find();
+                if (!empty($book)) {
+                    $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
+                } else {
+                    $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['pid']]));
+                }
                 $total = Db::name('chapter')->where(['bookid' => $v['pid'], 'status' => 1, 'verify' => ['in', '0,1']])->count();
                 $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $v['pid']])->count();
                 if ($total == 0 || $reads < 0) {
@@ -565,7 +570,7 @@ class User extends BaseController
                     continue;
                 }
                 $authorurl = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $book['authorid']]));
-                $bookurl = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['book_id']]));
+                $bookurl = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                 $newread = Db::name('readhistory')->field('IF(update_time = 0, create_time, update_time) AS order_time,id,update_time,create_time,title,chapter_id,book_id')->where($where)->order('order_time desc')->find();
                 $chapterurl = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $newread['chapter_id']]));
                 $total = Db::name('chapter')->where(['bookid' => $v['book_id'], 'status' => 1, 'verify' => ['in', '0,1']])->count();

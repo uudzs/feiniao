@@ -22,7 +22,14 @@ class Book extends BaseController
         $ismakecache = $this->usecache();
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
-        $category = Db::name('category')->where(['id' => $id])->find();
+        if (intval($id) ==  $id) {
+            $category = Db::name('category')->where(['id' => $id])->find();
+        } else {
+            $category = Db::name('category')->where(['key' => $id])->find();
+            if (!empty($category)) {
+                $id = $category['id'];           
+            }
+        }        
         View::assign('category', $category);
         View::assign('catid', $id);
         View::assign('id', $id);
@@ -69,8 +76,14 @@ class Book extends BaseController
         $ismakecache = $this->usecache();
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
-        if (intval($id) > 0) {
+        if (intval($id) ==  $id) {
             Db::name('book')->where('id', $id)->inc('hits')->update();
+        } else {
+            $book = Db::name('book')->where('filename', $id)->find();
+            if (!empty($book)) {
+                $id = $book['id'];
+                Db::name('book')->where('id', $id)->inc('hits')->update();                
+            }
         }
         View::assign('bid', $id);
         if ($ismakecache) $this->makecache(View::fetch());

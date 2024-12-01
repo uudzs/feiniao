@@ -179,12 +179,13 @@ class Common extends BaseController
                                         $list[$k]['genre'] = '';
                                     }
                                     $list[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
+                                    $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                                 } else {
                                     $list[$k]['finish'] = '';
                                     $list[$k]['author'] = '';
                                     $list[$k]['genre'] = '';
+                                    $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                                 }
-                                $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                             } else {
                                 $list[$k]['finish'] = '';
                                 $list[$k]['author'] = '';
@@ -230,12 +231,13 @@ class Common extends BaseController
                                 $result[$k]['genre'] = '';
                             }
                             $result[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
+                            $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                         } else {
                             $result[$k]['finish'] = '';
                             $result[$k]['author'] = '';
                             $result[$k]['genre'] = '';
+                            $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                         }
-                        $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                     } else {
                         $result[$k]['finish'] = '';
                         $result[$k]['author'] = '';

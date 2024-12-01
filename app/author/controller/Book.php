@@ -8,6 +8,7 @@ use app\author\BaseController;
 use think\facade\Db;
 use think\facade\View;
 use think\Image;
+use Overtrue\Pinyin\Pinyin;
 
 class Book extends BaseController
 {
@@ -130,20 +131,33 @@ class Book extends BaseController
             $param['label'] = $param['style'] . ',' . $param['ending'] . ',' . ($param['identity'] ? $param['identity'] . ',' : '') . ($param['image'] ? $param['image'] . ',' : '') . ($param['schools'] ? $param['schools'] . ',' : '') . ($param['element'] ? $param['element'] : '');
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);
             $param['create_time'] = time();
-            $res = Db::name('book')->strict(false)->field(true)->insertGetId($param);
-            if ($res !== false) {
-                // $cover = makecover($res);
-                // if ($cover) {
-                //     $res = Db::name('book')->where(['id' => $res])->strict(false)->field(true)->update(['cover' => $cover]);
-                // } else {
-                //     Db::name('book')->where(['id' => $res])->delete();
-                //     //删除作品
-                //     to_assign(1, '封面生成失败');
-                // }
+            $filename = Pinyin::permalink($param['title'], '');
+            $book = Db::name('book')->where(['filename' => $filename])->find();
+            $param['filename'] = $filename;
+            $insertId = Db::name('book')->strict(false)->field(true)->insertGetId($param);
+            if ($insertId !== false) {
+                if (!empty($book)) {
+                    $filename = $filename . $insertId;
+                    Db::name('book')->where('id', $insertId)->strict(false)->field(true)->update(['filename' => $filename]);
+                }
                 to_assign(0, '添加成功');
             } else {
                 to_assign(1, '添加失败');
             }
+            // $res = Db::name('book')->strict(false)->field(true)->insertGetId($param);
+            // if ($res !== false) {
+            //     // $cover = makecover($res);
+            //     // if ($cover) {
+            //     //     $res = Db::name('book')->where(['id' => $res])->strict(false)->field(true)->update(['cover' => $cover]);
+            //     // } else {
+            //     //     Db::name('book')->where(['id' => $res])->delete();
+            //     //     //删除作品
+            //     //     to_assign(1, '封面生成失败');
+            //     // }
+            //     to_assign(0, '添加成功');
+            // } else {
+            //     to_assign(1, '添加失败');
+            // }
         } else {
             $result = hook("bookTagHook");
             $tags = json_decode($result, true);
@@ -363,7 +377,15 @@ class Book extends BaseController
             $param['label'] = $param['style'] . ',' . $param['ending'] . ',' . ($param['identity'] ? $param['identity'] . ',' : '') . ($param['image'] ? $param['image'] . ',' : '') . ($param['schools'] ? $param['schools'] . ',' : '') . ($param['element'] ? $param['element'] : '');
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);
             $param['update_time'] = time();
-            $res = Db::name('book')->where(['id' => $id])->strict(false)->field(true)->update($param);
+            if ($param['title'] != $book['title']) {
+                $filename = Pinyin::permalink($param['title'], '');
+                $filenamebook = Db::name('book')->where(['filename' => $filename, ['id', '<>', $book['id']]])->find();
+                if (!empty($filenamebook)) {
+                    $filename = $filename . $book['id'];
+                }
+                $param['filename'] = $filename;    
+            }
+            $res = Db::name('book')->where(['id' => $book['id']])->strict(false)->field(true)->update($param);
             if ($res !== false) {
                 to_assign(0, '编辑成功');
             } else {
@@ -373,5 +395,4 @@ class Book extends BaseController
             return to_assign(1, '错误');
         }
     }
-
 }

@@ -193,7 +193,7 @@ class Book extends BaseController
                 $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? '完结' : '连载';
                 $result['data'][$k]['words_str'] = intval($v['words']) > 0 ? wordCount($v['words']) : 0;
                 $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
-                $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['id']]));
+                $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']]));
             }
         } else {
             $result = [

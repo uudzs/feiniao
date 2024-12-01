@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
@@ -81,7 +83,7 @@ class Search extends BaseController
             } else {
                 $result['data'][$k]['searchtype'] = 1;
             }
-            $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['id']]));
+            $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']]));
         }
         //写记录
         $res = Db::name('search_log')->strict(false)->field(true)->insertGetId($data);

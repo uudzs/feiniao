@@ -16,7 +16,7 @@ class Book extends Model
     $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
     $order = empty($param['order']) ? 'id desc' : $param['order'];
     $list = self::where($where)
-      ->field('id,title,author,authorid,cover,style,ending,genre,subgenre,isfinish,finishtime,chapters,label,label_custom,hits,words,status,editor,editorid,issign,create_time,update_time,remark')
+      ->field('id,title,author,authorid,cover,style,ending,genre,subgenre,isfinish,finishtime,chapters,label,label_custom,hits,words,status,editor,editorid,issign,create_time,update_time,remark,filename')
       ->order($order)
       ->paginate($rows, false, ['query' => $param])
       ->each(function ($item, $key) {
