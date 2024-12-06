@@ -68,6 +68,21 @@
     </div>    
   </div>
 
+  <div id="comments" class="bui-tab bui-box-vertical">
+    <div class="bui-tab-head">
+        <ul class="bui-nav">
+            <li class="bui-btn">评论</li>
+        </ul>
+    </div>
+    <div class="bui-tab-main">
+        <ul>
+            <li>
+              {:hook('commentsHook', ['terminal' => 'wap_script', 'bookid' => $bid])}
+            </li>
+        </ul>
+    </div>
+</div>
+
   <div class="similar bui-scroll">
     <div class="section-title">同类推荐</div>
     <ul class="bui-list bui-list-pic bui-scroll-main"></ul>
@@ -121,6 +136,13 @@
         },
         mounted: function () {
             var that = this;
+            var uiTab = bui.tab({
+                id: "#comments",
+                width: "100%",
+                onTo(index) {
+                    console.log(index)
+                }
+            });
             post("{:furl('v1/bookdetail', ['id' => $bid], true, 'api')}", {}, function(result) {
                 if(result.code == 0) {
                     that.bookinfo = result.data || [];     
