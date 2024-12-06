@@ -1,6 +1,5 @@
 body {
-    background: url("../image/detail-bg.jpg") no-repeat top center;
-    background-size: contain;
+    background: #f6f8fa;
 }
 .book-detail {
     padding-top: 100px;
@@ -177,16 +176,16 @@ body {
     margin-bottom: 2rem;
 }
 .ypc-column-name {
-    color: #777;
-    font-size: 1.2rem;
-    font-weight: 600;
+    color: #148AFF;
+    font-size: 1rem;
+    font-weight: normal;
     line-height: 32px;
 }
 .book-detail .detail-card .ypc-column-name {
     margin-bottom: .5rem;
 }
 .book-detail .intro {
-    border-top: 1px solid #bde4ff;
+    border-top: 1px solid #e9e9e9;
     padding-top: 1rem;
     position: relative;
 }
@@ -197,7 +196,7 @@ body {
     line-height: 1.8;
 }
 .book-detail .catalogue {
-    border-top: .01rem solid #bde4ff;
+    border-top: .01rem solid #e9e9e9;
     font-size: 1rem;
     position: relative;
     padding: 0;
@@ -235,22 +234,6 @@ body {
     color: #999;
     flex-shrink: 0;
     margin-left: .95rem;
-}
-.book-detail .detail-card-catalogue .all {
-    align-items: center;
-    display: flex;
-    justify-content: space-between;
-}
-.book-detail .link-entry {
-    display: flex;
-    background-color: #fa573e;
-    color: #fff;
-    font-size: .8rem;
-    font-weight: normal;
-    max-width: 4.5rem;
-    border-radius: .2rem;
-    padding: .2rem .5rem;
-    cursor: pointer;
 }
 .author-info {
     background: #fff;
@@ -493,4 +476,28 @@ body {
 }
 .chapter-catalogue ul li.active a {
     color: #ff0000;
+}
+.book-detail-tab {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px 32px 0;
+    margin-bottom: 20px;
+}
+.layui-tab .layui-tab-title li {
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 32px;
+    padding: 0 50px;
+}
+.layui-tab-brief>.layui-tab-title .layui-this {
+    color: #148AFF ;
+}
+.layui-tab-brief>.layui-tab-title .layui-this:after {
+    border: none;
+    border-radius: 0;
+    border-bottom: 2px solid #148AFF;
+}
+.layui-tab-item.remark {
+    line-height: 2.5;
+    font-size: 15px;
 }

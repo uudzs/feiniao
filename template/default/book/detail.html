@@ -32,11 +32,9 @@
         if(!empty($chapterlist)) {
             $last_chapter = end($chapterlist);
             $new_chapter = array_reverse(array_slice($chapterlist, -6));
-            $front_chapter = array_slice($chapterlist, 0, 10);
         } else {
             $last_chapter = [];
             $new_chapter = [];
-            $front_chapter = [];
         }
         if (!empty($book['remark'])) {
             $book['remark'] = htmlspecialchars_decode($book['remark']);
@@ -56,6 +54,13 @@
         }        
         $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
         $follow_count = model('follow')->where(['from_id' => $book['authorid']])->count();
+        $content = $title = '';
+        if($chapterlist && $chapterlist[0]) {
+            $chaptertable = calc_hash_db($book['id']); //章节内容表名
+            $title = $chapterlist[0]['title'];
+            $content = model($chaptertable)->where(['sid' => $chapterlist[0]['id']])->value('info');
+            list($cnt, $content) = countWordsAndContent($content);
+        }
         {/php}
         <div class="crumbs"><a href="{:url('/')}">首页</a>{notempty name="$genrename"}<a href="{$genrelink}">{$genrename}</a>{/notempty}{notempty name="$subgenrename"}<a href="{$subgenrelink}">{$subgenrename}</a>{/notempty}<h2>{$book.title}</h2></div>
         <section class="header">
@@ -122,27 +127,57 @@
                 <div class="author-info--btn"><span><i class="bi bi-person-plus-fill"></i> 加关注</span></div>
             </section>
         </section>
-        <section class="detail-card detail-card-intro">
-            <p class="ypc-column-name">书籍简介</p>
-            <div class="intro">
-                <div class="intro-content">{$book.remark|raw}</div>            
-            </div>
-        </section>
-        {notempty name="$new_chapter"}
-        <section class="detail-card detail-card-catalogue">
-            <h2 class="ypc-column-name">最新章节</h2>
-            <ul class="catalogue">
-                {volist name="$new_chapter" id="v"}
-                    <li class="catalogue-list">
-                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
-                            <span class="catalogue-list__title">{$v.title}</span>
-                            <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
-                        </a>
-                    </li>
-                {/volist}
+
+        <div class="layui-tab layui-tab-brief book-detail-tab">
+            <ul class="layui-tab-title">
+              <li class="layui-this">作品信息</li>
+              <li>章节目录({:count($chapterlist)})</li>
+              <li>作品评论({:hook('commentsNum', ['bookid' => $book['id']])})</li>
             </ul>
-        </section>
-        {/notempty}
+            <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show remark">
+                    <h2 class="ypc-column-name">书籍简介</h2>
+                    {$book.remark|raw}
+                    <h2 class="ypc-column-name">{$title}</h2>
+                    {$content|raw}                    
+                </div>
+                <div class="layui-tab-item">
+                    {notempty name="$new_chapter"}
+                        <section class="detail-card detail-card-catalogue">
+                            <h2 class="ypc-column-name">最新章节</h2>
+                            <ul class="catalogue">
+                                {volist name="$new_chapter" id="v"}
+                                    <li class="catalogue-list">
+                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
+                                            <span class="catalogue-list__title">{$v.title}</span>
+                                            <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
+                                        </a>
+                                    </li>
+                                {/volist}
+                            </ul>
+                        </section>
+                    {/notempty}
+                    {notempty name="$chapterlist"}
+                        <section class="detail-card detail-card-catalogue">
+                            <h2 class="ypc-column-name">所有章节</h2>
+                            <ul class="catalogue">
+                                {volist name="$chapterlist" id="v"}
+                                    <li class="catalogue-list">
+                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
+                                            <span class="catalogue-list__title">{$v.title}</span>
+                                            <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
+                                        </a>
+                                    </li>
+                                {/volist}                   
+                            </ul>
+                        </section>
+                    {/notempty}
+                </div>
+                <div class="layui-tab-item">
+                    {:hook('commentsHook', ['terminal' => 'pc_script', 'bookid' => $book['id']])}
+                </div>
+            </div>
+        </div>       
         {php}
         if($book['genre']) {
             $similar = model('book')->field('id,cover,title')->where(['status' => 1, 'genre' => $book['genre']])->order('hits desc')->limit(8)->select()->toArray();
@@ -168,34 +203,7 @@
                     {/volist}
                 </ul>
             </section>
-        {/notempty}
-        {notempty name="$front_chapter"}
-            <section class="detail-card detail-card-catalogue">
-                <div class="all">
-                    <p class="ypc-column-name">全部章节</p>
-                    <div class="link-entry all-chapter">查看全部</div>
-                </div>
-                <ul class="catalogue">
-                    {volist name="$front_chapter" id="v"}
-                        <li class="catalogue-list">
-                            <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
-                                <span class="catalogue-list__title">{$v.title}</span>
-                                <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
-                            </a>
-                        </li>
-                    {/volist}                   
-                </ul>
-            </section>
-        {/notempty}
-        {notempty name="$chapterlist"}
-        <div class="chapter-catalogue-box">
-            <ul>
-                {volist name="$chapterlist" id="v"}
-                <li><a href="{:url('chapter_detail',['id'=>$v['id']])}">{$v.title}</a></li>
-                {/volist}
-            </ul>
-        </div>
-        {/notempty}       
+        {/notempty}          
         {php}
         if($book['genre']) {
             $new_book = model('book')->field('id,cover,title,author,authorid,words,remark,isfinish')->where(['status' => 1, 'genre' => $book['genre']])->order('create_time desc')->limit(9)->select()->toArray();
@@ -241,12 +249,52 @@
         </div>        
     {/notempty}
 </div>
+<style>
+#SOHUCS #SOHU_MAIN .module-cmt-footer .section-service-w .service-wrap-w a {
+    display: none!important
+}
+#SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw, #SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw:hover {
+    background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
+    color: #fff !important;
+    padding: 6px 13px!important;
+    border-radius: 50px!important;
+    font-weight: 400!important;
+    line-height: normal!important;
+    letter-spacing: 0.5px!important;
+    position: relative!important;
+    z-index: 1!important;
+    width: auto !important;
+    height: auto !important;
+    font-size: 15px!important;
+    overflow: hidden !important;
+}
+#SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .cy-logo {
+    background-size: contain!important;
+    background-repeat: no-repeat!important;
+    background-position: center center!important;
+}
+#SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .list-comment-empty-w .empty-prompt-w {
+    background: none!important;
+}
+#SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .platform-login .split-hr {
+    display: none!important;
+}
+#SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .block-head-w .head-img-w img {
+    border-radius: 50%!important;
+    clip-path: inset(0 round 20px);
+}
+#SOHUCS #SOHU_MAIN .module-cmt-list .block-cont-gw .cont-head-gw .head-img-gw img {
+    border-radius: 50%!important;
+    clip-path: inset(0 round 20px);
+}
+</style>
 {/block}
 <!-- 脚本 -->
 {block name="script"}
 <script src="{__STATIC__}/home/script/jquery.qrcode.min.js?v={$conf.version}"></script>
 <script>
     $(window).on('load', function () {
+        $(".btn-fw").text('评论一下');
         var bookinfo = [];
         $.postApi("{:furl('v1/bookdetail', ['id' => $bid], true, 'api')}", {}, function(result) {
             if(result.code == 0) {
@@ -281,6 +329,10 @@
                 }
             });
         })
+        $('.header-login').on('click', function () {
+            layer.msg('ddd');
+            $('.changyan-overlay-outer .phone-login .login-btn').html('登录');
+        })
         $('.author-info--btn').on('click', function () {
             var text = $(this).text().split(' ').join('');
             $.postApi("{:furl('v1/follow', [], true, 'api')}", {"from_id": bookinfo.authorid, "type": 1}, function(result) {
@@ -289,18 +341,6 @@
                     if(text == '加关注') $('.author-info--btn').html('<span><i class="bi bi-person-check-fill"></i> 已关注</span>');
                     if(text == '已关注') $('.author-info--btn').html('<span><i class="bi bi-person-plus-fill"></i> 加关注</span>');
                 }
-            });
-        })
-        $('.all-chapter').on('click', function () {
-            layer.open({
-                type: 1,
-                area: ['80%', '50%'],
-                title: '章节目录',
-                shade: 0.6,
-                shadeClose: true,
-                maxmin: true,
-                anim: 0,
-                content: '<div class="chapter-catalogue">' + $(".chapter-catalogue-box").html() + '</div>'
             });
         })
     });

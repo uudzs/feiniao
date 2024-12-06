@@ -184,6 +184,7 @@ a.creat-accout-btn:hover::before,
 
 .top-manu li.loginstatus img {
     width: 20px;
+    height: 20px;
     border-radius: 50%;
 }
 

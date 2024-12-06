@@ -59,11 +59,10 @@
 <script>
 	$(window).on('load', function () {
 		var localfeiniao = layui.data('feiniao');
-		token = localfeiniao.token;
-		console.log('token',token);   
+		token = localfeiniao.token;  
 		if (!token) $.getToken();
 		$.getMe("{:furl('v1/mine', [], true, 'api')}", function(result) {
-			if(result.code == 0) {
+			if(parseInt(result.code) == 0) {
                 window.memerInfo = result.data.userinfo;
                 $('.loginstatus').html("<img src='" + result.data.userinfo.headimgurl + "'><span>欢迎您！</span>");
             }

@@ -65,7 +65,7 @@ class Index
         } else {
             $data['session'] = 0;
         }
-        $storageDir = CMS_ROOT . '/public/storage/';
+        $storageDir = app()->getRootPath() . 'public/storage/';
         if (!is_dir($storageDir)) {
             mkdir($storageDir, 0777, true);
         }

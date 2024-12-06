@@ -3,7 +3,7 @@
     --bgColor: #F6F8FA;
     --modBgColor: rgba(255, 255, 255, .3);
     --modSamllBgColor: #fff;
-    --width: 640px;
+    --width: 960px;
     --borderSmallColor: #F2F0F0;
     --fontAcolor: #333;
     --fontBcolor: var(--fontCcolor);
@@ -145,8 +145,10 @@ em, i {
 .reader {
     position: relative;
     margin: 0 auto;
-    width: 960px;
     margin-top: 110px;
+    --side-width: 0px;
+    width: calc(var(--width) + var(--side-width));
+    --widthB: calc(var(--width) + var(--side-width));
 }
 .reader .reader-crumb {
     text-align: left;
@@ -185,10 +187,10 @@ em, i {
 }
 .reader .reader-wrap {
     display: flex;
-    width: 960px;
+    width: calc(var(--width) + var(--side-width));
 }
 .reader .reader-wrap .reader-main {
-    width: 960px;
+    width: var(--width);
 }
 .reader .reader-wrap .reader-main .reader-top {
     padding: 32px 0 16px;
@@ -380,7 +382,7 @@ em, i {
     position: fixed;
     left: 50%;
     top: 325px;
-    --w: calc(960px / 2);
+    --w: calc(var(--widthB) / 2);
     margin-left: calc(var(--w) + 16px);
     width: 60px;
     z-index: 1000;

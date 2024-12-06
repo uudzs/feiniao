@@ -38,6 +38,44 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
         {notempty name="$subgenrename"}<a href="{$subgenrelink}">{$subgenrename}</a><span></span>{/notempty}
         {$book.title}
     </div>
+    <style>
+    .reader .reader-wrap .reader-r {
+        width: 400px;
+        background: #ffffff;
+        border-radius: 12px;
+        display: none;
+        margin-left: 13px;
+        position: relative;
+    }
+    .reader .reader-wrap .reader-r .reader-forum {
+        padding: 36px 40px 40px;
+        width: 400px;
+    }
+    .reader .reader-wrap .reader-r .close {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        position: absolute;
+        right: 40px;
+        top: 40px;
+        z-index: 20;
+    }
+    .reader .reader-wrap .reader-r .forum-wrap {
+        height: calc(100vh - 191px);
+        overflow-y: auto;
+        transition: height .3s;
+        margin-right: -20px;
+        padding-right: 20px;
+    }
+    .reader .reader-wrap .reader-r.fixed {
+        position: fixed;
+        margin-left: calc(var(--width) + 13px);
+        top: 69px;
+    }
+    .reader .reader-wrap .reader-r.fixed .forum-wrap {
+        height: calc(100vh - 191px)
+    }
+    </style>
     <div class="reader-wrap">
         <div class="reader-main">
             <div class="reader-top">
@@ -69,7 +107,15 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
                     </div>
                 </div>
             </div>
-        </div>       
+        </div>
+        <div class="reader-r">
+            <div class="reader-forum">
+                <div class="close"><i class="bi bi-x-lg"></i></div>
+                <div class="forum-wrap JforumWrap">
+                    {:hook('commentsHook', ['terminal' => 'pc_script', 'chapterid' => $chapter['id']])}
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="gpd-right-menu fixed" id="Jadom_panel">
@@ -77,6 +123,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
             <div class="tooltip-wrapper"><button class="list"><i class="bi bi-justify"></i><span class="text">目录</span></button></div>
             <div class="tooltip-wrapper"><button class="setting"><i class="bi bi-nut"></i><span class="text">设置</span></button></div>
             <div class="tooltip-wrapper"><button class="listen"><i class="bi bi-music-note-list"></i><span class="text">听书</span></button></div>
+            <div class="tooltip-wrapper"><button class="comment"><i class="bi bi-chat-dots"></i><span class="text">评论</span></button></div>
             <div class="tooltip-wrapper"><button class="like"><i class="bi bi-heart"></i><span class="text">点赞</span></button></div>
             <div class="tooltip-wrapper"><button class="bookshelf"><i class="bi bi-bag-plus"></i><span class="text">书架</span></button></div>
             <div class="tooltip-wrapper"><button class="addshelf btn_addshelf"><a href="{:url('book_detail', ['id' => $book['id']])}"><i class="bi bi-book"></i><span class="text">书详情</span></a></button></div>            
@@ -137,17 +184,58 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
         </div>
     </div>
 </div>
+<style>
+    #SOHUCS #SOHU_MAIN .module-cmt-footer .section-service-w .service-wrap-w a {
+        display: none!important
+    }
+    #SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw, #SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw:hover {
+        background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
+        color: #fff !important;
+        padding: 6px 13px!important;
+        border-radius: 50px!important;
+        font-weight: 400!important;
+        line-height: normal!important;
+        letter-spacing: 0.5px!important;
+        position: relative!important;
+        z-index: 1!important;
+        width: auto !important;
+        height: auto !important;
+        font-size: 15px!important;
+        overflow: hidden !important;
+    }
+    #SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .cy-logo {
+        background-size: contain!important;
+        background-repeat: no-repeat!important;
+        background-position: center center!important;
+    }
+    #SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .list-comment-empty-w .empty-prompt-w {
+        background: none!important;
+    }
+    #SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .platform-login .split-hr {
+        display: none!important;
+    }
+    #SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .block-head-w .head-img-w img {
+        border-radius: 50%!important;
+        clip-path: inset(0 round 20px);
+    }
+    #SOHUCS #SOHU_MAIN .module-cmt-list .block-cont-gw .cont-head-gw .head-img-gw img {
+        border-radius: 50%!important;
+        clip-path: inset(0 round 20px);
+    }
+</style>
 {/block}
 <!-- 脚本 -->
 {block name="script"}
 <script>
 $(window).on('load', function () {
+    $(".btn-fw").text('评论一下');
     var chapter_id = '{$id}';
     var chapter_info = {};
     var info = {};
     var config = layui.data('feiniao').readconfig;
     var fontsizes = [16, 18, 20, 22, 24, 26, 28, 30];
     var isupperpage = false;
+    var SOHUCS = false;
     if(!config) {
         config = {
                 "theme": "theme1",
@@ -177,9 +265,19 @@ $(window).on('load', function () {
             $(".gpd-reader-toast .gpd-wrap:eq(" + $(this).index() + ")").toggle();
         }
     })
+    //评论
+    $('.comment').on('click', function (obj, index) {
+        $('.reader').css('--side-width', '412px');
+        $('.reader-r').show();
+        $(this).parent().hide();
+    })
+    $('.reader .reader-wrap .reader-r .close').on('click', function (obj, index) {
+        $('.reader').css('--side-width', '0px');
+        $('.reader-r').hide();
+        $('.tooltip-wrapper').show();
+    })
     //书架
     $('.bookshelf').on('click', function (obj, index) {
-        layer.msg('书架');
         $.postApi("{:furl('v1/favorites', [], true, 'api')}", {bookid: chapter_info.bookid}, function(result) {
             layer.msg(result.msg);
             if(result.code == 0) {
@@ -273,9 +371,15 @@ $(window).on('load', function () {
             layer.msg(result.msg);
         }
     });
+    if($('#SOHUCS').length > 0) SOHUCS = true;
     //滚动
     var isLoading = false;
     $(window).scroll(function() {
+        if($(window).scrollTop() > 69) {
+            $(".reader-r").addClass("fixed");
+        } else {
+            $(".reader-r").removeClass("fixed");
+        }
         if($(window).scrollTop() <= 0 && !isLoading) {
             isLoading = true;
             isupperpage = true;
@@ -294,6 +398,7 @@ $(window).on('load', function () {
         if(!chapter_id) return false;
         $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
             if(result.code == 0) {
+                get_sohucs(chapter_id);
                 info = result.data.data[0];
                 chapter_id = info.front_chapter;
                 $('#JcatalogListWrap ul li').removeClass('active');
@@ -312,12 +417,12 @@ $(window).on('load', function () {
                                     <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                                 </div>
                             </div>`;
-                    $('#Jcontent').prepend(html);
-                    if(parseInt(info.like) > 0) {
-                        $('.like').find('i').attr('class','bi bi-heart-fill');
-                    } else {
-                        $('.like').find('i').attr('class','bi bi-heart');
-                    }
+                $('#Jcontent').prepend(html);
+                if(parseInt(info.like) > 0) {
+                    $('.like').find('i').attr('class','bi bi-heart-fill');
+                } else {
+                    $('.like').find('i').attr('class','bi bi-heart');
+                }                
             } else {
                 layer.msg(result.msg);
             }
@@ -329,6 +434,7 @@ $(window).on('load', function () {
         if(chapter_info.after_chapter > 0) {
             $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_info.after_chapter}, function(result) {
                 if(result.code == 0) {
+                    get_sohucs(chapter_info.after_chapter);
                     chapter_info = result.data.data[0];
                     $('.read-speed').find('i').css('width', chapter_info.speed + '%');
                     $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
@@ -353,12 +459,20 @@ $(window).on('load', function () {
                         $('.like').find('i').attr('class','bi bi-heart-fill');
                     } else {
                         $('.like').find('i').attr('class','bi bi-heart');
-                    }
+                    }                    
                 } else {
                     layer.msg(result.msg);
                 }
-            });
+            });            
         }
+    }
+
+    function get_sohucs(id) {
+        $.postApi("{:addons_url('changyan://index/sohucs')}", {id: id}, function(result) {
+            if(result.code == 0) {
+                if(result.data.sid) $('#SOHUCS').attr('sid', result.data.sid);
+            }
+        });
     }
 });
 </script>

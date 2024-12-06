@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
+	<title>{:get_system_config('web','title')}</title>
+    <link rel="stylesheet" href="{__ASSETS__}/init/css/feiniao.css?v={:get_system_config('web','version')}" media="all">
+</head>
+<body class="main-body">
+    <style>
+    .layui-table-pagebar {
+        float: left;
+    }
+    [data-field="booktitle"], [data-field="booktitle"] div {
+        min-width: 200px;
+    }
+    </style>
+    <div class="p-3">
+        <form class="layui-form gg-form-bar border-t border-x">
+            <h3 class="pb-3">评论管理</h3>
+            <div class="layui-input-inline" style="width:300px;">
+                <input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+            </div>
+            <div class="layui-input-inline">
+                <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+            </div>
+        </form>
+        <table class="layui-hide" id="comments" lay-filter="comments"></table>
+    </div>
+    
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-group">
+            <span class="layui-btn layui-btn-sm layui-btn-normal" lay-event="changyan2local" data-title="同步新评论"><i class="layui-icon layui-icon-export"></i> 同步新评论</span>
+            <span class="layui-btn layui-btn-sm layui-bg-red" lay-event="changyan" data-title="前往畅言管理平台"><i class="layui-icon layui-icon-set-fill"></i> 前往畅言管理平台</span>
+        </div>
+    </script>
+    
+    <script type="text/html" id="barDemo">	
+    <div class="layui-btn-group">
+        <a class="layui-btn layui-btn-xs" lay-event="read">查看</a>
+    </div>
+    </script>
+    <script>
+        const moduleInit = ['tool'];
+        function feiniaoInit() {
+            var table = layui.table, tool = layui.tool, form = layui.form, element = layui.element;
+            layui.pageTable = table.render({
+                elem: '#comments',
+                title: '评论列表',
+                toolbar: '#toolbarDemo',
+                url: "{:addons_url('changyan://index/comments', ['id' => $id])}",
+                id: 'comments',
+                page: true,
+                limit: 20,
+                cols: [
+                    [{
+                        field: 'booktitle',
+                        title: '作品名称',
+                        align: 'center',
+                    },{
+                        field: 'chaptertitle',
+                        title: '章节名称',
+                        align: 'center',
+                        width: 300,
+                        templet:function(d) {
+                            return d.chaptertitle ? d.chaptertitle : '--';
+                        }
+                    },{
+                        field: 'create_time',
+                        title: '创建时间',
+                        align: 'center',
+                        width: 150,
+                        templet:function(d) {
+                            return d.create_time ? layui.util.toDateString((parseInt(d.create_time) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--';
+                        }
+                    },{
+                        field: 'topic_url',
+                        title: '链接地址',
+                        align: 'center',
+                        width: 300,
+                        templet:function(d) {
+                            return d.topic_url ? '<a href="'+d.topic_url+'">'+d.topic_url+'</a>' : '--';
+                        }
+                    },
+                    {
+                        fixed: 'right',
+                        field: 'right',
+                        title: '操作',
+                        toolbar: '#barDemo',
+                        width: 100,
+                        align: 'center'
+                    }]
+                ],
+            });
+
+            //监听表头工具栏事件
+            table.on('toolbar(comments)', function(obj){
+                if (obj.event === 'changyan2local') {
+                    tool.side("{:addons_url('changyan://index/changyan2local')}");
+                    return false;
+                } else if(obj.event === 'changyan') {
+                    window.open("https://changyan.kuaizhan.com/audit/comments/TOAUDIT/1");
+                    return false;
+                }
+            });
+    
+            //监听表格行工具事件
+            table.on('tool(comments)', function(obj) {
+                var data = obj.data;
+                if (obj.event === 'read') {
+                    tool.side("{:addons_url('changyan://index/read')}?bookid="+obj.data.bookid);
+                }
+                return false;
+            });
+    
+            //监听搜索提交
+            form.on('submit(searchform)', function(data) {
+                layui.pageTable.reload({
+                    where: {
+                        keywords: data.field.keywords
+                    },
+                    page: {
+                        curr: 1
+                    }
+                });
+                return false;
+            });
+        }
+    </script>
+    <script src="{__ASSETS__}/layui/layui.js"></script>
+	<script src="{__ASSETS__}/init/feiniaoInit.js"></script>
+</body>
+</html>

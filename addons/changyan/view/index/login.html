@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=0">
+	<title>登录{:get_system_config('web','title')}</title>
+    <link rel="stylesheet" href="{__ASSETS__}/init/css/feiniao.css?v={:get_system_config('web','version')}" media="all">
+</head>
+<body class="main-body">
+    <style>
+    .main-body {
+        background: url('{__STATIC__}/home/image/detail-bg.jpg') no-repeat;
+        background-size: cover;
+    }
+    .layui-form {
+        display: flex;
+        height: 100vh;
+        align-items: center;
+        justify-content: center;
+    }
+    .login-container{width: 320px; margin: 21px auto 0;}
+    .login-container .logo {
+        display: block;
+        text-align: center;
+        padding: 20px 0;
+    }
+    .login-other .layui-icon{position: relative; display: inline-block; margin: 0 2px; top: 2px; font-size: 26px;}
+    </style>    
+    <form class="layui-form">        
+        <div class="login-container">
+            <div class="logo"><a href="{:url('/')}"><img src="{:get_system_config('web','logo')}" alt="{:get_system_config('web','title')}"></a></div>
+            <div class="layui-form-item">
+                <div class="layui-input-wrap">
+                <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-username"></i>
+                </div>
+                <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" lay-reqtext="请填写用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-wrap">
+                <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-password"></i>
+                </div>
+                <input type="password" name="password" value="" lay-verify="required" placeholder="密码" lay-reqtext="请真写密码" autocomplete="off" class="layui-input" lay-affix="eye">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-row">
+                <div class="layui-col-xs7">
+                    <div class="layui-input-wrap">
+                    <div class="layui-input-prefix">
+                        <i class="layui-icon layui-icon-vercode"></i>
+                    </div>
+                    <input type="text" name="captcha" value="" lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear">
+                    </div>
+                </div>
+                <div class="layui-col-xs5">
+                    <div style="margin-left: 10px;">
+                        <img src="{:addons_url('changyan://index/captcha')}" id="captcha" onclick="this.src='{:addons_url('changyan://index/captcha')}?seed='+Math.random()" style="width: 100%;">
+                    </div>
+                </div>
+                </div>
+            </div>            
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="login">登录</button>
+            </div>
+            <div class="layui-form-item login-other">                
+                还没有账号？ <a href="{:addons_url('changyan://index/register')}">注册帐号</a>
+            </div>
+        </div>
+    </form>
+    <script>
+        var moduleInit = ['tool'];    
+        function feiniaoInit() {
+            var form = layui.form, tool = layui.tool;    
+            //监听提交
+            form.on('submit(login)', function (data) {
+                let callback = function (e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        layui.data('feiniao', {
+                            key: 'token',
+                            value: e.data.token
+                        });
+                        window.location.href = "{:url('/')}";
+                    } else {
+                        $('#captcha').attr("src", "{:addons_url('changyan://index/captcha')}" + "?" + Math.random());
+                    }
+                }
+                tool.post("{:addons_url('changyan://index/login')}", data.field, callback);
+                return false;
+            });
+        }
+    </script>
+    <script src="{__ASSETS__}/layui/layui.js"></script>
+	<script src="{__ASSETS__}/init/feiniaoInit.js"></script>
+</body>
+</html>

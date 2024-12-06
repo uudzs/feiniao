@@ -1498,7 +1498,7 @@ CREATE TABLE `fn_nav_info` (
 -- Records of fn_nav_info
 -- ----------------------------
 INSERT INTO `fn_nav_info` VALUES ('1', '0', '1', '首页', '/', '', '0', '1', '9', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('6', '0', '1', '公告', '/info.html', '', '0', '1', '5', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('6', '0', '1', '公告', '/notice.html', '', '0', '1', '5', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('7', '0', '1', '手机版', '', '', '0', '1', '2', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('8', '0', '2', '关于我们', '/page-about.html', '', '1', '1', '9', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('9', '0', '2', '用户协议', '/page-agreement.html', '', '1', '1', '3', '0', '0');
