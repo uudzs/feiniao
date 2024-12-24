@@ -41,7 +41,7 @@ class Pages extends BaseController
 		$detail['keyword_array'] = $keyword_array;
 		PagesModel::where('id', $detail['id'])->inc('read')->update();
 		View::assign('detail', $detail);
-		if ($ismakecache) $this->makecache(View::fetch());
+		if ($ismakecache) $this->makecache(View::fetch($detail['template']));
 		return view($detail['template']);
 	}
 }

@@ -37,6 +37,8 @@ abstract class BaseController
      */
     protected $middleware = [];
 
+    protected $param = [];
+
     /**
      * 构造方法
      * @access public
@@ -145,14 +147,11 @@ abstract class BaseController
     protected function redirect($url, $params = [], $code = 302, $with = [])
     {
         $response = Response::create($url, 'redirect');
-
         if (is_integer($params)) {
             $code = $params;
             $params = [];
         }
-
         $response->code($code)->params($params)->with($with);
-
         throw new HttpResponseException($response);
     }
 

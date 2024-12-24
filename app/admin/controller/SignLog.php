@@ -13,6 +13,10 @@ use think\facade\View;
 
 class SignLog extends BaseController
 {
+
+    var $uid;
+    var $model;
+    
 	/**
      * 构造函数
      */

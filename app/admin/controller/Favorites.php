@@ -14,6 +14,10 @@ use think\facade\View;
 class Favorites extends BaseController
 
 {
+
+    var $uid;
+    var $model;
+    
 	/**
      * 构造函数
      */

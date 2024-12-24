@@ -17,6 +17,10 @@ use think\facade\View;
 class Pages extends BaseController
 
 {
+	
+	var $uid;
+    var $model;
+
 	/**
 	 * 构造函数
 	 */

@@ -14,6 +14,10 @@ use Overtrue\Pinyin\Pinyin;
 
 class Book extends BaseController
 {
+    
+    var $uid;
+    var $model;
+
     /**
      * 构造函数
      */

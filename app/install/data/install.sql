@@ -202,12 +202,6 @@ INSERT INTO `fn_admin_rule` VALUES ('55', '53', 'nav/delete', '删除', '导航�
 INSERT INTO `fn_admin_rule` VALUES ('56', '3', 'nav/nav_info', '导航管理', '导航', '', '2', '1', '1', '', '', '0', '0');
 INSERT INTO `fn_admin_rule` VALUES ('57', '56', 'nav/nav_info_add', '新建/编辑', '导航', '', '2', '1', '1', '', '', '0', '0');
 INSERT INTO `fn_admin_rule` VALUES ('58', '56', 'nav/nav_info_delete', '删除导航', '导航', '', '2', '1', '1', '', '', '0', '0');
-INSERT INTO `fn_admin_rule` VALUES ('59', '3', 'sitemap/index', '网站地图', '网站地图分类', '', '1', '1', '1', '', '', '0', '0');
-INSERT INTO `fn_admin_rule` VALUES ('60', '59', 'sitemap/add', '新建/编辑', '网站地图分类', '', '2', '1', '1', '', '', '0', '0');
-INSERT INTO `fn_admin_rule` VALUES ('61', '59', 'sitemap/delete', '删除', '网站地图分类', '', '2', '1', '1', '', '', '0', '0');
-INSERT INTO `fn_admin_rule` VALUES ('62', '3', 'sitemap/sitemap_info', '网站地图管理', '网站地图', '', '2', '1', '1', '', '', '0', '0');
-INSERT INTO `fn_admin_rule` VALUES ('63', '62', 'sitemap/sitemap_info_add', '新建/编辑', '网站地图', '', '2', '1', '1', '', '', '0', '0');
-INSERT INTO `fn_admin_rule` VALUES ('64', '62', 'sitemap/sitemap_info_delete', '删除', '网站地图', '', '2', '1', '1', '', '', '0', '0');
 INSERT INTO `fn_admin_rule` VALUES ('65', '3', 'slide/index', '轮播广告', '轮播组', '', '1', '1', '1', '', '', '0', '0');
 INSERT INTO `fn_admin_rule` VALUES ('66', '65', 'slide/add', '新建/编辑', '轮播组', '', '2', '1', '1', '', '', '0', '0');
 INSERT INTO `fn_admin_rule` VALUES ('67', '65', 'slide/delete', '删除', '轮播组', '', '2', '1', '1', '', '', '0', '0');
@@ -1768,47 +1762,6 @@ CREATE TABLE `fn_sign_log` (
 
 -- ----------------------------
 -- Records of fn_sign_log
--- ----------------------------
-
--- ----------------------------
--- Table structure for fn_sitemap
--- ----------------------------
-DROP TABLE IF EXISTS `fn_sitemap`;
-CREATE TABLE `fn_sitemap` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `sitemap_cate_id` int(11) NOT NULL DEFAULT '0' COMMENT '分类id',
-  `name` varchar(255) NOT NULL DEFAULT '' COMMENT '标题',
-  `pc_img` varchar(255) DEFAULT NULL COMMENT 'pc端图片',
-  `pc_src` varchar(255) DEFAULT NULL COMMENT 'pc端链接',
-  `mobile_img` varchar(255) DEFAULT NULL COMMENT '移动端图片',
-  `mobile_src` varchar(255) DEFAULT NULL COMMENT '移动端链接',
-  `status` int(1) NOT NULL DEFAULT '1' COMMENT '1可用-1禁用',
-  `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
-  `create_time` int(11) NOT NULL DEFAULT '0',
-  `update_time` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='网站地图内容表';
-
--- ----------------------------
--- Records of fn_sitemap
--- ----------------------------
-
--- ----------------------------
--- Table structure for fn_sitemap_cate
--- ----------------------------
-DROP TABLE IF EXISTS `fn_sitemap_cate`;
-CREATE TABLE `fn_sitemap_cate` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL DEFAULT '' COMMENT '分类名称',
-  `status` int(1) NOT NULL DEFAULT '1' COMMENT '1可用-1禁用',
-  `sort` int(11) NOT NULL DEFAULT '0' COMMENT '排序',
-  `create_time` int(11) NOT NULL DEFAULT '0',
-  `update_time` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='网站地图分类表';
-
--- ----------------------------
--- Records of fn_sitemap_cate
 -- ----------------------------
 
 -- ----------------------------
