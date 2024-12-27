@@ -386,7 +386,10 @@ $(window).on('load', function () {
             upper_chapter();
             isLoading = false;
         } 
-        if(($(window).scrollTop() + $(window).height()) >= $(document).height() && !isLoading) {
+        var scrollTop = Math.ceil($(window).scrollTop());
+        var height = Math.ceil($(window).height());
+        var documentheight = parseInt($(document).height());
+        if((scrollTop + height >= documentheight) && !isLoading) {
             isLoading = true;
             isupperpage = false;
             next_chapter();
@@ -468,11 +471,13 @@ $(window).on('load', function () {
     }
 
     function get_sohucs(id) {
+        {eq name=":get_addons_info('changyan')['status']" value="1"}
         $.postApi("{:addons_url('changyan://index/sohucs')}", {id: id}, function(result) {
             if(result.code == 0) {
                 if(result.data.sid) $('#SOHUCS').attr('sid', result.data.sid);
             }
         });
+        {/eq}
     }
 });
 </script>
