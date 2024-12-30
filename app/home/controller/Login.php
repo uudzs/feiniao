@@ -33,6 +33,11 @@ class Login extends BaseController
         return View();
     }
 
+    public function register()
+    {
+        return View();
+    }
+
     //微信授权登录回调
     public function wechat_oauth_callback()
     {

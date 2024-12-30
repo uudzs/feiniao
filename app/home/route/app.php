@@ -18,6 +18,7 @@ Route::rule('page-<name>', 'pages/detail', 'GET|POST')->pattern(['name' => '\w+'
 Route::rule('notice-:id', 'info/detail', 'GET|POST')->name('notice_detail');
 Route::rule('news-:id', 'article/detail', 'GET|POST')->name('news_detail');
 Route::rule('login$', 'login/index', 'GET|POST')->name('login');
+Route::rule('register$', 'login/register', 'GET|POST')->name('register');
 Route::rule('search', 'search/index', 'GET|POST')->name('search');
 Route::rule('my$', 'user/index', 'GET|POST')->name('my');
 Route::rule('message$', 'message/index', 'GET|POST')->name('message');

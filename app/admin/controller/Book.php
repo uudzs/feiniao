@@ -14,7 +14,7 @@ use Overtrue\Pinyin\Pinyin;
 
 class Book extends BaseController
 {
-    
+
     var $uid;
     var $model;
 
@@ -309,34 +309,42 @@ class Book extends BaseController
                 //逐行读取文件内容
                 $handle = fopen($realPath, 'r');
                 while (($line = fgets($handle)) !== false) {
-                    $e = mb_detect_encoding($line, array('ASCII', 'GB2312', 'GBK', 'UTF-8'));
+                    $e = mb_detect_encoding($line, array('UTF-8', 'ASCII', 'GB2312', 'GBK', 'BIG5'));
                     if ($e != 'UTF-8') {
                         $line = iconv($e, 'UTF-8', $line);
                     }
                     //作者：作者: 
-                    if (strpos($line, ' 著') !== false) {
-                        $author = explode(' 著', $line)[0];
-                    }
-                    if (strpos($line, '作者:') !== false) {
-                        $a = explode('作者:', $line);
-                        $author = isset($a[1]) ? $a[1] : '';
-                    }
-                    if (strpos($line, '作者：') !== false) {
-                        $a = explode('作者：', $line);
-                        $author = isset($a[1]) ? $a[1] : '';
-                    }
-                    if (preg_match_all("/([第]?[\d一二三四五六七八九零十百千]+[章])([^\r\n]+)/u", $line, $arr)) {
-                        if ($title) {
-                            $chapter[] = [
-                                'title' => $title,
-                                'content' => $str
-                            ];
-                            $str = '';
+                    if (empty($author)) {
+                        if (strpos($line, ' 著') !== false) {
+                            $author = explode(' 著', $line)[0];
                         }
-                        $title = $line;
-                    } else {
-                        $str .= $line . "\n";
+                        if (strpos($line, '作者:') !== false) {
+                            $a = explode('作者:', $line);
+                            $author = isset($a[1]) ? $a[1] : '';
+                        }
+                        if (strpos($line, '作者：') !== false) {
+                            $a = explode('作者：', $line);
+                            $author = isset($a[1]) ? $a[1] : '';
+                        }
                     }
+                    if (preg_match_all("/^([第][\d一二两三四五六七八九零十百千万、-]+[章|章节|卷|集])([^\r\n]+)?/u", trim($line), $arr)) {
+                        unset($arr);
+                        if (mb_strlen(trim($line)) > 50) {
+                            $str .= trim($line) . "\n";
+                        } else {
+                            if ($title) {
+                                $chapter[] = [
+                                    'title' => $title,
+                                    'content' => $str
+                                ];
+                                $str = '';
+                            }
+                            $title = trim($line);
+                        }
+                    } else {
+                        $str .= trim($line) . "\n";
+                    }
+                    unset($line);
                 }
                 fclose($handle);
                 $chapter[] = [
@@ -407,10 +415,10 @@ class Book extends BaseController
                             'title' => $v['title'],
                             'chaps' => $k + 1,
                             'status' => 1,
-                            'verify' => 0,
+                            'verify' => 1,
                             'trial_time' => 0,
                             'verifyresult' => '',
-                            'verifytime' => 9999, //新章节
+                            'verifytime' => time(),
                             'wordnum' => $wordnum,
                             'create_time' => time()
                         ];

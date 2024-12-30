@@ -34,7 +34,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
 <div class="reader" id="page_reader">
     <div class="reader-crumb">
         <a href="{:url('/')}">首页</a><span></span>
-        {notempty name="$genrename"}<a href="{$genrelink}">{$genrename}</a><span></span>{/notempty}
+        {notempty name="$genrename"}<a href="{$genrelink}">{$genrename}</a><span></span>{/notempty}   
         {notempty name="$subgenrename"}<a href="{$subgenrelink}">{$subgenrename}</a><span></span>{/notempty}
         {$book.title}
     </div>
@@ -83,7 +83,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
                 <div class="name">{$book.title}</div>
                 <div class="au">{$book.author}</div>
                 <div class="tags">
-                    <span>{$genrename} <i>类型</i></span><i class="line"></i>
+                    <span>{$genrename ? $genrename : '--'} <i>类型</i></span><i class="line"></i>
                     <span>{:time_format($book.create_time,'Y-m-d')} <i>发布时间</i></span><i class="line"></i>
                     <span>{:wordCount($book_words_count)} <i>字数</i></span>
                 </div>
@@ -383,8 +383,7 @@ $(window).on('load', function () {
         if($(window).scrollTop() <= 0 && !isLoading) {
             isLoading = true;
             isupperpage = true;
-            upper_chapter();
-            isLoading = false;
+            upper_chapter();            
         } 
         var scrollTop = Math.ceil($(window).scrollTop());
         var height = Math.ceil($(window).height());
@@ -392,14 +391,17 @@ $(window).on('load', function () {
         if((scrollTop + height >= documentheight) && !isLoading) {
             isLoading = true;
             isupperpage = false;
-            next_chapter();
-            isLoading = false;
+            next_chapter();            
         }
     });
     //上一页
     function upper_chapter() {
-        if(!chapter_id) return false;
+        if(!chapter_id) {
+            isLoading = false;
+            return false;            
+        }
         $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
+            isLoading = false;
             if(result.code == 0) {
                 get_sohucs(chapter_id);
                 info = result.data.data[0];
@@ -433,9 +435,13 @@ $(window).on('load', function () {
     }
     //下一页
     function next_chapter() {
-        if(chapter_info && !chapter_info.after_chapter) return false;
+        if(chapter_info && !chapter_info.after_chapter) {
+            isLoading = false;
+            return false;
+        }
         if(chapter_info.after_chapter > 0) {
             $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_info.after_chapter}, function(result) {
+                isLoading = false;
                 if(result.code == 0) {
                     get_sohucs(chapter_info.after_chapter);
                     chapter_info = result.data.data[0];
@@ -467,6 +473,8 @@ $(window).on('load', function () {
                     layer.msg(result.msg);
                 }
             });            
+        } else {
+            isLoading = false;
         }
     }
 

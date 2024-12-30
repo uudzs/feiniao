@@ -93,29 +93,31 @@
 					<div class="editor-recommend__left">
 						{php}$home_editor_main = isset($pageconf['home_editor_main']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['home_editor_main']])->order('level desc')->find() : '';{/php}
 						{notempty name="home_editor_main"}
-						{php}
-							$book = model('book')->where(['id' => $home_editor_main['books']])->find();
-							$link = url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]);					
-						{/php}
-						<div class="editor-recommend__left-coverImage global-book--shadow">
-							<div class="editor-recommend__left-coverImage-cover global-book--frame">
-								<a href="{$link}" target="_blank" title="{$home_editor_main.title}">
-									<img src="{$home_editor_main.images}" alt="{$home_editor_main.title}" class="animation-img editor-recommend__left-coverImage-img">
-								</a>
-							</div>
-							<div class="editor-recommend__left-coverImage-shadow global-radius"></div>
-						</div>
-						<div class="editor-recommend__left-currInfo">
-							<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-title global-hover ellipsis-two-lines">
-								{$home_editor_main.title}
-							</a>
-							<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-author ellipsis global-hover">
-								{$book.author}
-							</a>
-							<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-desc ellipsis-two-lines">
-								{$home_editor_main.introduction}
-							</a>
-						</div>
+							{php}
+								$book = model('book')->where(['id' => $home_editor_main['books']])->find();
+								$link = $book ? url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]) : '';					
+							{/php}
+							{notempty name="book"}
+								<div class="editor-recommend__left-coverImage global-book--shadow">
+									<div class="editor-recommend__left-coverImage-cover global-book--frame">
+										<a href="{$link}" target="_blank" title="{$home_editor_main.title}">
+											<img src="{$home_editor_main.images}" alt="{$home_editor_main.title}" class="animation-img editor-recommend__left-coverImage-img">
+										</a>
+									</div>
+									<div class="editor-recommend__left-coverImage-shadow global-radius"></div>
+								</div>
+								<div class="editor-recommend__left-currInfo">
+									<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-title global-hover ellipsis-two-lines">
+										{$home_editor_main.title}
+									</a>
+									<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-author ellipsis global-hover">
+										{$book.author}
+									</a>
+									<a href="{$link}" target="_blank" title="{$home_editor_main.title}" class="currInfo-desc ellipsis-two-lines">
+										{$home_editor_main.introduction}
+									</a>
+								</div>
+							{/notempty}
 						{/notempty}
 					</div>
 				</div>
@@ -127,30 +129,32 @@
 					{volist name="$home_editor_images" id="v"}
 						{php}
 							$book = model('book')->where(['id' => $v['books']])->find();
-							$link = url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]);				
+							$link = $book ? url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]) : '';				
 						{/php}
-						<div class="recommend-item">
-							<div class="recommend-img global-book--shadow">
-								<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-img--cover global-radius global-book--frame">
-									<img src="{$v.images}" alt="{$v.title}" class="animation-img">
-								</a>
-							</div>
-							<div class="recommend-content">
-								<div class="recommend-title ellipsis-two-lines global-hover">
-									<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-title ellipsis-two-lines global-hover">{$v.title}</a>
-								</div>
-								<div class="recommend-desc ellipsis-two-lines global-hover">
-									<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-desc ellipsis-two-lines global-hover">
-										{$v.introduction}
+						{notempty name="book"}
+							<div class="recommend-item">
+								<div class="recommend-img global-book--shadow">
+									<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-img--cover global-radius global-book--frame">
+										<img src="{$v.images}" alt="{$v.title}" class="animation-img">
 									</a>
 								</div>
-								<div class="recommend-type ellipsis">
-									<a href="{$link}" title="{$book.author}" target="_blank" class="global-hover">{$book.author}</a>
-									<span>·</span>
-									<a href="{$link}" title="{$v.title}" target="_blank" class="global-hover">{$book.isfinish == 2 ? '完结' : '连载'}</a>
+								<div class="recommend-content">
+									<div class="recommend-title ellipsis-two-lines global-hover">
+										<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-title ellipsis-two-lines global-hover">{$v.title}</a>
+									</div>
+									<div class="recommend-desc ellipsis-two-lines global-hover">
+										<a href="{$link}" target="_blank" title="{$v.title}" class="recommend-desc ellipsis-two-lines global-hover">
+											{$v.introduction}
+										</a>
+									</div>
+									<div class="recommend-type ellipsis">
+										<a href="{$link}" title="{$book.author}" target="_blank" class="global-hover">{$book.author}</a>
+										<span>·</span>
+										<a href="{$link}" title="{$v.title}" target="_blank" class="global-hover">{$book.isfinish == 2 ? '完结' : '连载'}</a>
+									</div>
 								</div>
 							</div>
-						</div>
+						{/notempty}
 					{/volist}
 					{/notempty}
 				</div>
@@ -162,6 +166,7 @@
 					{notempty name="home_editor_top"}
 						{volist name="$home_editor_top" id="v"}
 							{php}$book = model('book')->where(['id' => $v['books']])->find();{/php}
+							{notempty name="book"}
 							<div class="zh-modules-rank-book">
 								{eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$v.title}"></div>{/eq}
 								{eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$v.title}"></div>{/eq}
@@ -175,6 +180,7 @@
 									<div class="editor-recommend__rank-text">{$book.isfinish == 2 ? '完结' : '连载'}</div>
 								</div>						
 							</div>
+							{/notempty}
 						{/volist}
 					{/notempty}
 				</div>

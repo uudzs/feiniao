@@ -28,25 +28,17 @@
                     <span class="icon icon-7"></span>
                     <input type="text" name="captcha" placeholder="请输入验证码" maxlength="6">
                     <img id="refreshCaptcha" class="validateImg" src="{:furl('v1/captcha', [], true, 'api')}" onclick="this.src='{:furl('v1/captcha', [], true, 'api')}?seed='+Math.random()">
-                </div>
-                <div class="tip">
-                    <input type="checkbox" name="agree" lay-skin="primary" title="同意" lay-filter="agree">   
-                    <span class="agreement">《用户协议》</span><span class="privacy">《隐私政策》</span>
-                </div>
+                </div>              
             </div>
             <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
-                <button class="login-btn" lay-submit="" lay-filter="login">立即登录</button>
+                <button class="login-btn" lay-submit="" lay-filter="login" style="margin-top: 0;">立即登录</button>
             </div>
             <div class="layui-form-item" style="text-align:center; margin-top: 20px;">
-                <a href="{:addons_url('changyan://index/register')}">注册帐号</a>
+                <a href="{:url('register')}">没有账号？前往注册</a>
             </div>
         </div>
     </div>
 </div>
-{php}
-$agreement = model('pages')->where(['status' => 1, 'name' => 'agreement'])->value('content');
-$privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('content');
-{/php}
 {/block}
 {block name="script"}
 <script>
@@ -56,20 +48,9 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
             var $ = layui.jquery,
             form = layui.form,
             layer = layui.layer;
-            var agree = false;
-            form.on('checkbox(agree)', function(data) {
-                if(data.elem.checked){
-                    agree = true;
-                } else {
-                    agree = false;
-                }
-            });
+           
             form.on('submit(login)', function (data) {
-                data = data.field;
-                if(!agree) {
-                    layer.msg('请先同意相关协议');
-                    return false;
-                }
+                data = data.field;               
                 if (data.username == '') {
                     layer.msg('用户名不能为空');
                     return false;
@@ -109,49 +90,7 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
                 $(this).addClass('icon-5');
                 $("input[name='password']").attr('type', 'text');
             }
-        });
-        $('.agreement').on('click', function () {
-            layer.open({
-                type: 1,
-                area: ['80%', '50%'],
-                title: '用户协议',
-                shade: 0.6,
-                shadeClose: false,
-                maxmin: false,
-                btnAlign: 'c',
-                closeBtn: 0,
-                anim: 0,
-                content: `<div class="login_agreement">{$agreement|raw}</div>`,
-                btn: ['确定', '关闭'],
-                btn1: function(index, layero, that) {
-                    layer.close(index);
-                },
-                btn2: function(index, layero, that) {
-                    layer.close(index);
-                },
-            });
-        })        
-        $('.privacy').on('click', function () {
-            layer.open({
-                type: 1,
-                area: ['80%', '50%'],
-                title: '隐私政策',
-                shade: 0.6,
-                shadeClose: false,
-                maxmin: false,
-                btnAlign: 'c',
-                closeBtn: 0,
-                anim: 0,
-                content: `<div class="login_agreement">{$privacy|raw}</div>`,
-                btn: ['确定', '关闭'],
-                btn1: function(index, layero, that) {
-                    layer.close(index);
-                },
-                btn2: function(index, layero, that) {
-                    layer.close(index);
-                },
-            });
-        })        
+        });       
     });
 </script>
 {/block}

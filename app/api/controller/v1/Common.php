@@ -23,7 +23,7 @@ class Common extends BaseController
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => ['login', 'token', 'service', 'captcha']]
+        Auth::class => ['except' => ['login', 'register', 'token', 'service', 'captcha']]
     ];
 
     /**
@@ -605,6 +605,138 @@ class Common extends BaseController
             $token = JWT::encode($arr, $config['secrect'], 'HS256');
             $this->apiSuccess('登录成功', ['token' => $token]);
         }
+    }
+
+    public function register()
+    {
+        $param = get_params();
+        $username = isset($param['username']) ?  trim($param['username']) : '';
+        $password = isset($param['password']) ?  trim($param['password']) : '';
+        $confirmPassword = isset($param['confirmPassword']) ?  trim($param['confirmPassword']) : '';
+        $nickname = isset($param['nickname']) ?  trim($param['nickname']) : '';
+        $captcha = isset($param['captcha']) ? $param['captcha'] : '';
+        $invite_code = isset($param['invite_code']) ? trim($param['invite_code']) : '';
+        if (empty($username) || empty($password) || empty($confirmPassword) || empty($nickname)) {
+            $this->apiError('参数错误');
+        }
+        if (empty($captcha)) {
+            $this->apiError('参数错误');
+        }
+        if (!captcha_check($captcha)) {
+            $this->apiError('验证码错误');
+        }
+        if ($password != $confirmPassword) {
+            $this->apiError('两次密码输入不一致');
+        }
+        $user = Db::name('user')->where(['username' => $username])->find();
+        if (!empty($user)) {
+            $this->apiError('此用户名已被注册');
+        }
+        $user = Db::name('user')->where(['nickname' => $nickname])->find();
+        if (!empty($user)) {
+            $this->apiError('此昵称已被注册');
+        }
+        $session_invite = get_config('app.session_invite');
+        $invite = Cookie::get($session_invite);
+        $invite = $invite ?: $invite_code;
+        $pid = 0;
+        if (!empty($invite)) {
+            $senior = Db::name('user')->where(['qrcode_invite' => $invite])->find();
+            if (!empty($senior)) {
+                $pid = $senior['id'];
+            }
+        }
+        $add = [];
+        $add['salt'] = set_salt(20);
+        $add['username'] = $username;
+        $add['mobile'] = '';
+        $add['coin'] = 0;
+        $add['inviter'] = $pid;
+        $add['password'] = set_password($password, $add['salt']);
+        $add['register_time'] = time();
+        $add['mobile_status'] = 0;
+        $add['headimgurl'] = '';
+        $add['nickname'] = $nickname;
+        $add['qrcode_invite'] = get_invite_code();
+        $add['register_ip'] = request()->ip();
+        $uid = Db::name('user')->strict(false)->field(true)->insertGetId($add);
+        if (!$uid) {
+            $this->apiError('注册失败');
+        }
+        $user = Db::name('user')->where(['id' => $uid])->find();
+        if (!empty($user)) {
+            //发放奖励
+            $conf = get_system_config('reward');
+            //邀请
+            if (!empty($invite)) {
+                Cookie::delete($session_invite);
+                if ($pid > 0) {
+                    //邀请奖励
+                    if (intval($conf['invite_reward']) > 0) {
+                        Db::startTrans();
+                        try {
+                            // 执行数据库操作
+                            Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
+                            add_coin_log($pid, intval($conf['invite_reward']), 2, '邀请一个好友奖励，好友ID：' . $uid);
+                            Db::name('task')->strict(false)->field(true)->insertGetId([
+                                'user_id' => $pid,
+                                'taskid' => $uid,
+                                'type' => 3,
+                                'status' => 1,
+                                'title' => '邀请一个好友奖励',
+                                'task_date' => date('Y-m-d'),
+                                'reward' => intval($conf['invite_reward']),
+                                'ip' => app('request')->ip(),
+                                'create_time' => time()
+                            ]);
+                            // 提交事务
+                            Db::commit();
+                        } catch (\Exception $e) {
+                            // 回滚事务
+                            Db::rollback();
+                        }
+                    }
+                    //先生成奖励任务
+                    Db::name('task')->strict(false)->field(true)->insertGetId([
+                        'user_id' => $pid,
+                        'taskid' => $uid,
+                        'type' => 4,
+                        'status' => 0,
+                        'title' => '注册当天首次阅读章节',
+                        'task_date' => date('Y-m-d'),
+                        'reward' => intval($conf['invite_1_level']),
+                        'ip' => app('request')->ip(),
+                        'create_time' => time()
+                    ]);
+                    Db::name('task')->strict(false)->field(true)->insertGetId([
+                        'user_id' => $pid,
+                        'taskid' => $uid,
+                        'type' => 5,
+                        'status' => 0,
+                        'title' => '注册开始连续3天阅读章节',
+                        'task_date' => date('Y-m-d'),
+                        'reward' => intval($conf['invite_2_level']),
+                        'ip' => app('request')->ip(),
+                        'create_time' => time()
+                    ]);
+                    Db::name('task')->strict(false)->field(true)->insertGetId([
+                        'user_id' => $pid,
+                        'taskid' => $uid,
+                        'type' => 6,
+                        'status' => 0,
+                        'title' => '注册开始连续7天阅读章节',
+                        'task_date' => date('Y-m-d'),
+                        'reward' => intval($conf['invite_3_level']),
+                        'ip' => app('request')->ip(),
+                        'create_time' => time()
+                    ]);
+                }
+            }
+        }
+        if (empty($user)) {
+            $this->apiError('注册失败');
+        }
+        $this->apiSuccess('注册成功');
     }
 
     /**
