@@ -162,13 +162,16 @@ a.creat-accout-btn:hover::before,
 .logo {
     width: 180px;
 }
-
+.top-manu {
+    display: flex;
+}
 .top-manu ul {
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: end;
     align-items: center;
+    position: relative;
 }
 
 .top-manu li {
@@ -178,7 +181,7 @@ a.creat-accout-btn:hover::before,
 }
 
 .top-manu li.loginstatus {
-    display: flex;
+    display: flex;    
     align-items: center;
 }
 
@@ -221,6 +224,136 @@ a.creat-accout-btn:hover::before,
     background: #64adb9;
     border-color: #64adb9;
     color: #fff;
+}
+
+.comm_header_user_logined_avatar {
+    display: none;
+    width: 34px;
+    height: 34px;
+    background: #f6f8fa;
+    margin-left: 22px;
+    position: relative;
+    background-color: transparent;
+    transition-duration: .2s;
+    box-sizing: border-box;
+}
+.comm_header_user_logined_avatar img {
+    width: 34px;
+    height: 34px;
+    border-radius: 30px;
+    transition-duration: .2s;
+    left: 0;
+    position: absolute;
+    box-sizing: border-box;
+}
+.comm_header_user_logined_avatar:hover .comm_header_nav_slidebox {
+    display: block;
+}
+.comm_header_nav_slidebox {
+    display: none;
+    position: absolute;
+    right: 0;
+    z-index: 9;
+    box-sizing: border-box;
+}
+.comm_header_user_logined_avatar .comm_header_userInfoBox {
+    margin-top: 30px;
+    width: 285px;
+    padding: 20px 28px 12px;
+    background: #fff;
+    box-shadow: 0 0 4px 4px rgba(146, 146, 146, .05);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex-grow: 1;
+    position: relative;
+    box-sizing: border-box;
+}
+.comm_header_userInfoBox {
+    display: block
+}
+.comm_header_userInfoBox .comm_header_uf_name {
+    height: 24px;
+    font-size: 16px;
+    font-family: PingFangSC-Medium, PingFang SC;
+    font-weight: 500;
+    color: #333;
+    line-height: 24px;
+    max-width: 180px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0 auto;
+    text-align: center
+}
+.comm_header_userInfoBox {
+    flex-grow: 1;
+    position: relative
+}
+.comm_header_uinfo_sline {
+    height: 1px;
+    background-color: #f1f5f9;
+    margin: 4px 0;
+}
+.comm_header_ul_box {
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+    background: url('../../mobile/default/image/vip.png') no-repeat;
+    margin: 10px 0;
+    padding: 5px 0;
+}
+.comm_header_unum_wp {
+    display: flex;
+    justify-content: space-between
+}
+.comm_header_unum_num {
+    width: 75px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none
+}
+.comm_header_unum_num div {
+    white-space: nowrap;
+    font-size: 16px;
+    font-family: DINAlternate-Bold, DINAlternate;
+    font-weight: 700;
+    color: #333;
+    height: 24px;
+    line-height: 24px
+}
+.comm_header_unum_num span {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    height: 24px;
+    font-size: 12px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: #999;
+    line-height: 24px
+}
+.comm_header_ui_lnk {
+    height: 38px;
+    border-radius: 8px;
+    padding: 0 10px 0 16px;
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+.comm_header_uinfo_sline {
+    height: 1px;
+    background-color: #f1f5f9;
+    margin: 4px 0
+}
+.comm_header_ui_lnk:hover {
+    background-color: #f6f8fa
 }
 
 .creat-accout-btn {

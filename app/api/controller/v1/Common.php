@@ -365,6 +365,9 @@ class Common extends BaseController
             $user['email'] = implode('@', $parts);
         }
         $apply_coin = Db::name('withdraw')->where(['user_id' => JWT_UID, 'status' => 0])->sum('coin'); //提现中
+        $user['follow'] = Db::name('follow')->where(['user_id' => JWT_UID])->count(); //关注
+        $user['like'] = Db::name('like_log')->where(['user_id' => JWT_UID])->count(); //点赞
+        $user['favorites'] = Db::name('favorites')->where(['user_id' => JWT_UID])->count(); //书架
         $user['withdrawn'] = Db::name('withdraw')->where(['user_id' => JWT_UID, 'status' => 1])->sum('coin'); //已提现
         if (intval($apply_coin) > 0) {
             if (intval($apply_coin) > intval($user['coin'])) {

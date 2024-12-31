@@ -21,15 +21,18 @@ class Login extends BaseController
     {
         // 获取来路URL
         $refererUrl = Request::instance()->server('HTTP_REFERER', '');
-        $profileurl = furl('profile', [], true, 'home');
-        $profileurl2 =  furl('profile', [], true, true);
-        $loginurl = furl('login', [], true, 'home');
-        $loginurl2 = furl('login', [], true, true);
-        $regurl = furl('register', [], true, 'home');
-        $regurl2 = furl('register', [], true, true);
-        if (($refererUrl == $profileurl) || ($refererUrl == $loginurl) || ($refererUrl == $profileurl2) || ($refererUrl == $regurl) || ($refererUrl == $regurl2) || ($refererUrl == $loginurl2) || ($refererUrl == '')) {
-            $refererUrl = furl('/', [], true, 'home');
+        if (!empty($refererUrl)) {
+            $parsedUrl = parse_url($refererUrl);
+            if (!empty($parsedUrl) && isset($parsedUrl['path'])) {
+                $profileurl = furl('profile', [], true, 'home');
+                $loginurl = furl('login', [], true, 'home');
+                $regurl = furl('register', [], true, 'home');
+                if ($parsedUrl['path'] == $profileurl || $parsedUrl['path'] == $loginurl || $parsedUrl['path'] == $regurl) {
+                    $refererUrl = '';
+                }
+            }
         }
+        $refererUrl = $refererUrl ? $refererUrl : furl('/', [], true, 'home');
         View::assign('refererUrl', $refererUrl);
         add_user_log('view', '登录页面');
         return View();

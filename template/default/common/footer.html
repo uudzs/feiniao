@@ -63,9 +63,28 @@
 		if (!token) $.getToken();
 		$.getMe("{:furl('v1/mine', [], true, 'api')}", function(result) {
 			if(parseInt(result.code) == 0) {
-                window.memerInfo = result.data.userinfo;
-                $('.loginstatus').html("<img src='" + result.data.userinfo.headimgurl + "'><span>欢迎您！</span>");
-            }
+				$(".loginstatus").remove();
+				$('.comm_header_user_logined_avatar').show();
+				$('.comm_header_uf_name').text(result.data.userinfo.nickname ? result.data.userinfo.nickname : '--');
+				$('.comm_header_user_logined_avatar').find('img').attr('src', result.data.userinfo.headimgurl);
+				$('.comm_header_ul_box').text('VIP：' + result.data.userinfo.viptime + ' | 金币：' + result.data.userinfo.coin);
+				$('.comm_header_unum_wp').find('.comm_header_unum_num div').eq(0).text(result.data.userinfo.favorites);
+				$('.comm_header_unum_wp').find('.comm_header_unum_num div').eq(1).text(result.data.userinfo.like);
+				$('.comm_header_unum_wp').find('.comm_header_unum_num div').eq(2).text(result.data.userinfo.follow);
+            } else {
+				$('.comm_header_user_logined_avatar').remove();
+			}
 		});
+		$('.comm_header_ui_lnk').on('click', function (obj, index) {
+			layer.confirm('确定要退出登录吗？', {title: '退出提示',icon: 3}, function() {
+				layui.data('feiniao', {
+					key: 'token',
+					remove: true
+				});
+				location.reload();
+			}, function(){
+				layer.close(index);
+			});
+		})
 	});
 </script>

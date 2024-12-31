@@ -41,8 +41,38 @@
 								</li>
 							{/empty}
 						{/foreach}
-						<li class="loginstatus"><a href="{:furl('login', [], true, 'home')}" class="login-btn">登录</a></li>
+						</style>
+						<li class="loginstatus">
+							<a href="{:furl('login', [], true, 'home')}" class="login-btn">登录</a>							
+						</li>
 						<li><a href="{:furl('/', [], true, 'author')}" class="creat-accout-btn" target="_blank">作家中心</a></li>
+					</ul>
+					<ul>
+						<div class="comm_header_user_logined_avatar">
+							<img src="{__STATIC__}/assets/init/images/data-none.png" alt="">
+							<div class="comm_header_nav_slidebox">
+								<div class="comm_header_userInfoBox">
+									<div class="comm_header_uf_name">--</div>
+									<div class="comm_header_ul_box">--</div>
+									<div class="comm_header_unum_wp">
+										<span class="comm_header_unum_num">
+											<div>0</div>
+											<span>书架</span>
+										</span>
+										<span class="comm_header_unum_num">
+											<div>0</div>
+											<span>点赞</span>
+										</span>
+										<span class="comm_header_unum_num">
+											<div>0</div>
+											<span>关注</span>
+										</span>
+									</div>
+									<div class="comm_header_uinfo_sline"></div>
+									<a href="javascript:;" class="comm_header_ui_lnk">退出登录</a>
+								</div>
+							</div>
+						</div>
 					</ul>
 				</div>
 			</div>
