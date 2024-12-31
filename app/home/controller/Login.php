@@ -25,7 +25,9 @@ class Login extends BaseController
         $profileurl2 =  furl('profile', [], true, true);
         $loginurl = furl('login', [], true, 'home');
         $loginurl2 = furl('login', [], true, true);
-        if (($refererUrl == $profileurl) || ($refererUrl == $loginurl) || ($refererUrl == $profileurl2) || ($refererUrl == $loginurl2) || ($refererUrl == '')) {
+        $regurl = furl('register', [], true, 'home');
+        $regurl2 = furl('register', [], true, true);
+        if (($refererUrl == $profileurl) || ($refererUrl == $loginurl) || ($refererUrl == $profileurl2) || ($refererUrl == $regurl) || ($refererUrl == $regurl2) || ($refererUrl == $loginurl2) || ($refererUrl == '')) {
             $refererUrl = furl('/', [], true, 'home');
         }
         View::assign('refererUrl', $refererUrl);

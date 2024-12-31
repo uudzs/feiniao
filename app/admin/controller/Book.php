@@ -396,6 +396,7 @@ class Book extends BaseController
                             'author' => $author,
                             'authorid' => $authorid,
                             'status' => 1,
+                            'filename' => Pinyin::permalink($title, ''),
                             'create_time' => time(),
                         ]);
                     } else {
