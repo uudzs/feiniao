@@ -55,6 +55,17 @@ class Chapter extends BaseController
         $chapter['book'] = $book;
         $chaptertable = calc_hash_db($book['id']); //章节内容表名
         $chapter['info'] = Db::name($chaptertable)->where(['sid' => $chapter['id']])->value('info');
+        if (empty($chapter['info'])) {
+            $config = get_addons_info('caijipro');
+            if ($config && isset($config['status']) && isset($config['install']) && $config['status'] && $config['install']) {
+                $content = hook('caijiproChapterHook', ['chapterid' => $chapter['id']]);
+                if ($content && mb_strlen($content) > 0) {
+                    list($wordnum, $content) = countWordsAndContent($content, true);
+                    $chapter['info'] = $content;
+                    $chapter['wordnum'] = $wordnum;
+                }
+            }
+        }
         $chapter['info'] = htmlspecialchars_decode($chapter['info']);
         $replace = array("&nbsp;", "<br>", "<br>");
         $search = array(" ", "\n", '\n');

@@ -32,7 +32,7 @@ class User extends BaseController
     {
         $uid = get_login_author('id');
         $userInfo = Db::name('author')->where(['id' => $uid])->find();
-        if (strpos($userInfo['nickname'], (get_system_config('web', 'admin_title') . '_')) !== false) {
+        if (strpos($userInfo['nickname'], (get_system_config('web', 'title') . '_')) !== false) {
             $userInfo['nicknamemodify'] = 1;
         } else {
             $userInfo['nicknamemodify'] = 0;
@@ -60,7 +60,7 @@ class User extends BaseController
             if ($member['status'] != 1) {
                 to_assign(1, '用户被禁止！');
             }
-            if (strpos($member['nickname'], (get_system_config('web', 'admin_title') . '_')) !== false && empty($param['nickname'])) {
+            if (strpos($member['nickname'], (get_system_config('web', 'title') . '_')) !== false && empty($param['nickname'])) {
                 to_assign(1, '请设置笔名！');
             }
             //如果还未认证过实名
@@ -137,7 +137,7 @@ class User extends BaseController
             //是否修改笔名
             $ismodnickname = false;
             //修改笔名
-            if (strpos($member['nickname'], (get_system_config('web', 'admin_title') . '_')) !== false && !empty($param['nickname'])) {
+            if (strpos($member['nickname'], (get_system_config('web', 'title') . '_')) !== false && !empty($param['nickname'])) {
                 if ($param['nickname'] != $member['nickname']) {
                     $exist = Db::name('author')->where(['nickname' => $param['nickname']])->find(); //检测是否有重复
                     if (!empty($exist)) {

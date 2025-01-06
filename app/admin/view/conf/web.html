@@ -63,6 +63,7 @@
 			<td>
 				<select name="send_captcha">
 					<option value="">请选择验证码类型</option>
+					<option value="1" {notempty name="$config.send_captcha"}{eq name="$config.send_captcha" value="1"}selected{/eq}{/notempty}>邮箱发送</option>
 					<option value="2" {notempty name="$config.send_captcha"}{eq name="$config.send_captcha" value="2"}selected{/eq}{/notempty}>阿里云短信</option>
 				</select>
 			</td>

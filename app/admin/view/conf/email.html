@@ -120,7 +120,7 @@
 					return false;
 				}
 				$.ajax({
-					url: "/home/api/email_test",
+					url: "{:url('api/email_test')}",
 					data: { email: value },
 					type: "post",
 					beforeSend: function () {

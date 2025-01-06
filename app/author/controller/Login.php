@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\author\controller;
@@ -106,7 +107,7 @@ class Login
             // 验证失败 输出错误信息
             return to_assign(1, $e->getError());
         }
-        $mobile = intval($param['mobile']);
+        $mobile = trim($param['mobile']);
         $user = Db::name('author')->where(['mobile' => $mobile])->find();
         if (empty($user)) {
             return to_assign(1, '未找到对应账号');
@@ -123,45 +124,49 @@ class Login
             }
         }
         //发送过程
-        $config_web = get_system_config('web');
-        if (is_array($config_web) && isset($config_web['send_captcha']) && $config_web['send_captcha'] == 2) {
-            $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
-            $result = json_decode($result, true);
-            if ($result && is_array($result) && $result['Code'] == 'OK') {
-                if (!empty($verif)) {
-                    $data = array(
-                        'account' => $mobile,
-                        'count' => $verif['count']++,
-                        'send_time' => time(),
-                        'expire_time' => time() + 900,
-                        'code' => $code,
-                    );
-                    $res = Db::name('sms_log')->where(['id' => $verif['id']])->strict(false)->field(true)->update($data);
-                    if ($res) {
-                        return to_assign(0, '发送成功');
+        if (preg_match('/^1[3-9]\d{9}$/', $mobile)) {
+            $config = get_addons_info('aliyunsms');
+            if ($config && isset($config['status']) && isset($config['install']) && $config['status'] && $config['install']) {
+                $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
+                $result = json_decode($result, true);
+                if ($result && is_array($result) && $result['Code'] == 'OK') {
+                    if (!empty($verif)) {
+                        $data = array(
+                            'account' => $mobile,
+                            'count' => $verif['count']++,
+                            'send_time' => time(),
+                            'expire_time' => time() + 900,
+                            'code' => $code,
+                        );
+                        $res = Db::name('sms_log')->where(['id' => $verif['id']])->strict(false)->field(true)->update($data);
+                        if ($res) {
+                            return to_assign(0, '发送成功');
+                        } else {
+                            return to_assign(1, '发送失败');
+                        }
                     } else {
-                        return to_assign(1, '发送失败');
+                        $data = array(
+                            'account' => $mobile,
+                            'count' => 1,
+                            'send_time' => time(),
+                            'expire_time' => time() + 900,
+                            'code' => $code,
+                        );
+                        $id = Db::name('sms_log')->strict(false)->field(true)->insertGetId($data);
+                        if ($id > 0) {
+                            return to_assign(0, '发送成功');
+                        } else {
+                            return to_assign(1, '发送失败');
+                        }
                     }
                 } else {
-                    $data = array(
-                        'account' => $mobile,
-                        'count' => 1,
-                        'send_time' => time(),
-                        'expire_time' => time() + 900,
-                        'code' => $code,
-                    );
-                    $id = Db::name('sms_log')->strict(false)->field(true)->insertGetId($data);
-                    if ($id > 0) {
-                        return to_assign(0, '发送成功');
-                    } else {
-                        return to_assign(1, '发送失败');
-                    }
+                    return to_assign(1, $result['Message']);
                 }
             } else {
-                return to_assign(1, $result['Message']);
+                return to_assign(1, '短信服务未开启');
             }
         } else {
-            return to_assign(1, '未开启短信发送功能');
+            return to_assign(1, '手机号格式错误');
         }
     }
 
@@ -193,7 +198,7 @@ class Login
             // 验证失败 输出错误信息
             return to_assign(1, $e->getError());
         }
-        $mobile = intval($param['mobile']);
+        $mobile = trim($param['mobile']);
         $user = Db::name('author')->where(['mobile' => $mobile])->find();
         if (!empty($user)) {
             return to_assign(1, '该账户已经存在');
@@ -210,45 +215,49 @@ class Login
             }
         }
         //发送过程
-        $config_web = get_system_config('web');
-        if (is_array($config_web) && isset($config_web['send_captcha']) && $config_web['send_captcha'] == 2) {
-            $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
-            $result = json_decode($result, true);
-            if ($result && is_array($result) && $result['Code'] == 'OK') {
-                if (!empty($verif)) {
-                    $data = array(
-                        'account' => $mobile,
-                        'count' => $verif['count']++,
-                        'send_time' => time(),
-                        'expire_time' => time() + 900,
-                        'code' => $code,
-                    );
-                    $res = Db::name('sms_log')->where(['id' => $verif['id']])->strict(false)->field(true)->update($data);
-                    if ($res) {
-                        return to_assign(0, '发送成功');
+        if (preg_match('/^1[3-9]\d{9}$/', $mobile)) {
+            $config = get_addons_info('aliyunsms');
+            if ($config && isset($config['status']) && isset($config['install']) && $config['status'] && $config['install']) {
+                $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
+                $result = json_decode($result, true);
+                if ($result && is_array($result) && $result['Code'] == 'OK') {
+                    if (!empty($verif)) {
+                        $data = array(
+                            'account' => $mobile,
+                            'count' => $verif['count']++,
+                            'send_time' => time(),
+                            'expire_time' => time() + 900,
+                            'code' => $code,
+                        );
+                        $res = Db::name('sms_log')->where(['id' => $verif['id']])->strict(false)->field(true)->update($data);
+                        if ($res) {
+                            return to_assign(0, '发送成功');
+                        } else {
+                            return to_assign(1, '发送失败');
+                        }
                     } else {
-                        return to_assign(1, '发送失败');
+                        $data = array(
+                            'account' => $mobile,
+                            'count' => 1,
+                            'send_time' => time(),
+                            'expire_time' => time() + 900,
+                            'code' => $code,
+                        );
+                        $id = Db::name('sms_log')->strict(false)->field(true)->insertGetId($data);
+                        if ($id > 0) {
+                            return to_assign(0, '发送成功');
+                        } else {
+                            return to_assign(1, '发送失败');
+                        }
                     }
                 } else {
-                    $data = array(
-                        'account' => $mobile,
-                        'count' => 1,
-                        'send_time' => time(),
-                        'expire_time' => time() + 900,
-                        'code' => $code,
-                    );
-                    $id = Db::name('sms_log')->strict(false)->field(true)->insertGetId($data);
-                    if ($id > 0) {
-                        return to_assign(0, '发送成功');
-                    } else {
-                        return to_assign(1, '发送失败');
-                    }
+                    return to_assign(1, $result['Message']);
                 }
             } else {
-                return to_assign(1, $result['Message']);
+                return to_assign(1, '短信服务未开启');
             }
         } else {
-            return to_assign(1, '未开启短信发送功能');
+            return to_assign(1, '手机号格式错误');
         }
     }
 
@@ -311,7 +320,7 @@ class Login
     //随机昵称
     private function randNickname()
     {
-        $nickname = get_system_config('web', 'admin_title') . '_' . set_salt(10);
+        $nickname = get_system_config('web', 'title') . '_' . set_salt(10);
         $data = Db::name('author')->where(array('nickname' => $nickname))->find();
         if (empty($data)) {
             return $nickname;

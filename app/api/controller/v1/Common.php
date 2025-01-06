@@ -412,27 +412,19 @@ class Common extends BaseController
     public function login()
     {
         $param = get_params();
+        $email = isset($param['email']) ? trim($param['email']) : '';
         $username = isset($param['username']) ? trim($param['username']) : '';
         $mobile = isset($param['mobile']) ? trim($param['mobile']) : '';
         $password = isset($param['password']) ? trim($param['password']) : '';
         $invite_code = isset($param['invite_code']) ? trim($param['invite_code']) : '';
-        if (empty($mobile) && empty($username)) {
+        if (empty($mobile) && empty($username) && empty($email)) {
             $this->apiError('参数错误');
-        }
-        if (empty($param['code'])) {
-            $this->apiError('参数错误');
-        }
-        if (!empty($username) && empty($mobile)) {
-            $code = trim($param['code']);
-            if (!captcha_check($code)) {
-                $this->apiError('验证码错误');
-            }
-            if (empty($password)) {
-                $this->apiError('参数错误');
-            }
         }
         $user = [];
         if ($mobile) {
+            if (empty($param['code'])) {
+                $this->apiError('参数错误');
+            }
             $code = intval($param['code']);
             if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
                 $this->apiError('手机号不正确');
@@ -448,6 +440,9 @@ class Common extends BaseController
             $user = Db::name('user')->where(['mobile' => $mobile])->find();
         }
         if ($username) {
+            if (empty($password)) {
+                $this->apiError('参数错误');
+            }
             $user = Db::name('user')->where(['username' => $username])->find();
             if (empty($user)) {
                 $this->apiError('未找到此用户');
@@ -456,6 +451,24 @@ class Common extends BaseController
             if ($pwd !== $user['password']) {
                 $this->apiError('密码错误');
             }
+        }
+        if ($email) {
+            if (empty($param['code'])) {
+                $this->apiError('参数错误');
+            }
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $this->apiError('邮箱格式不正确');
+            }
+            $code = intval($param['code']);
+            $verif = Db::name('sms_log')->where(array('account' => $email, 'code' => $code))->find();
+            if (empty($verif)) {
+                $this->apiError('验证码未发送');
+            } else {
+                if ($verif['expire_time'] < time()) {
+                    $this->apiError('验证码已超时');
+                }
+            }
+            $user = Db::name('user')->where(['email' => $email])->find();
         }
         // 校验
         if (empty($user)) {
@@ -471,12 +484,14 @@ class Common extends BaseController
             }
             $add = [];
             $add['salt'] = set_salt(20);
+            $add['username'] = $username;
+            $add['email'] = $email;
             $add['mobile'] = $mobile;
             $add['coin'] = 0;
             $add['inviter'] = $pid;
             $add['password'] = set_password(set_salt(20), $add['salt']);
             $add['register_time'] = time();
-            $add['mobile_status'] = 1;
+            $add['mobile_status'] = $mobile ? 1 : 0;
             $add['headimgurl'] = '';
             $add['nickname'] = randNickname();
             $add['qrcode_invite'] = get_invite_code();
@@ -489,7 +504,7 @@ class Common extends BaseController
             if (!empty($user)) {
                 //发放奖励
                 $conf = get_system_config('reward');
-                if (intval($conf['mobile']) > 0) {
+                if (intval($conf['mobile']) > 0 && $mobile) {
                     Db::startTrans();
                     try {
                         // 执行数据库操作
@@ -608,6 +623,7 @@ class Common extends BaseController
             $token = JWT::encode($arr, $config['secrect'], 'HS256');
             $this->apiSuccess('登录成功', ['token' => $token]);
         }
+        $this->apiError('注册失败');
     }
 
     public function register()
@@ -760,23 +776,21 @@ class Common extends BaseController
     public function smssend()
     {
         $param = get_params();
-        $mobile = trim($param['mobile']);
-        if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-            $this->apiError('手机号不正确');
-        }
-        $code = mt_rand(100000, 999999);
+        $mobile = isset($param['mobile']) ? trim($param['mobile']) : '';
+        //发送配置
+        $config_web = get_system_config('web');
         $verif = Db::name('sms_log')->where(array('account' => $mobile))->find();
         if (!empty($verif)) {
             if ($verif['expire_time'] > time()) {
                 $this->apiError('已发出的验证码还有效，请输入！');
             }
         }
-        //发送过程
-        $config_web = get_system_config('web');
-        if (is_array($config_web) && isset($config_web['send_captcha']) && $config_web['send_captcha'] == 2) {
-            $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
-            $result = json_decode($result, true);
-            if ($result && is_array($result) && $result['Code'] == 'OK') {
+        $code = mt_rand(100000, 999999);
+        //邮箱
+        if (filter_var($mobile, FILTER_VALIDATE_EMAIL)) {
+            $content = '【' . $config_web['title'] . '】验证码：' . $code . '（15分钟内有效），请勿泄露验证码，如非本人操作，请忽略。';
+            $send = send_email($mobile, $config_web['title'] . '注册邮件', $content);
+            if ($send === true) {
                 if (!empty($verif)) {
                     $data = array(
                         'account' => $mobile,
@@ -807,10 +821,50 @@ class Common extends BaseController
                     }
                 }
             } else {
-                $this->apiError($result['Message']);
+                $this->apiError('发送失败：' . $send);
             }
-        } else {
-            $this->apiError('未开启短信发送功能');
         }
+        //手机
+        if (preg_match('/^1[3-9]\d{9}$/', $mobile)) {
+            $config = get_addons_info('aliyunsms');
+            if ($config && isset($config['status']) && isset($config['install']) && $config['status'] && $config['install']) {
+                $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
+                $result = json_decode($result, true);
+                if ($result && is_array($result) && $result['Code'] == 'OK') {
+                    if (!empty($verif)) {
+                        $data = array(
+                            'account' => $mobile,
+                            'count' => $verif['count']++,
+                            'send_time' => time(),
+                            'expire_time' => time() + 900,
+                            'code' => $code,
+                        );
+                        $res = Db::name('sms_log')->where(['id' => $verif['id']])->strict(false)->field(true)->update($data);
+                        if ($res) {
+                            $this->apiSuccess('发送成功', []);
+                        } else {
+                            $this->apiError('发送失败');
+                        }
+                    } else {
+                        $data = array(
+                            'account' => $mobile,
+                            'count' => 1,
+                            'send_time' => time(),
+                            'expire_time' => time() + 900,
+                            'code' => $code,
+                        );
+                        $id = Db::name('sms_log')->strict(false)->field(true)->insertGetId($data);
+                        if ($id > 0) {
+                            $this->apiSuccess('发送成功', []);
+                        } else {
+                            $this->apiError('发送失败');
+                        }
+                    }
+                } else {
+                    $this->apiError($result['Message']);
+                }
+            }
+        }
+        $this->apiError('禁止相关功能');
     }
 }

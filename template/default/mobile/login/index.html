@@ -11,6 +11,26 @@ $site_title = '登录';
 .bui-dialog-fullscreen .bui-dialog-main {
     text-align: left;
 }
+.login-form .bui-menu-bottom {
+    background: #fff;
+    z-index: 22;
+}
+.login-form .bui-menu-bottom li {
+    margin-bottom: 0!important;
+    padding: .25rem 0!important;
+}
+.login-form .bui-list {
+    overflow: unset;
+}
+.login-form #loginType .bui-btn {
+    margin-bottom: 0!important;
+}
+.login-form .clearactive {
+    display: flex;
+}
+.login-form .close {
+    display: none;
+}
 </style>
 <div class="container">
     <div class="subtitle logo">
@@ -20,15 +40,32 @@ $site_title = '登录';
         <div class="subtitle">快捷登录</div>
         <ul class="bui-list">
             <li class="bui-btn bui-box">
+                <label class="bui-label">
+                    <div id="loginType" class="bui-dropdown">
+                        <div class="bui-btn bui-box" >
+                            <div class="span1">请选择</div>
+                            <i class="icon-dropdown"></i>
+                        </div>
+                    </div>
+                </label>
                 <div class="span1">
                     <div class="bui-input user-input">
                         <i class="icon-phone">&#xe603;</i>
-                        <input type="text" name="mobile" placeholder="手机号码" value="" b-model="login.userinfo.mobile" b-blur="login.check" rule="^\d{11}" tip="请输入正确的手机号码">
+                        <input type="text" name="mobile" placeholder="请输入对应账号" b-model="login.userinfo.mobile" tip="请输入正确账号">
                         <i class="icon-remove" b-show="login.userinfo.mobile" b-click="login.clear('userinfo.mobile')"></i>
                     </div>
                 </div>
             </li>
-            <li class="bui-btn bui-box">
+            <li class="bui-btn bui-box" b-if="(login.loginType==3)">
+                <div class="span1">
+                    <div class="bui-input password-input">
+                        <i class="icon-lock"></i>
+                        <input type="password" name="password" placeholder="请输入密码" b-model="login.userinfo.password" tip="请输入密码">
+                        <i class="icon-remove" b-show="login.userinfo.password" b-click="login.clear('userinfo.password')"></i>
+                    </div>
+                </div>
+            </li>
+            <li class="bui-btn bui-box clearactive" b-class="login.captcha">
                 <div class="span1">
                     <div class="bui-input">
                         <i class="icon-safe"></i>
@@ -71,15 +108,49 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
             data: {
                 userinfo: {
                     mobile: "",
-                    code: ""
+                    code: "",
+                    password: "0",
                 },
                 remember: false,
                 agree: false,
                 auto: false,
                 disabled: false,
                 codetext: "获取验证码",
+                loginType: 1,
+                captcha: 'clearactive'
             },
             methods: {
+                loginTypes() {
+                    let that =this;
+                    var dropdown = bui.dropdown({
+                        id: "#loginType",
+                        data: [{
+                            name:"手机登录",
+                            value:1
+                        },{
+                            name:"邮箱登录",
+                            value:2
+                        },{
+                            name:"账号密码",
+                            value:3
+                        }],
+                        value:1,
+                        relative: false,
+                        callback: function (e) {
+                            that.loginType = this.value();
+                            if(that.loginType == 3) {
+                                that.captcha = 'close';
+                                that.userinfo.code = '0';
+                                that.userinfo.password = '';
+                            } else {
+                                that.captcha = 'clearactive';
+                                that.userinfo.password = '0';
+                                that.userinfo.code = '';
+                            }
+                        }
+                    });
+                    return dropdown;
+                },
                 agreement(e) {
                     var uiDialog = bui.popover({
                         content:`{$agreement|raw}`,
@@ -98,7 +169,7 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
                         }
                     })
                 },
-                 sign(e) {
+                sign(e) {
                     var that = this;
                     let userinfo = that.userinfo;
                     // 检测是否为空
@@ -109,7 +180,9 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
                     if(!that.agree) return bui.hint('请选同意相关协议！');
                     // 登陆
                     var invite_code = getCookie(sessioninvitename);
-                    var postData = {"mobile": that.userinfo.mobile, "code": that.userinfo.code, "invite_code": invite_code};
+                    if(that.loginType == 1) var postData = {"mobile": that.userinfo.mobile, "code": that.userinfo.code, "invite_code": invite_code};
+                    if(that.loginType == 2) var postData = {"email": that.userinfo.mobile, "code": that.userinfo.code, "invite_code": invite_code};
+                    if(that.loginType == 3) var postData = {"username": that.userinfo.mobile, "password": that.userinfo.password, "invite_code": invite_code};
                     post("{:furl('v1/login', [], true, 'api')}", postData, function(result) {
                         if(parseInt(result.code) === 0) {
                             storage.set("token", result.data.token);
@@ -150,7 +223,7 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
                     }                    
                     if (!that.disabled) {
                         if(!that.userinfo.mobile) return bui.hint('请输入手机号！');
-                        if (!(/^1\d{10}$/.test(that.userinfo.mobile))) {
+                        if (that.loginType == 1 && !(/^1\d{10}$/.test(that.userinfo.mobile))) {
                             return bui.hint('手机号不正确！');
                         }
                         if(!that.agree) return bui.hint('请选同意相关协议！');
@@ -187,6 +260,7 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
             templates: {},
             mounted: function () {
                 // 数据解析后执行
+                this.loginTypes();
             }
         })
     })

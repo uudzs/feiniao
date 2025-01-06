@@ -247,15 +247,12 @@ class Api extends BaseController
         $validate = \think\facade\Validate::rule([
             'email' => 'email'
         ]);
-
         $data = [
             'email' => $sender
         ];
-
         if (!$validate->check($data)) {
             return to_assign(1, $validate->getError());
         }
-
         $email_config = \think\facade\Db::name('config')->where('name', 'email')->find();
         $config = unserialize($email_config['content']);
         $content = $config['template'];
@@ -263,12 +260,11 @@ class Api extends BaseController
         if (empty($config['smtp']) || empty($config['smtp_port']) || empty($config['smtp_user']) || empty($config['smtp_pwd'])) {
             return to_assign(1, '请完善邮件配置信息！');
         }
-
         $send = send_email($sender, '测试邮件', $content);
-        if ($send) {
+        if ($send === true) {
             return to_assign(0, '邮件发送成功！');
         } else {
-            return to_assign(1, '邮件发送失败！');
+            return to_assign(1, $send);
         }
     }
 
@@ -338,5 +334,4 @@ class Api extends BaseController
 
         return to_assign(0, '', ['data_first' => hour_document($data_first), 'data_second' => hour_document($data_second), 'data_three' => date_document($data_three)]);
     }
-
 }

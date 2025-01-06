@@ -99,7 +99,7 @@ class Sign extends BaseController
             }
             $sign_progress++;
         }
-        View::assign('webtitle', get_system_config('web', 'admin_title'));
+        View::assign('webtitle', get_system_config('web', 'title'));
         View::assign('list', $list);
         View::assign('bank_list', $bank_list);
         View::assign('sign_succes', $sign_succes);
@@ -173,7 +173,7 @@ class Sign extends BaseController
         }
         View::assign('book', $book);
         View::assign('signlist', $signlist);
-        View::assign('webtitle', get_system_config('web', 'admin_title'));
+        View::assign('webtitle', get_system_config('web', 'title'));
         return view();
     }
 

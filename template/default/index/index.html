@@ -36,10 +36,6 @@
 	</section>
 
 	<div class="container">
-		<div style="margin-top: 20px; background: #fbfcdd; padding-top: 20px; padding-bottom: 20px; text-align: center;color: #ff5e00;font-size: 15px;border-radius: 12px;">本站所有内容来自互联网，纯作为系统演示用，无任何其他商业用途，如对您的知识产权构成侵害，请及时联系我们，我们会第一时间积极配合处理。</div>		
-	</div>
-
-	<div class="container">
 		<section class="home-tap-link">
 			<div class="home-tap-link__left" >
 				<a href="{:url('quanben')}" title="全本" class="home-tap-link__left-item">
@@ -448,7 +444,7 @@
 		</section>
 	</div>
 
-	{php}$links = model('links')->where(['status' => 1, ['logo', '>', 0]])->order('sort desc')->select()->toArray();{/php}
+	{php}$links = model('links')->where(['status' => 1])->order('sort desc')->select()->toArray();{/php}
 	{notempty name="links"}
 	<div class="container comm_friendLnk">
 		<div class="comm_footer_partner">

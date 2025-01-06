@@ -402,55 +402,52 @@ function add_user_log($type, $param_str = '', $param_id = 0, $param = [])
 function send_email($to, $subject = '', $content = '')
 {
     $mail = new PHPMailer\PHPMailer\PHPMailer();
-    $email_config = Db::name('config')
-        ->where('name', 'email')
-        ->find();
+    $email_config = Db::name('config')->where('name', 'email')->find();
     $config = unserialize($email_config['content']);
-
-    $mail->CharSet = 'UTF-8'; //设定邮件编码，默认ISO-8859-1，如果发中文此项必须设置，否则乱码
-    $mail->isSMTP();
-    $mail->SMTPDebug = 0;
-
-    //调试输出格式
-    //$mail->Debugoutput = 'html';
-    //smtp服务器
-    $mail->Host = $config['smtp'];
-    //端口 - likely to be 25, 465 or 587
-    $mail->Port = $config['smtp_port'];
-    if ($mail->Port == '465') {
-        $mail->SMTPSecure = 'ssl'; // 使用安全协议
-    }
-    //Whether to use SMTP authentication
-    $mail->SMTPAuth = true;
-    //发送邮箱
-    $mail->Username = $config['smtp_user'];
-    //密码
-    $mail->Password = $config['smtp_pwd'];
-    //Set who the message is to be sent from
-    $mail->setFrom($config['email'], $config['from']);
-    //回复地址
-    //$mail->addReplyTo('replyto@example.com', 'First Last');
-    //接收邮件方
-    if (is_array($to)) {
-        foreach ($to as $v) {
-            $mail->addAddress($v);
+    try {
+        $mail->CharSet = 'UTF-8'; //设定邮件编码，默认ISO-8859-1，如果发中文此项必须设置，否则乱码
+        $mail->isSMTP();
+        $mail->SMTPDebug = 0;
+        //调试输出格式
+        //$mail->Debugoutput = 'html';
+        //smtp服务器
+        $mail->Host = $config['smtp'];
+        //端口 - likely to be 25, 465 or 587
+        $mail->Port = $config['smtp_port'];
+        if ($mail->Port == '465') {
+            $mail->SMTPSecure = 'ssl'; // 使用安全协议
         }
-    } else {
-        $mail->addAddress($to);
-    }
-
-    $mail->isHTML(true); // send as HTML
-    //标题
-    $mail->Subject = $subject;
-    //HTML内容转换
-    $mail->msgHTML($content);
-    $status = $mail->send();
-    if ($status) {
-        return true;
-    } else {
-        //  echo "Mailer Error: ".$mail->ErrorInfo;// 输出错误信息
-        //  die;
-        return false;
+        //Whether to use SMTP authentication
+        $mail->SMTPAuth = true;
+        //发送邮箱
+        $mail->Username = $config['smtp_user'];
+        //密码
+        $mail->Password = $config['smtp_pwd'];
+        //Set who the message is to be sent from
+        $mail->setFrom($config['email'], $config['from']);
+        //回复地址
+        //$mail->addReplyTo('replyto@example.com', 'First Last');
+        //接收邮件方
+        if (is_array($to)) {
+            foreach ($to as $v) {
+                $mail->addAddress($v);
+            }
+        } else {
+            $mail->addAddress($to);
+        }
+        $mail->isHTML(true); // send as HTML
+        //标题
+        $mail->Subject = $subject;
+        //HTML内容转换
+        $mail->msgHTML($content);
+        $result = $mail->send();
+        if ($result) {
+            return $result;
+        } else {
+            return $mail->ErrorInfo;
+        }
+    } catch (\Exception $e) {
+        return $e->getMessage();
     }
 }
 
@@ -1131,7 +1128,7 @@ if (!function_exists('get_invite_code')) {
 if (!function_exists('randNickname')) {
     function randNickname()
     {
-        $nickname = get_system_config('web', 'admin_title') . '_' . set_salt(10);
+        $nickname = get_system_config('web', 'title') . '_' . set_salt(10);
         $data = Db::name('user')->where(array('nickname' => $nickname))->find();
         if (empty($data)) {
             return $nickname;
@@ -1145,7 +1142,7 @@ if (!function_exists('randNickname')) {
 if (!function_exists('randNicknameAuthor')) {
     function randNicknameAuthor()
     {
-        $nickname = get_system_config('web', 'admin_title') . '_' . set_salt(10);
+        $nickname = get_system_config('web', 'title') . '_' . set_salt(10);
         $data = Db::name('author')->where(array('nickname' => $nickname))->find();
         if (empty($data)) {
             return $nickname;

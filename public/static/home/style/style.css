@@ -302,6 +302,7 @@ a.creat-accout-btn:hover::before,
     justify-content: center;
     border-radius: 10px;
     background: url('../../mobile/default/image/vip.png') no-repeat;
+    background-size: cover;
     margin: 10px 0;
     padding: 5px 0;
 }

@@ -353,7 +353,7 @@ class User extends BaseController
             $this->apiError('邀请码不存在');
         }
         $title = $conf['invite_content'];
-        $replace = array(get_system_config('web', 'admin_title'), $user['nickname']);
+        $replace = array(get_system_config('web', 'title'), $user['nickname']);
         $search = array('{sitename}', "{nickname}");
         $title = str_replace($search, $replace, $title);
         try {
