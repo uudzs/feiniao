@@ -381,7 +381,7 @@ em, i {
 .reader .gpd-right-menu {
     position: fixed;
     left: 50%;
-    top: 325px;
+    top: 155px;
     --w: calc(var(--widthB) / 2);
     margin-left: calc(var(--w) + 16px);
     width: 60px;
@@ -425,11 +425,11 @@ em, i {
 .gpd-reader-toast {
     z-index: 1001;
     position: fixed;
-    top: 25%;
+    top: 15%;
     left: 25%;
     width: 50%;
-    height: 50%;
-    max-height: 50%;
+    height: auto;
+    /* max-height: 50%; */
     margin: 0 auto;
     overflow: hidden;
     display: none;

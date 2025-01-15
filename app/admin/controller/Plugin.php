@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace app\admin\controller;
@@ -50,18 +51,23 @@ class Plugin extends BaseController
                 return to_assign($result['code'], $result['msg']);
             }
         } else {
-            $config = ThinkAddons::config($param['name']);
-            // 如果插件自带配置模版的话加载插件自带的，否则调用表单构建器
-            $file = app()->getRootPath() . 'addons' . DIRECTORY_SEPARATOR . $param['name'] . DIRECTORY_SEPARATOR . 'config.html';
-            View::assign('name', $param['name']);
-            if (file_exists($file)) {
-                View::assign([
-                    'config' => $config
-                ]);
-                return view($file);
-            } else {
-                View::assign('config', $config);
-                return view();
+            try {
+                $config = ThinkAddons::config($param['name']);
+                // 如果插件自带配置模版的话加载插件自带的，否则调用表单构建器
+                $file = app()->getRootPath() . 'addons' . DIRECTORY_SEPARATOR . $param['name'] . DIRECTORY_SEPARATOR . 'config.html';
+                View::assign('name', $param['name']);
+                if (file_exists($file)) {
+                    View::assign([
+                        'config' => $config
+                    ]);
+                    return view($file);
+                } else {
+                    View::assign('config', $config);
+                    return view();
+                }
+            } catch (\Exception $e) {
+                // 处理HttpException
+                return json(['code' => 1, 'msg' => $e->getMessage(), 'data' => []]);
             }
         }
     }
@@ -136,8 +142,8 @@ class Plugin extends BaseController
                     $field['setup']['default'],    // 默认值
                     $field['group'],               // 标签组，可以在文本框前后添加按钮或者文字
                     $field['setup']['extra_attr'], // 额外属性
-                    $field['setup']['extra_class'],// 额外CSS
-                    $field['setup']['placeholder'],// 占位符
+                    $field['setup']['extra_class'], // 额外CSS
+                    $field['setup']['placeholder'], // 占位符
                     $field['required'],            // 是否必填
                 ];
             } elseif ($field['type'] == 'textarea' || $field['type'] == 'password') {
@@ -225,7 +231,7 @@ class Plugin extends BaseController
                     $field['setup']['format'],     // 日期格式
                     $field['setup']['extra_attr'], // 额外属性 extra_attr
                     '',                            // 额外CSS extra_class
-                    $field['setup']['placeholder'],// 占位符
+                    $field['setup']['placeholder'], // 占位符
                     $field['required'],            // 是否必填
                 ];
             } elseif ($field['type'] == 'daterange') {

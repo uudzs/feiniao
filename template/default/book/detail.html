@@ -93,7 +93,6 @@
                     <a href="javascript:;" class="creat-accout-btn"> 立即阅读 </a>
                     <div class="btn-buttom favorites"><i class="bi bi-hdd-stack"></i>书架</div>
                     <div class="btn-buttom"><i class="bi bi-cloud-arrow-down"></i>下载</div>
-                    <div class="btn-buttom"><i class="bi bi-headphones"></i>听书</div>
                     <button class="ym-btn ym-btn-danger ym-btn-large mobile_watch">手机观看<div class="mobile_qrcode"></div></button>                    
                 </div>
             </section>
@@ -132,7 +131,7 @@
             <ul class="layui-tab-title">
               <li class="layui-this">作品信息</li>
               <li>章节目录({:count($chapterlist)})</li>
-              <li>作品评论({:hook('commentsNum', ['bookid' => $book['id']])})</li>
+              <li>作品评论{eq name=":get_addons_info('changyan')['status']" value="1"}({:hook('commentsNum', ['bookid' => $book['id']])}){/eq}</li>
             </ul>
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show remark">
@@ -174,7 +173,9 @@
                     {/notempty}
                 </div>
                 <div class="layui-tab-item">
+                    {eq name=":get_addons_info('changyan')['status']" value="1"}
                     {:hook('commentsHook', ['terminal' => 'pc_script', 'bookid' => $book['id']])}
+                    {/eq}
                 </div>
             </div>
         </div>       

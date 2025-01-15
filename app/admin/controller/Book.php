@@ -473,22 +473,46 @@ class Book extends BaseController
      */
     public function del()
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '-1');
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
-        $book = Db::name('book')->where(['id' => $id])->find();
-        if (empty($book)) {
-            return to_assign(1, '作品不存在');
+        $i = 0;
+        if (strpos($id, ',') !== false) {
+            $list = explode(',', $id);
+            foreach ($list as $key => $value) {
+                $book = Db::name('book')->where(['id' => $value])->find();
+                if (!empty($book)) {
+                    $chaptertable = calc_hash_db($book['id']); //章节内容表名
+                    $chapter = Db::name('chapter')->where(['bookid' => $book['id']])->select();
+                    $chapter = $chapter ? $chapter->toArray() : [];
+                    foreach ($chapter as $k => $v) {
+                        Db::name('chapter')->where(['id' => $v['id']])->delete();
+                        Db::name('chapter_draft')->where(['cid' => $v['id']])->delete(); //草稿箱
+                        Db::name('chapter_verify')->where(['cid' => $v['id']])->delete(); //审核库
+                        Db::name($chaptertable)->where(['sid' => $v['id']])->delete();
+                    }
+                    Db::name('book')->where(['id' => $book['id']])->delete(); //作品
+                    $i++;
+                }
+            }
+        } else {
+            $book = Db::name('book')->where(['id' => $id])->find();
+            if (empty($book)) {
+                return to_assign(1, '作品不存在');
+            }
+            $chaptertable = calc_hash_db($book['id']); //章节内容表名
+            $chapter = Db::name('chapter')->where(['bookid' => $book['id']])->select();
+            $chapter = $chapter ? $chapter->toArray() : [];
+            foreach ($chapter as $k => $v) {
+                Db::name('chapter')->where(['id' => $v['id']])->delete();
+                Db::name('chapter_draft')->where(['cid' => $v['id']])->delete(); //草稿箱
+                Db::name('chapter_verify')->where(['cid' => $v['id']])->delete(); //审核库
+                Db::name($chaptertable)->where(['sid' => $v['id']])->delete();
+            }
+            Db::name('book')->where(['id' => $book['id']])->delete(); //作品
+            $i++;
         }
-        $chaptertable = calc_hash_db($book['id']); //章节内容表名
-        $chapter = Db::name('chapter')->where(['bookid' => $book['id']])->select();
-        $chapter = $chapter ? $chapter->toArray() : [];
-        foreach ($chapter as $k => $v) {
-            Db::name('chapter')->where(['id' => $v['id']])->delete();
-            Db::name('chapter_draft')->where(['cid' => $v['id']])->delete(); //草稿箱
-            Db::name('chapter_verify')->where(['cid' => $v['id']])->delete(); //审核库
-            Db::name($chaptertable)->where(['sid' => $v['id']])->delete();
-        }
-        Db::name('book')->where(['id' => $book['id']])->delete(); //作品
-        return to_assign();
+        return to_assign(0, '删除' . $i . '个作品！');
     }
 }

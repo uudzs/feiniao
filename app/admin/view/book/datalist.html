@@ -42,11 +42,16 @@
 	<div class="layui-btn-group">
 		<span class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add" data-title="添加作品">添加作品</span>
 		<span class="layui-btn layui-btn-sm" lay-event="import" data-title="导入作品">导入作品</span>
+		<span class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete" data-title="删除作品">删除作品</span>
   	</div>
 </script>
 
 <script type="text/html" id="barDemo">	
-<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="chapter">章节</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+	<div class="layui-btn-group">
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+		<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="chapter">章节</a>
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+	</div>
 </script>
 
 <script type="text/html" id="statusTpl">
@@ -73,11 +78,13 @@
 			id: 'booklist',
 			page: true,
 			limit: 20,
+			limits: [10,20,30,50,100,500,1000],
 			//height: 'full-35',
      		//lineStyle: 'height: auto;', // 定义表格的多行样式
 			//cellMinWidth: 300,
 			cols: [
 				[
+				{checkbox: true, fixed: true},
 				{
 					field: 'id',
 					title: '编号',
@@ -229,6 +236,33 @@
 				return false;
 			} else if(obj.event === 'import') {
 				tool.side("{:url('book/import')}");
+				return false;
+			} else if(obj.event === 'delete') {
+				var id = obj.config.id;
+    			var checkStatus = table.checkStatus(id);
+				var data = checkStatus.data;
+				if(data.length <= 0) return layer.msg('请选择要删除的记录');
+				var arr = [];
+				$.each(data,function(index,items){
+					arr.push(items['id']);					
+				})
+				layer.confirm('确定要删除相关记录吗?', {
+					icon: 3,
+					title: '删除提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							layui.pageTable.reload({
+								page: {
+									curr: 1
+								}
+							});
+						}
+					}
+					tool.delete("{:url('book/del')}", { id: arr.join(',') }, callback);
+					layer.close(index);
+				});
 				return false;
 			}
 		});

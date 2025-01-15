@@ -59,7 +59,7 @@
                 <h2>如需开启单点登录与本站会员同步，请按以下步骤操作：</h2>
                 <h3>1、开启单点登录服务 <a href="https://changyan.kuaizhan.com/setting/pc/single_sign" target="_blank">前往畅言PC版设置页面</a> 进行开启，<code>WAP版地与PC版一致。</code></h3>
                 <h3>2、选打开新页面登录</h3>
-                <h3>3、复制此地址到单点登录页面url：<code>您前台的域名+{:addons_url('changyan://index/login')}</code></h3>                
+                <h3>3、复制此地址到单点登录页面url：<code>您前台的域名+{:furl('login', [], true, 'home')}"</code></h3>                
                 <h3>4、获取用户信息接口URL：<code>您前台的域名+{:addons_url('changyan://index/getuserinfo')}</code></h3>                
                 <h3>5、用户退出接口URL：<code>您前台的域名+{:addons_url('changyan://index/logout')}</code></h3>                
               </div>

@@ -178,8 +178,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
             </div>
             <div class="gpd-wrap gpd-listen-wrap" style="display:none">
                 <h3>听书阅读</h3>
-                <div class="tit">敬请期待！</div>
-                <div class="txt">尽在<i>{$conf.title}</i>听书</div>
+                <div class="tit">{:hook('baiduspeechHook', ['terminal' => 'web', 'bookid' => $chapter['bookid'], 'chapterid' => $chapter['id']])}</div>
             </div>            
         </div>
     </div>
@@ -230,7 +229,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
 $(window).on('load', function () {
     $(".btn-fw").text('评论一下');
     var chapter_id = '{$id}';
-    var chapter_info = {};
+    window.chapter_info = {};
     var info = {};
     var config = layui.data('feiniao').readconfig;
     var fontsizes = [16, 18, 20, 22, 24, 26, 28, 30];
@@ -395,7 +394,8 @@ $(window).on('load', function () {
         }
     });
     //上一页
-    function upper_chapter() {
+    
+    window.upper_chapter = function() {
         if(!chapter_id) {
             isLoading = false;
             return false;            
@@ -434,7 +434,7 @@ $(window).on('load', function () {
         });
     }
     //下一页
-    function next_chapter() {
+    window.next_chapter = function() {
         if(chapter_info && !chapter_info.after_chapter) {
             isLoading = false;
             return false;

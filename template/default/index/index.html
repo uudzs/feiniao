@@ -376,65 +376,63 @@
 							</colgroup>
 							<tbody>
 								{php}
-								$book_count = model('book')->where(['status' => 1, ['chapters', '>', 0]])->count();
-								if($book_count > 20) {
-									$start = mt_rand(0, ($book_count - 20));
-								} else {
-									$start = 0;
-								}								
-								$update_list = model('book')->where(['status' => 1, ['chapters', '>', 0]])->order('update_time desc')->limit($start, 20)->select()->toArray();
+									$update_list = model('book')->field('id,genre,title as booktitle,filename,create_time,words,author')->where(['status' => 1])->order('create_time desc')->limit(20)->select()->toArray();
+									if(!empty($update_list)) {
+										foreach ($update_list as $k => $vo) {
+											$update_list[$k]['link'] = (string) url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);
+											if($vo['genre']) {
+												$category = model('category')->where(['status' => 1, 'id' => $vo['genre']])->find();
+												$update_list[$k]['genrelink'] = $category ? (string) url('book_cates', ['id' => $category['key'] ? $category['key'] : $category['id']]) : 'javascript:;';
+												$update_list[$k]['genrename'] = $category ? $category['name'] : '--';
+											} else {
+												$update_list[$k]['genrename'] = '--';
+												$update_list[$k]['genrelink'] = 'javascript:;';
+											}
+											$chapter = model('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $vo['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('create_time desc')->find();
+											$update_list[$k]['chapterlink'] = $chapter ? (string) url('chapter_detail', ['id' => $chapter['id']]) : 'javascript:;';
+											$update_list[$k]['title'] = $chapter ? $chapter['title'] : '--';
+										}
+									}
 								{/php}
 								{notempty name="update_list"}
-								{volist name="$update_list" id="vo"}
-								{php}
-								$link = url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);
-								if($vo['genre']) {
-									$genrename = model('category')->where(['status' => 1, 'id' => $vo['genre']])->value('name');
-									$genrelink = url('book_cates', ['id' => $vo['genre']]);
-								} else {
-									$genrename = '--';
-									$genrelink = 'javascript:;';
-								}
-								$chapter = model('chapter')->where(['bookid' => $vo['id'],'status' => 1, ['verify', 'in', '0,1']])->order('update_time desc')->find();								
-								$chapterlink = url('chapter_detail', ['id' => $chapter['id']]);
-								{/php}
-								<tr class="el-table__row">
-									<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
-										{notempty name="$vo['genre']"}
-											<div class="cell"><a title="{$genrename}" href="{$genrelink}" target="_blank" class="table-list--type global-hover">{$genrename}</a></div>
-										{else/}
-										<div class="cell"><a href="{$genrelink}" class="table-list--type global-hover">{$genrename}</a></div>
-										{/notempty}
-									</td>
-									<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
-										<div class="cell">
-											<div class="ellipsis"><a title="{$vo['title']}" href="{$link}" target="_blank" class="bookName global-hover update-bookName">{$vo['title']}</a></div>
-										</div>
-									</td>
-									<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
-										<div class="cell"><a href="{$chapterlink}" target="_blank" title="{$chapter.title}" class="ellipsis chapter global-hover">{$chapter.title}</a></div>
-									</td>
-									<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
-										<div class="cell">
-											<div class="ellipsis">
-												{:ceil($vo.words/10000)}万字
-											</div>
-										</div>
-									</td>
-									<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
-										<div class="cell">
-											<div class="ellipsis global-hover">{$vo['author']}</div>
-										</div>
-									</td>
-									<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
-										<div class="cell">
-											<div class="ellipsis">
-												{:time_format($chapter.create_time)}
-											</div>
-										</div>
-									</td>
-								</tr>
-								{/volist}
+									{volist name="$update_list" id="vo"}										
+										<tr class="el-table__row">
+											<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
+												{notempty name="$vo['genre']"}
+													<div class="cell"><a title="{$vo['genrename']}" href="{$vo['genrelink']}" target="_blank" class="table-list--type global-hover">{$vo['genrename']}</a></div>
+												{else/}
+													<div class="cell"><a href="{$vo['genrelink']}" class="table-list--type global-hover">{$vo['genrename']}</a></div>
+												{/notempty}
+											</td>
+											<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
+												<div class="cell">
+													<div class="ellipsis"><a title="{$vo['booktitle']}" href="{$vo['link']}" target="_blank" class="bookName global-hover update-bookName">{$vo['booktitle']}</a></div>
+												</div>
+											</td>
+											<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
+												<div class="cell"><a href="{$vo['chapterlink']}" target="_blank" title="{$vo.title}" class="ellipsis chapter global-hover">{$vo.title}</a></div>
+											</td>
+											<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
+												<div class="cell">
+													<div class="ellipsis">
+														{:ceil($vo.words/10000)}万字
+													</div>
+												</div>
+											</td>
+											<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
+												<div class="cell">
+													<div class="ellipsis global-hover">{$vo['author']}</div>
+												</div>
+											</td>
+											<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
+												<div class="cell">
+													<div class="ellipsis">
+														{:time_format($vo.create_time)}
+													</div>
+												</div>
+											</td>
+										</tr>
+									{/volist}
 								{/notempty}								
 							</tbody>
 						</table>
