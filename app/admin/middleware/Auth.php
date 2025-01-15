@@ -34,7 +34,7 @@ class Auth
             }
             $uid = Session::get($session_admin)['id'];
             // 验证用户访问权限
-            if ($action !== 'index' && $action !== 'api') {
+            if ($action !== 'index' && $action !== 'api' && $action !== 'addons') {
                 if (!$this->checkAuth($controller, $pathInfo, $action, $uid)) {
                     if ($request->isAjax()) {
                         return to_assign(202, '你没有权限,请联系超级管理员！');
@@ -116,7 +116,7 @@ class Auth
                     $pathUrl = str_ireplace('admin/', '', $pathUrl);
                 }
             }
-            foreach ($auth_list as $k => $v) {        
+            foreach ($auth_list as $k => $v) {
                 if (in_array($v, $skip, true)) {
                     continue;
                 }

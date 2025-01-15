@@ -161,7 +161,6 @@ class Gallery extends BaseController
     public function del()
     {
         $param = get_params();
-		$param = get_params();
 		$id = isset($param['id']) ? $param['id'] : 0;
 		$type = isset($param['type']) ? $param['type'] : 0;
 
