@@ -66,14 +66,18 @@ class Chapter extends BaseController
                 }
             }
         }
-        $chapter['info'] = htmlspecialchars_decode($chapter['info']);
-        $replace = array("&nbsp;", "<br>", "<br>");
-        $search = array(" ", "\n", '\n');
-        $chapter['content'] = str_replace($search, $replace, $chapter['info']);
+        if (!empty($chapter['info'])) {
+            $chapter['info'] = htmlspecialchars_decode($chapter['info']);
+            $replace = array("&nbsp;", "<br>", "<br>");
+            $search = array(" ", "\n", '\n');
+            $chapter['content'] = str_replace($search, $replace, $chapter['info']);
+        } else {
+            $chapter['content'] = '';
+        }
+        unset($chapter['info']);
         $bookid = $book['id'];
         $chapter_id = $id;
         $today = date('Y-m-d'); // 当天日期
-        unset($chapter['info']);
         $ip = request()->ip();
         if (!empty($uid)) {
             $member = Db::name('user')->where(array('id' => $uid))->find();

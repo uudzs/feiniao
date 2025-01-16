@@ -112,7 +112,9 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
             <div class="reader-forum">
                 <div class="close"><i class="bi bi-x-lg"></i></div>
                 <div class="forum-wrap JforumWrap">
+                    {eq name=":get_addons_is_enable('changyan')" value="1"}
                     {:hook('commentsHook', ['terminal' => 'pc_script', 'chapterid' => $chapter['id']])}
+                    {/eq}
                 </div>
             </div>
         </div>
@@ -178,7 +180,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
             </div>
             <div class="gpd-wrap gpd-listen-wrap" style="display:none">
                 <h3>听书阅读</h3>
-                <div class="tit">{:hook('baiduspeechHook', ['terminal' => 'web', 'bookid' => $chapter['bookid'], 'chapterid' => $chapter['id']])}</div>
+                <div class="tit">{eq name=":get_addons_is_enable('baiduspeech')" value="1"}{:hook('baiduspeechHook', ['terminal' => 'web', 'bookid' => $chapter['bookid'], 'chapterid' => $chapter['id']])}{/eq}</div>
             </div>            
         </div>
     </div>
@@ -479,7 +481,7 @@ $(window).on('load', function () {
     }
 
     function get_sohucs(id) {
-        {eq name=":get_addons_info('changyan')['status']" value="1"}
+        {eq name=":get_addons_is_enable('changyan')" value="1"}
         $.postApi("{:addons_url('changyan://index/sohucs')}", {id: id}, function(result) {
             if(result.code == 0) {
                 if(result.data.sid) $('#SOHUCS').attr('sid', result.data.sid);

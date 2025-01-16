@@ -131,7 +131,7 @@
             <ul class="layui-tab-title">
               <li class="layui-this">作品信息</li>
               <li>章节目录({:count($chapterlist)})</li>
-              <li>作品评论{eq name=":get_addons_info('changyan')['status']" value="1"}({:hook('commentsNum', ['bookid' => $book['id']])}){/eq}</li>
+              <li>作品评论{eq name=":get_addons_is_enable('changyan')" value="1"}({:hook('commentsNum', ['bookid' => $book['id']])}){/eq}</li>
             </ul>
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show remark">
@@ -173,7 +173,7 @@
                     {/notempty}
                 </div>
                 <div class="layui-tab-item">
-                    {eq name=":get_addons_info('changyan')['status']" value="1"}
+                    {eq name=":get_addons_is_enable('changyan')" value="1"}
                     {:hook('commentsHook', ['terminal' => 'pc_script', 'bookid' => $book['id']])}
                     {/eq}
                 </div>

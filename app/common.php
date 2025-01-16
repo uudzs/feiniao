@@ -1534,3 +1534,17 @@ if (!function_exists('furl')) {
         return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain);
     }
 }
+if (!function_exists('get_addons_is_enable')) {
+    function get_addons_is_enable($name)
+    {
+        if (empty($name)) return false;
+        try {
+            $info = get_addons_info($name);
+            if (empty($info)) return false;
+            if (!$info['install'] || !$info['status']) return false;
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+}

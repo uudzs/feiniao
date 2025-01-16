@@ -104,7 +104,9 @@
       </ul>
     </div>    
 </div>
+{eq name=":get_addons_is_enable('baiduspeech')" value="1"}
 {:hook('baiduspeechHook', ['terminal' => 'wap', 'bookid' => $bookid, 'chapterid' => $id])}
+{/eq}
 {/block}
 {block name="script"}
 <script>
