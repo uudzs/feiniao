@@ -32,7 +32,7 @@ return [
     //home模块域名，只有domain_bind设置多域名时有效，并且只适用home模块
     /**
      *  示例
-     *  'home_domain' => 'www..youdomain.com',
+     *  'home_domain' => 'www.youdomain.com',
      */
     'home_domain' => '',
     // 禁止URL访问的应用列表（自动多应用模式有效）
