@@ -826,8 +826,7 @@ class Common extends BaseController
         }
         //手机
         if (preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-            $config = get_addons_info('aliyunsms');
-            if ($config && isset($config['status']) && isset($config['install']) && $config['status'] && $config['install']) {
+            if (get_addons_is_enable('aliyunsms')) {
                 $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
                 $result = json_decode($result, true);
                 if ($result && is_array($result) && $result['Code'] == 'OK') {

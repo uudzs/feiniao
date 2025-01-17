@@ -1507,15 +1507,13 @@ if (!function_exists('furl')) {
                 $domain_bind = $domain_bind ? array_flip($domain_bind) : [];
                 if (isset($domain_bind[$domain]) && $domain_bind[$domain]) {
                     if ($domain_bind[$domain] == '*') {
-                        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(false);
+                        $home_domain = get_config('app.home_domain');
+                        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($home_domain ? $home_domain : true);
                     } else {
                         return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain_bind[$domain]);
                     }
                 } else {
-                    $rurl = url($url, $vars, $suffix, $domain);
-                    return $rurl;
-                    $url = '/' . $domain . $url;
-                    $domain = false;
+                    return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(true);
                 }
             } else {
                 $rurl = (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(false);
@@ -1527,11 +1525,11 @@ if (!function_exists('furl')) {
                     $url = '/' . $url;
                 }
                 $url = '/' . $domain . $url;
-                $domain = false;
+                $domain = true;
+                return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain);
             }
-            return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain);
         }
-        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain);
+        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(false);
     }
 }
 if (!function_exists('get_addons_is_enable')) {
@@ -1546,5 +1544,35 @@ if (!function_exists('get_addons_is_enable')) {
         } catch (\Exception $e) {
             return false;
         }
+    }
+}
+if (!function_exists('get_addons_list')) {
+    function get_addons_list()
+    {
+        $list = [];
+        $class = 'app\admin\service\ThinkAddons';
+        if (class_exists($class)) {
+            $obj = app($class);
+            $list = $obj->localAddons();
+        }
+        return $list;
+    }
+}
+if (!function_exists('load_addons_run')) {
+    function load_addons_run()
+    {
+        $html = '';
+        $list = get_addons_list();
+        foreach ($list as $k => $v) {
+            if (empty($v['install']) || empty($v['status'])) continue;
+            $addons_class = '\\addons\\' . $v['name'] . '\\Plugin';
+            if (class_exists($addons_class)) {
+                $addon = app($addons_class);
+                if (method_exists($addon, 'run')) {
+                    $html .= $addon->run();
+                }
+            }
+        }
+        return $html;
     }
 }
