@@ -1,0 +1,68 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+	.layui-card-body .layui-timeline-title {
+		padding-bottom: 0;
+		font-size: 14px;
+	}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<div class="layui-card">
+		<div class="layui-card-header"><h3>可更新版本</h3></div>
+		<div class="layui-card-body">
+            {notempty name="list"}
+                {volist name="$list" id="v"}
+                <div class="layui-timeline">
+                    <div class="layui-timeline-item">
+                        <i class="layui-icon layui-timeline-axis"></i>
+                        <div class="layui-timeline-content layui-text">
+                            <h3 class="layui-timeline-title">V{$v.version}</h3>
+                            {php}
+                            $v['intro'] = htmlspecialchars_decode($v['intro']);
+                            $replace = array("&nbsp;", "<br>", "<br>");
+                            $search = array(" ", "\n", '\n');
+                            $v['intro'] = str_replace($search, $replace, $v['intro']);
+                            {/php}
+                            <p>{$v.intro|raw}</p>
+                            {if $i == 1}
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" data-id="{$v.id}" id="upgrade"><i class="layui-icon layui-icon-download-circle"></i> 升级</button>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+                {/volist}
+            {else/}
+                <h5>已是最新版本！</h5>
+            {/notempty}
+		</div>
+	</div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	function feiniaoInit() {
+		$('#upgrade').on('click',function() {
+            var id = $(this).data('id');
+            if(!id) return layer.msg('ID错误！');
+			$.ajax({
+                url: "{:url('upgrade/index')}",
+                type: 'post',
+                data: {id: id},
+                success: function(e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        location.reload();
+                    }
+                }
+            })
+		})
+	}
+</script>
+{/block}
+<!-- /脚本 -->

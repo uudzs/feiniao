@@ -3,12 +3,75 @@
 <style type="text/css">
 .editormd-code-toolbar select {display: inline-block}
 .editormd li {list-style: inherit;}
+.layui-text h2 {
+    margin: 24px 0;
+    font-size: 24px;
+}
+.ws-text h1, .ws-text h2 {
+    font-weight: 700;
+}
+.ws-text h2, .ws-text h3, .ws-text h4.ws-anchor {
+    margin: 16px 0;
+}
+.ws-text h2 {
+    font-size: 21px;
+}
+.layui-text ol, .layui-text ul {
+    padding-left: 15px;
+}
+.layui-text ul li {
+    margin-top: 5px;
+    list-style-type: none;
+}
+.layui-text h4 {
+    margin: 11px 0;
+    font-size: 16px;
+}
+.ws-text h4 {
+    font-size: 16px;
+}
 </style>
 {/block}
 <!-- 主体 -->
 {block name="body"}
-<form class="layui-form p-4">
+<form class="layui-form p-4 layui-text">
 	<h3 class="pb-3">导入作品</h3>
+	<h4 class="ws-anchor">导入说明</h4>
+	<ul>
+		<li>
+			<h5>一、作者识别规则</h5>
+			<ul>
+				<li>1、内容中有*** 著，作者与著中间有一个空格，本行作者名前面不能有无关的其他信息。</li>
+				<li>2、内容中有作者:***，半角冒号后面为作者名称，并且作者名称后面不能有其他信息。</li>
+				<li>3、作者：***，全角冒号后面为作者名称，并且作者名称后面不能有其他信息。</li>
+			</ul>
+		</li>
+		<li>
+			<h5>二、作品名称识别规则</h5>
+			<ul>
+				<li>1、默认以整体文件名为作品名称。</li>
+				<li>2、如果文件名不止作品名称，可将文件名以《***》这样格式来命名，书名号中的内容为作品名称。</li>
+			</ul>
+		</li>
+		<li>
+			<h5>三、章节识别规则</h5>
+			<ul>
+				<li>1、章节名称必须独占一行。</li>
+				<li>2、章节名称第一个字必须为“第”。</li>
+				<li>3、章节名称中“第”字后面允许由：数字一二两三四五六七八九零十百千万、-这些字符构成。</li>
+				<li>4、章节名称的章节序号后由：章|章节|卷|集字符来收尾，没有这些收尾字符将无法识别成功。</li>
+			</ul>
+		</li>
+		<li>
+			<h5>四、其他说明</h5>
+			<ul>
+				<li>1、目前只支持txt文件导入。</li>
+				<li>2、最好文件为UTF-8格式。</li>
+				<li>3、文件太大容易导入失败，一是脚本运行时间超时导致，还有上传文件大小超过最大值导致，可设置相关环境配置参数后再试。</li>
+				<li>4、会自动检测作品是否重复、作者是否重复、章节名称是否重复。</li>
+			</ul>
+		</li>		
+	</ul>
 	<table class="layui-table layui-table-form">
 		<tr>			
 			<td class="layui-td-gray" style="vertical-align:top;">文件</td>

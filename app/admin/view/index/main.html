@@ -227,8 +227,22 @@
 			]]
 		});
 		get_view_data();
-	}
 
+		$.ajax({
+			url: "{:url('upgrade/check_upgrade')}",
+			type: 'post',
+			data: {},
+			success: function (e) {
+				if (e.code == 0 && e.data.length > 0) {
+					layer.confirm('系统有新版本，是否现在升级？', {title:'升级提示', btn: ['现在升级', '以后在说']}, function() {
+						window.location.href = "{:url('upgrade/index')}"
+					}, function(index) {
+						layer.close(index);
+					});
+				}
+			}
+		})
+	}
 
 	function setHour(num) {
 		var str = num + ':00';
@@ -237,7 +251,10 @@
 		}
 		return str;
 	}
+
 	var chartView = echarts.init(document.getElementById('chartView'));
+
+
 	function get_view_data() {
 		$.ajax({
 			url: "{:url('api/get_view_data')}",
