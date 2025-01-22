@@ -1,26 +1,45 @@
 {extend name="common/base"/}
 <!-- 主体 -->
 {block name="body"}
+<style>
+.layui-textarea {
+	height: auto!important;
+	line-height: 2;
+	font-size: 1rem;
+}
+</style>
 <form class="layui-form p-4">
-	<h3 class="pb-3">新建章节</h3>
+	<h3 class="pb-3">添加章节</h3>
 	<table class="layui-table layui-table-form">
-		<tr><td class="layui-td-gray-2">章节标题<font>*</font></td>
-			<td><input type="text" name="title"  lay-verify="required" lay-reqText="请完善章节标题" value="" autocomplete="off" placeholder="请输入章节标题" class="layui-input"></td><td class="layui-td-gray-2">状态</td>
+		<tr>
+			<td class="layui-td-gray">章节名称</td>
 			<td>
-				<input type="radio" name="status" value="0" title="选项一">
-				<input type="radio" name="status" value="1" title="选项二">
-			</td><td class="layui-td-gray-2">是否审核</td>
-			<td>
-				<input type="radio" name="verify" value="0" title="选项一">
-				<input type="radio" name="verify" value="1" title="选项二">
+				<div class="layui-form-item" style="margin-bottom: 0;">
+					<label class="layui-form-label">{$chapstitle}</label>
+					<div class="layui-input-block">
+						<input type="text" name="title" lay-reqText="请输入章节名称" value="" autocomplete="off" placeholder="请输入章节名称" class="layui-input">
+					</div>
+				</div>
 			</td>
 		</tr>
-				<tr><td class="layui-td-gray-2">审核结果</td>
-			<td><input type="text" name="verifyresult"  value="" autocomplete="off" placeholder="请输入审核结果" class="layui-input"></td><td colspan='4'></td>
+		<tr>
+			<td class="layui-td-gray">章节内容</td>
+			<td>
+				<textarea name="content" rows="30" class="layui-textarea"></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">状态</td>
+			<td>
+				<input type="radio" name="status" value="1" title="正常" checked>
+				<input type="radio" name="status" value="0" title="下架">
+			</td>
 		</tr>
 	</table>
-	<div class="pt-3">
-		<input type="hidden" name="id" value="0"/>
+	<div class="py-3">
+		<input type="hidden" name="bookid" value="{$book['id']}"/>
+		<input type="hidden" name="authorid" value="{$book['authorid']}"/>
+		<input type="hidden" name="serial" value="{$serial}"/>
 		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
 		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
 	</div>
@@ -34,11 +53,9 @@
 	var moduleInit = ['tool'];
 
 	function feiniaoInit() {
-		var form = layui.form, tool = layui.tool;
-				
+		var form = layui.form, tool = layui.tool;				
 		//监听提交
-		form.on('submit(webform)', function (data) {
-			
+		form.on('submit(webform)', function (data) {			
 			let callback = function (e) {
 				layer.msg(e.msg);
 				if (e.code == 0) {

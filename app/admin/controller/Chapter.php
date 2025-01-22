@@ -16,7 +16,7 @@ class Chapter extends BaseController
 
     var $uid;
     var $model;
-    
+
     /**
      * 构造函数
      */
@@ -96,8 +96,8 @@ class Chapter extends BaseController
      */
     public function add()
     {
+        $param = get_params();
         if (request()->isAjax()) {
-            $param = get_params();
             // 检验完整性
             try {
                 validate(ChapterValidate::class)->check($param);
@@ -105,11 +105,67 @@ class Chapter extends BaseController
                 // 验证失败 输出错误信息
                 return to_assign(1, $e->getError());
             }
-            if (isset($param["trial_time"])) {
-                $param["trial_time"] = $param["trial_time"] ? strtotime($param["trial_time"]) : 0;
+            $book = Db::name('book')->where(array('id' => $param['bookid']))->find();
+            if (empty($book)) {
+                to_assign(1, '作品不存在');
             }
-            $this->model->addChapter($param);
+            $serial = intval($param['serial']);
+            if (empty($serial)) $serial = 1;
+            $title = '第' . numConvertWord($serial) . '章 ' . trim($param['title']);
+            $istitle = Db::name('chapter')->where(['bookid' => $book['id'], 'title' => $title])->find();
+            if (!empty($istitle)) {
+                to_assign(1, '章节名称重复，无法发布。');
+            }
+            $info = $param['content'];
+            list($wordnum, $content) = countWordsAndContent($info, true);
+            if (empty($content) || empty($wordnum)) {
+                to_assign(1, '章节内容为空，无法发布。');
+            }
+            if ($wordnum < 1000) {
+                to_assign(1, '章节内容不能少于1000字');
+            }
+            if ($wordnum > 10000) {
+                to_assign(1, '章节内容字数大于10000字，无法发布。');
+            }
+            $chaptertable = calc_hash_db($book['id']); //章节内容表名
+            $data = [
+                'title' => $title,
+                'bookid' => $book['id'],
+                'authorid' => $book['authorid'],
+                'title' => $title,
+                'chaps' => $serial,
+                'content' => $content,
+                'wordnum' => $wordnum,
+                'firstverifyword' => $wordnum,
+                'status' => 1,
+                'verify' => 1,
+                'draft' => 0,
+                'trial_time' => 0,
+                'create_time' => time(),
+                'firstpasstime' => time()
+            ];
+            $sid = Db::name('chapter')->strict(false)->field(true)->insertGetId($data);
+            if ($sid !== false) {
+                Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $sid, 'info' => $content]);
+                to_assign(0, '添加成功');
+            } else {
+                to_assign(1, '操作失败');
+            }
         } else {
+            $book = Db::name('book')->where(array('id' => $param['bid']))->find();
+            if (empty($book)) {
+                to_assign(1, '作品不存在');
+            }
+            $chapter = Db::name('chapter')->where(array('bookid' => $param['bid']))->order('chaps desc')->value('chaps');
+            if (!empty($chapter)) {
+                $serial = intval($chapter) + 1;
+            } else {
+                $serial = 1;
+            }
+            $chapstitle = '第' . numConvertWord($serial) . '章 '; //章节序号名称
+            View::assign('book', $book);
+            View::assign('serial', $serial);
+            View::assign('chapstitle', $chapstitle);
             return view();
         }
     }
@@ -261,8 +317,8 @@ class Chapter extends BaseController
         }
         $chaptertable = calc_hash_db($chapter['bookid']); //章节内容表名
         Db::name('chapter')->where(['id' => $id])->delete();
-        Db::name('chapter_draft')->where(['cid' => $id])->delete();//草稿箱
-        Db::name('chapter_verify')->where(['cid' => $id])->delete();//审核库
+        Db::name('chapter_draft')->where(['cid' => $id])->delete(); //草稿箱
+        Db::name('chapter_verify')->where(['cid' => $id])->delete(); //审核库
         Db::name($chaptertable)->where(['sid' => $id])->delete();
         return to_assign();
     }

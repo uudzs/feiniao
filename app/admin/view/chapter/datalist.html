@@ -16,8 +16,7 @@
 
 <script type="text/html" id="toolbarDemo">
 	<div class="layui-btn-container">
-		《{$title}》
-		<!-- <span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加章节">+ 添加章节</span> -->
+		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加章节">+ 添加章节</span>《{$title}》		
 	</div>
 </script>
 
@@ -147,7 +146,7 @@
 		//监听表头工具栏事件
 		table.on('toolbar(chapter)', function(obj){
 			if (obj.event === 'add') {
-				tool.side("{:url('chapter/add')}");
+				tool.side("{:url('chapter/add',['bid'=>$bid])}");
 				return false;
 			}
 		});

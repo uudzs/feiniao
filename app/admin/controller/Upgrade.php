@@ -27,7 +27,8 @@ class Upgrade extends BaseController
             $info = $result['data'];
             if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '不存在升级项');
             if (!empty($info['path'])) {
-                $path = root_path() . 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['version'] . DIRECTORY_SEPARATOR;
+                $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['version'] . DIRECTORY_SEPARATOR;
+                $path = app()->getRootPath() . $relativepath;
                 if (!createDirectory($path)) {
                     return to_assign(1, '创建' . $path . '目录失败');
                 }
@@ -43,16 +44,28 @@ class Upgrade extends BaseController
                 if (!class_exists('ZipArchive')) {
                     return to_assign(1, '请手动解压' . $filepath . '到根目录。');
                 }
-                $zip = new ZipArchive;
-                $res = $zip->open($filepath);
-                if ($res === TRUE) {
-                    $zip->extractTo(root_path());
-                    $zip->close();
-                    unlink($filepath);
-                    $this->deleteDir($path);
-                } else {
-                    unlink($filepath);
-                    return to_assign(1, '解压文件失败，请检查目录权限。');
+                try {
+                    $zip = new ZipArchive;
+                    $res = $zip->open($filepath);
+                    if ($res === TRUE) {
+                        $zip->extractTo($path);
+                        $zip->close();
+                        unlink($filepath);
+                        self::get_allfiles($path, $files);
+                        foreach ($files as $key => $value) {
+                            $destination =  str_replace($relativepath, '', $value);
+                            $destination =  str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $destination);
+                            if ($this->copyfile($value, $destination)) {
+                                unlink($value);
+                            }
+                        }
+                        $this->deleteDir($path);
+                    } else {
+                        unlink($filepath);
+                        return to_assign(1, '解压文件失败，请检查目录权限。');
+                    }
+                } catch (\Exception $e) {
+                    return to_assign(1, $e->getMessage());
                 }
             }
             if (!empty($info['sql'])) {
@@ -85,23 +98,50 @@ class Upgrade extends BaseController
         }
     }
 
-    private function deleteDir($dirPath)
+    private function copyfile($source, $destination)
     {
-        if (!is_dir($dirPath)) {
+        $destinationDirectory = dirname($destination);
+        if (!is_dir($destinationDirectory)) {
+            mkdir($destinationDirectory, 0755, true);
+        }
+        if (false === file_put_contents($destination, file_get_contents($source))) {
             return false;
         }
-        if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
-            $dirPath .= '/';
-        }
-        $files = glob($dirPath . '*', GLOB_MARK);
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                $this->deleteDir($file);
-            } else {
-                unlink($file);
+        return true;
+    }
+
+    private static function get_allfiles($path, &$files)
+    {
+        if (is_dir($path)) {
+            $dp = dir($path);
+            while ($file = $dp->read()) {
+                if ($file !== "." && $file !== "..") {
+                    self::get_allfiles($path . "/" . $file, $files);
+                }
             }
+            $dp->close();
         }
-        rmdir($dirPath);
+        if (is_file($path)) {
+            $files[] =  $path;
+        }
+    }
+
+    private function deleteDir($folder)
+    {
+        if (is_dir($folder)) {
+            $files = scandir($folder);
+            foreach ($files as $file) {
+                if ($file != "." && $file != "..") {
+                    $file = $folder . "/" . $file;
+                    if (is_dir($file)) {
+                        $this->deleteDir($file);
+                    } else {
+                        unlink($file);
+                    }
+                }
+            }
+            rmdir($folder);
+        }
     }
 
     public function check_upgrade()
