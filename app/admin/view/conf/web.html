@@ -73,6 +73,7 @@
 					<option value="">请选择上传方式</option>
 					<option value="1" {notempty name="$config.upload_driver"}{eq name="$config.upload_driver" value="1"}selected{/eq}{/notempty}>本地上传</option>
 					<option value="2" {notempty name="$config.upload_driver"}{eq name="$config.upload_driver" value="2"}selected{/eq}{/notempty}>阿里云OSS</option>
+					<option value="3" {notempty name="$config.upload_driver"}{eq name="$config.upload_driver" value="3"}selected{/eq}{/notempty}>腾讯云COS</option>
 				</select>
 			</td>
 		</tr>

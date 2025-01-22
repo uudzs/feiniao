@@ -159,9 +159,13 @@ class Book extends BaseController
             //     to_assign(1, '添加失败');
             // }
         } else {
-            $result = hook("bookTagHook");
-            $tags = json_decode($result, true);
-            View::assign('tags', $tags['data']);
+            if (get_addons_is_enable('booktag')) {
+                $result = hook("bookTagHook");
+                $tags = json_decode($result, true);
+                View::assign('tags', $tags['data']);
+            } else {
+                View::assign('tags', []);
+            }
             $genre = Db::name('category')->where(['pid' => 0, 'status' => 1])->order('ordernum asc')->select()->toArray();
             View::assign('genre', $genre);
             return view();
@@ -182,10 +186,14 @@ class Book extends BaseController
             to_assign(1, '作品不存在');
         }
         $chapters = Db::name('chapter')->field('id,title,create_time,wordnum,status')->where(array('bookid' => $book['id']))->order('create_time desc')->limit(10)->select()->toArray();
-        $result = hook("bookTagHook");
-        $result = json_decode($result, true);
-        $tags = $result['data'];
-        View::assign('tags', $tags);
+        if (get_addons_is_enable('booktag')) {
+            $result = hook("bookTagHook");
+            $result = json_decode($result, true);
+            $tags = $result['data'];
+            View::assign('tags', $tags);
+        } else {
+            View::assign('tags', []);
+        }
         $genre = Db::name('category')->where(['pid' => 0, 'status' => 1])->order('ordernum asc')->select()->toArray();
         View::assign('genre', $genre);
         $subgenre = Db::name('category')->where(['pid' => $book['genre'], 'status' => 1])->order('ordernum asc')->select()->toArray();
@@ -383,7 +391,7 @@ class Book extends BaseController
                 if (!empty($filenamebook)) {
                     $filename = $filename . $book['id'];
                 }
-                $param['filename'] = $filename;    
+                $param['filename'] = $filename;
             }
             $res = Db::name('book')->where(['id' => $book['id']])->strict(false)->field(true)->update($param);
             if ($res !== false) {

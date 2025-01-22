@@ -410,7 +410,7 @@ $(window).on('load', function () {
                 chapter_id = info.front_chapter;
                 $('#JcatalogListWrap ul li').removeClass('active');
                 $('#JcatalogListWrap ul').find('[data-chapterid="' + info.id + '"]').addClass('active');
-                var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]};">
+                var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]}px;">
                                 <div class="title">
                                     <div class="title_txtbox">${info.title}</div>
                                 </div>
@@ -451,7 +451,7 @@ $(window).on('load', function () {
                     $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
                     $('#JcatalogListWrap ul li').removeClass('active');
                     $('#JcatalogListWrap ul').find('[data-chapterid="' + chapter_info.id + '"]').addClass('active');
-                    var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]};">
+                    var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]}px;">
                                     <div class="title">
                                         <div class="title_txtbox">${chapter_info.title}</div>
                                     </div>

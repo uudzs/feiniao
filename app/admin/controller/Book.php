@@ -112,12 +112,16 @@ class Book extends BaseController
             return to_assign(0, '操作成功', ['aid' => $insertId]);
             //$this->model->addBook($param);
         } else {
-            $result = hook("bookTagHook");
-            $result = json_decode($result, true);
-            $tags = $result['data'];
+            if (get_addons_is_enable('booktag')) {
+                $result = hook("bookTagHook");
+                $result = json_decode($result, true);
+                $tags = $result['data'];
+                View::assign('tags', $tags);
+            } else {
+                View::assign('tags', []);
+            }
             $genres = Db::name('category')->where(['pid' => 0, 'status' => 1])->order('ordernum asc')->select()->toArray();
             View::assign('genres', $genres);
-            View::assign('tags', $tags);
             return view();
         }
     }
@@ -202,9 +206,13 @@ class Book extends BaseController
             $detail = $this->model->getBookById($id);
             if (!empty($detail)) {
                 $identity = $image = $schools = $element = '';
-                $result = hook("bookTagHook");
-                $result = json_decode($result, true);
-                $tags = $result['data'];
+                if (get_addons_is_enable('booktag')) {
+                    $result = hook("bookTagHook");
+                    $result = json_decode($result, true);
+                    $tags = $result['data'];
+                } else {
+                    $tags = [];
+                }
                 if (!empty($detail['label'])) {
                     $labels = explode(',', $detail['label']);
                     foreach ($tags['identity']['data'] as $v) {
@@ -452,7 +460,7 @@ class Book extends BaseController
                     return to_assign(0, '导入成功' . $success . '章，跳过重复章节' . $skip . '章。');
                 } else {
                     return to_assign(1, '未识别到章节');
-                }                
+                }
             } else {
                 return to_assign(1, '上传失败，请重试');
             }

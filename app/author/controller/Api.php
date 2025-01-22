@@ -80,12 +80,30 @@ class Api extends BaseController
             if (is_array($config_web)) {
                 // 阿里云oss
                 if (isset($config_web['upload_driver']) && $config_web['upload_driver'] == 2) {
-                    $urlArr = hook('aliyunOssHook', ['url' => $filename]);
-                    $urlArr = json_decode($urlArr, true);
-                    if (isset($urlArr['error']) && $urlArr['error'] == 0) {
-                        $filepath = $urlArr['data'];
+                    if (get_addons_is_enable('aliyunoss')) {
+                        $urlArr = hook('aliyunOssHook', ['url' => $filename]);
+                        $urlArr = json_decode($urlArr, true);
+                        if (isset($urlArr['error']) && $urlArr['error'] == 0) {
+                            $filepath = $urlArr['data'];
+                        } else {
+                            return to_assign(1, $urlArr['msg']);
+                        }
                     } else {
-                        return to_assign(1, $urlArr['msg']);
+                        return to_assign(1, '未开启OSS上传功能');
+                    }
+                }
+                //腾讯云cos
+                if (isset($config_web['upload_driver']) && $config_web['upload_driver'] == 3) {
+                    if (get_addons_is_enable('qcloudcos')) {
+                        $urlArr = hook('qcloudCosHook', ['url' => $filename]);
+                        $urlArr = json_decode($urlArr, true);
+                        if (isset($urlArr['error']) && $urlArr['error'] == 0) {
+                            $filepath = $urlArr['data'];
+                        } else {
+                            return to_assign(1, $urlArr['msg']);
+                        }
+                    } else {
+                        return to_assign(1, '未开启COS上传功能');
                     }
                 }
             }
