@@ -1,0 +1,74 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">内容配置</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">章节字数</td>
+			<td>
+				<div class="layui-form-item" style="margin-bottom: 0;">
+					<div class="layui-inline">
+					  <label class="layui-form-label">最小字数</label>
+					  <div class="layui-input-block" style="max-width: 100px;">
+						<input type="text" name="chapter_min_num" value="{$config.chapter_min_num ? $config.chapter_min_num : 0}" autocomplete="off" class="layui-input">
+					  </div>
+					</div>
+					<div class="layui-inline">
+					  <label class="layui-form-label">最大字数</label>
+					  <div class="layui-input-inline" style="max-width: 100px;">
+						<input type="text" name="chapter_max_num" value="{$config.chapter_max_num ? $config.chapter_max_num : 0}" autocomplete="off" class="layui-input">
+					  </div>
+					</div>
+					<div class="layui-inline layui-text-em">设为0时为不限制，但最大字数不可超过数据库最大限制。</div>
+				</div>				
+			</td>			
+		</tr>
+		
+	</table>
+
+	<div class="py-3">
+		<input type="hidden" name="id" value="{$id}">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool, upload = layui.upload;
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});
+
+		//logo上传
+		var uploadInst = upload.render({
+			elem: '#uploadBtn',
+			url: "{:url('api/upload')}",
+			done: function (res) {
+				if (res.code == 1) {
+					layer.msg('上传失败');
+				} else {
+					layer.msg('上传成功');
+					$('#demo1 input').attr('value', res.data.filepath);
+					$('#demo1 img').attr('src', res.data.filepath);
+				}
+			}
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

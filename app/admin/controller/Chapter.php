@@ -121,11 +121,14 @@ class Chapter extends BaseController
             if (empty($content) || empty($wordnum)) {
                 to_assign(1, '章节内容为空，无法发布。');
             }
-            if ($wordnum < 1000) {
-                to_assign(1, '章节内容不能少于1000字');
+            $config = get_system_config('content');
+            $chapter_min_num = isset($config['chapter_min_num']) ? intval($config['chapter_min_num']) : 0;
+            $chapter_max_num = isset($config['chapter_max_num']) ? intval($config['chapter_max_num']) : 0;
+            if ($chapter_min_num > 0 && $wordnum < $chapter_min_num) {
+                to_assign(1, '章节内容不能少于' . $chapter_min_num . '字');
             }
-            if ($wordnum > 10000) {
-                to_assign(1, '章节内容字数大于10000字，无法发布。');
+            if ($chapter_max_num > 0 && $wordnum > $chapter_max_num) {
+                to_assign(1, '章节内容字数大于' . $chapter_max_num . '字，无法发布。');
             }
             $chaptertable = calc_hash_db($book['id']); //章节内容表名
             $data = [
@@ -200,11 +203,14 @@ class Chapter extends BaseController
             if (empty($content) || empty($wordnum)) {
                 to_assign(1, '章节内容为空，无法发布。');
             }
-            if ($wordnum < 1000) {
-                to_assign(1, '章节内容不能少于1000字');
+            $config = get_system_config('content');
+            $chapter_min_num = isset($config['chapter_min_num']) ? intval($config['chapter_min_num']) : 0;
+            $chapter_max_num = isset($config['chapter_max_num']) ? intval($config['chapter_max_num']) : 0;
+            if ($chapter_min_num > 0 && $wordnum < $chapter_min_num) {
+                to_assign(1, '章节内容不能少于' . $chapter_min_num . '字');
             }
-            if ($wordnum > 10000) {
-                to_assign(1, '章节内容字数大于10000字，无法发布。');
+            if ($chapter_max_num > 0 && $wordnum > $chapter_max_num) {
+                to_assign(1, '章节内容字数大于' . $chapter_max_num . '字，无法发布。');
             }
             $param['update_time'] = time();
             $param['wordnum'] = $wordnum;
