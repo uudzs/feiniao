@@ -30,6 +30,9 @@
         $author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();        
         $chapterlist = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
         if(!empty($chapterlist)) {
+            foreach ($chapterlist as $k => $v) {
+                $chapterlist[$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
+            }
             $last_chapter = end($chapterlist);
             $new_chapter = array_reverse(array_slice($chapterlist, -6));
         } else {

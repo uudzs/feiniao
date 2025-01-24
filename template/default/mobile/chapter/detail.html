@@ -175,7 +175,10 @@
                         storage.set(this.CACHEKEY, this.config);
                     }
                     this.render();
-                },    
+                },
+                format_chapter: function(chapter) {
+                    return '<p>' + chapter.split("<br>").join("</p><p>") + "</p>";
+                },
                 chapter() {
                     var that = this;
                     that.sl = bui.list({
@@ -210,7 +213,7 @@
                                             <div class="chapterName-modul">
                                                 <p> ${data[0].chaps} </p><span> ${data[0].title} </span>
                                             </div>
-                                        </div><div class="content" b-click="chapter.menu($(this))">${data[0].content}</div>
+                                        </div><div class="content" b-click="chapter.menu($(this))">${that.format_chapter(data[0].content)}</div>
                                         <div class="chapterName-line"></div>`;
                             }
                         },

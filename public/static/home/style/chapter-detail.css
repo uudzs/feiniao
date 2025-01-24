@@ -349,6 +349,9 @@ em, i {
     word-wrap: break-word;
     position: relative;
 }
+.reader .reader-wrap .reader-main .reader-content .content p {
+    text-indent: 2em;
+}
 .reader .reader-wrap .reader-main .reader-content .btn-w {
     position: relative;
     height: 46px;

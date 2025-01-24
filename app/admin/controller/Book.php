@@ -97,6 +97,18 @@ class Book extends BaseController
             if (isset($param["finishtime"])) {
                 $param["finishtime"] = $param["finishtime"] ? strtotime($param["finishtime"]) : 0;
             }
+            if (empty($param['title'])) {
+                return to_assign(1, '作品名称不能为空');
+            }
+            if (empty($param['authorid'])) {
+                return to_assign(1, '作者不能为空');
+            }
+            if (empty($param['genre'])) {
+                return to_assign(1, '作品大类不能为空');
+            }
+            if (empty($param['subgenre'])) {
+                return to_assign(1, '作品小类不能为空');
+            }
             $param['create_time'] = time();
             $filename = Pinyin::permalink($param['title'], '');
             $book = Db::name('book')->where(['filename' => $filename])->find();
@@ -157,18 +169,21 @@ class Book extends BaseController
             if (empty($param['title'])) {
                 return to_assign(1, '作品名称不能为空');
             }
+            if (empty($param['authorid'])) {
+                return to_assign(1, '作者不能为空');
+            }
             if (empty($param['genre'])) {
                 return to_assign(1, '作品大类不能为空');
             }
             if (empty($param['subgenre'])) {
                 return to_assign(1, '作品小类不能为空');
             }
-            if (empty($param['style'])) {
-                return to_assign(1, '作品风格不能为空');
-            }
-            if (empty($param['ending'])) {
-                return to_assign(1, '作品结局不能为空');
-            }
+            // if (empty($param['style'])) {
+            //     return to_assign(1, '作品风格不能为空');
+            // }
+            // if (empty($param['ending'])) {
+            //     return to_assign(1, '作品结局不能为空');
+            // }
             if (!isset($param['identity'])) {
                 $param['identity'] = '';
             }
@@ -315,47 +330,69 @@ class Book extends BaseController
                 $chapter = [];
                 $data_link = [];
                 $str = $title = $author = '';
-                //逐行读取文件内容
-                $handle = fopen($realPath, 'r');
-                while (($line = fgets($handle)) !== false) {
-                    $e = mb_detect_encoding($line, array('UTF-8', 'ASCII', 'GB2312', 'GBK', 'BIG5'));
-                    if ($e != 'UTF-8') {
-                        $line = iconv($e, 'UTF-8', $line);
-                    }
-                    //作者：作者: 
-                    if (empty($author)) {
-                        if (strpos($line, ' 著') !== false) {
-                            $author = explode(' 著', $line)[0];
+                try {
+                    //逐行读取文件内容
+                    $handle = fopen($realPath, 'r');
+                    while (($line = fgets($handle)) !== false) {
+                        $e = mb_detect_encoding($line, array('UTF-8', 'ASCII', 'GB2312', 'GBK', 'BIG5'));
+                        if ($e != 'UTF-8') {
+                            $line = mb_convert_encoding($line, 'UTF-8', $e);
+                            //$line = iconv($e, 'UTF-8', $line);
                         }
-                        if (strpos($line, '作者:') !== false) {
-                            $a = explode('作者:', $line);
-                            $author = isset($a[1]) ? $a[1] : '';
-                        }
-                        if (strpos($line, '作者：') !== false) {
-                            $a = explode('作者：', $line);
-                            $author = isset($a[1]) ? $a[1] : '';
-                        }
-                    }
-                    if (preg_match_all("/^([第][\d一二两三四五六七八九零十百千万、-]+[章|章节|卷|集])([^\r\n]+)?/u", trim($line), $arr)) {
-                        unset($arr);
-                        if (mb_strlen(trim($line)) > 50) {
-                            $str .= trim($line) . "\n";
-                        } else {
-                            if ($title) {
-                                $chapter[] = [
-                                    'title' => $title,
-                                    'content' => $str
-                                ];
-                                $str = '';
+                        //作者：作者: 
+                        if (empty($author)) {
+                            if (strpos($line, ' 著') !== false) {
+                                $author = explode(' 著', $line)[0];
                             }
-                            $title = trim($line);
+                            if (strpos($line, '作者:') !== false) {
+                                $a = explode('作者:', $line);
+                                $author = isset($a[1]) ? $a[1] : '';
+                            }
+                            if (strpos($line, '作者：') !== false) {
+                                $a = explode('作者：', $line);
+                                $author = isset($a[1]) ? $a[1] : '';
+                            }
                         }
-                    } else {
-                        $str .= trim($line) . "\n";
+                        $line = preg_replace('/^[\p{C}\s]+|[\p{C}\s]+$/u', '', $line);
+                        if (preg_match_all("/^([序|尾]+[章|声])([^\r\n]+)?/u", $line, $arr)) {
+                            unset($arr);
+                            if (mb_strlen($line) > 50) {
+                                $str .= $line . "\n";
+                            } else {
+                                if ($title) {
+                                    $chapter[] = [
+                                        'title' => $title,
+                                        'content' => $str
+                                    ];
+                                    $str = '';
+                                }
+                                $title = $line;
+                            }
+                        } else {
+                            if (preg_match_all("/^([第][\d一二两三四五六七八九零十百千万、-]+[章|章节|卷|集|回])([^\r\n]+)?/u", $line, $arr)) {
+                                unset($arr);
+                                if (mb_strlen($line) > 50) {
+                                    $str .= $line . "\n";
+                                } else {
+                                    if ($title) {
+                                        $chapter[] = [
+                                            'title' => $title,
+                                            'content' => $str
+                                        ];
+                                        $str = '';
+                                    }
+                                    $title = $line;
+                                }
+                            } else {
+                                $str .= $line . "\n";
+                            }
+                        }
+                        unset($line);
                     }
-                    unset($line);
+                    fclose($handle);
+                } catch (\Exception $e) {
+                    return to_assign(1, '导入失败:' . $e->getMessage());
                 }
-                fclose($handle);
                 $chapter[] = [
                     'title' => $title,
                     'content' => $str
@@ -364,6 +401,7 @@ class Book extends BaseController
                 if (!empty($title)) {
                     $title = explode('.', trim($title))[0];
                 }
+                unlink($realPath);
                 if (empty($title)) {
                     return to_assign(1, '文件名称获取失败');
                 }

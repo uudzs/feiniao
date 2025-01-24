@@ -660,7 +660,9 @@ if (!function_exists('get_full_chapter')) {
         if (empty($title)) {
             return $title;
         }
-        if (preg_match_all("/([第]?[\d一二三四五六七八九零十百千]+[章节])([^\r\n]+)/u", $title, $arr)) {
+        if (preg_match_all("/^([序|尾]+[章|声])([^\r\n]+)?/u", $title, $arr)) {
+            return $title;
+        } else if (preg_match_all("/^([第][\d一二两三四五六七八九零十百千万、-]+[章|章节|卷|集|回])([^\r\n]+)?/u", $title, $arr)) {
             return $title;
         }
         return '第' . numConvertWord(intval($seria)) . '章 ' . $title;

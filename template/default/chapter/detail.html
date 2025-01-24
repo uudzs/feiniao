@@ -357,7 +357,7 @@ $(window).on('load', function () {
             $('.read-speed').find('i').css('width', chapter_info.speed + '%');
             $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
             $('.title_txtbox').html(chapter_info.title);
-            $('.content').html(chapter_info.content);
+            $('.content').html(format_chapter(chapter_info.content));
             if(parseInt(chapter_info.like) > 0) {
                 $('.like').find('i').attr('class','bi bi-heart-fill');
             } else {
@@ -419,7 +419,7 @@ $(window).on('load', function () {
                                     <span>更新时间：<i>${info.create_time}</i></span>
                                 </div>
                                 <div class="reader-line"></div>
-                                <div class="content">${info.content}</div>
+                                <div class="content">${format_chapter(info.content)}</div>
                                 <div class="btn-w">
                                     <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                                 </div>
@@ -460,7 +460,7 @@ $(window).on('load', function () {
                                         <span>更新时间：<i>${chapter_info.create_time}</i></span>
                                     </div>
                                     <div class="reader-line"></div>
-                                    <div class="content">${chapter_info.content}</div>
+                                    <div class="content">${format_chapter(chapter_info.content)}</div>
                                     <div class="btn-w">
                                         <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                                     </div>
@@ -479,6 +479,10 @@ $(window).on('load', function () {
             isLoading = false;
         }
     }
+
+    var format_chapter = function(chapter) {
+        return '<p>' + chapter.split("<br>").join("</p><p>") + "</p>";
+    };
 
     function get_sohucs(id) {
         {eq name=":get_addons_is_enable('changyan')" value="1"}

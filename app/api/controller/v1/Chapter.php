@@ -67,7 +67,7 @@ class Chapter extends BaseController
         }
         if (!empty($chapter['info'])) {
             $chapter['info'] = htmlspecialchars_decode($chapter['info']);
-            $replace = array("&nbsp;", "<br>", "<br>");
+            $replace = array("", "<br>", "<br>");
             $search = array(" ", "\n", '\n');
             $chapter['content'] = str_replace($search, $replace, $chapter['info']);
         } else {

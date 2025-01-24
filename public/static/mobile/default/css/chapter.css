@@ -121,9 +121,7 @@
     word-break: break-all;
 }
 #page_reader .content p {
-    /* letter-spacing: .025rem;
-    line-height: 2;
-    text-indent: 2em; */
+    text-indent: 2em;
 }
 /* 顶部菜单 */
 .chapter-top-menu {
