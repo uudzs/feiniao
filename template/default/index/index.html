@@ -305,140 +305,64 @@
 		</a>
 	</div>
 	{/notempty}
-
-	<div class="container">
-		<section class="novel-update">
-			<div class="zh-modules-nav">
-				<div class="zh-modules-nav-cont">
-					<div class="zh-modules-nav--item currTab"><span>最近更新</span></div>					
-					<div class="el-tabs__active-bar"></div>
-				</div>
-			</div>
-			<div class="novel-update__update-main">
-				<div class="el-table el-table--fit el-table--enable-row-hover el-table--enable-row-transition"
-					data-v-78500626="">
-					<div class="hidden-columns">
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-						<div></div>
-					</div>
-					<div class="el-table__header-wrapper">
-						<table cellspacing="0" cellpadding="0" border="0" class="el-table__header">
-							<colgroup>		
-								<col name="el-table_1_column_1" width="90">
-								<col name="el-table_1_column_2" width="300">
-								<col name="el-table_1_column_3" width="350">
-								<col name="el-table_1_column_4" width="100">
-								<col name="el-table_1_column_5" width="180">
-								<col name="el-table_1_column_6" width="180">
-								<col name="gutter" width="0">
-							</colgroup>
-							<thead class="has-gutter">
-								<tr class="">
-									<th colspan="1" rowspan="1" class="el-table_1_column_1     is-leaf el-table__cell">
-										<div class="cell">类别</div>
-									</th>
-									<th colspan="1" rowspan="1" class="el-table_1_column_2     is-leaf el-table__cell">
-										<div class="cell">书名</div>
-									</th>
-									<th colspan="1" rowspan="1" class="el-table_1_column_3     is-leaf el-table__cell">
-										<div class="cell">章节名称</div>
-									</th>
-									<th colspan="1" rowspan="1" class="el-table_1_column_4     is-leaf el-table__cell">
-										<div class="cell">字数</div>
-									</th>
-									<th colspan="1" rowspan="1" class="el-table_1_column_5     is-leaf el-table__cell">
-										<div class="cell">作者</div>
-									</th>
-									<th colspan="1" rowspan="1" class="el-table_1_column_6     is-leaf el-table__cell">
-										<div class="cell">更新时间</div>
-									</th>
-									<th class="el-table__cell gutter" style="width: 0px; display: none;"></th>
-								</tr>
-							</thead>
-						</table>
-					</div>
-					<div class="el-table__body-wrapper is-scrolling-none">
-						<table cellspacing="0" cellpadding="0" class="el-table__body">
-							<colgroup>
-								<col name="el-table_1_column_1" width="90">
-								<col name="el-table_1_column_2" width="300">
-								<col name="el-table_1_column_3" width="350">
-								<col name="el-table_1_column_4" width="100">
-								<col name="el-table_1_column_5" width="180">
-								<col name="el-table_1_column_6" width="180">
-							</colgroup>
-							<tbody>
-								{php}
-									$update_list = model('book')->field('id,genre,title as booktitle,filename,create_time,words,author')->where(['status' => 1])->order('create_time desc')->limit(20)->select()->toArray();
-									if(!empty($update_list)) {
-										foreach ($update_list as $k => $vo) {
-											$update_list[$k]['link'] = (string) url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);
-											if($vo['genre']) {
-												$category = model('category')->where(['status' => 1, 'id' => $vo['genre']])->find();
-												$update_list[$k]['genrelink'] = $category ? (string) url('book_cates', ['id' => $category['key'] ? $category['key'] : $category['id']]) : 'javascript:;';
-												$update_list[$k]['genrename'] = $category ? $category['name'] : '--';
-											} else {
-												$update_list[$k]['genrename'] = '--';
-												$update_list[$k]['genrelink'] = 'javascript:;';
-											}
-											$chapter = model('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $vo['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('create_time desc')->find();
-											$update_list[$k]['chapterlink'] = $chapter ? (string) url('chapter_detail', ['id' => $chapter['id']]) : 'javascript:;';
-											$update_list[$k]['title'] = $chapter ? $chapter['title'] : '--';
-										}
-									}
-								{/php}
-								{notempty name="update_list"}
-									{volist name="$update_list" id="vo"}										
-										<tr class="el-table__row">
-											<td rowspan="1" colspan="1" class="el-table_1_column_1 el-table__cell">
-												{notempty name="$vo['genre']"}
-													<div class="cell"><a title="{$vo['genrename']}" href="{$vo['genrelink']}" target="_blank" class="table-list--type global-hover">{$vo['genrename']}</a></div>
-												{else/}
-													<div class="cell"><a href="{$vo['genrelink']}" class="table-list--type global-hover">{$vo['genrename']}</a></div>
-												{/notempty}
-											</td>
-											<td rowspan="1" colspan="1" class="el-table_1_column_2 el-table__cell">
-												<div class="cell">
-													<div class="ellipsis"><a title="{$vo['booktitle']}" href="{$vo['link']}" target="_blank" class="bookName global-hover update-bookName">{$vo['booktitle']}</a></div>
-												</div>
-											</td>
-											<td rowspan="1" colspan="1" class="el-table_1_column_3 el-table__cell">
-												<div class="cell"><a href="{$vo['chapterlink']}" target="_blank" title="{$vo.title}" class="ellipsis chapter global-hover">{$vo.title}</a></div>
-											</td>
-											<td rowspan="1" colspan="1" class="el-table_1_column_4 el-table__cell">
-												<div class="cell">
-													<div class="ellipsis">
-														{:ceil($vo.words/10000)}万字
-													</div>
-												</div>
-											</td>
-											<td rowspan="1" colspan="1" class="el-table_1_column_5 el-table__cell">
-												<div class="cell">
-													<div class="ellipsis global-hover">{$vo['author']}</div>
-												</div>
-											</td>
-											<td rowspan="1" colspan="1" class="el-table_1_column_6 el-table__cell">
-												<div class="cell">
-													<div class="ellipsis">
-														{:time_format($vo.create_time)}
-													</div>
-												</div>
-											</td>
-										</tr>
-									{/volist}
-								{/notempty}								
-							</tbody>
-						</table>
+	
+	{php}
+		$update_list = model('book')->field('id,genre,title as booktitle,filename,create_time,words,author')->where(['status' => 1])->order('create_time desc')->limit(20)->select()->toArray();
+		if(!empty($update_list)) {
+			foreach ($update_list as $k => $vo) {
+				$update_list[$k]['link'] = (string) url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);
+				if($vo['genre']) {
+					$category = model('category')->where(['status' => 1, 'id' => $vo['genre']])->find();
+					$update_list[$k]['genrelink'] = $category ? (string) url('book_cates', ['id' => $category['key'] ? $category['key'] : $category['id']]) : 'javascript:;';
+					$update_list[$k]['genrename'] = $category ? $category['name'] : '--';
+				} else {
+					$update_list[$k]['genrename'] = '--';
+					$update_list[$k]['genrelink'] = 'javascript:;';
+				}
+				$chapter = model('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $vo['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('create_time desc')->find();
+				$update_list[$k]['chapterlink'] = $chapter ? (string) url('chapter_detail', ['id' => $chapter['id']]) : 'javascript:;';
+				$update_list[$k]['title'] = $chapter ? $chapter['title'] : '--';
+			}
+		}
+	{/php}
+	{notempty name="update_list"}
+		<div class="container">
+			<section class="novel-update">
+				<div class="zh-modules-nav">
+					<div class="zh-modules-nav-cont">
+						<div class="zh-modules-nav--item currTab"><span>最近更新</span></div>					
+						<div class="el-tabs__active-bar"></div>
 					</div>
 				</div>
-			</div>
-		</section>
-	</div>
-
+				<div class="novel-update_update-main">
+					<ul class="update-menu">
+						<li>类别</li>
+						<li>书名</li>
+						<li>章节名称</li>
+						<li>字数</li>
+						<li>作者</li>
+						<li>更新时间</li>
+					</ul>
+					{volist name="$update_list" id="vo"}
+					<ul>
+						<li>
+							<a title="{$vo['genrename']}" href="{$vo['genrelink']}" target="_blank">{$vo['genrename']}</a>
+						</li>
+						<li>
+							<a title="{$vo['booktitle']}" href="{$vo['link']}" target="_blank" class="bookName global-hover update-bookName">{$vo['booktitle']}</a>
+						</li>
+						<li>
+							<a href="{$vo['chapterlink']}" target="_blank" title="{$vo.title}" class="ellipsis chapter global-hover">{$vo.title}</a>
+						</li>
+						<li>{:ceil($vo.words/10000)}万字</li>
+						<li>{$vo['author']}</li>
+						<li>{:time_format($vo.create_time)}</li>
+					</ul>
+					{/volist}
+				</div>
+			</section>
+		</div>
+	{/notempty}
 	{php}$links = model('links')->where(['status' => 1])->order('sort desc')->select()->toArray();{/php}
 	{notempty name="links"}
 	<div class="container comm_friendLnk">
@@ -452,7 +376,6 @@
 		</div>
 	</div>
 	{/notempty}
-
 {/block}
 <!-- /主体 -->
 
