@@ -60,7 +60,7 @@
           <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" id="uploadBtn">选择要上传的图片</button>
           <div class="layui-upload-list" id="demo1" style="width: 100%; overflow:hidden;">
             <img {notempty name="$slide_info.img"}src="{:get_file($slide_info.img)}"{else/}src=""{/notempty} style="max-width: 120px;" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';"/>
-            <input type="hidden" name="img" {notempty name="$slide_info.img"}value="{$slide_info.img}"{/notempty}>
+            <input type="text" name="img" {notempty name="$slide_info.img"}value="{$slide_info.img}"{/notempty} class="layui-input">
           </div>
         </div>
       </td>

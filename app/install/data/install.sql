@@ -1808,8 +1808,8 @@ CREATE TABLE `fn_slide_info` (
 -- ----------------------------
 -- Records of fn_slide_info
 -- ----------------------------
-INSERT INTO `fn_slide_info` VALUES ('1', '1', '2', '首页轮播1', '<div class=\"col-lg-7 col-md-8\">\n					<div class=\"hero-left-content\">\n						<h2>用文字绘画，为情感谱曲！<br> <span>你的想象无边，我们的创作无限，小说等你来发掘！</span></h2>\n						<p>故事随手写，情感万相生，品味小说中的世界！</p>					\n					</div>\n				</div>', '', '', '1', '5', '1729355956', '1729356697');
-INSERT INTO `fn_slide_info` VALUES ('2', '1', '2', '作家创作', '<div class=\"col-lg-7 col-md-8\">\n					<div class=\"hero-left-content\">\n						<h2>穿越千古脉络，情系字里千秋。<br><strong>书香袅袅，故事悠悠，走进小说，共鉴人生。</strong></h2>\n						<p>墨香涌动，情思无尽，小说的世界，等你来探索。</p>					\n					</div>\n				</div>', '', '', '1', '0', '1729356543', '0');
+INSERT INTO `fn_slide_info` VALUES ('1', '1', '1', '首页轮播1', '<div class=\"col-lg-7 col-md-8\">\n					<div class=\"hero-left-content\">\n						<h2>用文字绘画，为情感谱曲！<br> <span>你的想象无边，我们的创作无限，小说等你来发掘！</span></h2>\n						<p>故事随手写，情感万相生，品味小说中的世界！</p>					\n					</div>\n				</div>', 'https://demo.feiniao.paheng.net/storage/202501/0699f9dd299c37058982253de9dc222d.png', 'https://demo.feiniao.paheng.net/', '1', '5', '1729355956', '1737700094');
+INSERT INTO `fn_slide_info` VALUES ('2', '1', '1', '首页轮播2', '<div class=\"col-lg-7 col-md-8\">\n					<div class=\"hero-left-content\">\n						<h2>穿越千古脉络，情系字里千秋。<br><strong>书香袅袅，故事悠悠，走进小说，共鉴人生。</strong></h2>\n						<p>墨香涌动，情思无尽，小说的世界，等你来探索。</p>					\n					</div>\n				</div>', 'https://demo.feiniao.paheng.net/storage/202501/c35661f8789e380ebe25a7acf217ee3c.png', 'https://demo.feiniao.paheng.net/', '1', '0', '1729356543', '1737700103');
 
 -- ----------------------------
 -- Table structure for fn_sms_log

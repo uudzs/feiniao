@@ -85,7 +85,7 @@ a.creat-accout-btn:hover::before,
     position: absolute;
     width: 100%;
     z-index: 99;
-    border-bottom: 1px solid rgba(225, 228, 237, 0.80);
+    border-bottom: 1px solid #e7e7e7;
 }
 
 .wrapper .header-fixd {
@@ -116,7 +116,7 @@ a.creat-accout-btn:hover::before,
     flex-grow: 1;
     height: 40px;
     background-color: #fff;
-    border: 1px solid #e6e6e6;
+    border: 1px solid #e7e7e7;
     border-radius: 20px;
     backdrop-filter: blur(8px);
     display: flex;

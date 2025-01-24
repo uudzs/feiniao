@@ -102,31 +102,20 @@ section.hero-area {
     position: relative;
     z-index: 1;
     padding-bottom: 20px;
-    padding-top: 130px;
+    padding-top: 100px;
     overflow: hidden;
-    background-image: url("../image/bg.png");
-    background-size: cover;
-    background-position: center right;
-    background-repeat: no-repeat;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(46.2%, hsla(0, 0%, 100%, 0)), to(#F8FAFC)), #def4ff;
+    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0) 46.2%, #F8FAFC), #def4ff;
 }
-
-img.circle-1 {
-    position: absolute;
-    right: -48px;
-    top: -8px;
+section.hero-area .container {
+    padding: 0;
 }
-
-img.circle-2 {
-    position: absolute;
-    right: -66px;
-    top: -82px;
-    transform: rotate(9deg);
+section.hero-area .container .row {
+    margin: 0;
 }
-
-.hero-circle img {
-    width: 45%;
+section.hero-area .container .row .owl-item img {
+    border-radius: 16px;
 }
-
 .hero-left-content h2 {
     color: #000;
     font-size: 22px;
