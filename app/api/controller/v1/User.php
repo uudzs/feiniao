@@ -324,10 +324,11 @@ class User extends BaseController
     {
         $param = get_params();
         $path = trim($param['path']);
+        $inviteurl = trim($param['inviteurl']);
         if (empty(JWT_UID)) {
             $this->apiError('请先登录', [], 99);
         }
-        if (empty($path)) {
+        if (empty($path) || empty($inviteurl)) {
             $this->apiError('参数错误');
         }
         $conf = get_system_config('invite');
@@ -365,8 +366,8 @@ class User extends BaseController
             $filename = set_password($user['id'], $user['salt']);
             $filePath = $savePath . $filename . '.jpg';
             $posterPath = get_config('filesystem.disks.public.url') . '/invite/' . $user['id'] . '/' . $filename . '.jpg';
-            $url = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('inviteurl', ['name' => $user['qrcode_invite']])->domain(true));
-            $qrFile = $savePath . 'qrcode.png';
+            //$url = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('inviteurl', ['name' => $user['qrcode_invite']])->domain(true));
+            $qrFile = $savePath . 'poster_qrcode.png';
             $qrwidth = 200;
             if (!is_file($qrFile)) {
                 $logoPath = CMS_ROOT . 'public/static/home/images/logo-invite.png';
@@ -376,7 +377,7 @@ class User extends BaseController
                 $result = Builder::create()
                     ->writer(new PngWriter())
                     ->writerOptions([])
-                    ->data($url)
+                    ->data($inviteurl)
                     ->encoding(new Encoding('UTF-8'))
                     ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
                     ->size($qrwidth)

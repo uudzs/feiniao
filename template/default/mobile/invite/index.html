@@ -25,9 +25,9 @@ if (!empty($inviteconf['bglist'])) {
     <h1>{$conf.invite_reward}</h1>
     <div class="invite-code">
        我的邀请码：<span b-text="invite.userinfo.qrcode_invite">未登录</span>
-        <div class="btn" b-click="invite.copyTextToClipboard(invite.userinfo.qrcode_invite)">复制</div>
+        <div class="btn" b-click="invite.copyTextToClipboard()">复制</div>
     </div>
-    <a href="javascript:;" class="invitation"  b-click="invite.copyTextToClipboard(invite.userinfo.qrcode_invite)">点击复制邀请链接</a>
+    <a href="javascript:;" class="invitation"  b-click="invite.copyTextToClipboard()">点击复制邀请链接</a>
     <div class="menu-list">
         <div class="sub-title">我如何获得奖励？</div>
         <div class="item-title">让您的朋友按以下操作可获得三次奖励！</div>
@@ -130,12 +130,16 @@ if (!empty($inviteconf['bglist'])) {
            userinfo: {},
         },
         methods: {
-            async copyTextToClipboard(text) {                
+            invitePath() {                
                 var protocol = window.location.protocol; // 获取协议
                 var hostname = window.location.hostname; // 获取域名
-                text = protocol + '//' + hostname + '/i/' + text;
+                var href = window.location.href;
+                var path = href.includes('home') ? '/home' : '';
+                return protocol + '//' + hostname + path + '/i/' + this.userinfo.qrcode_invite;
+            },
+            async copyTextToClipboard() {                
                 const textarea = document.createElement('textarea');
-                textarea.value = text;
+                textarea.value = this.invitePath();
                 document.body.appendChild(textarea);
                 textarea.select();
                 try {
@@ -170,7 +174,7 @@ if (!empty($inviteconf['bglist'])) {
             },
             themeview(path) {
                 var that = this;
-                post("{:furl('v1/invitetheme', [], true, 'api')}", {path: path}, function(result) {
+                post("{:furl('v1/invitetheme', [], true, 'api')}", {path: path, inviteurl: that.invitePath()}, function(result) {
                     if(result.code == 0) {
                         var dialog = bui.dialog();
                         dialog.create({

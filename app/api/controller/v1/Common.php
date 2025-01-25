@@ -373,6 +373,11 @@ class Common extends BaseController
         if (empty($user)) {
             $this->apiError('用户不存在', 98);
         }
+        if (empty($user['qrcode_invite'])) {
+            $qrcode_invite = get_invite_code();
+            Db::name('user')->where('id', JWT_UID)->update(['qrcode_invite' => $qrcode_invite]);
+            $user['qrcode_invite'] = $qrcode_invite;
+        }
         $user['mobile'] = $user['mobile'] ? substr_replace($user['mobile'], '****', 3, 4) : '';
         $user['id_card'] = $user['id_card'] ? substr_replace($user['id_card'], '****', 3, 4) : '';
         $user['headimgurl'] = get_file($user['headimgurl']);

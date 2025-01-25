@@ -264,6 +264,13 @@ $(window).on('load', function () {
             $('.gpd-toast-mask').toggle();
             $(".gpd-reader-toast").toggle();
             $(".gpd-reader-toast .gpd-wrap:eq(" + $(this).index() + ")").toggle();
+            if ($(this).index() === 0 && $(".gpd-reader-toast .gpd-wrap:eq(" + $(this).index() + ")").is(":visible")) {
+                var offsettop = $('[data-chapterid="' + chapter_info.id + '"]').offset().top;
+                var bordertop = parseInt($("#JcatalogListWrap").offset().top);
+                $('#JcatalogListWrap').animate({
+                    scrollTop: offsettop - bordertop
+                }, 1000);
+            }
         }
     })
     //评论
@@ -302,10 +309,13 @@ $(window).on('load', function () {
         });
     })
     //关闭
-    $('.gpd-toast-mask').on('click', function (obj, index) {
+    $('.gpd-toast-mask').on('click', function (obj, index) { 
+        $('#JcatalogListWrap').animate({
+            scrollTop: 0
+        }, 0);
         $(this).hide();
         $(".gpd-reader-toast").toggle();
-        $(".gpd-reader-toast .gpd-wrap").hide();
+        $(".gpd-reader-toast .gpd-wrap").hide();        
     })
     //主题
     $('.gpd-setstyle .gpd-setcon a').on('click', function (obj, index) {
@@ -367,7 +377,7 @@ $(window).on('load', function () {
                 $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus-fill');
             } else {
                 $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus');
-            }
+            }            
         } else {
             layer.msg(result.msg);
         }
@@ -395,8 +405,8 @@ $(window).on('load', function () {
             next_chapter();            
         }
     });
-    //上一页
-    
+
+    //上一页    
     window.upper_chapter = function() {
         if(!chapter_id) {
             isLoading = false;
