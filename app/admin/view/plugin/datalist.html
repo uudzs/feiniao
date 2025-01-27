@@ -6,7 +6,8 @@
 </div>
 <script type="text/html" id="toolbarDemo">
 	<div class="layui-btn-group">
-		<span class="layui-btn layui-btn-sm layui-bg-red" lay-event="addons" data-title="插件市场"><i class="layui-icon layui-icon-app"></i> 插件市场</span>
+		<span class="layui-btn layui-btn-sm layui-bg-blue" lay-event="addons" data-title="插件市场"><i class="layui-icon layui-icon-app"></i> 插件市场</span>
+		<span class="layui-btn layui-btn-sm" lay-event="loginunion" data-title="登录联盟"><i class="layui-icon layui-icon-user"></i> 登录联盟</span>
   	</div>
 </script>
 <script type="text/html" id="plugin-status-switch">
@@ -37,9 +38,9 @@
 				{field: 'version', width:85, title: '版本'},
 				{title: '状态', width:85, templet: '#plugin-status-switch'},				
 				{
-					width: 100, title: '操作', align: 'center', templet: function (d) {
+					width: 150, title: '操作', align: 'center', templet: function (d) {
 						if (d.install == 1) {
-							return '<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="config">配置</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="uninstall">卸载</a></div>';
+							return '<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="config">配置</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="uninstall">卸载</a><a class="layui-btn layui-bg-purple layui-btn-xs" lay-event="update">检查更新</a></div>';
 						} else {
 							return '<div class="layui-btn-group"><a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="install">安装</a></div>';
 						}
@@ -87,7 +88,10 @@
 		//监听表头工具栏事件
 		table.on('toolbar(list)', function(obj){
 			if(obj.event === 'addons') {
-				tool.side("https://www.paheng.com/forum-38-1.html");
+				tool.side("{:url('upgrade/union_plugin')}");
+				return false;
+			} else if(obj.event === 'loginunion') {
+				tool.side("{:url('upgrade/union_login')}");
 				return false;
 			}
 		});
@@ -108,6 +112,36 @@
 					tool.post("{:url('plugin/uninstall')}", { id: obj.data.name }, callback);
 					layer.close(index);
 				});
+			}
+			if(obj.event === 'update') {
+				let callback = function (e) {
+					if (e.code == 0) {
+						if(e.data == 1) {		
+							layer.confirm('此插件有新版本，现在更新该插件吗?', { icon: 3, title: '更新提示', btn: ['更新', '关闭'] }, function (index) {
+								var loadIndex = layer.load(0);
+								let callback = function (r) {
+									layer.msg(r.msg);
+									if (r.code == 0) {
+										layer.close(loadIndex);
+										layer.close(index);
+										layui.pageTable.reload()
+									} else {
+										layer.close(loadIndex);
+										return layer.msg(r.msg);
+									}
+								}								
+								tool.post("{:url('upgrade/plugin_update')}", { name: obj.data.name }, callback);
+								return false;
+							});
+						} else {
+							layer.msg('不需要更新！');
+						}
+					} else {
+						layer.msg(e.msg);
+					}
+				}
+				tool.post("{:url('upgrade/plugin_check')}", { name: obj.data.name }, callback);
+				return false;
 			}
 			if (obj.event === 'install') {
 				layer.confirm('确定要安装该插件吗?', { icon: 3, title: '提示' }, function (index) {

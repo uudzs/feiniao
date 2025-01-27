@@ -9,9 +9,16 @@ use think\facade\Db;
 use think\facade\View;
 use ZipArchive;
 use think\facade\Config;
+use app\admin\validate\LoginValidate;
+use think\exception\ValidateException;
+
+set_time_limit(0);
+ini_set('memory_limit', '256M');
 
 class Upgrade extends BaseController
 {
+
+    private static $tokenKey = 'union_token';
 
     public function index()
     {
@@ -69,30 +76,11 @@ class Upgrade extends BaseController
                 }
             }
             if (!empty($info['sql'])) {
-                $info['sql'] = str_replace("\r", "\n", $info['sql']);
-                $sql = explode("\n", $info['sql']);
-                $templine = '';
-                foreach ($sql as $line) {
-                    if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 2) == '/*')
-                        continue;
-                    $templine .= $line;
-                    if (substr(trim($line), -1, 1) == ';') {
-                        // 不区分大小写替换前缀
-                        $templine = str_ireplace('__PREFIX__', Config::get('database.connections.mysql.prefix'), $templine);
-                        // 忽略数据库中已经存在的数据
-                        $templine = str_ireplace('INSERT INTO ', 'INSERT IGNORE INTO ', $templine);
-                        try {
-                            Db::execute($templine);
-                        } catch (\PDOException $e) {
-                            //$e->getMessage();
-                        }
-                        $templine = '';
-                    }
-                }
+                $this->runsql($info['sql']);
             }
             return to_assign(0, '升级成功');
         } else {
-            $list = $this->get_version();
+            $list = $this->get_system_version();
             View::assign('list', isset($list['data']) ? $list['data'] : []);
             return view();
         }
@@ -116,7 +104,7 @@ class Upgrade extends BaseController
             $dp = dir($path);
             while ($file = $dp->read()) {
                 if ($file !== "." && $file !== "..") {
-                    self::get_allfiles($path . "/" . $file, $files);
+                    self::get_allfiles($path . DIRECTORY_SEPARATOR . $file, $files);
                 }
             }
             $dp->close();
@@ -129,29 +117,220 @@ class Upgrade extends BaseController
     private function deleteDir($folder)
     {
         if (is_dir($folder)) {
-            $files = scandir($folder);
-            foreach ($files as $file) {
-                if ($file != "." && $file != "..") {
-                    $file = $folder . "/" . $file;
-                    if (is_dir($file)) {
-                        $this->deleteDir($file);
-                    } else {
-                        unlink($file);
+            try {
+                $files = scandir($folder);
+                foreach ($files as $file) {
+                    if ($file != "." && $file != "..") {
+                        $file = $folder . "/" . $file;
+                        if (is_dir($file)) {
+                            $this->deleteDir($file);
+                        } else {
+                            unlink($file);
+                        }
                     }
                 }
+                rmdir($folder);
+            } catch (\Exception $e) {
+                return to_assign(1, $e->getMessage());
             }
-            rmdir($folder);
         }
+        return true;
     }
 
-    public function check_upgrade()
+    private function copy_addone_file($addone, $info)
+    {
+        $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $addone['name'] . DIRECTORY_SEPARATOR;
+        $path = app()->getRootPath() . $relativepath;
+        if (!createDirectory($path)) {
+            return to_assign(1, '创建' . $path . '目录失败');
+        }
+        $zipfile = Http::doGet($info['path']);
+        if (!$zipfile || empty($zipfile)) {
+            return to_assign(1, '读取远程升级文件错误，请检测网络！');
+        }
+        $filepath = $path . $addone['name'] . '.zip';
+        if (false === @file_put_contents($filepath, $zipfile)) {
+            return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
+        }
+        if (!is_file($filepath)) return to_assign(1, '升级包保存失败');
+        if (!class_exists('ZipArchive')) {
+            return to_assign(1, '请手动解压' . $filepath . '到根目录。');
+        }
+        try {
+            $zip = new ZipArchive;
+            $res = $zip->open($filepath);
+            if ($res === TRUE) {
+                $zip->extractTo($path);
+                $zip->close();
+                unlink($filepath);
+                self::get_allfiles($path, $files);
+                $file = app()->getRootPath() . 'addons' . DIRECTORY_SEPARATOR . $addone['name'] . DIRECTORY_SEPARATOR . 'info.ini';
+                foreach ($files as $key => $value) {
+                    $destination =  str_replace('runtime' . DIRECTORY_SEPARATOR . 'upgrade', 'addons', $value);
+                    if (basename($value) == 'config.php' && is_file($file)) continue;
+                    if (basename($value) == 'info.ini' && is_file($file)) {
+                        // 拼接要写入的数据
+                        $str = '';
+                        foreach ($addone as $k => $v) {
+                            if ($k == 'version') {
+                                $v = $info['version'];
+                            }
+                            $str .= $k . " = " . $v . "\n";
+                        }
+                        if ($handle = fopen($file, 'w')) {
+                            fwrite($handle, $str);
+                            fclose($handle);
+                        }
+                        continue;
+                    }
+                    if ($this->copyfile($value, $destination)) {
+                        unlink($value);
+                    }
+                }
+                $this->deleteDir($path);
+            } else {
+                unlink($filepath);
+                return to_assign(1, '解压文件失败，请检查目录权限。');
+            }
+        } catch (\Exception $e) {
+            return to_assign(1, $e->getMessage());
+        }
+        return true;
+    }
+
+    private function runsql($sql)
+    {
+        if (empty($sql)) return false;
+        $sql = str_replace("\r", "\n", $sql);
+        $sql = explode("\n", $sql);
+        $templine = '';
+        foreach ($sql as $line) {
+            if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 2) == '/*')
+                continue;
+            $templine .= $line;
+            if (substr(trim($line), -1, 1) == ';') {
+                // 不区分大小写替换前缀
+                $templine = str_ireplace('__PREFIX__', Config::get('database.connections.mysql.prefix'), $templine);
+                // 忽略数据库中已经存在的数据
+                $templine = str_ireplace('INSERT INTO ', 'INSERT IGNORE INTO ', $templine);
+                try {
+                    Db::execute($templine);
+                } catch (\PDOException $e) {
+                    //$e->getMessage();
+                }
+                $templine = '';
+            }
+        }
+        return true;
+    }
+
+    public function check_system_upgrade()
     {
         if (request()->isAjax()) {
-            return table_assign(0, '', $this->get_version());
+            return table_assign(0, '', $this->get_system_version());
         }
     }
 
-    private function get_version()
+    public function plugin_check()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $name = isset($param['name']) ? trim($param['name']) : '';
+            if (empty($name)) {
+                return to_assign(1, '插件信息不存在');
+            }
+            if (!get_addons_is_enable($name)) return to_assign(1, '插件没有安装或启用');
+            $info = get_addons_info($name);
+            $url = get_config('upgrade.official_api_url') . 'plugincheck' . '/' . $name . '/' . $info['version'];
+            $content = Http::doGet($url);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+            if (!isset($result['data']['update'])) return to_assign(1, '数据错误');
+            return to_assign(0, '检查成功', $result['data']['update']);
+        }
+    }
+
+    public function plugin_update()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $name = isset($param['name']) ? trim($param['name']) : '';
+            if (empty($name)) {
+                return to_assign(1, '插件信息不存在');
+            }
+            if (!get_addons_is_enable($name)) return to_assign(1, '插件没有安装或启用');
+            $addoneinfo = get_addons_info($name);
+            $url = get_config('upgrade.official_api_url') . 'pluginupgrade' . '/' . $name;
+            $token = get_cache(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $header = 'token:' . $token;
+            $content = Http::doGet($url, 60, $header);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+            $info = $result['data'];
+            if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '不存在升级项');
+            if (!empty($info['path'])) {
+                $this->copy_addone_file($addoneinfo, $info);
+            }
+            if (!empty($info['sql'])) {
+                $this->runsql($info['sql']);
+            }
+            return to_assign(0, '升级成功');
+        }
+    }
+
+    public function plugin_install()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $name = isset($param['name']) ? trim($param['name']) : '';
+            if (empty($name)) {
+                return to_assign(1, '插件信息不存在');
+            }
+            $token = get_cache(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $list = get_addons_list();
+            $plugin = array_column($list, null, 'name');
+            if (isset($plugin[$name]) && $plugin[$name]) return to_assign(1, '已经安装过此插件了');
+            $url = get_config('upgrade.official_api_url') . 'pluginupgrade' . '/' . $name;
+            $header = 'token:' . $token;
+            $content = Http::doGet($url, 60, $header);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+            $info = $result['data'];
+            if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '插件无效');
+            if (!empty($info['path'])) {
+                $this->copy_addone_file(['name' => $name], $info);
+            }
+            if (!empty($info['sql'])) {
+                $this->runsql($info['sql']);
+            }
+            return to_assign(0, '安装成功');
+        }
+    }
+
+    public function union_plugin()
+    {
+        $url = get_config('upgrade.official_api_url') . 'plugin';
+        $content = Http::doGet($url);
+        if (empty($content)) return to_assign(1, '获取信息失败');
+        $result = json_decode($content, true);
+        if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+        if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+        return view('union_plugin', ['list' => $result['data']]);
+    }
+
+    private function get_system_version()
     {
         $url = get_config('upgrade.official_api_url') . 'version';
         $version = get_config('upgrade.version');
@@ -164,6 +343,34 @@ class Upgrade extends BaseController
             return ['code' => 1, 'msg' => '无更新', 'data' => ''];
         }
         return $upArray;
+    }
+
+    public function union_login()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            try {
+                validate(LoginValidate::class)->check($param);
+            } catch (ValidateException $e) {
+                // 验证失败 输出错误信息
+                return to_assign(1, $e->getError());
+            }
+            $url = get_config('upgrade.official_api_url') . 'login/login';
+            $data = [
+                'account' => $param['username'],
+                'password' => $param['password'],
+                'scene' => 'account',
+            ];
+            $content = Http::doPost($url, $data);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!isset($result['data']['token']) || empty($result['data']['token'])) return to_assign(1, '登录失败');
+            set_cache(self::$tokenKey, $result['data']['token'], 7200);
+            return to_assign(0, '登录成功');
+        } else {
+            return view('union_login', ['official_url' => str_replace('api/', '', get_config('upgrade.official_api_url')), 'islogin' => get_cache(self::$tokenKey) ? 1 : 0]);
+        }
     }
 }
 
@@ -305,7 +512,6 @@ class Http
         } else {
             $post_string = http_build_query($post_data);
         }
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);

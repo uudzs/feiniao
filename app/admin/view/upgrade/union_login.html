@@ -1,0 +1,90 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+	.layui-card-body .layui-timeline-title {
+		padding-bottom: 0;
+		font-size: 14px;
+	}
+    .layui-form {
+        max-width: 400px;
+    }
+    .captcha_img img {
+        height: 100%;
+    }
+    .union-reg a {
+        color: #187FDD;
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<div class="layui-card">
+		<div class="layui-card-header"><h3>联盟登录</h3></div>
+		<div class="layui-card-body">
+            {eq name="islogin" value="0"}
+                <form class="layui-form">
+                    <div class="layui-form-item">
+                        <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-username"></i>
+                        </div>
+                        <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" lay-reqtext="请填写用户名" autocomplete="off" class="layui-input" lay-affix="clear">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <i class="layui-icon layui-icon-password"></i>
+                        </div>
+                        <input type="password" name="password" value="" lay-verify="required" placeholder="密   码" lay-reqtext="请填写密码" autocomplete="off" class="layui-input" lay-affix="eye">
+                        </div>
+                    </div>        
+                    <div class="layui-form-item">
+                            <div class="layui-input-inline" style="width:158px;">
+                                <input type="text" name="captcha" lay-verify="required" placeholder="验证码" lay-reqText="请输入验证码" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-input-inline captcha_img" style="width:142px; height:36px; margin-right:0">
+                                <img src="{:url('verify')}" alt="captcha" onclick="this.src='{:url('verify')}?'+Math.random()">
+                                <input type="hidden" value="{:make_token()}"/>
+                            </div>
+                    </div>                  
+                    <div class="layui-form-item">
+                        <button class="layui-btn layui-btn-fluid" type="button" lay-submit="" lay-filter="union-login">登录</button>
+                    </div>
+                    <div class="layui-form-item union-reg">                
+                        或 <a href="{$official_url}" target="_blank">注册帐号</a>
+                    </div>
+                </form>
+            {else/}
+                <blockquote class="layui-elem-quote">已登录成功！</blockquote>
+            {/eq}
+		</div>
+	</div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+	function feiniaoInit() {
+        var form = layui.form, tool = layui.tool;
+        form.on('submit(union-login)', function(data) {
+            let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				} else {
+                    $('[alt="captcha"]').click();
+					$('input[name="captcha"]').val('');
+                }
+			}
+			tool.post("{:url('upgrade/union_login')}", data.field, callback);
+            return false;
+        });
+	}
+</script>
+{/block}
+<!-- /脚本 -->

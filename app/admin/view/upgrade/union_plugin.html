@@ -1,0 +1,116 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+    .layui-card-body .layui-timeline-title {
+        padding-bottom: 0;
+        font-size: 14px;
+    }
+    .layui-card-body {
+        overflow: hidden;
+    }
+    .layui-bg-gray {
+        padding: 20px;
+    }
+    .plugin_image {
+        width: 100%;
+        border-radius: 5px;
+    }
+    .plugin_intro {
+        padding-left: 20px;
+    }
+    .plugin_intro p {
+        height: 96px;
+        overflow: hidden;
+    }
+    .layui-card-header button {
+        float: right;
+        margin-top: 10px;
+    }
+    .layui-card-header h3 span {
+        float: right;
+        margin-top: 10px;
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <h3>插件市场<span class="layui-btn layui-btn-sm" lay-event="loginunion" data-title="登录联盟">登录联盟</span></h3>            
+        </div>
+        <div class="layui-card-body">
+            {notempty name="list"}
+            <div class="layui-bg-gray">
+                <div class="layui-row layui-col-space15">
+                    {volist name="list" id="v"}
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <div class="layui-card-header">
+                                    {$v.title}<button type="button" data-name="{$v.name}" class="layui-btn layui-btn-sm layui-bg-blue" lay-filter="plugin-install">安装</button>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div class="layui-col-xs3">
+                                        <img src="{$v.image}" class="plugin_image" alt="{$v.title}">
+                                    </div>
+                                    <div class="layui-col-xs9 plugin_intro">
+                                        <p>{$v.intro}</p>
+                                        <hr>
+                                        <div class="layui-col-xs6 layui-col-md12">
+                                            版本：<span class="layui-badge layui-bg-cyan">v{$v.version}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;支持平台：<span class="layui-badge layui-bg-cyan">{$v.platform|strtoupper}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;免费：<span class="layui-badge layui-bg-cyan">{$v.is_free == '1' ? '是' : '否'}</span>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    {/volist}                    
+                </div>
+            </div>
+            {else/}
+                <h5>无插件数据！</h5>
+            {/notempty}
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+    function feiniaoInit() {
+        var form = layui.form, tool = layui.tool;
+        $('body').on('click', '[lay-filter="plugin-install"]', function() {
+            var name = $(this).data('name');
+            layer.confirm('确定要安装该插件吗?', { icon: 3, title: '安装提示' }, function (index) {
+                var loadIndex = layer.load(0);
+                $.ajax({
+                    url: "{:url('upgrade/plugin_install')}",
+                    type: 'POST',
+                    data: { name: name },
+                    async: true,
+                    success: function(response) {
+                        layer.close(loadIndex);
+                        layer.msg(response.msg);
+                        if (response.code == 0) {
+                            parent.layui.tool.close(1000);	
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        layer.close(loadIndex);
+                        parent.layui.tool.close(1000);
+                    }
+                });
+            });
+        });
+        $('body').on('click', '[lay-event="loginunion"]', function() {
+            tool.side("{:url('upgrade/union_login')}");
+			return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->
