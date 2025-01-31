@@ -1,0 +1,99 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/my.css?v={$conf.version}" />
+{/block}
+{block name="title"}
+<title>个人信息-{$conf.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="个人信息" />
+<meta name="description" content="个人信息" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index'/}
+<style>
+    .i-right .i-bot .l-botMod {
+        width: 100%;
+    }
+    .i-right .i-bot .l-botMod .myMod {
+        padding-top: 30px;
+        padding-right: 30px;
+        padding-bottom: 20px;
+        display: flex;
+    }
+</style>
+<div class="container ucenter">
+    {include file="user/menu" /}
+    <!--right mod -->
+    <div class="i-right">
+        <div class="i-bot">
+            <div class="l-botMod">
+                <div class="i-title" style="padding-left:30px;">
+                    个人信息
+                </div>
+                <div class="myMod">
+                    <form class="layui-form layui-form-pane">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">昵称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="nickname" autocomplete="off" placeholder="请输入" lay-verify="required" class="layui-input">
+                            </div>
+                        </div>                           
+                        <div class="layui-form-item">
+                            <button class="layui-btn layui-btn-fluid layui-bg-blue" type="button" lay-submit="" lay-filter="profile">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    $(window).on('load', function () {
+        window.ucenter_call = function (result) {
+            layui.use(['form', 'jquery'], function () {
+                var $ = layui.jquery,
+                    form = layui.form,
+                    layer = layui.layer,
+                    userinfo = {};
+                if (parseInt(result.code) == 0) {
+                    userinfo = result.data.userinfo;
+                    if (userinfo) {
+                        $('input[name="nickname"]').val(userinfo.nickname);
+                    }
+                } else {
+                    if (parseInt(result.code) == 401) {
+                        layui.data('feiniao', {
+                            key: 'token',
+                            remove: true
+                        });
+                        location.reload();
+                    } else if (parseInt(result.code) == 99) {
+                        layer.alert('请先登录', { title: "登录提示", icon: 3, closeBtn: 0, btnAlign: 'c', shadeClose: true }, function (index) {
+                            window.location.href = loginurl;
+                        });
+                    } else {
+                        return layer.msg(result.msg);
+                    }
+                }
+                form.on('submit(profile)', function(data) {
+                    var field = data.field;
+                    if(!field.nickname) return layer.msg('请设置昵称！');
+                    if(field.nickname == userinfo.nickname) return layer.msg('昵称没有变化无需修改！');
+                    $.postApi("{:furl('v1/nickname', [], true, 'api')}", { nickname: field.nickname }, function(result) {
+                        layer.msg(result.msg);
+                        if(result.code == 0) {
+                            location.reload();
+                        }
+                    });
+                });
+            });
+        }
+    });
+</script>
+{/block}
+<!-- /脚本 -->

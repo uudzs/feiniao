@@ -1,0 +1,638 @@
+
+.wrapper, body {
+    background: #F8FAFC;
+}
+.ucenter {
+    padding-top: 90px;
+    display: flex;
+}
+.i-left,.i-right {
+	margin-bottom: 20px
+}
+
+.iw-right {
+	width: 950px!important
+}
+em, i {
+    font-style: normal;
+}
+.i-left {
+	width: 200px;
+	float: left;
+	font-size: 14px;
+	background: #fff;
+	overflow: hidden
+}
+
+.i-left .title {
+	padding-left: 30px;
+	height: 40px;
+	line-height: 40px;
+	color: #999;
+	border-bottom: solid 1px #f2f2f2
+}
+
+.i-left .title i {
+	display: inline-block;
+    margin-right: 10px;
+    width: 18px;
+    height: 15px;
+    font-size: 18px;
+}
+.iconfont {
+    font-family: "user_iconfont" !important;
+    font-size: 24px;
+    font-style: normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.1px;
+    -moz-osx-font-smoothing: grayscale;
+}
+.i-left ul {
+	padding: 0 0 15px 30px;
+	/* border-bottom: solid 5px #fafafa; */
+	overflow: hidden
+}
+
+.i-left ul li {
+	margin-top: 15px;
+	border-right: solid 2px transparent
+}
+
+.i-left ul li a:hover,.i-left ul li.on {
+	border-right: solid 2px #148AFF
+}
+
+.i-left ul li a {
+	display: block;
+	color: #333;
+	font-size: 14px
+}
+
+.i-left ul li i {
+	display: inline-block;
+    margin-right: 10px;
+    width: 18px;
+    height: 15px;
+    font-size: 18px;
+}
+
+.i-left ul li.on a {
+	color: #148AFF
+}
+
+.i-left ul li.on a:hover {
+	border-right: solid 2px transparent
+}
+
+.i-left .user_block{
+	border-bottom: solid 15px #fafafa;
+	background: url(../image/user-bg.png);
+}
+.i-left .user_block .header {
+    width: 100%;
+    height: 60px;
+    text-align: center;
+    padding-top: 20px;
+}
+
+.i-left .user_block .header span {
+    width: 60px;
+    height: 60px;
+    display: block;
+    margin: 0 auto;
+    background-color: #e1e1e1;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.i-left .user_block .header img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.i-left .user_block .name {
+    width: 100%;
+    padding: 25px 0 0 0;
+    text-align: center;
+    font-size: 16px;
+    color: #fafafa;
+}
+.i-left .user_block .group {
+    width: 100%;
+    padding: 5px 0 20px 0;
+    text-align: center;
+    font-size: 12px;
+    color: #f2f2f2;
+}
+.i-left .user_block .group i{
+	font-size: 12px;
+	margin-right: 5px;
+	color: #148AFF;
+}
+.i-left .user_block_list2 {
+    width: 100%;
+    background-color: #fff;
+    padding: 10px 0;
+}
+.i-left .user_block_list2 ul {
+    width: 100%;
+    display: block;
+    padding: 0px;
+}
+.i-left .user_block_list2 ul li {
+	display: block;
+    width: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-top: 0px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.i-left .user_block_list2 ul li .borderBottom {
+	display: inline-block;
+    width: 140px;
+    border-bottom: 1px dashed #e9e9e9;
+    height: 35px;
+    line-height: 35px;
+    position: relative;
+    padding-left: 10px;
+}
+.i-left .user_block_list2 ul li:last-child .borderBottom, .i-left .user_block_list2 ul li.last .borderBottom {
+    border-bottom: #fff;
+}
+
+.i-right {
+	float: right;
+	width: calc(100% - 220px);
+	overflow: hidden;
+    padding: 0;
+    margin-left: 20px;
+}
+
+.i-right .i-top,.i-right .i-top .iDetail dl {
+	margin-bottom: 10px;
+	overflow: hidden
+}
+
+.i-right .i-top {
+	padding: 15px 30px;
+	height: 150px;
+	background: #fff
+}
+
+.i-right .i-top .iDetail {
+	width: 195px;
+	height: 150px;
+	float: left;
+	padding-right: 30px;
+	border-right: solid 1px #e6e6e6
+}
+
+.i-right .i-top .iDetail dl dt {
+	margin-right: 15px;
+	float: left;
+	width: 60px
+}
+
+.i-right .i-top .iDetail dl dt a {
+	display: block
+}
+
+.i-right .i-top .iDetail dl dt img {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	display: block
+}
+
+.i-right .i-top .iDetail dl dd {
+	float: left;
+	width: 120px
+}
+
+.i-right .i-top .iDetail dl dd a {
+	display: inline-block;
+	line-height: 18px;
+	color: #000;
+	font-size: 14px
+}
+
+.i-right .i-top .iDetail dl dd cite {
+	height: 14px;
+	width: 14px;
+	display: inline-block;
+	margin: 0 0 0 10px
+}
+
+.i-right .i-top .iDetail dl dd cite.v0 {
+	background-position: -60px 0
+}
+
+.i-right .i-top .iDetail dl dd cite.v1 {
+	background-position: -60px -30px
+}
+
+.i-right .i-top .iDetail dl dd cite.v2 {
+	background-position: -60px -62px
+}
+
+.i-right .i-top .iDetail dl dd cite.v3 {
+	background-position: -60px -92px
+}
+
+.i-right .i-top .iDetail dl dd cite.v4 {
+	background-position: -60px -131px
+}
+
+.i-right .i-top .iDetail dl dd cite.v5 {
+	background-position: -60px -161px
+}
+
+.i-right .i-top .iDetail dl dd span {
+	padding: 0 12px;
+	height: 20px;
+	line-height: 20px;
+	color: #fff;
+	display: inline-block;
+	margin-top: 10px;
+	border-radius: 12px;
+	background: #148AFF
+}
+
+.i-right .i-top .iDetail dl dd span.nosign {
+	background: #999
+}
+
+.i-right .i-top .iDetail .medal {
+	overflow: hidden
+}
+
+.i-right .i-top .iDetail .medal img {
+	display: inline-block;
+	margin: 10px 10px 0 0;
+	width: 24px;
+	height: 24px
+}
+
+.i-right .i-top .iAttend {
+	padding-top: 45px;
+	float: left;
+	width: 230px;
+	height: 105px;
+	text-align: center;
+	border-right: solid 1px #e6e6e6;
+	overflow: hidden
+}
+
+.i-right .i-top .iAttend a {
+	width: 115px;
+	display: block;
+	float: left;
+	color: grey;
+	font-size: 14px
+}
+
+.i-right .i-top .iAttend a em {
+	display: block;
+	margin: 15px auto;
+	width: 15px;
+	height: 2px;
+	background: #ccc
+}
+
+.i-right .i-top .iAttend a b {
+	color: #000
+}
+
+.i-right .i-top .iBookshelf {
+	padding-top: 25px;
+	width: 135px;
+	height: 125px;
+	float: left;
+	padding-left: 40px;
+	border-right: solid 1px #e6e6e6;
+	overflow: hidden
+}
+
+.i-right .i-top .iBookshelf a {
+	display: block;
+	color: #000;
+	font-size: 14px;
+	line-height: 40px
+}
+
+.i-right .i-top .iBookshelf a em {
+	display: inline-block;
+	margin-right: 20px;
+	width: 40px;
+	height: 40px;
+	color: #fff;
+	text-align: center;
+	background: #148AFF;
+	border-radius: 50%
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li a,.i-right .i-bot .l-botMod .myMod .bookUl li p i,.i-right .i-bot .l-botMod .myMod .bookUl li p span {
+	display: block
+}
+.i-right .i-bot .l-botMod .myMod:last-child {
+    margin-bottom: 0;
+}
+.i-right .i-top .iBookshelf a.readed {
+	margin-top: 15px
+}
+
+.i-right .i-top .iBookshelf a.readed em {
+	background: #6cd
+}
+
+.i-right .i-top .iTicket {
+	width: 336px;
+	border: none
+}
+
+.i-right .i-top .iTicket a {
+	width: 112px
+}
+
+.i-right .i-top .iTicket a .red {
+	font-weight: 700!important;
+	color: #148AFF
+}
+
+.i-right .i-bot {
+	overflow: hidden
+}
+
+.i-right .i-bot .l-botMod {
+	float: left;
+	width: calc(100% - 260px);
+	overflow: hidden
+}
+
+.i-right .i-bot .l-botMod .myMod {
+	margin-bottom: 20px;
+	padding-left: 30px;
+	background: #fff;
+	overflow: hidden
+}
+
+.i-right .i-bot .l-botMod .myMod .bookNone {
+	padding: 50px 0;
+	text-align: center;
+	font-size: 16px;
+	color: #666
+}
+
+.i-right .i-bot .l-botMod .myMod .bookNone a {
+	font-weight: 700;
+	color: #148AFF;
+	font-size: 16px
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl {
+	width: 100%;
+	padding: 0 20px 10px 0;
+	overflow: hidden
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li {
+	position: relative;
+	padding: 20px 0;
+	border-bottom: solid 1px #f2f2f2;
+	overflow: hidden
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li:last-child {
+	border-bottom: none
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li .addShelf {
+	position: absolute;
+	top: 80px;
+	right: 25px;
+	z-index: 999;
+	width: 98px;
+	height: 28px;
+	line-height: 28px;
+	font-size: 16px;
+	color: #666;
+	text-align: center;
+	border: 1px solid #333;
+	border-radius: 3px
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li img {
+	margin-right: 15px;
+	display: block;
+	float: left;
+	width: 74px;
+	height: 100px;
+	-webkit-box-shadow: 1px 1px 2px rgba(0,0,0,.3);
+	box-shadow: 1px 1px 2px rgba(0,0,0,.3)
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p {
+	position: relative;
+	width: calc(100% - 100px);
+	float: left
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p i {
+	position: absolute;
+	top: 10px;
+	right: 0;
+	width: 98px;
+	height: 28px;
+	line-height: 28px;
+	font-size: 16px;
+	color: #666;
+	text-align: center;
+	border: 1px solid #333;
+	border-radius: 3px
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p i.goon,.i-right .i-bot .l-botMod .myMod .bookUl li p i.hover {
+	top: 55px
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookName {
+	padding: 15px 0;
+	font-size: 16px;
+	color: #333;
+	font-weight: 700
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookStatus {
+	color: #999;
+	font-size: 12px
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookStatus .authorSt {
+	display: inline-block;
+	margin-right: 75px
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookStatus .authorSt.chapterSt {
+	margin-right: 0
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookStatus .authorSt em {
+	line-height: 12px;
+	display: block;
+	margin-bottom: 10px
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookStatus .authorSt em.none {
+	margin-bottom: 0
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookStatus .authorSt em.ct {
+	color: #333
+}
+
+.i-right .i-bot .l-botMod .myMod .bookUl li p .bookStatus .authorSt em.time {
+	color: #666
+}
+
+.i-right .i-bot .l-botMod .myMod .hotBookBd {
+	padding: 20px 0;
+	overflow: hidden
+}
+
+.i-right .i-bot .l-botMod .myMod .hotBookBd li {
+	margin-right: 43px;
+	float: left;
+	width: 140px;
+	text-align: center;
+	overflow: hidden
+}
+
+.i-right .i-bot .l-botMod .myMod .hotBookBd li:last-child {
+	margin: 0
+}
+
+.i-right .i-bot .l-botMod .myMod .hotBookBd li img {
+	width: 110px;
+	height: 150px;
+	display: inline-block;
+	-webkit-box-shadow: 1px 1px 2px rgba(0,0,0,.3);
+	box-shadow: 1px 1px 2px rgba(0,0,0,.3)
+}
+
+.i-right .i-bot .l-botMod .myMod .hotBookBd li a,.i-right .i-bot .l-botMod .myMod .hotBookBd li span {
+	display: block
+}
+
+.i-right .i-bot .l-botMod .myMod .hotBookBd li a.bookName,.i-right .i-bot .l-botMod .myMod .hotBookBd li span.bookName {
+	font-size: 16px;
+	line-height: 16px;
+	padding: 10px 0 5px;
+	color: #333
+}
+
+.i-right .i-bot .l-botMod .myMod .hotBookBd li a.bookAuthor,.i-right .i-bot .l-botMod .myMod .hotBookBd li span.bookAuthor {
+	font-size: 14px;
+	color: #999
+}
+
+.i-right .i-bot .r-botMod {
+	float: right;
+	width: 240px;
+	overflow: hidden
+}
+
+.myWorks {
+	padding: 0 20px 20px 30px;
+	background: #fff;
+	overflow: hidden
+}
+
+.myWorks ul {
+	margin: 0;
+	overflow: hidden
+}
+
+.myWorks ul li {
+	margin-top: 15px;
+	overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.myWorks ul li a {
+	display: block
+}
+
+.myWorks ul li img {
+	display: block;
+	float: left;
+	width: 50px;
+	height: 50px;
+    border-radius: 50%;
+    border: #ccc 1px solid;
+}
+
+.myWorks ul li p {
+	margin-left: 10px;
+	float: left;
+}
+
+.myWorks ul li p span {
+	display: block
+}
+
+.myWorks ul li p .bookName {
+	padding: 10px 0;
+	color: #000;
+	font-size: 14px
+}
+
+.i-title {
+	position: relative;
+	height: 46px;
+	line-height: 46px;
+	font-size: 18px;
+	color: #333;
+	border-bottom: solid 1px #f2f2f2;
+	background: #fff
+}
+
+.i-title .clickMore,.i-title .goLevel {
+	margin-right: 20px;
+	color: #999;
+	font-size: 14px;
+	float: right;
+	display: block
+}
+
+.i-title .goLevel {
+	padding: 0 10px;
+	margin-top: 10px;
+	color: #148AFF;
+	font-size: 12px;
+	border: 1px solid #148AFF;
+	border-radius: 15px;
+	height: 24px;
+	line-height: 24px
+}
+
+.i-right .bookshelfMod table tr td.t7 a.goon {
+	margin: 0 auto 10px;
+	display: block;
+	width: 98px;
+	height: 28px;
+	line-height: 28px;
+	font-size: 16px;
+	color: #666;
+	text-align: center;
+	border: 1px solid #333;
+	border-radius: 3px
+}
+.anormal,.del_Layer_yes,.i-right .bookshelfMod table tr a.goon:hover,.i-right .bookshelfMod table tr td.t7 a.goon:hover,.i-right .i-bot .l-botMod .myMod .bookUl li .addShelf:hover,.i-right .i-bot .l-botMod .myMod .bookUl li p i.goon:hover,.i-right .i-bot .l-botMod .myMod .bookUl li p i.hover,.more:hover,.my_Post_content_del:hover,.my_Post_content_edit:hover,.my_Post_content_look:hover,.my_Post_content_stop:hover {
+	color: #fff!important;
+	background: #148AFF;
+	border: 1px solid #148AFF!important
+}

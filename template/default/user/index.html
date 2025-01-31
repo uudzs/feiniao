@@ -1,0 +1,158 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/my.css?v={$conf.version}" />
+{/block}
+{block name="title"}
+<title>个人中心-{$conf.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="个人中心" />
+<meta name="description" content="个人中心" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index'/}
+<div class="container ucenter">
+ 
+        {include file="user/menu" /}
+        <!--right mod -->
+        <div class="i-right">
+            <!--bot mod -->
+            <div class="i-bot">
+                <!--left mod -->
+                <div class="l-botMod">
+                    <div class="myMod" id="myMod">
+                        <div class="i-title">
+                            我的书架<a href="{:url('bookshelf')}" class="clickMore">查看更多&gt;&gt;</a>
+                        </div>
+                        <ul class="bookUl bookshelf">    
+                            <p class="bookNone">暂无书架内容！</p>
+                        </ul>
+                    </div>
+                    <div class="myMod">
+                        <div class="i-title">
+                            最近阅读<a href="{:url('readlog')}" class="clickMore">查看更多&gt;&gt;</a>
+                        </div>
+                        <ul class="bookUl readlog">
+                            <p class="bookNone">暂无阅读记录！</p>                           
+                        </ul>
+                    </div>
+                </div>
+                <!--right mod -->
+                <div class="r-botMod">
+                    <div class="myWorks">
+                        <div class="i-title">关注作者</div>
+                        <ul>
+                            <li><p class="bookNone">暂无关注内容！</p></li>                           
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div> 
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    $(window).on('load', function () {
+        window.ucenter_call = function(result) {
+            if(parseInt(result.code) == 0) {
+                var userinfo = result.data.userinfo;
+                if(userinfo) {
+                    $.postApi("{:furl('v1/bookshelf', [], true, 'api')}", {limit:3}, function(result) {
+                        if(parseInt(result.code) == 0) {
+                            if(result.data.data && result.data.data.length > 0) {
+                                var html = '';
+                                result.data.data.forEach(function(el, index) {
+                                    html +=`<li>
+                                                <a href="${el.url}" target="_blank" alt="${el.title}" title="${el.title}">
+                                                    <img src="${el.cover}">
+                                                </a>
+                                                <p>
+                                                    <a href="${el.url}" target="_blank"><span class="bookName">${el.title}</span></a>
+                                                    <span class="bookStatus">
+                                                        <b class="authorSt">
+                                                            <em>分类：${el.bigcatetitle}</em>
+                                                            <a href="${el.authorurl}" target="_blank"><em class="none">作者：${el.author}</em></a>
+                                                        </b>
+                                                        <b class="authorSt chapterSt">
+                                                            <a href="${el.url}" target="_blank"><em class="ct">阅读进度：${el.speed}%</em></a>
+                                                            <em class="time">添加时间：${el.create_time}</em>
+                                                        </b>
+                                                    </span>
+                                                    <a href="${el.url}" target="_blank"> <i class="goon">阅读</i>
+                                                    </a>
+                                                </p>
+                                            </li>`;
+                                });
+                                $('.bookshelf').html(html);
+                            }                       
+                        }
+                    });
+                    $.postApi("{:furl('v1/readlog', [], true, 'api')}", {limit:3}, function(result) {
+                        if(parseInt(result.code) == 0) {
+                            if(result.data.data && result.data.data.length > 0) {
+                                var html = '';
+                                result.data.data.forEach(function(el, index) {
+                                    html +=`<li>
+                                                <a href="${el.chapterurl}" target="_blank" alt="${el.title}" title="${el.title}">
+                                                    <img src="${el.cover}">
+                                                </a>
+                                                <p>
+                                                    <a href="${el.bookurl}" target="_blank"><span class="bookName">${el.title}</span></a>
+                                                    <span class="bookStatus">
+                                                        <b class="authorSt">
+                                                            <em>《${el.booktitle}》</em>
+                                                            <a href="${el.authorurl}" target="_blank"><em class="none">作者：${el.author}</em></a>
+                                                        </b>
+                                                        <b class="authorSt chapterSt">
+                                                            <a href="${el.chapterurl}" target="_blank"><em class="ct">阅读次数：${el.readnum}</em></a>
+                                                            <em class="time">阅读时间：${el.create_time}</em>
+                                                        </b>
+                                                    </span>
+                                                    <a href="${el.chapterurl}" target="_blank"> <i class="goon">续读</i>
+                                                    </a>
+                                                </p>
+                                            </li>`;
+                                });
+                                $('.readlog').html(html);
+                            }                       
+                        }
+                    });
+                    $.postApi("{:furl('v1/followlist', [], true, 'api')}", {limit:3}, function(result) {
+                        if(parseInt(result.code) == 0) {
+                            if(result.data.data && result.data.data.length > 0) {
+                                var html = '';
+                                result.data.data.forEach(function(el, index) {
+                                    html +=`<li>
+                                                <a href="${el.link}" target="_blank" alt="${el.nickname}" title="${el.nickname}">
+                                                    <img src="${el.headimg}">
+                                                </a>
+                                                <p><a href="${el.link}" target="_blank"><span class="bookName">${el.nickname}</span></a></p>
+                                            </li>`;
+                                });
+                                $('.myWorks ul').html(html);
+                            }                       
+                        }
+                    });
+                }
+            } else {
+                if(parseInt(result.code) == 401) {
+                    layui.data('feiniao', {
+                        key: 'token',
+                        remove: true
+                    });
+                    location.reload();
+                } else if(parseInt(result.code) == 99) {
+                    layer.alert('请先登录', {title: "登录提示",icon: 3, closeBtn: 0, btnAlign: 'c', shadeClose: true}, function(index) {
+                        window.location.href = loginurl;                    
+                    });
+                } else {
+                    return layer.msg(result.msg);
+                }
+            }
+        }
+    });
+</script>
+{/block}
+<!-- /脚本 -->

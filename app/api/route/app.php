@@ -20,6 +20,7 @@ Route::group('v1', function () {
     Route::rule('favorites', 'api/v1.user/favorites', 'GET|POST');
     Route::rule('follow', 'api/v1.user/follow', 'GET|POST');
     Route::rule('bookshelf', 'api/v1.user/bookshelf', 'GET|POST');
+    Route::rule('followlist', 'api/v1.user/followlist', 'GET|POST');
     Route::rule('delbookshelf', 'api/v1.user/delbookshelf', 'GET|POST');
     Route::rule('readlog', 'api/v1.user/readlog', 'GET|POST');
     Route::rule('chapter', 'api/v1.chapter/detail', 'GET|POST');

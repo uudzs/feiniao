@@ -1,0 +1,71 @@
+<!--left mod -->
+<div class="i-left">
+    <div class="user_block">
+        <div class="header">
+            <span><img src="{__STATIC__}/home/images/logo-ico.png"></span>
+        </div>
+        <div class="name">--</div>
+        <div class="group">--</div>
+        <div class="user_block_list2">
+            <ul>
+                <li>
+                    <span class="borderBottom" onclick="window.location.href='{:url("my")}'"><i class="bi bi-person-circle"></i>个人中心</span>
+                </li>
+                <li>
+                    <span class="borderBottom">
+                        <i class="bi bi-bag-plus"></i>
+                        书架：<font>0</font>
+                    </span>
+                </li>
+                <li>
+                    <span class="borderBottom">
+                        <i class="bi bi-heart"></i>
+                        点赞：<font>0</font>
+                    </span>
+                </li>
+                <li>
+                    <span class="borderBottom">
+                        <i class="bi bi-person-add"></i>
+                        关注：<font>0</font>
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <p class="title">
+        <i class="bi bi-card-checklist"></i>我的记录
+    </p>
+    <ul>
+        <li {if controller} {eq name="$params['controller']" value="Bookshelf"}class="on"{/eq}>
+            <a href="{:url('bookshelf')}"><i class="bi bi-book"></i>我的书架</a>
+        </li>
+        <li {eq name="$params['action']" value="readlog"}class="on"{/eq}>
+            <a href="{:url('readlog')}"><i class="bi bi-journal-bookmark"></i>我的阅读</a>
+        </li>
+    </ul>
+    <p class="title">
+        <i class="bi bi-nut"></i>设置
+    </p>
+    <ul>
+        <li>
+            <a href="{:url('profile')}"><i class="bi bi-person"></i>个人信息 </a>
+        </li>
+    </ul>
+</div>
+<script>
+$(window).on('load', function () {
+    window.ucenter_common = function(result) {
+        if(parseInt(result.code) == 0) {
+            var userinfo = result.data.userinfo;
+            if(userinfo) {
+                $('.user_block .header img').attr('src', userinfo.headimgurl);
+                $('.user_block .name').text(userinfo.nickname);
+                $('.user_block .group').text('VIP：' + userinfo.viptime + ' | 金币：' + userinfo.coin);
+                $('.user_block_list2').find('li').eq(1).find('span font').text(userinfo.favorites);
+                $('.user_block_list2').find('li').eq(2).find('span font').text(userinfo.like);
+                $('.user_block_list2').find('li').eq(3).find('span font').text(userinfo.follow);
+            }
+        }
+    }
+});
+</script>

@@ -62,7 +62,13 @@
 		token = localfeiniao.token;  
 		if (!token) $.getToken();
 		$.getMe("{:furl('v1/mine', [], true, 'api')}", function(result) {
-			if(parseInt(result.code) == 0) {
+			if (typeof ucenter_call === 'function') {
+				ucenter_call(result);
+			}
+			if (typeof ucenter_common === 'function') {
+				ucenter_common(result);
+			}
+			if(parseInt(result.code) == 0) {				
 				$(".loginstatus").remove();
 				$('.comm_header_user_logined_avatar').show();
 				$('.comm_header_uf_name').text(result.data.userinfo.nickname ? result.data.userinfo.nickname : '--');
@@ -75,15 +81,13 @@
 				$('.comm_header_user_logined_avatar').remove();
 			}
 		});
-		$('.comm_header_ui_lnk').on('click', function (obj, index) {
+		$('.comm_header_ui_lnk').on('click', function () {
 			layer.confirm('确定要退出登录吗？', {title: '退出提示',icon: 3}, function() {
 				layui.data('feiniao', {
 					key: 'token',
 					remove: true
 				});
 				location.reload();
-			}, function(){
-				layer.close(index);
 			});
 		})
 	});

@@ -11,6 +11,7 @@ use think\facade\Db;
 use think\facade\Route;
 use app\admin\model\Readhistory;
 use app\admin\model\Favorites;
+use app\admin\model\Follow;
 use app\admin\model\User as UserModel;
 use think\Image;
 
@@ -74,7 +75,7 @@ class User extends BaseController
 
     /**
      * 添加或取消关注
-     * Summary of favorites
+     * Summary of follow
      * @return void
      */
     public function follow()
@@ -513,6 +514,58 @@ class User extends BaseController
         }
         $starttime = strtotime("today midnight");
         $result['todayreadnum'] = Db::name('readhistory')->where(['user_id' => $uid, ['create_time', '>=', $starttime]])->count();
+        $this->apiSuccess('请求成功', $result);
+    }
+
+    /**
+     * 关注列表
+     * Summary of followlist
+     * @return void
+     */
+    public function followlist()
+    {
+        $param = get_params();
+        if (empty(JWT_UID)) {
+            $this->apiError('请先登录', [], 99);
+        }
+        $uid = JWT_UID;
+        $user = Db::name('user')->where(['id' => $uid])->find();
+        if (empty($user)) {
+            $this->apiError('用户不存在');
+        }
+        $where = ['user_id' => $uid];
+        $param['order'] = 'create_time desc';
+        if (!isset($param['limit']) || intval($param['limit']) <= 0) {
+            $param['limit'] = 1000;
+        }
+        $list = (new Follow())->getFollowList($where, $param);
+        $result = $list->toArray();
+        if (!empty($result['data'])) {
+            foreach ($result['data'] as $k => $v) {
+                if ($v['type'] == 1) {
+                    $author = Db::name('author')->where(['id' => $v['from_id']])->find();
+                    if (empty($author)) {
+                        unset($result['data'][$k]);
+                        continue;
+                    }
+                    $result['data'][$k]['link'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $author['id']]));
+                    $result['data'][$k]['headimg'] = get_file($author['headimg']);
+                    $result['data'][$k]['nickname'] = $author['nickname'];
+                } else {
+                    $result['data'][$k]['link'] = 'javascript:;';
+                    $result['data'][$k]['headimg'] = '';
+                    $result['data'][$k]['nickname'] = '';
+                }
+            }
+        } else {
+            $result = [
+                'data' => [],
+                'total' => 0,
+                'current_page' => 1,
+                'last_page' => 0,
+                'per_page' => 0
+            ];
+        }
         $this->apiSuccess('请求成功', $result);
     }
 

@@ -1,0 +1,129 @@
+{extend name="common/base"/}
+{block name="style"}
+<link rel="stylesheet" href="{__STATIC__}/home/style/my.css?v={$conf.version}" />
+{/block}
+{block name="title"}
+<title>阅读记录-{$conf.title}</title>
+{/block}
+{block name="keywords"}
+<meta name="keywords" content="阅读记录" />
+<meta name="description" content="阅读记录" />
+{/block}
+<!-- 主体 -->
+{block name="body"}
+{include file="common/header" nav='index'/}
+<style>
+.i-right .i-bot .l-botMod, .i-right .i-bot .l-botMod .myMod .bookUl {
+    width: 100%;
+}
+.i-right .i-bot .l-botMod .myMod .bookUl li p {
+    width: calc(100% - 100px);
+}
+</style>
+<div class="container ucenter"> 
+    {include file="user/menu" /}
+    <!--right mod -->
+    <div class="i-right">
+        <div class="i-bot">
+            <div class="l-botMod">
+                <div class="i-title" style="padding-left:30px;">
+                    阅读记录
+                </div>
+                <div class="myMod">
+                    <ul class="bookUl readlog"></ul>
+                    <div id="readlogpage"></div>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>
+{/block}
+<!-- 脚本 -->
+{block name="script"}
+<script>
+$(window).on('load', function () {
+    window.ucenter_call = function(result) {
+        layui.use(['form', 'jquery'], function () {
+            var $ = layui.jquery,
+            form = layui.form,
+            laypage = layui.laypage,
+            layer = layui.layer;
+            if(parseInt(result.code) == 0) {
+                var userinfo = result.data.userinfo;
+                if(userinfo) {
+                    var limit = 10;
+                    var condition = {"limit": limit};
+                    var page = 1;
+                    function pageRender() {
+                        condition['page'] = page; 
+                        let layerIndex = layer.load();
+                        $.postApi("{:furl('v1/readlog', [], true, 'api')}", condition, function(result) {               
+                            layer.close(layerIndex); 
+                            if(result.code == 0) {
+                                laypage.render({
+                                    theme: '#148AFF',
+                                    elem: 'readlogpage',
+                                    limit: limit,
+                                    curr: page,
+                                    count: result.data.total,
+                                    jump: function(obj, first) {
+                                        if(!first) {
+                                            page = obj.curr;
+                                            pageRender()
+                                        }
+                                    }
+                                });
+                                makeHtml(result.data.data)
+                            } else {
+                                return layer.msg(result.msg);
+                            }
+                        });
+                    }
+                    function makeHtml(data) {
+                        $('.readlog').html('');
+                        $.each(data, function(key, el) {
+                            var html =`<li>
+                                            <a href="${el.chapterurl}" target="_blank" alt="${el.title}" title="${el.title}">
+                                                <img src="${el.cover}">
+                                            </a>
+                                            <p>
+                                                <a href="${el.bookurl}" target="_blank"><span class="bookName">${el.title}</span></a>
+                                                <span class="bookStatus">
+                                                    <b class="authorSt">
+                                                        <em>《${el.booktitle}》</em>
+                                                        <a href="${el.authorurl}" target="_blank"><em class="none">作者：${el.author}</em></a>
+                                                    </b>
+                                                    <b class="authorSt chapterSt">
+                                                        <a href="${el.chapterurl}" target="_blank"><em class="ct">阅读次数：${el.readnum}</em></a>
+                                                        <em class="time">阅读时间：${el.create_time}</em>
+                                                    </b>
+                                                </span>
+                                                <a href="${el.chapterurl}" target="_blank"> <i class="goon">续读</i></a>
+                                            </p>
+                                        </li>`;
+                            $('.readlog').append(html);                
+                        });
+                    }
+                    pageRender();
+                }
+            } else {
+                if(parseInt(result.code) == 401) {
+                    layui.data('feiniao', {
+                        key: 'token',
+                        remove: true
+                    });
+                    location.reload();
+                } else if(parseInt(result.code) == 99) {
+                    layer.alert('请先登录', {title: "登录提示",icon: 3, closeBtn: 0, btnAlign: 'c', shadeClose: true}, function(index) {
+                        window.location.href = loginurl;                    
+                    });
+                } else {
+                    return layer.msg(result.msg);
+                }
+            }        
+        });
+    }
+});
+</script>
+{/block}
+<!-- /脚本 -->
