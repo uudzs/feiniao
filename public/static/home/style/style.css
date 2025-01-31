@@ -338,25 +338,40 @@ a.creat-accout-btn:hover::before,
     color: #999;
     line-height: 24px
 }
-.comm_header_ui_lnk {
-    height: 38px;
-    border-radius: 8px;
-    padding: 0 10px 0 16px;
+.comm_header_ui_link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+.comm_header_ui_center, .comm_header_ui_lnk {
+    border-radius: 5px;
+    padding: 3px 6px;
     color: #333;
     text-decoration: none;
     display: flex;
     align-items: center;
-    justify-content: center
+    justify-content: center;
+    color: #fff;
+}
+.comm_header_ui_center {    
+    background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
+}
+.comm_header_ui_lnk {
+    color: #666;
+    background: var(--Linear, linear-gradient(159deg, #e9e9e9 31.17%, #c5c5c5 72.66%));
 }
 .comm_header_uinfo_sline {
     height: 1px;
     background-color: #f1f5f9;
     margin: 4px 0
 }
-.comm_header_ui_lnk:hover {
-    background-color: #f6f8fa
+.comm_header_ui_center:hover {
+    color: #fff
 }
-
+.comm_header_ui_lnk:hover {
+    color: #333
+}
 .creat-accout-btn {
     background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
     color: #fff !important;
