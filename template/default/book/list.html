@@ -120,9 +120,8 @@ $(window).on('load', function () {
         }
         pageRender();
         $('.books-nav--item .books-nav--item-wrap a').on('click', function () {
-            $(this).siblings('ul').find('a').removeClass('currNavLink');
+            $('.category a').removeClass('currNavLink');
             $(this).siblings().removeClass('currNavLink');
-            $(this).parent().siblings('a').removeClass('currNavLink');
             $(this).addClass('currNavLink');
             condition['genre'] = '';
             condition['subgenre'] = '';       
