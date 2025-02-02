@@ -910,7 +910,7 @@ section.hero-area .container .row .owl-item img {
 .home-activities {
     margin: 20px auto;
     overflow: hidden;
-    position: relative;
+    /* position: relative; */
 	padding: 20px 0;
 	background: #fff;
 	border-radius: 12px;

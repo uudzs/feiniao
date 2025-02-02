@@ -54,7 +54,20 @@
 }
 .books-nav--item-nav span {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 2px 12px;
+}
+.category {
+    flex-direction: column;
+}
+.category ul {
+    display: block;
+    background: #fafafa;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+.category ul a {
+    margin-bottom: 0;
+    font-weight: normal;
 }
 .nav-content {
     background: #fff;

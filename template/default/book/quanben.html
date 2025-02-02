@@ -20,10 +20,15 @@
                     <div class="books-nav--item-title">
                         作品分类
                     </div>
-                    <div class="books-nav--item-wrap">
+                    <div class="books-nav--item-wrap category">
                         <a class="books-nav--item-nav global-hover-card currNavLink" href="javascript:;" data-genre="0"><span>全部</span></a>
                         {volist name=":model('category')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
                             <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-genre="{$vo.id}"><span>{$vo.name}</span></a>
+                            <ul>
+                                {volist name=":model('category')->where(['status' => 1,'pid' => $vo['id']])->order('ordernum asc')->select()" id="v"}
+                                <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-subgenre="{$v.id}"><span>{$v.name}</span></a>
+                                {/volist}
+                            </ul>
                         {/volist}                        
                     </div>
                 </div>
@@ -115,8 +120,12 @@ $(window).on('load', function () {
         }
         pageRender();
         $('.books-nav--item .books-nav--item-wrap a').on('click', function () {
+            $(this).siblings('ul').find('a').removeClass('currNavLink');
             $(this).siblings().removeClass('currNavLink');
+            $(this).parent().siblings('a').removeClass('currNavLink');
             $(this).addClass('currNavLink');
+            condition['genre'] = '';
+            condition['subgenre'] = '';      
             page = 1;
             pageRender();
         })

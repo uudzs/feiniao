@@ -31,7 +31,38 @@
 			</div>
 		</div>
 	</section>
-
+<style>
+.home-tap-link .home-tap-link__center .home-tap-link__center-item {
+	position: relative;
+}
+.home-tap-link .home-tap-link__center .home-tap-link__center-item ul {
+    position: absolute;
+	display: block;
+    top: 30px;
+	width: 300%;
+	left: 0px;
+    z-index: 900;
+    visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: #fff;
+	box-shadow: 1px 1px 6px 0px rgb(183 183 183 / 30%);
+    padding: 10px;
+	border-radius: 10px;
+}
+.home-tap-link .home-tap-link__center .home-tap-link__center-item ul li {
+	float: left;;
+	color: #000;
+	padding: 10px; 
+}
+.home-tap-link .home-tap-link__center .home-tap-link__center-item ul li:hover {
+	color: #39F;
+}
+.home-tap-link .home-tap-link__center .home-tap-link__center-item:hover ul {
+	opacity: 1;
+	visibility:unset;
+	-webkit-backface-visibility:unset;
+}
+</style>
 	<div class="container">
 		<section class="home-tap-link">
 			<div class="home-tap-link__left" >
@@ -47,14 +78,30 @@
 			</div>
 			<div class="home-tap-link__center">
 				{volist name=":model('category')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
-					<a href="{:furl('book_cates', ['id'=>$vo.key ? $vo.key : $vo.id], true, 'home')}" title="{$vo.name}" class="home-tap-link__center-item">{$vo.name}</a>
+					<a href="{:furl('book_cates', ['id'=>$vo.key ? $vo.key : $vo.id], true, 'home')}" title="{$vo.name}" class="home-tap-link__center-item">
+						{$vo.name}
+						{php}$sublist = model('category')->where(['status' => 1, 'pid' => $vo['id']])->order('ordernum asc')->select()->toArray();{/php}
+						{notempty name="sublist"}
+							<ul>
+								{volist name="$sublist" id="v"}
+									<li onclick="window.location.href = '{:furl('book_cates', ['id'=>$v.key ? $v.key : $v.id], true, 'home')}';">{$v.name}</li>
+								{/volist}
+							</ul>
+						{/notempty}
+					</a>
                 {/volist}
 			</div>
+			<script>
+			$('.home-tap-link__center-item ul li').on('click', function () {
+				event.stopPropagation();
+    			event.preventDefault();
+			})
+			</script>
 			<div class="home-tap-link__right">
-				<a href="javascript:;" class="home-tap-link__right-item">我的书架</a>
-				<a href="javascript:;" class="home-tap-link__right-item">阅读记录</a>
-				<a href="javascript:;"  class="home-tap-link__right-item">投稿指南</a>
-				<a href="javascript:;" class="home-tap-link__right-item">完本专区</a>
+				<a href="{:url('bookshelf')}" class="home-tap-link__right-item">我的书架</a>
+				<a href="{:url('readlog')}" class="home-tap-link__right-item">阅读记录</a>
+				<a href="{:url('my')}"  class="home-tap-link__right-item">个人中心</a>
+				<a href="{:url('quanben')}" class="home-tap-link__right-item">完本专区</a>
 				<a href="javascript:;" class="home-tap-link__right-item">加入我们</a>
 				<a href="javascript:;" class="home-tap-link__right-item">帮助中心</a>
 			</div>
