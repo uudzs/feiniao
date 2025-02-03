@@ -23,13 +23,15 @@
                     <div class="books-nav--item-wrap category">
                         <a class="books-nav--item-nav global-hover-card" href="javascript:;" data-genre="0"><span>全部</span></a>
                         {volist name=":model('category')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
-                            <a class="books-nav--item-nav global-hover-card {eq name="$vo.id" value="$id"}currNavLink{/eq}" href="javascript:;" data-genre="{$vo.id}"><span>{$vo.name}</span></a>                            
-                            <ul>
+                            <a class="books-nav--item-nav global-hover-card {if $vo['id'] == $id || $vo['id'] == $category['pid']}currNavLink{/if}" href="javascript:;" data-genre="{$vo.id}"><span>{$vo.name}</span></a>  
+                        {/volist}
+                        {volist name=":model('category')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
+                            <ul id="cate_{$vo.id}">
                                 {volist name=":model('category')->where(['status' => 1,'pid' => $vo['id']])->order('ordernum asc')->select()" id="v"}
                                 <a class="books-nav--item-nav global-hover-card {eq name="$v.id" value="$id"}currNavLink{/eq}" href="javascript:;" data-subgenre="{$v.id}"><span>{$v.name}</span></a>
                                 {/volist}
                             </ul>
-                        {/volist}                        
+                        {/volist}
                     </div>
                 </div>
                 <div class="books-nav--item">
@@ -118,9 +120,17 @@ $(window).on('load', function () {
                 }
             });
         }
+        if($('.category ul a').hasClass('currNavLink')) {
+            $('.category .currNavLink').parent().show();
+        }
         pageRender();
         $('.books-nav--item .books-nav--item-wrap a').on('click', function () {
-            $('.category a').removeClass('currNavLink');
+            var genre = $(this).data('genre');
+            if(genre >= 0) {
+                $('.category a').removeClass('currNavLink');
+                $('.category ul').hide();
+                if(genre > 0) $('#cate_' + genre).show();
+            }
             $(this).siblings().removeClass('currNavLink');
             $(this).addClass('currNavLink');
             condition['genre'] = '';
