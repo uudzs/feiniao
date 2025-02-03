@@ -688,7 +688,7 @@ class User extends BaseController
         } else {
             $consecutiveDays = intval($lastSign['consecutive_days']) + 1;
             if ($consecutiveDays > 7) {
-                $reward = $conf['day_8_reward'];
+                $reward = isset($conf['day_8_reward']) ? intval($conf['day_8_reward']) : 0;
             } else {
                 $key = 'day_' . $consecutiveDays . '_reward';
                 $reward = isset($conf[$key]) ? intval($conf[$key]) : 0;
