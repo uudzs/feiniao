@@ -148,8 +148,6 @@ class Category extends BaseController
     {
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
-        $type = isset($param['type']) ? $param['type'] : 0;
-
-        $this->model->delCategoryById($id, $type);
+        $this->model->delCategoryById($id);
     }
 }

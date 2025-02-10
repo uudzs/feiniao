@@ -11,7 +11,9 @@ Route::group('v1', function () {
     Route::rule('mine', 'api/v1.common/mine', 'GET|POST');
     Route::rule('advert', 'api/v1.common/recommend', 'GET|POST');
     Route::rule('bigcate', 'api/v1.category/bigcate', 'GET|POST');
+    Route::rule('smallcate', 'api/v1.category/smallcate', 'GET|POST');
     Route::rule('bookdetail', 'api/v1.book/detail', 'GET|POST');
+    Route::rule('authordetail', 'api/v1.author/detail', 'GET|POST');
     Route::rule('booklist', 'api/v1.book/booklist', 'GET|POST');
     Route::rule('search', 'api/v1.search/index', 'GET|POST');
     Route::rule('keywords', 'api/v1.search/keywords', 'GET|POST');
@@ -21,6 +23,7 @@ Route::group('v1', function () {
     Route::rule('follow', 'api/v1.user/follow', 'GET|POST');
     Route::rule('bookshelf', 'api/v1.user/bookshelf', 'GET|POST');
     Route::rule('followlist', 'api/v1.user/followlist', 'GET|POST');
+    Route::rule('likelist', 'api/v1.user/likelist', 'GET|POST');
     Route::rule('delbookshelf', 'api/v1.user/delbookshelf', 'GET|POST');
     Route::rule('readlog', 'api/v1.user/readlog', 'GET|POST');
     Route::rule('chapter', 'api/v1.chapter/detail', 'GET|POST');
@@ -33,6 +36,7 @@ Route::group('v1', function () {
     Route::rule('upload', 'api/v1.common/upload', 'GET|POST');
     Route::rule('avatar', 'api/v1.user/avatar', 'GET|POST');
     Route::rule('nickname', 'api/v1.user/nickname', 'GET|POST');
+    Route::rule('sex', 'api/v1.user/sex', 'GET|POST');
     Route::rule('mobile', 'api/v1.user/mobile', 'GET|POST');
     Route::rule('security', 'api/v1.user/security', 'GET|POST');
     Route::rule('createorder', 'api/v1.order/create', 'GET|POST');

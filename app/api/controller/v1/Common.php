@@ -196,12 +196,17 @@ class Common extends BaseController
                                     } else {
                                         $list[$k]['genre'] = '';
                                     }
+                                    $v['images'] = $v['images'] ? $v['images'] : $book['cover'];
+                                    $list[$k]['chapters'] = $book['chapters'];
+                                    $list[$k]['isfinish'] = $book['isfinish'];
                                     $list[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
                                     $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                                 } else {
+                                    $list[$k]['isfinish'] = 1;
                                     $list[$k]['finish'] = '';
                                     $list[$k]['author'] = '';
                                     $list[$k]['genre'] = '';
+                                    $list[$k]['chapters'] = 0;
                                     $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                                 }
                             } else {
@@ -209,7 +214,10 @@ class Common extends BaseController
                                 $list[$k]['author'] = '';
                                 $list[$k]['genre'] = '';
                                 $list[$k]['url'] = '';
+                                $list[$k]['chapters'] = 0;
+                                $list[$k]['isfinish'] = 1;
                             }
+                            $list[$k]['images'] = get_file($v['images']);
                             $list[$k]['width'] = $adver[$value]['width'];
                             $list[$k]['height'] = $adver[$value]['height'];
                             $list[$k]['isendpage'] = $isendpage;
@@ -249,19 +257,27 @@ class Common extends BaseController
                                 $result[$k]['genre'] = '';
                             }
                             $result[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
+                            $result[$k]['chapters'] = $book['chapters'];
+                            $result[$k]['isfinish'] = $book['isfinish'];
                             $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
+                            $v['images'] = $v['images'] ? $v['images'] : $book['cover'];
                         } else {
                             $result[$k]['finish'] = '';
                             $result[$k]['author'] = '';
                             $result[$k]['genre'] = '';
+                            $result[$k]['chapters'] = 0;
+                            $result[$k]['isfinish'] = 1;
                             $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                         }
                     } else {
+                        $result[$k]['isfinish'] = 1;
                         $result[$k]['finish'] = '';
                         $result[$k]['author'] = '';
                         $result[$k]['genre'] = '';
                         $result[$k]['url'] = '';
+                        $result[$k]['chapters'] = 0;
                     }
+                    $result[$k]['images'] = get_file($v['images']);
                     $result[$k]['width'] = $adver['width'];
                     $result[$k]['height'] = $adver['height'];
                     $result[$k]['isendpage'] = $isendpage;
@@ -423,7 +439,8 @@ class Common extends BaseController
         unset($user['securitypwd']);
         $user['consecutive_days'] = intval($consecutive_days);
         $user['level_title'] = Db::name('UserLevel')->where(['id' => $user['level']])->value('title');
-        $user['sex'] = ($user['sex'] == 1) ? '男' : '女';
+        $user['gender'] = $user['sex'];
+        $user['sex'] = ($user['sex'] == 1) ? '男' : ($user['sex'] == 2 ? '女' : '未知');
         $this->apiSuccess('请求成功', ['userinfo' => $user]);
     }
 

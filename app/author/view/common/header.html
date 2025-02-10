@@ -77,15 +77,15 @@
 				<ul class="navbar-nav mr-auto mt-md-0"></ul>
 				<ul class="navbar-nav my-lg-0">
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{$userInfo.headimg}" onerror="this.src='/static/home/images/logo-ico.png'" alt="user" class="profile-pic"></a>
+						<a class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="{$userInfo.headimg|default="/static/home/images/logo-ico.png"}" onerror="this.src='/static/home/images/logo-ico.png'" alt="user" class="profile-pic"></a>
 						<div class="dropdown-menu dropdown-menu-right scale-up">
 							<ul class="dropdown-user">
 								<li>
 									<div class="dw-user-box">
-										<!-- <div class="u-img"><img src="{$userInfo.headimg}" alt="user"></div> -->
+										<!-- <div class="u-img"><img src="{$userInfo.headimg|default="/static/home/images/logo-ico.png"}" alt="user"></div> -->
 										<div class="u-text" style="padding-left: 0;">
-											<h4>{$userInfo.nickname}</h4>
-											<!-- <p class="text-muted">{$userInfo.mobile}</p> -->
+											<h4>{$userInfo.nickname|default="--"}</h4>
+											<!-- <p class="text-muted">{$userInfo.mobile|default="--"}</p> -->
 											<!-- <a href="{:url('user/basic')}" class="btn btn-rounded btn-info btn-sm">修改头像</a> -->
 										</div>
 									</div>

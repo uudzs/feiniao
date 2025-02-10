@@ -5,16 +5,13 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
 use app\admin\model\Readhistory;
-use app\admin\model\Favorites;
 use app\admin\model\Follow;
 use app\admin\model\User as UserModel;
 use think\Image;
-
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
@@ -64,12 +61,15 @@ class User extends BaseController
             if ($fid != false) {
                 $this->apiSuccess('添加成功', ['fid' => $fid]);
             } else {
-                $this->apiError('添加失败');
+                $this->apiError('添加失败', ['fid' => 0]);
             }
         } else {
             //取消收藏！
-            Db::name('favorites')->where(['user_id' => JWT_UID, 'pid' => $pid])->delete();
-            $this->apiSuccess('取消成功', []);
+            if (Db::name('favorites')->where(['user_id' => JWT_UID, 'pid' => $pid])->delete()) {
+                $this->apiSuccess('取消成功', ['fid' => 0]);
+            } else {
+                $this->apiError('添加失败', ['fid' => 0]);
+            }
         }
     }
 
@@ -136,7 +136,31 @@ class User extends BaseController
         if (empty($user)) {
             $this->apiError('用户不存在');
         }
-        $result = Db::name('user')->where('id', $user['id'])->update(['headimgurl' => $avatar, 'update_time' => time()]);
+        $imageType = '';
+        if (preg_match('/^data:image\/(\w+);base64,/', $avatar, $matches)) {
+            $imageType = $matches[1]; // 获取图片类型，例如 'jpeg', 'png', 'gif' 等
+        } else {
+            $this->apiError('不是图片');
+        }
+        if (!in_array($imageType, ['jpg', 'png', 'jpeg', 'gif'])) {
+            $this->apiError('不是图片');
+        }
+        // 日期前綴
+        $img_name = md5('avatar' . JWT_UID . time());
+        $path = date('Ymd', time()) . '/';
+        $upload_path = app()->getRootPath() . 'public/storage/' . $path;
+        if (!createDirectory($upload_path)) {
+            $this->apiError('无写入权限');
+        }
+        $filename = $img_name . "." . $imageType;
+        $localpath = get_config('filesystem.disks.public.url') . '/' . $path . $filename;
+        $save_path = $upload_path . $filename;
+        $base64Data = str_replace('data:image/' . $imageType . ';base64,', '', $avatar);
+        $imageData = base64_decode($base64Data);
+        if (false === @file_put_contents($save_path, $imageData)) {
+            return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
+        }
+        $result = Db::name('user')->where('id', $user['id'])->update(['headimgurl' => $localpath, 'update_time' => time()]);
         if ($result === false) {
             $this->apiError('上传失败');
         } else {
@@ -208,6 +232,39 @@ class User extends BaseController
             $this->apiError('此昵称已被使用');
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['nickname' => $nickname, 'update_time' => time()]);
+        if ($result === false) {
+            $this->apiError('设置失败');
+        } else {
+            $this->apiSuccess('设置成功');
+        }
+    }
+
+    /**
+     * 设置性别
+     * Summary of sex
+     * @return void
+     */
+    public function sex()
+    {
+        $param = get_params();
+        $sex = intval($param['sex']);
+        if (empty(JWT_UID)) {
+            $this->apiError('请先登录', [], 99);
+        }
+        if (empty($sex)) {
+            $this->apiError('参数错误');
+        }
+        if (!in_array($sex, [1, 2])) {
+            $this->apiError('参数错误');
+        }
+        $user = Db::name('user')->where(['id' => JWT_UID])->find();
+        if (empty($user)) {
+            $this->apiError('用户不存在');
+        }
+        if (intval($user['sex']) > 0) {
+            $this->apiError('性别已设置不可更改');
+        }
+        $result = Db::name('user')->where('id', $user['id'])->update(['sex' => $sex, 'update_time' => time()]);
         if ($result === false) {
             $this->apiError('设置失败');
         } else {
@@ -479,38 +536,59 @@ class User extends BaseController
         if (empty($user)) {
             $this->apiError('用户不存在');
         }
-        $where = ['a.user_id' => $uid];
-        $param['order'] = 'a.create_time desc';
-        if (!isset($param['limit']) || intval($param['limit']) <= 0) {
-            $param['limit'] = 1000;
-        }
-        $list = (new Favorites())->getFavoritesList($where, $param);
-        $result = $list->toArray();
-        if (!empty($result['data'])) {
-            foreach ($result['data'] as $k => $v) {
-                $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
-                $book = Db::name('book')->where(['id' => $v['pid']])->find();
-                if (!empty($book)) {
-                    $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
-                } else {
-                    $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['pid']]));
-                }
-                $total = Db::name('chapter')->where(['bookid' => $v['pid'], 'status' => 1, ['verify', 'in', '0,1']])->count();
-                $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $v['pid']])->count();
-                if ($total == 0 || $reads < 0) {
-                    $result['data'][$k]['speed'] = 0;
-                } else {
-                    $result['data'][$k]['speed'] = round(($reads / $total) * 100, 2);
+        if (isset($param['bookshelf']) && $param['bookshelf']) {
+            $list = json_decode($param['bookshelf'], true);
+            foreach ($list as $key => $v) {
+                $fav = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $v['bookId']])->find();
+                if (empty($fav)) {
+                    $data = array(
+                        "user_id" => $uid,
+                        "pid" => $v['bookId'],
+                        "create_time" => time(),
+                    );
+                    Db::name('favorites')->strict(false)->field(true)->insertGetId($data);
                 }
             }
-        } else {
-            $result = [
-                'data' => [],
-                'total' => 0,
-                'current_page' => 1,
-                'last_page' => 0,
-                'per_page' => 0
-            ];
+        }
+        if (!isset($param['limit']) || intval($param['limit']) <= 0) {
+            $param['limit'] = get_config('app.page_size');
+        }
+        $order = empty($param['order']) ? 'create_time desc' : $param['order'];
+        $list =  Db::name('favorites')->where(['user_id' => $uid])->order($order)->paginate($param['limit'], false);
+        $result = $list->toArray();
+        $modelName = \think\facade\App::initialize()->http->getName();
+        foreach ($result['data'] as $k => $v) {
+            $book = Db::name('book')->field('id as bookId,title,cover,author,authorid,chapters,isfinish,genre,subgenre,filename')->where(['id' => $v['pid']])->find();
+            if (!empty($book)) {
+                $result['data'][$k]['authorurl'] = str_replace($modelName, 'home', (string) Route::buildUrl('author_detail', ['id' => $book['authorid']]));
+                $result['data'][$k]['cover'] = get_file($book['cover']);
+                $result['data'][$k]['bookId'] = $book['bookId'];
+                $result['data'][$k]['title'] = $book['title'];
+                $result['data'][$k]['author'] = $book['author'];
+                $result['data'][$k]['authorid'] = $book['authorid'];
+                $result['data'][$k]['chapters'] = $book['chapters'];
+                $result['data'][$k]['isfinish'] = $book['isfinish'];
+                $result['data'][$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
+                $result['data'][$k]['bigcatetitle'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
+                $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $book['subgenre']])->value('name');
+                $result['data'][$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['bookId']]));
+            } else {
+                unset($result['data'][$k]);
+                continue;
+            }
+            $readhistory = Db::name('readhistory')->field('IF(update_time = 0, create_time, update_time) AS order_time,create_time,update_time,chapter_id')->where(['user_id' => $uid, 'book_id' => $v['pid']])->order('order_time desc')->find();
+            if (!empty($readhistory)) {
+                $result['data'][$k]['chapter_id'] = $readhistory['chapter_id'];
+            } else {
+                $result['data'][$k]['chapter_id'] = 0;
+            }
+            $total = Db::name('chapter')->where(['bookid' => $v['pid'], 'status' => 1, ['verify', 'in', '0,1']])->count();
+            $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $v['pid']])->count();
+            if ($total == 0 || $reads < 0) {
+                $result['data'][$k]['speed'] = 0;
+            } else {
+                $result['data'][$k]['speed'] = round(($reads / $total) * 100, 2);
+            }
         }
         $starttime = strtotime("today midnight");
         $result['todayreadnum'] = Db::name('readhistory')->where(['user_id' => $uid, ['create_time', '>=', $starttime]])->count();
@@ -551,10 +629,17 @@ class User extends BaseController
                     $result['data'][$k]['link'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $author['id']]));
                     $result['data'][$k]['headimg'] = get_file($author['headimg']);
                     $result['data'][$k]['nickname'] = $author['nickname'];
+                    $result['data'][$k]['book_count'] = Db::name('book')->where(['status' => 1, 'authorid' => $v['from_id']])->count();;
                 } else {
+                    $user = Db::name('user')->where(['id' => $v['from_id']])->find();
+                    if (empty($user)) {
+                        unset($result['data'][$k]);
+                        continue;
+                    }
                     $result['data'][$k]['link'] = 'javascript:;';
-                    $result['data'][$k]['headimg'] = '';
-                    $result['data'][$k]['nickname'] = '';
+                    $result['data'][$k]['headimg'] = get_file($user['headimgurl']);
+                    $result['data'][$k]['nickname'] = $user['nickname'];
+                    $result['data'][$k]['book_count'] = 0;
                 }
             }
         } else {
@@ -587,8 +672,7 @@ class User extends BaseController
         }
         $bid = trim($param['bid']);
         if (strpos($bid, ',') !== false) {
-            $ids = implode(',', explode(',', $bid));
-            Db::name('favorites')->where(['user_id' => JWT_UID, ['pid', 'in', $ids]])->delete();
+            Db::name('favorites')->where(['user_id' => JWT_UID, ['pid', 'in', $bid]])->delete();
         } else {
             Db::name('favorites')->where(['user_id' => JWT_UID, 'pid' => intval($bid)])->delete();
         }
@@ -819,6 +903,57 @@ class User extends BaseController
         } else {
             $this->apiError('点赞失败');
         }
+    }
+
+    /**
+     * 获取点赞
+     * Summary of likelist
+     * @return void
+     */
+    public function likelist()
+    {
+        $param = get_params();
+        if (empty(JWT_UID)) {
+            $this->apiError('请先登录', [], 99);
+        }
+        $uid = JWT_UID;
+        $user = Db::name('user')->where(['id' => $uid])->find();
+        if (empty($user)) {
+            $this->apiError('用户不存在');
+        }
+        if (!isset($param['limit']) || intval($param['limit']) <= 0) {
+            $param['limit'] = get_config('app.page_size');
+        }
+        $order = empty($param['order']) ? 'create_time desc' : $param['order'];
+        $list =  Db::name('like_log')->where(['user_id' => $uid])->group('book_id')->order($order)->paginate($param['limit'], false);
+        $result = $list->toArray();
+        $modelName = \think\facade\App::initialize()->http->getName();
+        foreach ($result['data'] as $k => $v) {
+            $book = Db::name('book')->field('id as bookId,title,cover,author,authorid,chapters,isfinish,genre,subgenre,filename')->where(['id' => $v['book_id']])->find();
+            if (!empty($book)) {
+                $result['data'][$k]['authorurl'] = str_replace($modelName, 'home', (string) Route::buildUrl('author_detail', ['id' => $book['authorid']]));
+                $result['data'][$k]['cover'] = get_file($book['cover']);
+                $result['data'][$k]['bookId'] = $book['bookId'];
+                $result['data'][$k]['title'] = $book['title'];
+                $result['data'][$k]['author'] = $book['author'];
+                $result['data'][$k]['authorid'] = $book['authorid'];
+                $result['data'][$k]['chapters'] = $book['chapters'];
+                $result['data'][$k]['isfinish'] = $book['isfinish'];
+                $result['data'][$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
+                $result['data'][$k]['bigcatetitle'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
+                $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $book['subgenre']])->value('name');
+                $result['data'][$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['bookId']]));
+            } else {
+                unset($result['data'][$k]);
+                continue;
+            }
+            $likelist =  Db::name('like_log')->where(['user_id' => $uid, 'book_id' => $v['book_id']])->order('create_time desc')->select()->toArray();
+            foreach ($likelist as $key => $value) {
+                $likelist[$key]['chapter_title'] = Db::name('chapter')->where(['id' => $value['chapter_id'], 'status' => 1, ['verify', 'in', '0,1']])->value('title');
+            }
+            $result['data'][$k]['list'] = $likelist;
+        }
+        $this->apiSuccess('请求成功', $result);
     }
 
     /**

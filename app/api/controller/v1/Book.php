@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
+//use think\Request;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
-use app\admin\model\Book as BookModel;
 
 class Book extends BaseController
 {
@@ -72,6 +71,7 @@ class Book extends BaseController
                 $detail['fav'] = '';
                 $detail['follow'] = '';
             }
+            $detail['fav_count'] = Db::name('favorites')->where(['pid' => $detail['id']])->count();
             //查询是否有该书记录
             $reads = Db::name('readhistory')->field('IF(update_time = 0, create_time, update_time) AS order_time,id,update_time,create_time,title,chapter_id,book_id')->where($where)->order('order_time desc')->find();
             //查询是否有该章节记录
@@ -120,9 +120,10 @@ class Book extends BaseController
         if (isset($param['keywords']) && !empty($param['keywords'])) {
             $where[] = ['title|author', 'like', '%' . $param['keywords'] . '%'];
         }
+        $page = isset($param['page']) ? intval($param['page']) : 1;
         //最多可以载加多少页
-        if (isset($param['page']) && intval($param['page']) > 10) {
-            $param['page'] = 10;
+        if ($page > 10) {
+            $page = 10;
         }
         if (isset($param['subgenre']) && !empty($param['subgenre'])) {
             $where[] = ['subgenre', '=', $param['subgenre']];
@@ -138,6 +139,16 @@ class Book extends BaseController
         }
         if (isset($param['isfinish']) && !empty($param['isfinish'])) {
             $where[] = ['isfinish', '=', $param['isfinish']];
+        }
+        if (isset($param['rand']) && !empty($param['rand']) && isset($param['limit']) && !empty($param['limit'])) {
+            $count = Db::name('book')->where(['status' => 1])->count();
+            $limit = intval($param['limit']);
+            if ($count > $limit) {
+                $count_page = ceil($count / $limit);
+                if ($count_page > 1) {
+                    $page = mt_rand(1, (int)$count_page);
+                }
+            }
         }
         if (isset($param['words']) && !empty($param['words'])) {
             $words = intval($param['words']);
@@ -179,7 +190,12 @@ class Book extends BaseController
         if (isset($param['limit'])) {
             $param['limit'] = intval($param['limit']);
         }
-        $list = (new BookModel())->getBookList($where, $param);
+        $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
+        $order = empty($param['order']) ? 'id desc' : $param['order'];
+        $list =  Db::name('book')->where($where)
+            ->field('id,title,author,authorid,cover,style,ending,genre,subgenre,isfinish,finishtime,chapters,label,label_custom,hits,words,status,editor,editorid,issign,create_time,update_time,remark,filename')
+            ->order($order)
+            ->paginate(['list_rows' => $rows, 'var_page' => 'page', 'page' => $page, 'query' => $param]);
         $result = $list->toArray();
         if (!empty($result['data'])) {
             foreach ($result['data'] as $k => $v) {
@@ -188,6 +204,9 @@ class Book extends BaseController
                     unset($result['data'][$k]);
                     continue;
                 }
+                $result['data'][$k]['cover']  = get_file($v['cover']);
+                $result['data'][$k]['bigcatetitle'] = Db::name('category')->where(['id' => $v['genre']])->value('name');
+                $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $v['subgenre']])->value('name');
                 $result['data'][$k]['headpic'] = get_file($author['headimg']);
                 $result['data'][$k]['cover_str'] = get_file($v['cover']);
                 $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? '完结' : '连载';

@@ -68,7 +68,7 @@
                 <!-- Column -->
                 <div class="card">
                     <div class="card-body little-profile text-center">
-                        <div class="pro-img"><img src="{$userInfo.headimg}" onerror="this.src='/static/home/images/logo-ico.png'"></div>
+                        <div class="pro-img"><img src="{$userInfo.headimg|default="/static/home/images/logo-ico.png"}" onerror="this.src='/static/home/images/logo-ico.png'"></div>
                         <h3>昵称：{$userInfo.nickname|default="暂无"} / 真实姓名：{$userInfo.true_name|default="暂无"}</h3>
                         <p>手机：{$userInfo.mobile|default="暂无"} / 邮箱：{$userInfo.email|default="暂无"} / QQ：{$userInfo.qq|default="暂无"}</p>
                         {eq name="userInfo.authstate" value="1"}

@@ -66,8 +66,8 @@
             <div class="col-lg-4 col-xlg-3 col-md-5">
                 <div class="card">
                     <div class="card-body">
-                        <center class="m-t-30"> <img src="{$userInfo['headimg']}" onerror="this.src='/static/home/images/logo-ico.png'" class="img-circle useravatar" width="100" height="100">
-                            <h4 class="card-title m-t-10">{$userInfo['nickname']}</h4>
+                        <center class="m-t-30"> <img src="{$userInfo['headimg']|default="/static/home/images/logo-ico.png"}" onerror="this.src='/static/home/images/logo-ico.png'" class="img-circle useravatar" width="100" height="100">
+                            <h4 class="card-title m-t-10">{$userInfo['nickname']|default="--"}</h4>
                             <h6 class="card-subtitle">注册时间：{$userInfo.create_time|date='Y-m-d H:i:s'}</h6>
                             <div class="row text-center justify-content-md-center">
                                 <div class="upload-avatar btn btn-success btn-sm"><i class="ti-image"></i> 上传头像<input type="file" name="file" accept="image/*" id="uploadavatar"></div>
@@ -94,12 +94,12 @@
                     <div class="card-body">
                         <code>实名认证涉及稿费发放，请务必认真填写与作者本人匹配的真实信息，否则将导致发放失败。</code>
                         <form class="form" id="profile">
-                            <input type="hidden" name="headimg" id="headimg" value="{$userInfo['headimg']}">                            
+                            <input type="hidden" name="headimg" id="headimg" value="{$userInfo['headimg']|default="/static/home/images/logo-ico.png"}">                            
                             <div class="form-group m-t-20">
                                 <label class="col-md-12">笔名</label>
                                 <div class="col-md-12">
                                     {eq name="userInfo.nicknamemodify" value="1"}
-                                        <input type="text" placeholder="请填写笔名，不可重复" name="nickname" value="{$userInfo['nickname']}" class="form-control" maxlength="32">
+                                        <input type="text" placeholder="请填写笔名，不可重复" name="nickname" value="{$userInfo['nickname']|default="--"}" class="form-control" maxlength="32">
                                         <code>修改后不可再次自行修改，请认真填写。</code>
                                     {else/}
                                         <div class="form-control" readonly style="display: block;">{$userInfo['nickname']|default="暂无"}</div>
@@ -115,13 +115,13 @@
                             <div class="form-group">
                                 <label class="col-md-12">邮箱</label>
                                 <div class="col-md-12">
-                                    <input type="text" value="{$userInfo['email']}" name="email" class="form-control">
+                                    <input type="text" value="{$userInfo['email']|default=""}" name="email" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-md-12">QQ</label>
                                 <div class="col-md-12">
-                                    <input type="text" value="{$userInfo['qq']}" name="qq" class="form-control">
+                                    <input type="text" value="{$userInfo['qq']|default=""}" name="qq" class="form-control">
                                 </div>
                             </div>
                             <code>签约信息（为生成签约协约必要信息，请认真填写）请填写以下信息，* 为必填项</code>
@@ -132,7 +132,7 @@
                                     {eq name="userInfo.authstate" value="1"}
                                         <div class="form-control" readonly style="display: block;">{$userInfo['true_name']|default="暂无"}</div>                                       
                                     {else/}
-                                        <input type="text" placeholder="请填写真实姓名" name="true_name" value="{$userInfo['true_name']}" class="form-control">
+                                        <input type="text" placeholder="请填写真实姓名" name="true_name" value="{$userInfo['true_name']|default=""}" class="form-control">
                                     {/eq}                                    
                                 </div>
                             </div>
@@ -164,7 +164,7 @@
                                     {eq name="userInfo.authstate" value="1"}
                                         <div class="form-control" readonly style="display: block;">{$userInfo['idcard']|default="暂无"}</div>
                                     {else/}
-                                        <input type="text" placeholder="请填写身份证号" name="idcard" value="{$userInfo['idcard']}" class="form-control">                                        
+                                        <input type="text" placeholder="请填写身份证号" name="idcard" value="{$userInfo['idcard']|default=""}" class="form-control">                                        
                                     {/eq}                                    
                                 </div>
                             </div>
@@ -174,7 +174,7 @@
                                     <div class="col-sm-6 p-l-0 p-r-0">
                                         <img src="{:get_file($userInfo['idcardpos'])}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" alt="身份证正面" id="idcardposimage">
                                     </div>
-                                    <input type="hidden" name="idcardpos" value="{$userInfo['idcardpos']}"> 
+                                    <input type="hidden" name="idcardpos" value="{$userInfo['idcardpos']|default=""}"> 
                                     <div class="col-sm-6 p-l-0 p-r-0 m-t-20">
                                         <div class="upload-box">
                                             <div class="file">
@@ -191,7 +191,7 @@
                                     <div class="col-sm-6 p-l-0 p-r-0">
                                         <img src="{:get_file($userInfo['idcardside'])}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" alt="身份证反面" id="idcardsideimage">
                                     </div>
-                                    <input type="hidden" name="idcardside" value="{$userInfo['idcardside']}"> 
+                                    <input type="hidden" name="idcardside" value="{$userInfo['idcardside']|default=""}"> 
                                     <div class="col-sm-6 p-l-0 p-r-0 m-t-20">
                                         <div class="upload-box">
                                             <div class="file">
@@ -224,13 +224,13 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-md-12">
-                                    <input placeholder="请填写除省市县外的详细地址信息" class="form-control" type="text" name="address" value="{$userInfo['address']}">
+                                    <input placeholder="请填写除省市县外的详细地址信息" class="form-control" type="text" name="address" value="{$userInfo['address']|default=""}">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-md-12">邮编</label>
                                 <div class="col-md-12">
-                                    <input type="text" placeholder="请填写邮编" value="{$userInfo['postcode']}" name="postcode" class="form-control">
+                                    <input type="text" placeholder="请填写邮编" value="{$userInfo['postcode']|default=""}" name="postcode" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
@@ -256,7 +256,7 @@
                             <div class="form-group">
                                 <label class="col-md-12">开户银行</label>
                                 <div class="col-md-12">
-                                    <input type="text" placeholder="精确至分行,如:中国交通银行上海虹口支行" {eq name="userInfo.bankstate" value="1"}readonly{/eq} value="{$userInfo['bankdeposit']}" name="bankdeposit" class="form-control">
+                                    <input type="text" placeholder="精确至分行,如:中国交通银行上海虹口支行" {eq name="userInfo.bankstate" value="1"}readonly{/eq} value="{$userInfo['bankdeposit']|default=""}" name="bankdeposit" class="form-control">
                                 </div>
                             </div>                            
                             <div class="form-group m-t-20">
@@ -265,7 +265,7 @@
                                     {eq name="userInfo.bankstate" value="1"}
                                         <div class="form-control" readonly style="display: block;">{$userInfo['bankcard']|default="暂无"}</div>
                                     {else/}
-                                        <input type="text" placeholder="请仔细核对卡号" name="bankcard" value="{$userInfo['bankcard']}" class="form-control">                                        
+                                        <input type="text" placeholder="请仔细核对卡号" name="bankcard" value="{$userInfo['bankcard']|default=""}" class="form-control">                                        
                                     {/eq}                                    
                                 </div>
                             </div>
@@ -275,7 +275,7 @@
                                     <div class="col-sm-6 p-l-0 p-r-0">
                                         <img src="{:get_file($userInfo['bankcardphoto'])}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" alt="银行卡正面" id="bankcardphotoimage">
                                     </div>
-                                    <input type="hidden" name="bankcardphoto" value="{$userInfo['bankcardphoto']}"> 
+                                    <input type="hidden" name="bankcardphoto" value="{$userInfo['bankcardphoto']|default=""}"> 
                                     <div class="col-sm-6 p-l-0 p-r-0 m-t-20">
                                         <div class="upload-box">
                                             <div class="file">
@@ -290,13 +290,13 @@
                             <div class="form-group">
                                 <label class="col-md-12">工作单位</label>
                                 <div class="col-md-12">
-                                    <input type="text" placeholder="如暂时没有可不填" value="{$userInfo['workunit']}" name="workunit" class="form-control">
+                                    <input type="text" placeholder="如暂时没有可不填" value="{$userInfo['workunit']|default=""}" name="workunit" class="form-control">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-md-12">固定电话</label>
                                 <div class="col-md-12">
-                                    <input type="text" placeholder="如暂时没有可不填" value="{$userInfo['telephone']}" name="telephone" class="form-control">
+                                    <input type="text" placeholder="如暂时没有可不填" value="{$userInfo['telephone']|default=""}" name="telephone" class="form-control">
                                 </div>
                             </div>                            
                             <div class="form-group">
@@ -323,18 +323,18 @@
 <script>
 $(window).on('load', function() {
     var sign_count = parseInt('{$sign}');
-    var authstate = parseInt("{$userInfo['authstate']}");
-    var bankstate = parseInt("{$userInfo['bankstate']}");
-    var province = "{$userInfo['province']}";
-    var city = "{$userInfo['city']}";
-    var county = "{$userInfo['county']}";
-    var card = '{$userInfo["bankcard"]}';
+    var authstate = parseInt("{$userInfo['authstate']|default=""}");
+    var bankstate = parseInt("{$userInfo['bankstate']|default=""}");
+    var province = "{$userInfo['province']|default=""}";
+    var city = "{$userInfo['city']|default=""}";
+    var county = "{$userInfo['county']|default=""}";
+    var card = '{$userInfo["bankcard"]|default=""}';
     var pcode = '';
     var poption = "<option value=''>--请选择--</option>";
 
-    var bankprovince = "{$userInfo['bankprovince']}";
-    var bankcity = "{$userInfo['bankcity']}";
-    var bankcounty = "{$userInfo['bankcounty']}";
+    var bankprovince = "{$userInfo['bankprovince']|default=""}";
+    var bankcity = "{$userInfo['bankcity']|default=""}";
+    var bankcounty = "{$userInfo['bankcounty']|default=""}";
     var html = "<option value=''>--请选择--</option>";
     var provincecode = '';
     $("#bankprovince").empty();
