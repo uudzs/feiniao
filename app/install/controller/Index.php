@@ -164,14 +164,18 @@ class Index
         if (!$link->query($create_admin_sql)) {
             return to_assign(1, '创建管理员信息失败，请重试安装');
         }
-        $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `VIPExpired` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-01-01 22:40:25' ON COMPLETION NOT PRESERVE ENABLE COMMENT 'VIP过期' DO UPDATE `" . $data['DB_PREFIX'] . "vip_log` SET `status`=2 WHERE `expire_time`>0 and `expire_time`<=unix_timestamp(now()) and `status`=1";
-        $link->query($event);
-        $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `timingRelease` ON SCHEDULE EVERY 1 MINUTE STARTS '2021-03-27 15:19:16' ON COMPLETION PRESERVE ENABLE COMMENT '定时发布' DO UPDATE `" . $data['DB_PREFIX'] . "chapter` SET `status`=1,`trial_time`=0,`create_time`=unix_timestamp(now()) WHERE `trial_time`>0 and `trial_time`<=unix_timestamp(now()) and `status`=0";
-        $link->query($event);
-        $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `upBookChapters` ON SCHEDULE EVERY 1 DAY STARTS '2021-03-27 15:19:16' ON COMPLETION PRESERVE ENABLE COMMENT '更新作品章节数' DO UPDATE `" . $data['DB_PREFIX'] . "book` SET chapters = (SELECT count(`id`) FROM `" . $data['DB_PREFIX'] . "chapter` WHERE `bookid` = `" . $data['DB_PREFIX'] . "book`.id AND `verify` in(0,1))";
-        $link->query($event);
-        $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `upBookWords` ON SCHEDULE EVERY 1 MINUTE STARTS '2021-03-27 15:19:16' ON COMPLETION NOT PRESERVE ENABLE COMMENT '更新作品字数' DO UPDATE `" . $data['DB_PREFIX'] . "book` SET words = (SELECT SUM(`wordnum`) FROM `" . $data['DB_PREFIX'] . "chapter` WHERE `bookid` = `" . $data['DB_PREFIX'] . "book`.id AND `verify` in(0,1))";
-        $link->query($event);
+        try {
+            $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `VIPExpired` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-01-01 22:40:25' ON COMPLETION NOT PRESERVE ENABLE COMMENT 'VIP过期' DO UPDATE `" . $data['DB_PREFIX'] . "vip_log` SET `status`=2 WHERE `expire_time`>0 and `expire_time`<=unix_timestamp(now()) and `status`=1";
+            $link->query($event);
+            $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `timingRelease` ON SCHEDULE EVERY 1 MINUTE STARTS '2021-03-27 15:19:16' ON COMPLETION PRESERVE ENABLE COMMENT '定时发布' DO UPDATE `" . $data['DB_PREFIX'] . "chapter` SET `status`=1,`trial_time`=0,`create_time`=unix_timestamp(now()) WHERE `trial_time`>0 and `trial_time`<=unix_timestamp(now()) and `status`=0";
+            $link->query($event);
+            $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `upBookChapters` ON SCHEDULE EVERY 1 DAY STARTS '2021-03-27 15:19:16' ON COMPLETION PRESERVE ENABLE COMMENT '更新作品章节数' DO UPDATE `" . $data['DB_PREFIX'] . "book` SET chapters = (SELECT count(`id`) FROM `" . $data['DB_PREFIX'] . "chapter` WHERE `bookid` = `" . $data['DB_PREFIX'] . "book`.id AND `verify` in(0,1))";
+            $link->query($event);
+            $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `upBookWords` ON SCHEDULE EVERY 1 MINUTE STARTS '2021-03-27 15:19:16' ON COMPLETION NOT PRESERVE ENABLE COMMENT '更新作品字数' DO UPDATE `" . $data['DB_PREFIX'] . "book` SET words = (SELECT SUM(`wordnum`) FROM `" . $data['DB_PREFIX'] . "chapter` WHERE `bookid` = `" . $data['DB_PREFIX'] . "book`.id AND `verify` in(0,1))";
+            $link->query($event);
+        } catch (\Exception $e) {
+            //跳过不报错
+        }
         //开启事件
         //$sql = "SET GLOBAL event_scheduler = ON;";
         //$link->query($sql);        

@@ -85,6 +85,21 @@ function isWeChat() {
     }
 }
 
+function setCookie(name, value, days, options) {
+    options = options || {};
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    var cookieString = name + "=" + (value || "") + expires + "; path=" + (options.path || "/");
+    if (options.domain) cookieString += "; domain=" + options.domain;
+    if (options.secure) cookieString += "; secure";
+    if (options.sameSite) cookieString += "; samesite=" + options.sameSite; // 'Strict' or 'Lax'
+    document.cookie = cookieString;
+}
+
 function getCookie(name) {
     const cookies = document.cookie.split("; ");
     for (let i = 0; i < cookies.length; i++) {

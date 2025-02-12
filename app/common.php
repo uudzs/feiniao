@@ -221,9 +221,9 @@ function time_format($time = NULL, $format = 'Y-m-d H:i:s')
  */
 function get_file($id)
 {
-    $http_type = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https://' : 'http://';
-    $arr_url = parse_url($_SERVER['HTTP_HOST']);
-    $sitepath = $http_type . ($arr_url['path'] ? $arr_url['path'] : $_SERVER['HTTP_HOST']) . '/';
+    $host = Request::host();
+    $port = Request::port();
+    $sitepath = Request::scheme() . '://' . $host . ($port && ($port != 443 && $port != 80) ? (':' . $port) : '') . '/';
     if ($id) {
         $id2num = intval($id);
         if ($id2num == $id) {

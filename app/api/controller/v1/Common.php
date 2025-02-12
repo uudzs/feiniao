@@ -174,7 +174,8 @@ class Common extends BaseController
             foreach ($pids as $key => $value) {
                 $list = [];
                 if (isset($adver[$value]) && intval($adver[$value]['status']) == 1) {
-                    $limit = $pagesize > 0 ?: (intval($adver[$value]['viewnum']) > 0 ? intval($adver[$value]['viewnum']) : '');
+                    $limit = $pagesize > 0 ? $pagesize : (intval($adver[$value]['viewnum']) > 0 ? intval($adver[$value]['viewnum']) : 0);
+                    if ($limit <= 0) $limit = get_config('app.page_size');
                     //取总数
                     $count = Db::query("SELECT count(id) as cnt FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) LIMIT 1", ['status' => 1, 'adver_id' => $value, 'stime' => $time, 'etime' => $time]);
                     $total = intval($count[0]['cnt']);
@@ -185,7 +186,7 @@ class Common extends BaseController
                             $isendpage = true;
                         }
                         $condition = ($limit * ($page - 1)) . ',' . $limit;
-                        $list = Db::query("SELECT `id`,`title`,`adver_id`,`type`,`link`,`start_time`,`end_time`,`color`,`books`,`images`,`introduction` FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) ORDER BY `level` DESC LIMIT {$condition}", ['status' => 1, 'adver_id' => $value, 'stime' => $time, 'etime' => $time]);
+                        $list = Db::query("SELECT `id`,`title`,`adver_id`,`type`,`link`,`start_time`,`end_time`,`color`,`books`,`images`,`introduction`,`create_time` FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) ORDER BY `level` DESC LIMIT {$condition}", ['status' => 1, 'adver_id' => $value, 'stime' => $time, 'etime' => $time]);
                         foreach ($list as $k => $v) {
                             if (intval($v['books']) > 0) {
                                 $book = Db::name('book')->where(['id' => $v['books']])->find();
@@ -199,6 +200,10 @@ class Common extends BaseController
                                     $v['images'] = $v['images'] ? $v['images'] : $book['cover'];
                                     $list[$k]['chapters'] = $book['chapters'];
                                     $list[$k]['isfinish'] = $book['isfinish'];
+                                    $list[$k]['hits'] = $book['hits'];
+                                    $list[$k]['bigcate'] = $book['genre'];
+                                    $list[$k]['subgenre'] = $book['subgenre'];
+                                    $list[$k]['words'] = $book['words'];
                                     $list[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
                                     $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                                 } else {
@@ -206,6 +211,10 @@ class Common extends BaseController
                                     $list[$k]['finish'] = '';
                                     $list[$k]['author'] = '';
                                     $list[$k]['genre'] = '';
+                                    $list[$k]['bigcate'] = 0;
+                                    $list[$k]['subgenre'] = 0;
+                                    $list[$k]['words'] = 0;
+                                    $list[$k]['hits'] = 0;
                                     $list[$k]['chapters'] = 0;
                                     $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                                 }
@@ -214,7 +223,11 @@ class Common extends BaseController
                                 $list[$k]['author'] = '';
                                 $list[$k]['genre'] = '';
                                 $list[$k]['url'] = '';
+                                $list[$k]['bigcate'] = 0;
+                                $list[$k]['subgenre'] = 0;
+                                $list[$k]['words'] = 0;
                                 $list[$k]['chapters'] = 0;
+                                $list[$k]['hits'] = 0;
                                 $list[$k]['isfinish'] = 1;
                             }
                             $list[$k]['images'] = get_file($v['images']);
@@ -234,7 +247,8 @@ class Common extends BaseController
             if (intval($adver['status']) != 1) {
                 $this->apiError('广告位已禁止');
             }
-            $limit = $pagesize > 0 ?: (intval($adver['viewnum']) > 0 ? intval($adver['viewnum']) : '');
+            $limit = $pagesize > 0 ? $pagesize : (intval($adver['viewnum']) > 0 ? intval($adver['viewnum']) : 0);
+            if ($limit <= 0) $limit = get_config('app.page_size');
             //取总数
             $count = Db::query("SELECT count(id) as cnt FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime)", ['status' => 1, 'adver_id' => $pid, 'stime' => $time, 'etime' => $time]);
             $total = intval($count[0]['cnt']);
@@ -245,7 +259,7 @@ class Common extends BaseController
                     $isendpage = true;
                 }
                 $condition = ($limit * ($page - 1)) . ',' . $limit;
-                $result = Db::query("SELECT `id`,`title`,`adver_id`,`type`,`link`,`start_time`,`end_time`,`color`,`books`,`images`,`introduction` FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) ORDER BY `level` DESC LIMIT {$condition}", ['status' => 1, 'adver_id' => $pid, 'stime' => $time, 'etime' => $time]);
+                $result = Db::query("SELECT `id`,`title`,`adver_id`,`type`,`link`,`start_time`,`end_time`,`color`,`books`,`images`,`introduction`,`create_time` FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) ORDER BY `level` DESC LIMIT {$condition}", ['status' => 1, 'adver_id' => $pid, 'stime' => $time, 'etime' => $time]);
                 foreach ($result as $k => $v) {
                     if (intval($v['books']) > 0) {
                         $book = Db::name('book')->where(['id' => $v['books']])->find();
@@ -259,6 +273,10 @@ class Common extends BaseController
                             $result[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
                             $result[$k]['chapters'] = $book['chapters'];
                             $result[$k]['isfinish'] = $book['isfinish'];
+                            $result[$k]['subgenre'] = $book['subgenre'];
+                            $result[$k]['words'] = $book['words'];
+                            $result[$k]['bigcate'] = $book['genre'];
+                            $result[$k]['hits'] = $book['hits'];
                             $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                             $v['images'] = $v['images'] ? $v['images'] : $book['cover'];
                         } else {
@@ -266,6 +284,10 @@ class Common extends BaseController
                             $result[$k]['author'] = '';
                             $result[$k]['genre'] = '';
                             $result[$k]['chapters'] = 0;
+                            $result[$k]['words'] = 0;
+                            $result[$k]['bigcate'] = 0;
+                            $result[$k]['subgenre'] = 0;
+                            $result[$k]['hits'] = 0;
                             $result[$k]['isfinish'] = 1;
                             $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                         }
@@ -276,6 +298,10 @@ class Common extends BaseController
                         $result[$k]['genre'] = '';
                         $result[$k]['url'] = '';
                         $result[$k]['chapters'] = 0;
+                        $result[$k]['hits'] = 0;
+                        $result[$k]['words'] = 0;
+                        $result[$k]['bigcate'] = 0;
+                        $result[$k]['subgenre'] = 0;
                     }
                     $result[$k]['images'] = get_file($v['images']);
                     $result[$k]['width'] = $adver['width'];

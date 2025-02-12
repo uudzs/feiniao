@@ -16,6 +16,8 @@ Route::group('v1', function () {
     Route::rule('authordetail', 'api/v1.author/detail', 'GET|POST');
     Route::rule('booklist', 'api/v1.book/booklist', 'GET|POST');
     Route::rule('search', 'api/v1.search/index', 'GET|POST');
+    Route::rule('searchlog', 'api/v1.search/searchlog', 'GET|POST');
+    Route::rule('delsearchlog', 'api/v1.search/delsearchlog', 'GET|POST');
     Route::rule('keywords', 'api/v1.search/keywords', 'GET|POST');
     Route::rule('smssend', 'api/v1.common/smssend', 'GET|POST');
     Route::rule('gettoken', 'api/v1.common/token', 'GET|POST');

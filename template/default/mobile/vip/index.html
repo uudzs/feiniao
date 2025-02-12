@@ -165,7 +165,9 @@ $conf = get_system_config('vip');
                 buy: function (e) {
                     if(parseInt(e) <= 0) return bui.hint("套餐错误");
                     var that = this;
-                    if(isWeChat()) {
+                    var is_wechat_pay = {:get_system_config("wechat","pay_open")};
+                    var ua = navigator.userAgent.toLowerCase();
+                    if (ua.match(/MicroMessenger/i) == 'micromessenger' && parseInt(is_wechat_pay) === 1) {
                         post("{:furl('v1/createorder', [], true, 'api')}", { "type": "vip", "pid": e, "channel_type": "wechat" }, function (result) {
                             if (result.code == 0) {
                                 bui.hint({

@@ -8,6 +8,14 @@
 </style>
 <div class="p-3">
 	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline">
+			<select name="cate_id">
+				<option value="">请选择文章分类</option>
+				{volist name=":set_recursion(get_book_cate())" id="v"}
+				<option value="{$v.id}">{$v.title}</option>
+				{/volist}
+			</select>
+		</div>
 		<div class="layui-input-inline" style="width:300px;">
 			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
 		</div>
@@ -186,7 +194,8 @@
 		form.on('submit(searchform)', function(data) {
 			layui.pageTable.reload({
 				where: {
-					keywords: data.field.keywords
+					keywords: data.field.keywords,
+					cate_id: data.field.cate_id
 				},
 				page: {
 					curr: 1

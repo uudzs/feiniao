@@ -40,6 +40,9 @@ class Book extends BaseController
             if (!empty($param['subgenre'])) {
                 $where[] = ['subgenre', '=', $param['subgenre']];
             }
+            if (!empty($param['cate_id'])) {
+				$where[] = ['genre|subgenre', '=', $param['cate_id']];
+			}
             $param['order'] = 'id desc';
             $list = $this->model->getBookList($where, $param);
             $list = $list->toArray();
@@ -289,6 +292,9 @@ class Book extends BaseController
             if (!empty($param['keywords'])) {
                 $where[] = ['title|author', 'like', '%' . $param['keywords'] . '%'];
             }
+            if (!empty($param['cate_id'])) {
+				$where[] = ['genre|subgenre', '=', $param['cate_id']];
+			}
             $param['order'] = 'create_time Asc';
             $list = $this->model->getBookList($where, $param);
             return table_assign(0, '', $list);

@@ -16,7 +16,7 @@ class Author extends BaseController
 
     var $uid;
     var $model;
-    
+
     /**
      * 构造函数
      */
@@ -71,7 +71,6 @@ class Author extends BaseController
     {
         if (request()->isAjax()) {
             $param = get_params();
-
             // 检验完整性
             try {
                 validate(AuthorValidate::class)->check($param);
@@ -82,7 +81,13 @@ class Author extends BaseController
             if (isset($param["birth"])) {
                 $param["birth"] = $param["birth"] ? strtotime($param["birth"]) : 0;
             }
-
+            if (empty($param['password'])) {
+                return to_assign(1, '请填写密码！');
+            }
+            $time = (string) time();
+            $salt = substr(MD5($time), 0, 6);
+            $param['salt'] = $salt;
+            $param['password'] = sha1(MD5($param['password']) . $salt);
             $this->model->addAuthor($param);
         } else {
             return view();
@@ -112,11 +117,16 @@ class Author extends BaseController
             if (empty($detail)) {
                 return to_assign(1, '信息不存在');
             }
+            if (!empty($param['password'])) {
+                $param['password'] = sha1(MD5($param['password']) . $detail['salt']);
+            } else {
+                unset($param['password']);
+            }
             if ($detail['nickname'] != $param['nickname']) {
                 $param['update_time'] = time();
                 Db::name('author')->where('id', $id)->strict(false)->field(true)->update($param);
                 Db::name('book')->where('authorid', $id)->update(['author' => $param['nickname']]);
-                return to_assign(0, '修改成功');
+                return to_assign(0, '笔名修改成功');
             } else {
                 unset($param['file']);
                 $this->model->editAuthor($param);

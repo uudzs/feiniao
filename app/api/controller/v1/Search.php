@@ -114,4 +114,59 @@ class Search extends BaseController
             ->select();
         $this->apiSuccess('请求成功', $list);
     }
+
+    /**
+     * 搜索记录
+     * Summary of searchlog
+     * @return void
+     */
+    public function searchlog()
+    {
+        $param = get_params();
+        if (empty(JWT_UID)) {
+            $this->apiError('请先登录', [], 99);
+        }
+        $uid = JWT_UID;
+        $user = Db::name('user')->where(['id' => $uid])->find();
+        if (empty($user)) {
+            $this->apiError('用户不存在');
+        }
+        $page = (isset($param['page']) && intval($param['page']) > 0) ? intval($param['page']) : 1; //页码
+        $limit = (isset($param['limit']) && intval($param['limit']) > 0) ? intval($param['limit']) : 10; //条数
+        //最多可以载加多少页
+        if (isset($param['page']) && intval($param['page']) > 10) {
+            $param['page'] = 10;
+        }
+        $order = 'create_time desc';
+        $start = $limit * ($page - 1);
+        $list = Db::name('search_log')
+            ->field('id,type,keyword,user_id,resnum,create_time')
+            ->where(['user_id' => $uid])
+            ->group('keyword')
+            ->order($order)
+            ->limit($start, $limit)
+            ->select();
+        $this->apiSuccess('请求成功', $list);
+    }
+
+    /**
+     * 删除搜索记录
+     * Summary of delsearchlog
+     * @return void
+     */
+    public function delsearchlog()
+    {
+        $param = get_params();
+        if (empty(JWT_UID)) {
+            $this->apiError('请先登录', [], 99);
+        }
+        $uid = JWT_UID;
+        $user = Db::name('user')->where(['id' => $uid])->find();
+        if (empty($user)) {
+            $this->apiError('用户不存在');
+        }
+        $keyword = $param['keyword'];
+        Db::name('search_log')->where(['keyword' => $keyword, 'user_id' => $uid])->delete();
+        $this->apiSuccess('删除成功', []);
+    }
 }

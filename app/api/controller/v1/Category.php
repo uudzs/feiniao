@@ -25,7 +25,7 @@ class Category extends BaseController
     public function bigcate()
     {
         $param = get_params();
-        $list = Db::name('category')->where(['status' => 1, 'pid' => 0])->select()->toArray();
+        $list = Db::name('category')->where(['status' => 1, 'pid' => 0])->order('ordernum asc')->select()->toArray();
         if (isset($param['return']) && $param['return'] == 'fetch') {
             return View::fetch('', ['list' => $list]);
         } else {
@@ -42,7 +42,7 @@ class Category extends BaseController
         if (empty($param['pid'])) {
             $this->apiError('参数错误');
         }
-        $list = Db::name('category')->where(['status' => 1, 'pid' => $param['pid']])->select()->toArray();
+        $list = Db::name('category')->where(['status' => 1, 'pid' => $param['pid']])->order('ordernum asc')->select()->toArray();
         $this->apiSuccess('success', $list);
     }
 }

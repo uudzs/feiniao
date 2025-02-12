@@ -185,6 +185,7 @@ $privacy = model('pages')->where(['status' => 1, 'name' => 'privacy'])->value('c
                     if(that.loginType == 3) var postData = {"username": that.userinfo.mobile, "password": that.userinfo.password, "invite_code": invite_code};
                     post("{:furl('v1/login', [], true, 'api')}", postData, function(result) {
                         if(parseInt(result.code) === 0) {
+                            setCookie("{:get_config('app.session_user')}", result.data.token, 1, { path: "/" });
                             storage.set("token", result.data.token);
                             window.location.href = refererUrl;
                         } else {
