@@ -25,12 +25,33 @@
 	height: 100%;
 	border: none;
 }
+.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-1 {
+    height: auto!important;
+	width: auto!important;
+	min-width: 60px!important;
+}
+.book_customize_style .laytable-cell-1-0-1 {
+	width: auto!important;
+	min-width: 60px!important;
+}
+.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-3, 
+.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-4, 
+.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-5,
+.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-6 {
+    height: auto!important;
+	width: auto!important;
+	min-width: 230px!important;
+}
+.book_customize_style strong {
+	color: #bdbdbd;
+	font-weight: normal;
+}
 </style>
 <div class="p-3">
 	<form class="layui-form gg-form-bar border-t border-x">
 		<div class="layui-input-inline">
 			<select name="cate_id">
-				<option value="">请选择文章分类</option>
+				<option value="">请选择作品分类</option>
 				{volist name=":set_recursion(get_book_cate())" id="v"}
 				<option value="{$v.id}">{$v.title}</option>
 				{/volist}
@@ -69,6 +90,42 @@
 <script type="text/html" id="showTpl">
 	<input type="checkbox" name="ishow" value="{{d.ishow}}" lay-skin="switch" lay-text="显示|隐藏" lay-filter="isshow" {{ d.ishow == 1 ? 'checked' : '' }}>
 </script>
+
+<script type="text/html" id="basicinfo">
+    <ul>
+      <li><strong>名称:</strong> {{= d.title }} </li>
+      <li><strong>作者:</strong> {{= d.author }} </li>
+      <li><strong>大类:</strong> {{= d.bigcatetitle ? d.bigcatetitle : '--' }} </li>
+      <li><strong>小类:</strong> {{= d.sellcatetitle ? d.sellcatetitle : '--' }} </li>
+    </ul>
+</script>
+
+<script type="text/html" id="attribute">
+    <ul>
+      <li><strong>风格:</strong> {{= d.style ? d.style : '--' }} </li>
+      <li><strong>结局:</strong> {{= d.ending ? d.ending : '--' }} </li>
+      <li><strong>标签:</strong> {{= d.label ? d.label : '--' }} </li>
+      <li><strong>热度:</strong> {{= d.hits ? d.hits : '--' }} </li>
+    </ul>
+</script>
+
+<script type="text/html" id="basicdata">
+    <ul>
+      <li><strong>字数:</strong> {{= d.words ? d.words : '--' }} </li>
+      <li><strong>上月更新字数:</strong> {{= d.lastmonthwords ? d.lastmonthwords : '--' }} </li>
+      <li><strong>章节数:</strong> {{= d.chapters ? d.chapters : '--' }} </li>
+      <li><strong>自定义标签:</strong> {{= d.label_custom ? d.label_custom : '--' }} </li>
+    </ul>
+</script>
+
+<script type="text/html" id="timedata">
+    <ul>
+      <li><strong>创建时间:</strong> {{= d.create_time ? d.create_time : '--' }} </li>
+      <li><strong>更新时间:</strong> {{= d.update_time ? d.update_time : '--' }} </li>
+	  <li><strong>完结状态:</strong> {{= parseInt(d.isfinish) ? (parseInt(d.isfinish) === 2 ? '完结' : '连载') : '--' }} </li>
+      <li><strong>完结时间:</strong> {{= d.finishtime ? layui.util.toDateString((parseInt(d.finishtime) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--' }} </li>      
+    </ul>
+</script>
 {/block}
 <!-- /主体 -->
 
@@ -86,10 +143,10 @@
 			id: 'booklist',
 			page: true,
 			limit: 20,
-			limits: [10,20,30,50,100,500,1000],
-			//height: 'full-35',
-     		//lineStyle: 'height: auto;', // 定义表格的多行样式
-			//cellMinWidth: 300,
+			limits: [10,20,30,50,100,500,1000],			
+			height: 'full-35',
+			lineStyle: 'height: auto;',
+			className: 'book_customize_style', // 用于给表格主容器追加 css 类名
 			cols: [
 				[
 				{checkbox: true, fixed: true},
@@ -98,16 +155,6 @@
 					title: '编号',
 					align: 'center',
 					width: 60
-				},{
-					field: 'title',
-					title: '作品名称',
-					align: 'center',
-					style:'width: 250px;'
-				},{
-					field: 'author',
-					title: '作者',
-					align: 'center',
-					width: 200
 				},{
 					field: 'cover',
 					title: '封面图片',
@@ -119,75 +166,25 @@
 						return d.cover ? '<img src="' + d.cover + '" width="80">' : '--';
 					}
 				},{
-					field: 'style',
-					title: '风格',
-					align: 'center',
-					width: 100,
-					templet:function(d) {
-						return d.style ? d.style : '--';
-					}
+					field: 'none',
+					title: '基本信息',
+					width: 230,
+					templet: '#basicinfo'
 				},{
-					field: 'ending',
-					title: '结局',
-					align: 'center',
-					width: 100,
-					templet:function(d) {
-						return d.ending ? d.ending : '--';
-					}
+					field: 'none',
+					title: '基本属性',
+					width: 230,
+					templet: '#attribute'
 				},{
-					field: 'bigcatetitle',
-					title: '大类',
-					align: 'center',
-					width: 100
+					field: 'none',
+					title: '基本数据',
+					width: 230,
+					templet: '#basicdata'
 				},{
-					field: 'sellcatetitle',
-					title: '小类',
-					align: 'center',
-					width: 100
-				},{
-					field: 'isfinish',
-					title: '完结状态',
-					align: 'center',
-					width: 100,
-					templet:function(d) {
-						return parseInt(d.isfinish) ? (parseInt(d.isfinish) === 2 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>') : '--';
-					}
-				},{
-					field: 'finishtime',
-					title: '完结时间',
-					align: 'center',
-					width: 150,
-					templet:function(d) {
-						return d.finishtime ? layui.util.toDateString((parseInt(d.finishtime) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--';
-					}
-				},{
-					field: 'words',
-					title: '总字数',
-					align: 'center',
-					width: 80
-				},{
-					field: 'lastmonthwords',
-					title: '上月更新字数',
-					align: 'center',
-					width: 120
-				},{
-					field: 'chapters',
-					title: '总章节数',
-					align: 'center',
-					width: 80
-				},{
-					field: 'label',
-					title: '作品标签',
-					align: 'center',
-					width: 300
-				},{
-					field: 'label_custom',
-					title: '自定义标签',
-					align: 'center',
-					width: 150,
-					templet:function(d) {
-						return d.label_custom ? d.label_custom : '--';
-					}
+					field: 'none',
+					title: '其他数据',
+					width: 230,
+					templet: '#timedata'
 				},{
 					field: 'status',
 					title: '是否上架',
@@ -208,29 +205,12 @@
 					title: '编辑人员',
 					align: 'center',
 					width: 120
-				},{
-					field: 'create_time',
-					title: '创建时间',
-					align: 'center',
-					width: 150,
-					templet:function(d) {
-						return d.create_time ? d.create_time : '--';
-					}
-				},{
-					field: 'update_time',
-					title: '更新时间',
-					align: 'center',
-					width: 150,
-					templet:function(d) {
-						return d.update_time ? d.update_time : '--';
-					}
 				},
 				{
 					fixed: 'right',
 					field: 'right',
 					title: '操作',
 					toolbar: '#barDemo',
-					width: 150,
 					align: 'center'
 				}				
 				]
