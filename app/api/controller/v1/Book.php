@@ -121,15 +121,48 @@ class Book extends BaseController
             $where[] = ['title|author', 'like', '%' . $param['keywords'] . '%'];
         }
         $page = isset($param['page']) ? intval($param['page']) : 1;
+        $areaid = isset($param['areaid']) ? intval($param['areaid']) : 0;
         //最多可以载加多少页
         if ($page > 10) {
             $page = 10;
         }
-        if (isset($param['subgenre']) && !empty($param['subgenre'])) {
-            $where[] = ['subgenre', '=', $param['subgenre']];
+        if (!empty($areaid)) {
+            $big = [];
+            $category = Db::name('category')->field('id,name,pid')->where(['status' => 1])->order('ordernum asc')->select()->toArray();
+            if ($areaid == 2) {
+                foreach ($category as $key => $value) {
+                    if (intval($value['pid']) == 0 && strpos($value['name'], '女生') !== false) {
+                        $big = $value['id'];
+                        break;
+                    }
+                }
+                if ($big) {
+                    $param['genre'] = $big;
+                }
+            } else {
+                foreach ($category as $key => $value) {
+                    if (intval($value['pid']) == 0 && strpos($value['name'], '女生') === false) {
+                        $big[] = $value['id'];
+                    }
+                }
+                if (count($big) > 0) {
+                    $param['genre'] = implode(',', $big);
+                }
+            }
         }
         if (isset($param['genre']) && !empty($param['genre'])) {
-            $where[] = ['genre', '=', $param['genre']];
+            if (strpos((string)$param['genre'], ',') !== false) {
+                $where[] = ['genre', 'in', $param['genre']];
+            } else {
+                $where[] = ['genre', '=', $param['genre']];
+            }
+        }
+        if (isset($param['subgenre']) && !empty($param['subgenre'])) {
+            if (strpos((string)$param['subgenre'], ',') !== false) {
+                $where[] = ['subgenre', 'in', $param['subgenre']];
+            } else {
+                $where[] = ['subgenre', '=', $param['subgenre']];
+            }
         }
         if (isset($param['bookid']) && !empty($param['bookid'])) {
             $where[] = ['id', '<>', $param['bookid']];

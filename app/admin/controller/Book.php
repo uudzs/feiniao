@@ -41,8 +41,8 @@ class Book extends BaseController
                 $where[] = ['subgenre', '=', $param['subgenre']];
             }
             if (!empty($param['cate_id'])) {
-				$where[] = ['genre|subgenre', '=', $param['cate_id']];
-			}
+                $where[] = ['genre|subgenre', '=', $param['cate_id']];
+            }
             $param['order'] = 'id desc';
             $list = $this->model->getBookList($where, $param);
             $list = $list->toArray();
@@ -293,8 +293,8 @@ class Book extends BaseController
                 $where[] = ['title|author', 'like', '%' . $param['keywords'] . '%'];
             }
             if (!empty($param['cate_id'])) {
-				$where[] = ['genre|subgenre', '=', $param['cate_id']];
-			}
+                $where[] = ['genre|subgenre', '=', $param['cate_id']];
+            }
             $param['order'] = 'create_time Asc';
             $list = $this->model->getBookList($where, $param);
             return table_assign(0, '', $list);
@@ -335,7 +335,8 @@ class Book extends BaseController
                 $realPath = CMS_ROOT . "public" . $path . '/' . $filename;
                 $chapter = [];
                 $data_link = [];
-                $str = $title = $author = '';
+                $str = $title = $author = $genre = '';
+                $big_cate_id = 0; //大类
                 try {
                     //逐行读取文件内容
                     $handle = fopen($realPath, 'r');
@@ -357,6 +358,16 @@ class Book extends BaseController
                             if (strpos($line, '作者：') !== false) {
                                 $a = explode('作者：', $line);
                                 $author = isset($a[1]) ? $a[1] : '';
+                            }
+                        }
+                        if (empty($genre)) {
+                            if (strpos($line, '大类：') !== false) {
+                                $a = explode('大类：', $line);
+                                $genre = isset($a[1]) ? $a[1] : '';
+                            }
+                            if (strpos($line, '大类:') !== false) {
+                                $a = explode('大类:', $line);
+                                $genre = isset($a[1]) ? $a[1] : '';
                             }
                         }
                         $line = preg_replace('/^[\p{C}\s]+|[\p{C}\s]+$/u', '', $line);
@@ -446,12 +457,17 @@ class Book extends BaseController
                         $authorid = $user['id'];
                         $author = $user['nickname'];
                     }
+                    $category = Db::name('category')->where(['name' => trim($genre)])->find();
+                    if (!empty($category)) {
+                        $big_cate_id = $category['id'];
+                    }
                     if (empty($book)) {
                         $bookdata = [
                             'title' => $title,
                             'author' => $author,
                             'authorid' => $authorid,
                             'status' => 1,
+                            'genre' => $big_cate_id,
                             'filename' => Pinyin::permalink($title, ''),
                             'create_time' => time(),
                         ];

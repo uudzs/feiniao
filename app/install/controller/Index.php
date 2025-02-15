@@ -87,84 +87,95 @@ class Index
             return to_assign(1, $e->getError());
         }
         $dbName = $data['DB_NAME'];
-        //验证表是否存在		
+        $link = '';
+        //连接数据库	
         try {
-            // 连接数据库
             $link = @new mysqli("{$data['DB_HOST']}:{$data['DB_PORT']}", $data['DB_USER'], $data['DB_PWD']);
         } catch (\Exception $e) {
             // 这是进行异常捕获,创建数据库
-            $error = $e->getMessage();
-            return to_assign(1, '数据库链接失败:' . $error);
+            return to_assign(1, '数据库链接失败:' . $e->getMessage());
             die;
         }
         // 获取错误信息
-        $error = $link->connect_error;
-        if (!is_null($error)) {
+        if (!is_null($link->connect_error)) {
             // 转义防止和alert中的引号冲突
-            $error = addslashes($error);
-            return to_assign(1, '数据库链接失败:' . $error);
+            return to_assign(1, '数据库链接失败:' . addslashes($link->connect_error));
             die;
         }
-        // 设置字符集
-        $link->query("SET NAMES 'utf8mb4'");
-        //验证表是否存在		
         try {
+            // 设置字符集
+            $link->query("SET NAMES 'utf8mb4'");
             // 这里是主体代码
             $isDB = $link->query('SHOW TABLES LIKE ' . "'" . $dbName . "'");
             if (!$isDB) {
-                //创建数据库并选中
+                //不存在则创建数据库
                 $sql = "CREATE DATABASE IF NOT EXISTS `{$dbName}` DEFAULT CHARACTER SET utf8mb4";
                 $link->query($sql);
             }
+            //选中数据库
+            $link->select_db($dbName);
         } catch (\Exception $e) {
             // 这是进行异常捕获,创建数据库并选中
-            $error = $e->getMessage();
-            $sql = "CREATE DATABASE IF NOT EXISTS `{$dbName}` DEFAULT CHARACTER SET utf8mb4";
-            $link->query($sql);
-        }
-        $link->select_db($dbName);
-        // 导入sql数据并创建表
-        $fqcms_sql = file_get_contents(CMS_ROOT . '/app/install/data/install.sql');
-        $sql_array = preg_split("/;[\r\n]+/", str_replace("fn_", $data['DB_PREFIX'], $fqcms_sql));
-        foreach ($sql_array as $k => $v) {
-            if (!empty($v)) {
-                $link->query($v);
-            }
-        }
-        //创建章节表
-        $chapter_Tables = intval($data['chapter_Tables']);
-        if ($chapter_Tables <= 0) {
-            return to_assign(1, '章节分表数错误');
+            return to_assign(1, '创建数据库失败:' . addslashes($e->getMessage()));
             die;
         }
-        for ($i = 0; $i < $chapter_Tables; $i++) {
-            //$sql = "DROP TABLE IF EXISTS `" . $data['DB_PREFIX'] . "chapter_content_`" . $i . ";";
-            //$link->query($sql);
-            $sql = "CREATE TABLE `" . $data['DB_PREFIX'] . "chapter_content_" . $i . "` (
+        try {
+            // 导入sql数据并创建表
+            $fqcms_sql = file_get_contents(CMS_ROOT . '/app/install/data/install.sql');
+            $sql_array = preg_split("/;[\r\n]+/", str_replace("fn_", $data['DB_PREFIX'], $fqcms_sql));
+            foreach ($sql_array as $k => $v) {
+                if (!empty($v)) {
+                    $link->query($v);
+                }
+            }
+        } catch (\Exception $e) {
+            return to_assign(1, '创建表失败:' . addslashes($e->getMessage()));
+            die;
+        }
+        //创建章节表
+        try {
+            $chapter_Tables = intval($data['chapter_Tables']);
+            if ($chapter_Tables <= 0) {
+                return to_assign(1, '章节分表数错误');
+                die;
+            }
+            for ($i = 0; $i < $chapter_Tables; $i++) {
+                $sql = "CREATE TABLE `" . $data['DB_PREFIX'] . "chapter_content_" . $i . "` (
                 `sid` bigint(20) DEFAULT '0' COMMENT '章节ID',
                 `info` longtext COMMENT '章节内容',
                 KEY `sid` (`sid`)
             ) ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COMMENT='章节内容表'";
-            $link->query($sql);
-        }
-        $isTable = $link->query('SHOW TABLES LIKE "' . $data['DB_PREFIX'] . 'admin"');
-        if (!$isTable) {
-            return to_assign(1, '创建数据库表失败，请检查是否有创建权限！');
-        }
-        //插入管理员信息
-        $username = $data['username'];
-        $password = $data['password'];
-        $nickname = '超级管理员';
-        $thumb = '/static/admin/images/icon.png';
-        $salt = set_salt(20);
-        $password = set_password($password, $salt);
-        $create_time = time();
-        $update_time = time();
-        $create_admin_sql = "INSERT INTO " . $data['DB_PREFIX'] . "admin " . "(username,pwd, nickname,thumb,salt,did,position_id,create_time,update_time) " . "VALUES " . "('$username','$password','$nickname','$thumb','$salt',1,1,'$create_time','$update_time')";
-        if (!$link->query($create_admin_sql)) {
-            return to_assign(1, '创建管理员信息失败，请重试安装');
+                $link->query($sql);
+            }
+        } catch (\Exception $e) {
+            return to_assign(1, '创建章节表失败:' . addslashes($e->getMessage()));
+            die;
         }
         try {
+            //插入管理员信息
+            $isTable = $link->query('SHOW TABLES LIKE "' . $data['DB_PREFIX'] . 'admin"');
+            if (!$isTable) {
+                return to_assign(1, '创建数据库表失败，请检查是否有创建权限！');
+            }
+            //插入管理员信息
+            $username = $data['username'];
+            $password = $data['password'];
+            $nickname = '超级管理员';
+            $thumb = '/static/admin/images/icon.png';
+            $salt = set_salt(20);
+            $password = set_password($password, $salt);
+            $create_time = time();
+            $update_time = time();
+            $create_admin_sql = "INSERT INTO " . $data['DB_PREFIX'] . "admin " . "(username,pwd, nickname,thumb,salt,did,position_id,create_time,update_time) " . "VALUES " . "('$username','$password','$nickname','$thumb','$salt',1,1,'$create_time','$update_time')";
+            if (!$link->query($create_admin_sql)) {
+                return to_assign(1, '创建管理员信息失败，请重试安装');
+            }
+        } catch (\Exception $e) {
+            return to_assign(1, '插入管理员信息失败:' . addslashes($e->getMessage()));
+            die;
+        }
+        try {
+            //创建事件
             $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `VIPExpired` ON SCHEDULE EVERY 1 MINUTE STARTS '2024-01-01 22:40:25' ON COMPLETION NOT PRESERVE ENABLE COMMENT 'VIP过期' DO UPDATE `" . $data['DB_PREFIX'] . "vip_log` SET `status`=2 WHERE `expire_time`>0 and `expire_time`<=unix_timestamp(now()) and `status`=1";
             $link->query($event);
             $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `timingRelease` ON SCHEDULE EVERY 1 MINUTE STARTS '2021-03-27 15:19:16' ON COMPLETION PRESERVE ENABLE COMMENT '定时发布' DO UPDATE `" . $data['DB_PREFIX'] . "chapter` SET `status`=1,`trial_time`=0,`create_time`=unix_timestamp(now()) WHERE `trial_time`>0 and `trial_time`<=unix_timestamp(now()) and `status`=0";
@@ -173,12 +184,12 @@ class Index
             $link->query($event);
             $event = "CREATE DEFINER=`" . $data['DB_USER'] . "`@`localhost` EVENT `upBookWords` ON SCHEDULE EVERY 1 MINUTE STARTS '2021-03-27 15:19:16' ON COMPLETION NOT PRESERVE ENABLE COMMENT '更新作品字数' DO UPDATE `" . $data['DB_PREFIX'] . "book` SET words = (SELECT SUM(`wordnum`) FROM `" . $data['DB_PREFIX'] . "chapter` WHERE `bookid` = `" . $data['DB_PREFIX'] . "book`.id AND `verify` in(0,1))";
             $link->query($event);
+            //开启事件
+            //$sql = "SET GLOBAL event_scheduler = ON;";
+            //$link->query($sql);
         } catch (\Exception $e) {
             //跳过不报错
         }
-        //开启事件
-        //$sql = "SET GLOBAL event_scheduler = ON;";
-        //$link->query($sql);        
         $link->close();
         $db_str = "<?php
 return [

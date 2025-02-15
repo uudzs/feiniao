@@ -167,6 +167,7 @@ class Common extends BaseController
         $table = config('database.connections.mysql.prefix') . 'advsr';
         $condition = '';
         $result = [];
+        $modelName = \think\facade\App::initialize()->http->getName();
         if (strpos($pid, ',') !== false) {
             $adver = Db::name('adver')->where('id', 'in', $pid)->select()->toArray();
             $pids = explode(',', $pid);
@@ -192,6 +193,8 @@ class Common extends BaseController
                                 $book = Db::name('book')->where(['id' => $v['books']])->find();
                                 if (!empty($book)) {
                                     $list[$k]['author'] = $book['author'];
+                                    $list[$k]['authorid'] = $book['authorid'];
+                                    $list[$k]['headimg'] = get_file(Db::name('author')->where(['id' => $book['authorid']])->value('headimg'));
                                     if (!empty($book['genre'])) {
                                         $list[$k]['genre'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
                                     } else {
@@ -205,25 +208,29 @@ class Common extends BaseController
                                     $list[$k]['subgenre'] = $book['subgenre'];
                                     $list[$k]['words'] = $book['words'];
                                     $list[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
-                                    $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
+                                    $list[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                                 } else {
                                     $list[$k]['isfinish'] = 1;
                                     $list[$k]['finish'] = '';
                                     $list[$k]['author'] = '';
+                                    $list[$k]['headimg'] = '';
                                     $list[$k]['genre'] = '';
                                     $list[$k]['bigcate'] = 0;
+                                    $list[$k]['authorid'] = 0;
                                     $list[$k]['subgenre'] = 0;
                                     $list[$k]['words'] = 0;
                                     $list[$k]['hits'] = 0;
                                     $list[$k]['chapters'] = 0;
-                                    $list[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
+                                    $list[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                                 }
                             } else {
                                 $list[$k]['finish'] = '';
                                 $list[$k]['author'] = '';
+                                $list[$k]['headimg'] = '';
                                 $list[$k]['genre'] = '';
                                 $list[$k]['url'] = '';
                                 $list[$k]['bigcate'] = 0;
+                                $list[$k]['authorid'] = 0;
                                 $list[$k]['subgenre'] = 0;
                                 $list[$k]['words'] = 0;
                                 $list[$k]['chapters'] = 0;
@@ -265,6 +272,8 @@ class Common extends BaseController
                         $book = Db::name('book')->where(['id' => $v['books']])->find();
                         if (!empty($book)) {
                             $result[$k]['author'] = $book['author'];
+                            $result[$k]['authorid'] = $book['authorid'];
+                            $result[$k]['headimg'] = get_file(Db::name('author')->where(['id' => $book['authorid']])->value('headimg'));
                             if (!empty($book['genre'])) {
                                 $result[$k]['genre'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
                             } else {
@@ -277,27 +286,31 @@ class Common extends BaseController
                             $result[$k]['words'] = $book['words'];
                             $result[$k]['bigcate'] = $book['genre'];
                             $result[$k]['hits'] = $book['hits'];
-                            $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
+                            $result[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                             $v['images'] = $v['images'] ? $v['images'] : $book['cover'];
                         } else {
                             $result[$k]['finish'] = '';
                             $result[$k]['author'] = '';
+                            $result[$k]['headimg'] = '';
                             $result[$k]['genre'] = '';
                             $result[$k]['chapters'] = 0;
+                            $result[$k]['authorid'] = 0;
                             $result[$k]['words'] = 0;
                             $result[$k]['bigcate'] = 0;
                             $result[$k]['subgenre'] = 0;
                             $result[$k]['hits'] = 0;
                             $result[$k]['isfinish'] = 1;
-                            $result[$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
+                            $result[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
                         }
                     } else {
                         $result[$k]['isfinish'] = 1;
                         $result[$k]['finish'] = '';
                         $result[$k]['author'] = '';
+                        $result[$k]['headimg'] = '';
                         $result[$k]['genre'] = '';
                         $result[$k]['url'] = '';
                         $result[$k]['chapters'] = 0;
+                        $result[$k]['authorid'] = 0;
                         $result[$k]['hits'] = 0;
                         $result[$k]['words'] = 0;
                         $result[$k]['bigcate'] = 0;
