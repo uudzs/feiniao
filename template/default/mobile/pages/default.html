@@ -1,0 +1,37 @@
+{extend name="common/base"/}
+{block name="style"}
+{/block}
+{block name="body"}
+{php}
+$site_title = $detail['title'];
+{/php}
+{include file="common/header"/}
+<style>
+#scrollList .bui-list {
+    line-height: 28px;
+    padding: 10px 20px;
+}
+#scrollList .bui-list p {
+    padding: 5px 0;
+}
+</style>
+<div id="scrollList" class="bui-scroll">
+    <div class="bui-scroll-head"></div>
+    <div class="bui-scroll-main">
+        <ul class="bui-list">
+            {$detail.content|raw}
+        </ul>
+    </div>
+    <div class="bui-scroll-foot"></div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    bui.ready(function () {
+        $(".bui-navbar").hide();
+        $(".footer").hide();
+        $(".bui-bar-left").css('visibility', 'hidden');
+        $(".bui-bar-right").css('visibility', 'hidden');
+    })
+</script>
+{/block}

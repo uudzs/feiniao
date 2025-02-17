@@ -705,6 +705,17 @@ class Common extends BaseController
         $this->apiError('注册失败');
     }
 
+    public function pages()
+    {
+        $param = get_params();
+        $name = isset($param['name']) ? trim($param['name']) : '';
+        if (empty($name)) {
+            $this->apiError('参数错误');
+        }
+        $res = Db::name('pages')->where(['status' => 1, 'name' => $name])->find();
+        $this->apiSuccess('获取成功', $res ?: []);
+    }
+
     public function system()
     {
         $param = get_params();

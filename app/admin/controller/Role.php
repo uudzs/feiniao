@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace app\admin\controller;
 
@@ -46,7 +46,7 @@ class Role extends BaseController
                     return to_assign(1, $e->getError());
                 }
                 //为了系统安全id为1的系统所有者管理组不允许修改
-                if ($param['id'] == 1) {
+                if (get_login_admin('id') != 1 && $param['id'] == 1) {
                     return to_assign(1, '为了系统安全,该管理组不允许修改');
                 }
                 Db::name('AdminGroup')->where(['id' => $param['id']])->strict(false)->field(true)->update($param);
