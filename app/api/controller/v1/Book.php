@@ -45,7 +45,7 @@ class Book extends BaseController
             $detail['issign'] = Db::name('author')->where(['id' => $detail['authorid']])->value('issign');
             $detail['words'] = wordCount($detail['words']);
             $detail['uptime'] = $detail['update_time'] ? date('Y-m-d H:i:s', $detail['update_time']) : date('Y-m-d H:i:s', $detail['create_time']);
-            $detail['chapter'] = Db::name('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
+            $detail['chapter'] = Db::name('chapter')->field('id,title,chaps,bookid,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
             $first_chapter = $last_chapter = [];
             if (!empty($detail['chapter'])) {
                 $first_chapter = $detail['chapter'][0]; //第一章

@@ -1,0 +1,199 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+	[data-field="describe"], [data-field="describe"] div {
+		min-width: 200px;
+		text-align: left;
+	}
+	[data-field="edition_url"], [data-field="edition_url"] div {
+		min-width: 300px;
+		text-align: left;
+	}
+</style>
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="app_version" lay-filter="app_version"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo">
+	<div class="layui-btn-container">
+		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加版本">+ 添加版本</span>
+	</div>
+</script>
+
+<script type="text/html" id="barDemo">
+<div class="layui-btn-group"><a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a><a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a></div>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#app_version',
+			title: 'APP版本管理列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("app_version/datalist")}',
+			page: true,
+			limit: 20,
+			height: 'full-35',
+			lineStyle: 'height: auto;',
+			cols: [
+				[
+				{
+					field: 'id',
+					title: '编号',
+					align: 'center',
+					width: 80
+				},{
+					field: 'edition_number',
+					title: '版本号',
+					align: 'center',
+					width: 100,
+					templet:function(d) {
+						return parseFloat(d.edition_number);
+					}
+				},{
+					field: 'edition_name',
+					title: '牐本号名称',
+					align: 'center',
+					width: 100
+				},{
+					field: 'platform',
+					title: '平台',
+					align: 'center',
+					width: 100
+				},{
+					field: 'describe',
+					title: '描述',
+					align: 'center',
+					templet: function(d) {
+						return d.describe.replace(/\n/g, "<br>");
+					}
+				},{
+					field: 'edition_url',
+					title: '包地址',
+					align: 'center',
+				},{
+					field: 'edition_force',
+					title: '是否强制更新',
+					align: 'center',
+					width: 100,
+					templet: function(d) {
+						return parseInt(d.edition_force) == 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'package_type',
+					title: '整包升级',
+					align: 'center',
+					width: 100,
+					templet: function(d) {
+						return parseInt(d.package_type) == 0 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'edition_issue',
+					title: '是否发行',
+					align: 'center',
+					width: 100,
+					templet: function(d) {
+						return parseInt(d.edition_issue) == 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'edition_silence',
+					title: '是否静默更新',
+					align: 'center',
+					width: 100,
+					templet: function(d) {
+						return parseInt(d.edition_silence) == 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
+					}
+				},{
+					field: 'check_num',
+					title: '检查次数',
+					align: 'center',
+					width: 100
+				},{
+					field: 'create_time',
+					title: '创建时间',
+					align: 'center',
+					width: 150
+				},{
+					field: 'update_time',
+					title: '更新时间',
+					align: 'center',
+					width: 150
+				},
+				{
+					field: 'right',
+					title: '操作',
+					toolbar: '#barDemo',
+					width: 136,
+					align: 'center'
+				}				
+				]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(app_version)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('app_version/add')}");
+				return false;
+			}
+		});
+
+		//监听表格行工具事件
+		table.on('tool(app_version)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'read') {
+				tool.side('{:url("app_version/read")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'edit') {
+				tool.side('{:url("app_version/edit")}?id='+obj.data.id);
+			}
+			else if (obj.event === 'del') {
+				layer.confirm('确定要删除该记录吗?', {
+					icon: 3,
+					title: '提示'
+				}, function(index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							obj.del();
+						}
+					}
+					tool.delete("{:url('app_version/del')}", { id: data.id }, callback);
+					layer.close(index);
+				});
+			}
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

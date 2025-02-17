@@ -41,7 +41,7 @@ class Api extends BaseController
         $rule = [
             'image' => 'jpg,png,jpeg,gif',
             'doc' => 'doc,docx,ppt,pptx,xls,xlsx,pdf',
-            'file' => 'zip,gz,7z,rar,tar',
+            'file' => 'zip,gz,7z,rar,tar,wgt',
             'cert' => 'pem,p12,crt,jks,der,key',
             'video' => 'mpg,mp4,mpeg,avi,wmv,mov,flv,m4v',
         ];

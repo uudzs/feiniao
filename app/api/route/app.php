@@ -54,6 +54,8 @@ Route::group('v1', function () {
     Route::rule('realnameauth', 'api/v1.user/realnameauth', 'GET|POST');
     Route::rule('myinvite', 'api/v1.user/myinvite', 'GET|POST');
     Route::rule('regauthor', 'api/v1.user/regauthor', 'GET|POST');
+    Route::rule('system', 'api/v1.common/system', 'GET|POST');
+    Route::rule('appupgrade', 'api/v1.app/upgrade', 'GET|POST');
 });
 Route::rule('book-:id', 'book/detail', 'GET|POST')->name('book_detail');
 Route::rule('author-:id', 'author/detail', 'GET|POST')->name('author_detail');

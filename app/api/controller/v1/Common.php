@@ -23,7 +23,7 @@ class Common extends BaseController
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => ['login', 'register', 'token', 'service', 'captcha']]
+        Auth::class => ['except' => ['login', 'register', 'token', 'system', 'captcha']]
     ];
 
     /**
@@ -703,6 +703,29 @@ class Common extends BaseController
             $this->apiSuccess('登录成功', ['token' => $token]);
         }
         $this->apiError('注册失败');
+    }
+
+    public function system()
+    {
+        $param = get_params();
+        $config = isset($param['config']) ? $param['config'] : '';
+        $name = isset($param['name']) ? trim($param['name']) : '';
+        if (empty($config) && empty($name)) {
+            $this->apiError('参数错误');
+        }
+        if (empty($config)) {
+            $this->apiError('参数错误');
+        }
+        $res = [];
+        if ($name) {
+            $res = get_system_config($config, $name);
+        } else {
+            $res = get_system_config($config);
+        }
+        if ($config == 'web' && isset($res['logo'])) {
+            $res['logo'] = get_file($res['logo']);
+        }
+        $this->apiSuccess('获取成功', $res);
     }
 
     public function register()

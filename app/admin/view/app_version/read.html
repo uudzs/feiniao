@@ -1,0 +1,38 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+	<h3 class="pb-3">APP版本管理详情</h3>
+	<table class="layui-table layui-table-form">
+		<tr><td class="layui-td-gray-2">描述</td>
+			<td>{$detail.describe}</td><td class="layui-td-gray-2">包地址</td>
+			<td>{$detail.edition_url}</td><td class="layui-td-gray-2">是否强制更新</td>
+			<td>
+				{eq name="$detail.edition_force" value="0"}选项一{/eq}
+				{eq name="$detail.edition_force" value="1"}选项二{/eq}
+			</td>
+		</tr><tr><td class="layui-td-gray-2">整包升级</td>
+			<td>
+				{eq name="$detail.package_type" value="0"}选项一{/eq}
+				{eq name="$detail.package_type" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">是否发行</td>
+			<td>
+				{eq name="$detail.edition_issue" value="0"}选项一{/eq}
+				{eq name="$detail.edition_issue" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">版本号</td>
+			<td>{$detail.edition_number}</td>
+		</tr><tr><td class="layui-td-gray-2">牐本号名称</td>
+			<td>{$detail.edition_name}</td><td class="layui-td-gray-2">是否静默更新</td>
+			<td>
+				{eq name="$detail.edition_silence" value="0"}选项一{/eq}
+				{eq name="$detail.edition_silence" value="1"}选项二{/eq}
+			</td><td class="layui-td-gray-2">检查次数</td>
+			<td>{$detail.check_num}</td>
+		</tr><tr><td class="layui-td-gray-2">创建时间</td>
+			<td>{$detail.create_time|time_format=###,'Y-m-d'}</td><td class="layui-td-gray-2">更新时间</td>
+			<td>{$detail.update_time|time_format=###,'Y-m-d'}</td><td colspan='2'></td>
+		</tr>
+	</table>
+</div>
+{/block}
+<!-- /主体 -->

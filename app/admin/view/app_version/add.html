@@ -1,0 +1,110 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+	<h3 class="pb-3">新建版本</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td class="layui-td-gray-2">版本号<font>*</font></td>
+			<td><input type="text" name="edition_number"  lay-verify="required" lay-reqText="请完善版本号" value="" autocomplete="off" placeholder="请输入版本号" class="layui-input"></td>
+			<td class="layui-td-gray-2">牐本号名称</td>
+			<td><input type="text" name="edition_name"  value="" autocomplete="off" placeholder="请输入牐本号名称" class="layui-input"></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">包地址<font>*</font></td>
+			<td colspan="3">
+				<div class="layui-inline">
+					<div class="layui-input-inline layui-input-wrap" style="min-width: 450px;">
+						<input type="text" name="edition_url" id="edition_url" lay-verify="required" lay-reqText="请完善包文件" value="" autocomplete="off" placeholder="请上传包文件" class="layui-input">
+					</div>
+					<div class="layui-form-mid" style="padding: 0!important;float: right;margin-left:10px;"> 
+					  	<button type="button" class="layui-btn layui-bg-blue" id="attachment" lay-options="{accept: 'file'}"><i class="layui-icon layui-icon-upload"></i> 上传包文件</button>
+					</div>
+				</div>				
+			</td>			
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">是否强制更新</td>
+			<td>
+				<input type="radio" name="edition_force" value="0" title="否">
+				<input type="radio" name="edition_force" value="1" title="是" checked>
+			</td>
+			<td class="layui-td-gray-2">整包升级</td>
+			<td>
+				<input type="radio" name="package_type" value="0" title="是">
+				<input type="radio" name="package_type" value="1" title="否" checked>
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">是否发行</td>	
+			<td>
+				<input type="radio" name="edition_issue" value="0" title="否">
+				<input type="radio" name="edition_issue" value="1" title="是" checked>
+			</td>
+			<td class="layui-td-gray-2">是否静默更新</td>
+			<td>
+				<input type="radio" name="edition_silence" value="0" title="否" checked>
+				<input type="radio" name="edition_silence" value="1" title="是">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">平台</td>	
+			<td>
+				<input type="radio" name="platform" value="android|ios" title="Android和IOS" checked>
+				<input type="radio" name="platform" value="harmony" title="Harmony">
+			</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray" style="vertical-align:top;">描述</td>
+			<td colspan="3">
+				<textarea name="describe" placeholder="请输入描述，不能超过200个字，支持换行！" class="layui-textarea"></textarea>
+			</td>			
+		</tr>
+	</table>
+	<div class="pt-3">
+		<input type="hidden" name="id" value="0"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+
+		//上传包文件
+		var upload_attachment = layui.upload.render({
+			elem: '#attachment',
+			url: '{:url("api/upload")}',
+			accept: 'file',
+			done: function (res) {
+				//如果上传失败
+				if (res.code == 1) {
+					return layer.msg('上传失败');
+				}
+				//上传成功
+				$('#edition_url').attr('value', res.data.filepath);
+			}
+		});
+				
+		//监听提交
+		form.on('submit(webform)', function (data) {			
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					tool.sideClose(1000);
+				}
+			}
+			tool.post("{:url('app_version/add')}", data.field, callback);
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->
