@@ -15,7 +15,7 @@ class Category extends Model
   {
     $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
     $order = empty($param['order']) ? 'id desc' : $param['order'];
-    $list = self::where($where)->field('id,name,key,pid,ordernum,status,icons,create_user_id,update_user_id,create_time,update_time')->order($order)->paginate($rows, false, ['query' => $param]);
+    $list = self::where($where)->field('id,name,key,pid,ordernum,status,icons,remark,create_user_id,update_user_id,create_time,update_time')->order($order)->paginate($rows, false, ['query' => $param]);
     return $list;
   }
 

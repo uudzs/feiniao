@@ -10,7 +10,7 @@
 				<select name="pid" >
 					<option value="0">作为顶级分类</option>
 					{volist name=":set_recursion(get_book_cate())" id="v"}
-					<option value="{$v.id}" {eq name="$detail.id" value="$v.id" }selected{/eq}>{$v.title}</option>
+					<option value="{$v.id}" {eq name="$detail.pid" value="$v.id" }selected{/eq}>{$v.title}</option>
 					{/volist}
 				</select>
 			</td>
@@ -27,6 +27,10 @@
 				<input type="radio" name="status" value="0" title="禁止" {eq name="$detail.status" value="0"} checked{/eq}>
 				<input type="radio" name="status" value="1" title="正常" {eq name="$detail.status" value="1"} checked{/eq}>
 			</td><td colspan='2'></td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray-2">描述</td>
+			<td colspan="5"><input type="text" name="remark" value="{$detail.remark}" autocomplete="off" placeholder="请输入描述" class="layui-input"></td>
 		</tr>
 		<tr>
 			<td class="layui-td-gray-2">图标</td>

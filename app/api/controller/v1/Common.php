@@ -23,7 +23,7 @@ class Common extends BaseController
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => ['login', 'register', 'token', 'system', 'captcha']]
+        Auth::class => ['except' => ['login', 'register', 'token', 'captcha']]
     ];
 
     /**

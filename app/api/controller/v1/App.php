@@ -43,6 +43,7 @@ class App extends BaseController
         $version = Db::name('app_version')->where($where)->order('create_time asc')->find();
         if (!empty($version)) {
             Db::name('app_version')->where('id', $version['id'])->inc('check_num')->update();
+            $version['edition_url']=get_file($version['edition_url']);
         }
         $this->apiSuccess('请求成功', $version ?: []);
     }
