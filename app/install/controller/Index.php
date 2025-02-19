@@ -112,13 +112,13 @@ class Index
                 $sql = "CREATE DATABASE IF NOT EXISTS `{$dbName}` DEFAULT CHARACTER SET utf8mb4";
                 $link->query($sql);
             }
-            //选中数据库
-            $link->select_db($dbName);
         } catch (\Exception $e) {
             // 这是进行异常捕获,创建数据库并选中
-            return to_assign(1, '创建数据库失败:' . addslashes($e->getMessage()));
-            die;
+            $sql    = "CREATE DATABASE IF NOT EXISTS `{$dbName}` DEFAULT CHARACTER SET utf8mb4";
+            $link->query($sql);
         }
+        //选中数据库
+        $link->select_db($dbName);
         try {
             // 导入sql数据并创建表
             $fqcms_sql = file_get_contents(CMS_ROOT . '/app/install/data/install.sql');
