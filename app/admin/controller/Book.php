@@ -33,23 +33,51 @@ class Book extends BaseController
     {
         if (request()->isAjax()) {
             $param = get_params();
-            $where = [];
-            if (!empty($param['keywords'])) {
-                $where[] = ['title|author|style|ending|label|label_custom', 'like', '%' . $param['keywords'] . '%'];
-            }
-            if (!empty($param['subgenre'])) {
-                $where[] = ['subgenre', '=', $param['subgenre']];
-            }
-            if (!empty($param['cate_id'])) {
-                $where[] = ['genre|subgenre', '=', $param['cate_id']];
-            }
-            $param['order'] = 'id desc';
-            $list = $this->model->getBookList($where, $param);
-            $list = $list->toArray();
-            $starttime = strtotime(date('Y-m-01', strtotime('-1 month', time()))); // 获取上个月的第一天
-            $endtime = strtotime(date('Y-m-01', time())) - 1; // 获取上个月的最后一天
-            foreach ($list['data'] as $k => $v) {
-                $list['data'][$k]['lastmonthwords'] = Db::name('chapter')->where(['bookid' => $v['id'], 'status' => 1, ['verify', 'in', '0,1'], ['create_time', '>=', $starttime], ['create_time', '<=', $endtime]])->sum('wordnum');
+            if (get_addons_is_enable('caijipro') && !empty($param['coll_source_id'])) {
+                $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
+                $order = empty($param['order']) ? 'a.id desc' : $param['order'];
+                $where = ['c.rule_id' => $param['coll_source_id']];
+                if (!empty($param['keywords'])) {
+                    $where[] = ['a.title|a.author|a.style|a.ending|a.label|a.label_custom', 'like', '%' . $param['keywords'] . '%'];
+                }
+                if (!empty($param['subgenre'])) {
+                    $where[] = ['a.subgenre', '=', $param['subgenre']];
+                }
+                if (!empty($param['cate_id'])) {
+                    $where[] = ['a.genre|a.subgenre', '=', $param['cate_id']];
+                }
+                $list = $this->model->field('a.*,c.rule_id,c.bookid')
+                    ->alias('a')
+                    ->join('addons_caijipro_novel c', 'a.id = c.bookid')
+                    ->where($where)
+                    ->order($order)
+                    ->paginate($rows, false, ['query' => $param])
+                    ->each(function ($item, $key) {
+                        $item->cover = get_file($item->cover);
+                        $item->bigcatetitle = Db::name('category')->where(['id' => $item->genre])->value('name');
+                        $item->sellcatetitle = Db::name('category')->where(['id' => $item->subgenre])->value('name');
+                        if (!$item->editor) {
+                            if ($item->editorid) {
+                                $item->editor = Db::name('admin')->where(['id' => $item->editorid])->value('nickname');
+                            } else {
+                                $item->editor = '--';
+                            }
+                        }
+                    });
+                $list = $list->toArray();
+            } else {
+                $where = [];
+                if (!empty($param['keywords'])) {
+                    $where[] = ['title|author|style|ending|label|label_custom', 'like', '%' . $param['keywords'] . '%'];
+                }
+                if (!empty($param['subgenre'])) {
+                    $where[] = ['subgenre', '=', $param['subgenre']];
+                }
+                if (!empty($param['cate_id'])) {
+                    $where[] = ['genre|subgenre', '=', $param['cate_id']];
+                }
+                $list = $this->model->getBookList($where, $param);
+                $list = $list->toArray();
             }
             return table_assign(0, '', $list);
         } else {

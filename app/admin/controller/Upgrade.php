@@ -168,7 +168,15 @@ class Upgrade extends BaseController
                 $config_file = app()->getRootPath() . 'addons' . DIRECTORY_SEPARATOR . $addone['name'] . DIRECTORY_SEPARATOR . 'config.php';
                 foreach ($files as $key => $value) {
                     $destination =  str_replace('runtime' . DIRECTORY_SEPARATOR . 'upgrade', 'addons', $value);
-                    if (basename($value) == 'config.php' && is_file($config_file)) continue;
+                    if (basename($value) == 'config.php' && is_file($config_file)) {
+                        $new_config = include_once $value;
+                        $old_config = include_once $config_file;
+                        $config = array_merge($new_config, $old_config);
+                        if ($config) {
+                            file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';');                            
+                        }
+                        continue;
+                    }
                     if (basename($value) == 'info.ini' && is_file($file)) {
                         // 拼接要写入的数据
                         $str = '';

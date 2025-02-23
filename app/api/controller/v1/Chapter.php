@@ -76,7 +76,6 @@ class Chapter extends BaseController
         unset($chapter['info']);
         $bookid = $book['id'];
         $chapter_id = $id;
-        $today = date('Y-m-d'); // 当天日期
         $ip = request()->ip();
         if (!empty($uid)) {
             $member = Db::name('user')->where(array('id' => $uid))->find();
@@ -274,8 +273,30 @@ class Chapter extends BaseController
             $chapter['after_chapter'] = $after['id'];
             $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id']]));
         } else {
-            $chapter['after_chapter'] = 0;
-            $chapter['after_url'] = '';
+            if (get_addons_is_enable('caijipro')) {
+                try {
+                    $isNewChapter = hook('caijiproUpgradeHook', ['bookid' => $bookid]);
+                    if ($isNewChapter) {
+                        $after = Db::name('chapter')->field('id,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
+                        if (!empty($after)) {
+                            $chapter['after_chapter'] = $after['id'];
+                            $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id']]));
+                        } else {
+                            $chapter['after_chapter'] = 0;
+                            $chapter['after_url'] = '';
+                        }
+                    } else {
+                        $chapter['after_chapter'] = 0;
+                        $chapter['after_url'] = '';
+                    }
+                } catch (\Exception $e) {
+                    $chapter['after_chapter'] = 0;
+                    $chapter['after_url'] = '';
+                }
+            } else {
+                $chapter['after_chapter'] = 0;
+                $chapter['after_url'] = '';
+            }
         }
         $chapter['chaps'] = '第' . numConvertWord($chapter['chaps']) . '章';
         $total = Db::name('chapter')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->count();
@@ -295,6 +316,7 @@ class Chapter extends BaseController
             }
         }
         $chapter['fav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $book['id']])->count();
+        $today = date('Y-m-d'); // 当天日期
         $chapter['like'] = Db::name('like_log')->where(['user_id' => $uid, 'book_id' => $book['id'], 'chapter_id' => $chapter_id, 'like_date' => $today])->count();
         $chapter['create_time'] = time_format($chapter['create_time']);
         $result = [

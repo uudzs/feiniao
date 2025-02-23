@@ -57,9 +57,19 @@
 				{/volist}
 			</select>
 		</div>
+		{if get_addons_is_enable('caijipro')}
+			<div class="layui-input-inline">
+				<select name="coll_source_id">
+					<option value="">请选择采集源</option>
+					{volist name=":model('addons_caijipro_rule')->field('id,title')->where(['status' => 1])->order('id desc')->select()" id="vo"}
+					<option value="{$vo.id}">{$vo.title}</option>
+					{/volist}
+				</select>
+			</div>
+		{/if}
 		<div class="layui-input-inline" style="width:300px;">
 			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
-		</div>
+		</div>		
 		<div class="layui-input-inline">
 		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
 		</div>
@@ -111,10 +121,10 @@
 
 <script type="text/html" id="basicdata">
     <ul>
-      <li><strong>字数:</strong> {{= d.words ? d.words : '--' }} </li>
-      <li><strong>上月更新字数:</strong> {{= d.lastmonthwords ? d.lastmonthwords : '--' }} </li>
-      <li><strong>章节数:</strong> {{= d.chapters ? d.chapters : '--' }} </li>
-      <li><strong>自定义标签:</strong> {{= d.label_custom ? d.label_custom : '--' }} </li>
+      <li><strong>作品字数:</strong> {{= d.words ? d.words : '--' }} </li>
+      <li><strong>总章节数:</strong> {{= d.chapters ? d.chapters : '--' }} </li>
+      <li><strong>自定标签:</strong> {{= d.label_custom ? d.label_custom : '--' }} </li>
+      <li><strong>作品排序:</strong> {{= d.sort ? d.sort : '--' }} </li>
     </ul>
 </script>
 
@@ -163,7 +173,7 @@
 					event: 'uploadCover',
 					style:'cursor: pointer;',
 					templet:function(d) {
-						return d.cover ? '<img src="' + d.cover + '" width="80">' : '--';
+						return d.cover ? '<img src="' + d.cover + '" width="80" onerror="javascript:this.src=\'{__ASSETS__}/init/images/data-none.png\';this.onerror=null;">' : '--';
 					}
 				},{
 					field: 'none',
@@ -397,7 +407,8 @@
 			layui.pageTable.reload({
 				where: {
 					keywords: data.field.keywords,
-					cate_id: data.field.cate_id
+					cate_id: data.field.cate_id,
+					coll_source_id: data.field.coll_source_id
 				},
 				page: {
 					curr: 1
