@@ -326,6 +326,7 @@ class Book extends BaseController
                         $content = hook('caijiproChapterHook', ['chapterid' => $value['id']]);
                         if ($content && mb_strlen($content) > 0) {
                             list($wordnum, $content) = countWordsAndContent($content);
+                            $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
                             $novelContent .= $content;
                         }
                     }
@@ -336,10 +337,12 @@ class Book extends BaseController
                             $content = hook('caijiproChapterHook', ['chapterid' => $value['id']]);
                             if ($content && mb_strlen($content) > 0) {
                                 list($wordnum, $content) = countWordsAndContent($content);
+                                $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
                                 $novelContent .= $content;
                             }
                         }
                     } else {
+                        $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
                         $novelContent .= $content;
                     }
                 }
