@@ -122,6 +122,19 @@
                     </div>
                     <div class="layui-form-mid layui-text-em">对应导航组中的标识</div>
                 </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">作品详情页是否显示第一章内容</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.book_detail_first_chapter_isshow"}
+                            <input type="radio" name="book_detail_first_chapter_isshow" value="1" title="是">
+                            <input type="radio" name="book_detail_first_chapter_isshow" value="0" title="否" checked>
+                        {else/}
+                            <input type="radio" name="book_detail_first_chapter_isshow" value="1" title="是"{eq name="$config.book_detail_first_chapter_isshow" value="1"} checked{/eq}>
+                            <input type="radio" name="book_detail_first_chapter_isshow" value="0" title="否"{eq name="$config.book_detail_first_chapter_isshow" value="0"} checked{/eq}>
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">如不显示，则只显示作品简介。</div>
+                </div>
             </td>
         </tr>
         <tr>

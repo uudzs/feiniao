@@ -57,12 +57,14 @@
         }        
         $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
         $follow_count = model('follow')->where(['from_id' => $book['authorid']])->count();
-        $content = $title = '';
-        if($chapterlist && $chapterlist[0]) {
-            $chaptertable = calc_hash_db($book['id']); //章节内容表名
-            $title = $chapterlist[0]['title'];
-            $content = model($chaptertable)->where(['sid' => $chapterlist[0]['id']])->value('info');
-            list($cnt, $content) = countWordsAndContent($content);
+        if(isset($pageconf['book_detail_first_chapter_isshow']) && $pageconf['book_detail_first_chapter_isshow']) {
+            $content = $title = '';
+            if($chapterlist && $chapterlist[0]) {
+                $chaptertable = calc_hash_db($book['id']); //章节内容表名
+                $title = $chapterlist[0]['title'];
+                $content = model($chaptertable)->where(['sid' => $chapterlist[0]['id']])->value('info');
+                list($cnt, $content) = countWordsAndContent($content);
+            }
         }
         {/php}
         <div class="crumbs"><a href="{:url('/')}">首页</a>{notempty name="$genrename"}<a href="{$genrelink}">{$genrename}</a>{/notempty}{notempty name="$subgenrename"}<a href="{$subgenrelink}">{$subgenrename}</a>{/notempty}<h2>{$book.title}</h2></div>
@@ -139,9 +141,11 @@
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show remark">
                     <h2 class="ypc-column-name">书籍简介</h2>
-                    {$book.remark|raw}
-                    <h2 class="ypc-column-name">{$title}</h2>
-                    {$content|raw}                    
+                    {$book.remark|raw|default='无简介'}
+                    {if isset($pageconf['book_detail_first_chapter_isshow']) && $pageconf['book_detail_first_chapter_isshow']}
+                        <h2 class="ypc-column-name">{$title}</h2>
+                        {$content|raw}      
+                    {/if}              
                 </div>
                 <div class="layui-tab-item">
                     {notempty name="$new_chapter"}
@@ -305,6 +309,7 @@
                 bookinfo = result.data || [];
                 if(bookinfo) {
                     $('.book-info .creat-accout-btn').attr('href', bookinfo.chapter_url);
+                    if(parseInt(bookinfo.continueread) === 1) $('.book-info .creat-accout-btn').text(' 继续阅读 ');
                     if(bookinfo.fav.id > 0) {
                         $('.favorites').html('<i class="bi bi-hdd-stack"></i>取消');
                     }

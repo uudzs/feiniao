@@ -74,11 +74,13 @@ class Book extends BaseController
                 $detail['fav'] = '';
                 $detail['follow'] = '';
             }
+            $detail['continueread'] = 0;
             $detail['fav_count'] = Db::name('favorites')->where(['pid' => $detail['id']])->count();
             //查询是否有该书记录
             $reads = Db::name('readhistory')->field('IF(update_time = 0, create_time, update_time) AS order_time,id,update_time,create_time,title,chapter_id,book_id')->where($where)->order('order_time desc')->find();
             //查询是否有该章节记录
             if (!empty($reads)) {
+                $detail['continueread'] = 1;
                 $detail['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $reads['chapter_id']]);
             } else {
                 if ($first_chapter) {
