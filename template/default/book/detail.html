@@ -95,7 +95,7 @@
                 <div class="btn-box">
                     <a href="javascript:;" class="creat-accout-btn"> 立即阅读 </a>
                     <div class="btn-buttom favorites"><i class="bi bi-hdd-stack"></i>书架</div>
-                    <div class="btn-buttom"><i class="bi bi-cloud-arrow-down"></i>下载</div>
+                    <div class="btn-buttom txtdownload"><i class="bi bi-cloud-arrow-down"></i>下载</div>
                     <button class="ym-btn ym-btn-danger ym-btn-large mobile_watch">手机观看<div class="mobile_qrcode"></div></button>                    
                 </div>
             </section>
@@ -330,6 +330,14 @@
                 if(result.code == 0) {
                     if(text == '书架') $('.favorites').html('<i class="bi bi-hdd-stack"></i>取消');
                     if(text == '取消') $('.favorites').html('<i class="bi bi-hdd-stack"></i>书架');
+                }
+            });
+        })
+        $('.txtdownload').on('click', function () {
+            $.postApi("{:furl('v1/getdown', [], true, 'api')}", {"bookid": bookinfo.id, "type": 'txt'}, function(result) {
+                layer.msg(result.msg);
+                if(result.code == 0) {
+                    window.open(result.data.url);
                 }
             });
         })

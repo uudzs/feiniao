@@ -51,29 +51,44 @@ class Chapter extends BaseController
         if (intval($book['status']) != 1) {
             $this->apiError('作品被禁止');
         }
-        $book['cover'] = get_file($book['cover']);
-        $chapter['book'] = $book;
-        $chaptertable = calc_hash_db($book['id']); //章节内容表名
-        $chapter['info'] = Db::name($chaptertable)->where(['sid' => $chapter['id']])->value('info');
-        if (empty($chapter['info'])) {
-            if (get_addons_is_enable('caijipro')) {
-                $content = hook('caijiproChapterHook', ['chapterid' => $chapter['id']]);
-                if ($content && mb_strlen($content) > 0) {
-                    list($wordnum, $content) = countWordsAndContent($content, true);
-                    $chapter['info'] = $content;
-                    $chapter['wordnum'] = $wordnum;
+        $hide_content = false;
+        $power_config = get_system_config('power');
+        if (isset($power_config['login_read_open']) && intval($power_config['login_read_open']) == 1) {
+            $login_read_num = isset($power_config['login_read_num']) ? intval($power_config['login_read_num']) : 0;
+            if ($login_read_num > 0) {
+                $chaps = intval($chapter['chaps']);
+                if ($chaps > $login_read_num) {
+                    $hide_content = true;
                 }
             }
         }
-        if (!empty($chapter['info'])) {
-            $chapter['info'] = htmlspecialchars_decode($chapter['info']);
-            $replace = array("", "<br>", "<br>");
-            $search = array(" ", "\n", '\n');
-            $chapter['content'] = str_replace($search, $replace, $chapter['info']);
+        $book['cover'] = get_file($book['cover']);
+        $chapter['book'] = $book;
+        if (!$hide_content) {
+            $chaptertable = calc_hash_db($book['id']); //章节内容表名
+            $chapter['info'] = Db::name($chaptertable)->where(['sid' => $chapter['id']])->value('info');
+            if (empty($chapter['info'])) {
+                if (get_addons_is_enable('caijipro')) {
+                    $content = hook('caijiproChapterHook', ['chapterid' => $chapter['id']]);
+                    if ($content && mb_strlen($content) > 0) {
+                        list($wordnum, $content) = countWordsAndContent($content, true);
+                        $chapter['info'] = $content;
+                        $chapter['wordnum'] = $wordnum;
+                    }
+                }
+            }
+            if (!empty($chapter['info'])) {
+                $chapter['info'] = htmlspecialchars_decode($chapter['info']);
+                $replace = array("", "<br>", "<br>");
+                $search = array(" ", "\n", '\n');
+                $chapter['content'] = str_replace($search, $replace, $chapter['info']);
+            } else {
+                $chapter['content'] = '';
+            }
+            unset($chapter['info']);
         } else {
-            $chapter['content'] = '';
+            $chapter['content'] = '请登录后再阅读！';
         }
-        unset($chapter['info']);
         $bookid = $book['id'];
         $chapter_id = $id;
         $ip = request()->ip();
@@ -274,22 +289,17 @@ class Chapter extends BaseController
             $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id']]));
         } else {
             if (get_addons_is_enable('caijipro')) {
-                try {
-                    $isNewChapter = hook('caijiproUpgradeHook', ['bookid' => $bookid]);
-                    if ($isNewChapter) {
-                        $after = Db::name('chapter')->field('id,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
-                        if (!empty($after)) {
-                            $chapter['after_chapter'] = $after['id'];
-                            $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id']]));
-                        } else {
-                            $chapter['after_chapter'] = 0;
-                            $chapter['after_url'] = '';
-                        }
+                $isNewChapter = hook('caijiproUpgradeHook', ['bookid' => $bookid]);
+                if ($isNewChapter) {
+                    $after = Db::name('chapter')->field('id,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
+                    if (!empty($after)) {
+                        $chapter['after_chapter'] = $after['id'];
+                        $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id']]));
                     } else {
                         $chapter['after_chapter'] = 0;
                         $chapter['after_url'] = '';
                     }
-                } catch (\Exception $e) {
+                } else {
                     $chapter['after_chapter'] = 0;
                     $chapter['after_url'] = '';
                 }

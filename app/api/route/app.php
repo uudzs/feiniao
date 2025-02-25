@@ -13,6 +13,8 @@ Route::group('v1', function () {
     Route::rule('bigcate', 'api/v1.category/bigcate', 'GET|POST');
     Route::rule('smallcate', 'api/v1.category/smallcate', 'GET|POST');
     Route::rule('bookdetail', 'api/v1.book/detail', 'GET|POST');
+    Route::rule('getdown', 'api/v1.book/getdown', 'GET|POST');
+    Route::rule('download', 'api/v1.book/download', 'GET|POST');
     Route::rule('authordetail', 'api/v1.author/detail', 'GET|POST');
     Route::rule('booklist', 'api/v1.book/booklist', 'GET|POST');
     Route::rule('search', 'api/v1.search/index', 'GET|POST');

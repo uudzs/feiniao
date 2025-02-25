@@ -690,54 +690,59 @@ class User extends BaseController
         if (empty($user)) {
             $this->apiError('用户不存在');
         }
-        $where = ['user_id' => $uid];
         //最多可以载加多少页
+        if (!isset($param['page']) || empty($param['page'])) $param['page'] = 1;
         if (isset($param['page']) && intval($param['page']) > 10) {
             $param['page'] = 10;
         }
-        if (!isset($param['order']) || empty($param['order'])) {
-            $param['order'] = 'create_time DESC';
-        }
-        $list = (new Readhistory())->getReadhistoryBook($where, $param);
-        $list = $list->toArray();
-        $result = [];
-        if (!empty($list['data'])) {
-            foreach ($list['data'] as $k => $v) {
-                $book = Db::name('book')->where(['id' => $v['book_id']])->find();
-                if (empty($book)) {
-                    continue;
-                }
-                $authorurl = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $book['authorid']]));
-                $bookurl = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
-                $newread = Db::name('readhistory')->field('IF(update_time = 0, create_time, update_time) AS order_time,id,update_time,create_time,title,chapter_id,book_id')->where($where)->order('order_time desc')->find();
-                $chapterurl = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $newread['chapter_id']]));
-                $total = Db::name('chapter')->where(['bookid' => $v['book_id'], 'status' => 1, ['verify', 'in', '0,1']])->count();
-                $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $v['book_id']])->count();
-                if ($total == 0 || $reads < 0) {
-                    $speed = 0;
-                } else {
-                    $speed = round(($reads / $total) * 100, 2);
-                }
-                $result[$k] = $v;
-                $result[$k]['authorurl'] = $authorurl;
-                $result[$k]['bookurl'] = $bookurl;
-                $result[$k]['chapterurl'] = $chapterurl;
-                $result[$k]['speed'] = $speed;
-                $result[$k]['cover'] = get_file($book['cover']);
-                $result[$k]['booktitle'] = $book['title'];
-                $result[$k]['author'] = $book['author'];
-                $result[$k]['authorid'] = $book['authorid'];
-                $result[$k]['isfav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $v['book_id']])->count();
+        $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
+        $limit_start = ($param['page'] - 1) * $rows;
+        $limit_end = $param['page'] * $rows;
+        $list = Db::name('readhistory')->distinct(true)->field('book_id')->where(['user_id' => $uid])->select();
+        $modelname = \think\facade\App::initialize()->http->getName();
+        $result = $list->toArray();
+        foreach ($result as $k => $v) {
+            $book = Db::name('book')->field('author,title as booktitle,authorid,filename,cover,chapters')->where(['id' => $v['book_id']])->find();
+            if (empty($book)) {
+                unset($result[$k]);
+                continue;
             }
+            $v = Db::name('readhistory')->field('user_id,book_id,read_date,chapter_id,title,create_time,update_time,GREATEST(IFNULL(update_time, 0), create_time) AS max_time')->where(['user_id' => $uid, 'book_id' => $v['book_id']])->order('max_time desc')->find();
+            $v = array_merge($book, $v);
+            $result[$k] = $v;
+            $result[$k]['authorurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
+            $result[$k]['bookurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['book_id']]));
+            $result[$k]['chapterurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('chapter_detail', ['id' => $v['chapter_id']]));
+            $chapter = Db::name('chapter')->field('id')->where(['id' => $v['chapter_id']])->find();
+            //如果章节不存在，则删除阅读记录
+            if (empty($chapter)) {
+                Db::name('readhistory')->where(['chapter_id' => $v['chapter_id']])->delete();
+                unset($result[$k]);
+                continue;
+            }
+            if (intval($v['chapters']) <= 0) {
+                $total = Db::name('chapter')->where(['bookid' => $v['book_id'], 'status' => 1, ['verify', 'in', '0,1']])->count();
+            } else {
+                $total = $v['chapters'];
+            }
+            $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $v['book_id']])->group('book_id')->count();
+            if (intval($total) <= 0 || intval($reads) <= 0) {
+                $result[$k]['speed'] = 0;
+            } else {
+                $result[$k]['speed'] = round(($reads / $total) * 100, 2);
+            }
+            $result[$k]['isfav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $v['book_id']])->count();
+            $result[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
         }
+        // 先取出要排序的字段的值
+        $sort = array_column($result, 'create_time');
+        // 按照sort字段升序 其中SORT_ASC表示升序 SORT_DESC表示降序
+        array_multisort($sort, SORT_DESC, $result);
         $res = [
-            'data' => $result,
-            'total' => $list['total'],
-            'current_page' => $list['current_page'],
-            'last_page' => $list['last_page'],
-            'per_page' => $list['per_page']
+            'data' => array_slice($result, $limit_start, $limit_end),
+            'total' => count($result),
         ];
-        $this->apiSuccess('请求成功', $res);
+        $this->apiSuccess('请求成功', $res);       
     }
 
     /**

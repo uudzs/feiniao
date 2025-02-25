@@ -18,7 +18,7 @@ class Book extends BaseController
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => []]
+        Auth::class => ['except' => ['download']]
     ];
 
 
@@ -37,6 +37,9 @@ class Book extends BaseController
         $detail = Db::name('book')->where(['id' => $id])->find();
         $model_name = \think\facade\App::initialize()->http->getName();
         if ($detail) {
+            if (intval($detail['status']) != 1) {
+                $this->apiError('作品被禁止');
+            }
             $detail['bigclassname'] = Db::name('category')->where(['id' => $detail['genre']])->value('name');
             $detail['smallclassname'] = Db::name('category')->where(['id' => $detail['subgenre']])->value('name');
             $detail['bigclassname'] = $detail['bigclassname'] ?: '-';
@@ -257,5 +260,149 @@ class Book extends BaseController
             ];
         }
         $this->apiSuccess('请求成功', $result);
+    }
+
+    /**
+     * 获取下载
+     * Summary of getdown
+     * @return void
+     */
+    public function getdown()
+    {
+        $param = get_params();
+        $bookid = isset($param['bookid']) ? $param['bookid'] : 0;
+        $type = isset($param['type']) ? $param['type'] : 'txt';
+        if (empty($bookid)) {
+            $this->apiError('参数错误');
+        }
+        $uid = JWT_UID;
+        $power_config = get_system_config('power');
+        if (isset($power_config['txt_download_open']) && intval($power_config['txt_download_open']) == 1) {
+            $txt_download_islogin = isset($power_config['txt_download_islogin']) ? intval($power_config['txt_download_islogin']) : 0;
+            if ($txt_download_islogin == 1 && empty($uid)) {
+                $this->apiError('请先登录', [], 99);
+            }
+            $book = Db::name('book')->where(['id' => $bookid])->find();
+            if (empty($book)) {
+                $this->apiError('作品不存在');
+            }
+            if (intval($book['status']) != 1) {
+                $this->apiError('作品被禁止');
+            }
+            $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'down' . DIRECTORY_SEPARATOR . $book['id'] . DIRECTORY_SEPARATOR;
+            $path = app()->getRootPath() . $relativepath;
+            if (!createDirectory($path)) {
+                return to_assign(1, '创建' . $path . '目录失败');
+            }
+            $token = uuid('down_' . $book['id'] . '_' . $type . '_');
+            $down_path = get_cache($token);
+            if (!empty($down_path)) {
+                $this->apiSuccess('请求成功', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
+            }
+            $file = $path . $book['id'] . '.' . $type;
+            if (is_file($file)) {
+                $newChapter = Db::name('chapter')->field('IF(update_time = 0, create_time, update_time) AS order_time,create_time,update_time')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->order('order_time desc')->find();
+                if (!empty($newChapter)) {
+                    $file_time =  filectime($file);
+                    if ($file_time > intval($newChapter['order_time'])) {
+                        set_cache($token, $file, 60);
+                        $this->apiSuccess('请求成功', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
+                    }
+                }
+            }
+            $chaptertable = calc_hash_db($book['id']);
+            $chapters = Db::name('chapter')->field('id,title,chaps,wordnum')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
+            if (empty($chapters)) {
+                $this->apiError('章节为空');
+            }
+            $txt_download_num = isset($power_config['txt_download_num']) ? intval($power_config['txt_download_num']) : 0;
+            if ($txt_download_num > 0) {
+                $chapters = array_slice($chapters, 0, $txt_download_num);
+            }
+            $novelContent = '';
+            foreach ($chapters as $key => $value) {
+                if (intval($value['wordnum']) <= 0) {
+                    if (get_addons_is_enable('caijipro')) {
+                        $content = hook('caijiproChapterHook', ['chapterid' => $value['id']]);
+                        if ($content && mb_strlen($content) > 0) {
+                            list($wordnum, $content) = countWordsAndContent($content);
+                            $novelContent .= $content;
+                        }
+                    }
+                } else {
+                    $content = Db::name($chaptertable)->where(['sid' => $value['id']])->value('info');
+                    if (empty($content)) {
+                        if (get_addons_is_enable('caijipro')) {
+                            $content = hook('caijiproChapterHook', ['chapterid' => $value['id']]);
+                            if ($content && mb_strlen($content) > 0) {
+                                list($wordnum, $content) = countWordsAndContent($content);
+                                $novelContent .= $content;
+                            }
+                        }
+                    } else {
+                        $novelContent .= $content;
+                    }
+                }
+            }
+            try {
+                $stream = fopen($file, "w");
+                if ($stream === false) {
+                    $this->apiError('生成文件失败');
+                }
+                fwrite($stream, $novelContent); // 写入内容
+                fclose($stream); // 关闭文件
+            } catch (\Exception $e) {
+                $this->apiError('生成文件失败');
+            }
+            if (!is_file($file)) {
+                $this->apiError('生成文件失败');
+            }
+            set_cache($token, $file, 60);
+            $this->apiSuccess('请求成功', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
+        } else {
+            $this->apiError('禁止下载');
+        }
+    }
+
+    public function download()
+    {
+        $param = get_params();
+        $token = isset($param['token']) ? $param['token'] : '';
+        if (empty($token)) {
+            $this->apiError('参数错误');
+        }
+        list($action, $bookid, $type) = explode('_', $token);
+        if (empty($bookid)) {
+            $this->apiError('token错误');
+        }
+        if (empty($type)) {
+            $this->apiError('token错误');
+        }
+        $book = Db::name('book')->where(['id' => $bookid])->find();
+        if (empty($book)) {
+            $this->apiError('作品不存在');
+        }
+        if (intval($book['status']) != 1) {
+            $this->apiError('作品被禁止');
+        }
+        $down_path = get_cache($token);
+        if (empty($down_path)) {
+            $this->apiError('参数错误');
+        }
+        if (!is_file($down_path)) {
+            $this->apiError('下载文件不存在');
+        }
+        if ($type == 'txt') {
+            $filename = $book['title'] . '.txt';
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize($down_path));
+            readfile($down_path);
+            exit;
+        }
     }
 }

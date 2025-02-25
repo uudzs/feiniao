@@ -83,11 +83,11 @@ $(window).on('load', function () {
                         $('.readlog').html('');
                         $.each(data, function(key, el) {
                             var html =`<li>
-                                            <a href="${el.chapterurl}" target="_blank" alt="${el.title}" title="${el.title}">
+                                            <a href="${el.bookurl}" target="_blank" alt="${el.title}" title="${el.title}">
                                                 <img src="${el.cover}">
                                             </a>
                                             <p>
-                                                <a href="${el.bookurl}" target="_blank"><span class="bookName">${el.title}</span></a>
+                                                <a href="${el.chapterurl}" target="_blank"><span class="bookName">${el.title}</span></a>
                                                 <span class="bookStatus">
                                                     <b class="authorSt">
                                                         <em>《${el.booktitle}》</em>

@@ -1,0 +1,103 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<style>
+    .layui-form-label {
+        width: 150px;
+    }
+</style>
+<form class="layui-form p-4">
+	<h3 class="pb-3">权限设置</h3>
+    <div class="py-3">
+        <div class="layui-card">
+            <div class="layui-card-header">阅读设置</div>
+            <div class="layui-card-body">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否开启登录阅读</label>
+                        <div class="layui-input-block">
+                            {empty name="$config.login_read_open"}
+                                <input type="radio" name="login_read_open" value="1" title="是">
+                                <input type="radio" name="login_read_open" value="0" title="否" checked>
+                            {else/}
+                                <input type="radio" name="login_read_open" value="1" title="是"{eq name="$config.login_read_open" value="1"} checked{/eq}>
+                                <input type="radio" name="login_read_open" value="0" title="否"{eq name="$config.login_read_open" value="0"} checked{/eq}>
+                            {/empty}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">前多少章不需要登录</label>
+                        <div class="layui-input-inline layui-input-wrap">
+                          <input type="text" name="login_read_num" value="{$config.login_read_num|default='0'}" placeholder="请填写章节数" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-text-em">开启登录阅读后此项才会生效，为0或空则表示所有章节都需要登录后才能阅读。</div>
+                    </div>
+                </div>                
+            </div>
+            <hr>
+            <div class="layui-card-header">下载设置</div>
+            <div class="layui-card-body">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否开启TXT下载</label>
+                        <div class="layui-input-block">
+                            {empty name="$config.txt_download_open"}
+                                <input type="radio" name="txt_download_open" value="1" title="是">
+                                <input type="radio" name="txt_download_open" value="0" title="否" checked>
+                            {else/}
+                                <input type="radio" name="txt_download_open" value="1" title="是"{eq name="$config.txt_download_open" value="1"} checked{/eq}>
+                                <input type="radio" name="txt_download_open" value="0" title="否"{eq name="$config.txt_download_open" value="0"} checked{/eq}>
+                            {/empty}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">最多可下载章节数</label>
+                        <div class="layui-input-inline layui-input-wrap">
+                          <input type="text" name="txt_download_num" value="{$config.txt_download_num|default='0'}" placeholder="请填写章节数" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-text-em">开启TXT下载后此项才会生效，为0或空则表示下载所有章节。</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">下载是否必须登录</label>
+                        <div class="layui-input-block">
+                            {empty name="$config.txt_download_islogin"}
+                                <input type="radio" name="txt_download_islogin" value="1" title="是" checked>
+                                <input type="radio" name="txt_download_islogin" value="0" title="否">
+                            {else/}
+                                <input type="radio" name="txt_download_islogin" value="1" title="是"{eq name="$config.txt_download_islogin" value="1"} checked{/eq}>
+                                <input type="radio" name="txt_download_islogin" value="0" title="否"{eq name="$config.txt_download_islogin" value="0"} checked{/eq}>
+                            {/empty}
+                        </div>
+                    </div>
+                </div>                
+            </div>
+        </div>
+        <input type="hidden" name="id" value="{$id}">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;      
+		//监听提交
+		form.on('submit(webform)', function (data) {
+			let callback = function (e) {
+				layer.msg(e.msg);
+				if (e.code == 0) {
+					parent.layui.tool.close(1000);
+				}
+			}
+			tool.post("{:url('conf/edit')}", data.field, callback);
+			return false;
+		});		
+	}
+</script>
+{/block}
+<!-- /脚本 -->
