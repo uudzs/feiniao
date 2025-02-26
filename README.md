@@ -3,8 +3,9 @@
 
 ### 相关链接
 - 项目会不定时进行更新。
-- 演示地址：https://feiniao.paheng.net
-- 文档地址：[https://www.paheng.com/forum-2-1.html](https://www.paheng.com/forum-2-1.html)
+- 官方地址：https://feiniao.paheng.net
+- 使用手册：[https://feiniao.paheng.net/frontend/list](https://feiniao.paheng.net/frontend/list)
+- 交流社区：[https://www.paheng.com/forum-2-1.html](https://www.paheng.com/forum-2-1.html)
 - 开发交流QQ3群：177260545
 
 ### 系统介绍

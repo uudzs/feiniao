@@ -55,11 +55,13 @@ class Chapter extends BaseController
         $power_config = get_system_config('power');
         if (isset($power_config['login_read_open']) && intval($power_config['login_read_open']) == 1) {
             $login_read_num = isset($power_config['login_read_num']) ? intval($power_config['login_read_num']) : 0;
-            if ($login_read_num > 0) {
+            if (!$uid && $login_read_num > 0) {
                 $chaps = intval($chapter['chaps']);
                 if ($chaps > $login_read_num) {
                     $hide_content = true;
                 }
+            } else if (!$uid && $login_read_num <= 0) {
+                $hide_content = true;
             }
         }
         $book['cover'] = get_file($book['cover']);

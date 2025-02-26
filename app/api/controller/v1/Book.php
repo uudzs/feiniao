@@ -318,6 +318,8 @@ class Book extends BaseController
                 $this->apiError('章节为空');
             }
             $txt_download_num = isset($power_config['txt_download_num']) ? intval($power_config['txt_download_num']) : 0;
+            $txt_download_promotion_type = isset($power_config['txt_download_promotion_type']) ? intval($power_config['txt_download_promotion_type']) : 0;
+            $txt_download_promotion_content = isset($power_config['txt_download_promotion_content']) ? intval($power_config['txt_download_promotion_content']) : '';
             if ($txt_download_num > 0) {
                 $chapters = array_slice($chapters, 0, $txt_download_num);
             }
@@ -346,6 +348,24 @@ class Book extends BaseController
                     } else {
                         $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
                         $novelContent .= $content;
+                    }
+                }
+                if (mb_strlen($txt_download_promotion_content) > 0 && $txt_download_promotion_type > 0) {
+                    //头部添加
+                    if ($txt_download_promotion_type == 1 && $key == 0) {
+                        $novelContent = $txt_download_promotion_content . "\r\n\r\n" . $novelContent;
+                        //尾部添加
+                    } else if ($txt_download_promotion_type == 2 && (count($chapters) - 1) == $key) {
+                        $novelContent .= "\r\n\r\n" . $txt_download_promotion_content;
+                        //头尾添加
+                    } else if ($txt_download_promotion_type == 3 && $key == 0) {
+                        $novelContent = $txt_download_promotion_content . "\r\n\r\n" . $novelContent;
+                        //头尾添加
+                    } else if ($txt_download_promotion_type == 3 && (count($chapters) - 1) == $key) {
+                        $novelContent .= "\r\n\r\n" . $txt_download_promotion_content;
+                        //每章添加
+                    } else if ($txt_download_promotion_type == 4) {
+                        $novelContent .= "\r\n\r\n" . $txt_download_promotion_content;
                     }
                 }
             }

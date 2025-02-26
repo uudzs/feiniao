@@ -5,6 +5,9 @@
     .layui-form-label {
         width: 150px;
     }
+    .layui-input-block {
+        margin-left: 170px;
+    }
 </style>
 <form class="layui-form p-4">
 	<h3 class="pb-3">权限设置</h3>
@@ -67,6 +70,30 @@
                                 <input type="radio" name="txt_download_islogin" value="1" title="是"{eq name="$config.txt_download_islogin" value="1"} checked{/eq}>
                                 <input type="radio" name="txt_download_islogin" value="0" title="否"{eq name="$config.txt_download_islogin" value="0"} checked{/eq}>
                             {/empty}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">推广内容添加方式</label>
+                        <div class="layui-input-block">
+                            {empty name="$config.txt_download_promotion_type"}
+                                <input type="radio" name="txt_download_promotion_type" value="0" title="不添加" checked>
+                                <input type="radio" name="txt_download_promotion_type" value="1" title="头部添加">
+                                <input type="radio" name="txt_download_promotion_type" value="2" title="尾部添加">
+                                <input type="radio" name="txt_download_promotion_type" value="3" title="头尾添加">
+                                <input type="radio" name="txt_download_promotion_type" value="4" title="每章添加">
+                            {else/}
+                                <input type="radio" name="txt_download_promotion_type" value="0" title="不添加"{eq name="$config.txt_download_promotion_type" value="0"} checked{/eq}>
+                                <input type="radio" name="txt_download_promotion_type" value="1" title="头部添加"{eq name="$config.txt_download_promotion_type" value="1"} checked{/eq}>
+                                <input type="radio" name="txt_download_promotion_type" value="2" title="尾部添加"{eq name="$config.txt_download_promotion_type" value="2"} checked{/eq}>
+                                <input type="radio" name="txt_download_promotion_type" value="3" title="头尾添加"{eq name="$config.txt_download_promotion_type" value="3"} checked{/eq}>
+                                <input type="radio" name="txt_download_promotion_type" value="4" title="每章添加"{eq name="$config.txt_download_promotion_type" value="4"} checked{/eq}>
+                            {/empty}
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">推广内容</label>
+                        <div class="layui-input-block">
+                            <textarea placeholder="支持换行与空格，和种特殊字符，不支持html标签。" name="txt_download_promotion_content" class="layui-textarea">{$config.txt_download_promotion_content|default=''}</textarea>
                         </div>
                     </div>
                 </div>                
