@@ -10,6 +10,9 @@ use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
 
+set_time_limit(0);
+ini_set('memory_limit', '-1');
+
 class Book extends BaseController
 {
 
@@ -282,7 +285,7 @@ class Book extends BaseController
         if (isset($power_config['txt_download_open']) && intval($power_config['txt_download_open']) == 1) {
             $txt_download_islogin = isset($power_config['txt_download_islogin']) ? intval($power_config['txt_download_islogin']) : 0;
             if ($txt_download_islogin == 1 && empty($uid)) {
-                $this->apiError('请先登录', [], 99);
+                $this->apiError('请先登录');
             }
             $book = Db::name('book')->where(['id' => $bookid])->find();
             if (empty($book)) {
@@ -319,7 +322,7 @@ class Book extends BaseController
             }
             $txt_download_num = isset($power_config['txt_download_num']) ? intval($power_config['txt_download_num']) : 0;
             $txt_download_promotion_type = isset($power_config['txt_download_promotion_type']) ? intval($power_config['txt_download_promotion_type']) : 0;
-            $txt_download_promotion_content = isset($power_config['txt_download_promotion_content']) ? intval($power_config['txt_download_promotion_content']) : '';
+            $txt_download_promotion_content = isset($power_config['txt_download_promotion_content']) ? trim($power_config['txt_download_promotion_content']) : '';
             if ($txt_download_num > 0) {
                 $chapters = array_slice($chapters, 0, $txt_download_num);
             }

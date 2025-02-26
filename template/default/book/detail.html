@@ -97,7 +97,9 @@
                 <div class="btn-box">
                     <a href="javascript:;" class="creat-accout-btn"> 立即阅读 </a>
                     <div class="btn-buttom favorites"><i class="bi bi-hdd-stack"></i>书架</div>
+                    {eq name=":get_system_config('power','txt_download_open')" value="1"}                  
                     <div class="btn-buttom txtdownload"><i class="bi bi-cloud-arrow-down"></i>下载</div>
+                    {/eq}
                     <button class="ym-btn ym-btn-danger ym-btn-large mobile_watch">手机观看<div class="mobile_qrcode"></div></button>                    
                 </div>
             </section>
@@ -338,14 +340,18 @@
                 }
             });
         })
+        {eq name=":get_system_config('power','txt_download_open')" value="1"}
         $('.txtdownload').on('click', function () {
+            let layerIndex = layer.load();
             $.postApi("{:furl('v1/getdown', [], true, 'api')}", {"bookid": bookinfo.id, "type": 'txt'}, function(result) {
+                layer.close(layerIndex);
                 layer.msg(result.msg);
                 if(result.code == 0) {
                     window.open(result.data.url);
                 }
             });
         })
+        {/eq}
         $('.header-login').on('click', function () {
             layer.msg('ddd');
             $('.changyan-overlay-outer .phone-login .login-btn').html('登录');
