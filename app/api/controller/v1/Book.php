@@ -377,6 +377,7 @@ class Book extends BaseController
                 if ($stream === false) {
                     $this->apiError('生成文件失败');
                 }
+                fwrite($stream, "\xEF\xBB\xBF"); // UTF-8 BOM
                 fwrite($stream, $novelContent); // 写入内容
                 fclose($stream); // 关闭文件
             } catch (\Exception $e) {
