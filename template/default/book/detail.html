@@ -8,6 +8,20 @@
 {block name="keywords"}
 <meta name="keywords" content="{:get_seo_str('book','book_keywords','',['bookid'=>$bid])}"/>
 <meta name="description" content="{:get_seo_str('book','book_description','',['bookid'=>$bid])}"/>
+<meta property="og:type" content="novel"/>
+<meta property="og:title" content="{$book.title|default=''}"/>
+<meta property="og:description" content="{$book.remark|default=''}"/>
+<meta property="og:image" content="{$book.cover|default=''}"/>
+<meta property="og:novel:category" content="{$book.bigclassname|default=''}"/>
+<meta property="og:novel:author" content="{$book.author|default=''}"/>
+<meta property="og:novel:book_name" content="{$book.title|default=''}"/>
+<meta property="og:novel:read_url" content="{$book.first_chapter_url|default=''}"/>
+<meta property="og:novel:read_chapter_title" content="{$book.first_chapter_title|default=''}"/>
+<meta property="og:novel:author_link" content="{$book.authorurl|default=''}"/>
+<meta property="og:novel:status" content="{$book.isfinish == 2 ? '完结' : '连载'}"/>
+<meta property="og:novel:update_time" content="{$book.update_time|default=''}"/>
+<meta property="og:novel:latest_chapter_name" content="{$book.chapter_title|default=''}"/>
+<meta property="og:novel:latest_chapter_url" content="{$book.chapter_url|default=''}"/>
 {/block}
 <!-- 主体 -->
 {block name="body"}
