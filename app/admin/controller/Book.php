@@ -11,6 +11,7 @@ use think\exception\ValidateException;
 use think\facade\Db;
 use think\facade\View;
 use Overtrue\Pinyin\Pinyin;
+use think\facade\Config;
 
 class Book extends BaseController
 {
@@ -362,7 +363,6 @@ class Book extends BaseController
                 $path = get_config('filesystem.disks.public.url');
                 $realPath = CMS_ROOT . "public" . $path . '/' . $filename;
                 $chapter = [];
-                $data_link = [];
                 $str = $title = $author = $genre = '';
                 $big_cate_id = 0; //大类
                 try {
@@ -478,9 +478,6 @@ class Book extends BaseController
                             'status' => 1,
                         );
                         $authorid = Db::name('author')->strict(false)->field(true)->insertGetId($data);
-                        if ($authorid !== false) {
-                            $data_link[] = furl('author_detail', ['id' => $authorid], true, 'home');
-                        }
                     } else {
                         $authorid = $user['id'];
                         $author = $user['nickname'];
@@ -500,9 +497,6 @@ class Book extends BaseController
                             'create_time' => time(),
                         ];
                         $bookid = Db::name('book')->strict(false)->field(true)->insertGetId($bookdata);
-                        if ($bookid !== false) {
-                            $data_link[] = furl('book_detail', ['id' => $bookdata['filename'] ? $bookdata['filename'] : $bookid], true, 'home');
-                        }
                     } else {
                         $bookid = $book['id'];
                     }
@@ -529,7 +523,6 @@ class Book extends BaseController
                         ];
                         $sid = Db::name('chapter')->strict(false)->field(true)->insertGetId($data);
                         if ($sid !== false) {
-                            $data_link[] = furl('chapter_detail', ['id' => $sid], true, 'home');
                             Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $sid, 'info' => $content]);
                             $success++;
                         } else {
@@ -542,9 +535,6 @@ class Book extends BaseController
                     $booksave['chapters'] = Db::name('chapter')->where(array('bookid' => $bookid, ['verify', 'in', '0,1']))->count();
                     $booksave['update_time'] = time();
                     $res = Db::name('book')->where(['id' => $bookid])->strict(false)->field(true)->update($booksave);
-                    if (get_addons_is_enable('baidupush') && $data_link) {
-                        hook('baiduPushHook', ['type' => 'add', 'data' => $data_link]);
-                    }
                     return to_assign(0, '导入成功' . $success . '章，跳过重复章节' . $skip . '章。');
                 } else {
                     return to_assign(1, '未识别到章节');
@@ -601,6 +591,7 @@ class Book extends BaseController
                         Db::name($chaptertable)->where(['sid' => $v['id']])->delete();
                     }
                     Db::name('book')->where(['id' => $book['id']])->delete(); //作品
+                    $this->syncdelcaiji($book['id']);
                     $i++;
                 }
             }
@@ -619,8 +610,22 @@ class Book extends BaseController
                 Db::name($chaptertable)->where(['sid' => $v['id']])->delete();
             }
             Db::name('book')->where(['id' => $book['id']])->delete(); //作品
+            $this->syncdelcaiji($book['id']);
             $i++;
         }
         return to_assign(0, '删除' . $i . '个作品！');
+    }
+
+    public function syncdelcaiji($bookid)
+    {
+        if (!$bookid) return false;
+        try {
+            Db::name('addons_caijipro_novel')->where(['bookid' => $bookid])->delete();
+            Db::name('addons_caijipro_chapter')->where(['bookid' => $bookid])->delete();
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+        return false;
     }
 }

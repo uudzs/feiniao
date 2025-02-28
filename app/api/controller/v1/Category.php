@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
@@ -24,13 +26,8 @@ class Category extends BaseController
      */
     public function bigcate()
     {
-        $param = get_params();
         $list = Db::name('category')->where(['status' => 1, 'pid' => 0])->order('ordernum asc')->select()->toArray();
-        if (isset($param['return']) && $param['return'] == 'fetch') {
-            return View::fetch('', ['list' => $list]);
-        } else {
-            $this->apiSuccess('success', $list);
-        }
+        $this->apiSuccess('success', $list);
     }
 
     /**

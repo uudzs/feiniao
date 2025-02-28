@@ -33,7 +33,7 @@
         <priority>0.9</priority>
     </url>
     {/volist}
-    {volist name=":model('book')->field('id,filename,title,update_time,create_time')->where(['status' => 1, ['chapters', '>', 0]])->order('update_time desc')->limit(500)->select()" id="v"}
+    {volist name=":model('book')->field('id,filename,update_time,create_time')->where(['status' => 1])->order('create_time desc')->select()" id="v"}
 <url>
         <loc>{:url('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']], 'html', true)}</loc>
         <lastmod>{:time_format($v['update_time'] ? $v['update_time'] : $v['create_time'], 'Y-m-d')}</lastmod>

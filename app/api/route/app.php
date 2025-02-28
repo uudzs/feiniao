@@ -59,6 +59,9 @@ Route::group('v1', function () {
     Route::rule('system', 'api/v1.common/system', 'GET|POST');
     Route::rule('appupgrade', 'api/v1.app/upgrade', 'GET|POST');
     Route::rule('pages', 'api/v1.common/pages', 'GET|POST');
+    Route::rule('caijicategory', 'api/v1.caiji/category', 'GET|POST');
+    Route::rule('caijibook', 'api/v1.caiji/book', 'GET|POST');
+    Route::rule('caijichapter', 'api/v1.caiji/chapter', 'GET|POST');
 });
 Route::rule('book-:id', 'book/detail', 'GET|POST')->name('book_detail');
 Route::rule('author-:id', 'author/detail', 'GET|POST')->name('author_detail');

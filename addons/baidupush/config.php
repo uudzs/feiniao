@@ -13,5 +13,5 @@ return array(
         'type' => 'string',
         'value' => '',
         'tips' => '百度官方获取',
-    ),
+    )
 );

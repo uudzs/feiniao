@@ -1180,6 +1180,7 @@ if (!function_exists('add_coin_log')) {
 if (!function_exists('isWeChat')) {
     function isWeChat()
     {
+        if (!isset($_SERVER['HTTP_USER_AGENT'])) return false;
         return strpos($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger') !== false;
     }
 }

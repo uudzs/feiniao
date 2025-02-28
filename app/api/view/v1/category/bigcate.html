@@ -1,5 +1,23 @@
+{php}
+function set_recursion($result, $pid = 0, $level = -1)
+{
+    static $list = array();
+    static $space = ['', '├─', '§§├─', '§§§§├─', '§§§§§§├─'];
+    $level++;
+    foreach ($result as $k => $v) {
+        if ($v['pid'] == $pid) {
+            if ($pid != 0) {
+                $v['title'] = $space[$level] . $v['title'];
+            }
+            $list[] = $v;
+            set_recursion($result, $v['id'], $level);
+        }
+    }
+    return $list;
+}
+{/php}
 <select name="catid">
-    {volist name="list" id="v"}
-    <option value="{$v.id}">{$v.name}</option>
+    {volist name=":set_recursion(model('category')->field('id,name as title,pid')->where(['status' => 1])->order('ordernum asc')->select()->toArray())" id="v"}
+    <option value="{$v.id}">{$v.title}</option>
     {/volist}
 </select>
