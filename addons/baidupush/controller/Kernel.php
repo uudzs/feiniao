@@ -54,7 +54,7 @@ class Kernel
                 unset($param['keywords']);
             }
             $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
-            $order = empty($param['order']) ? 'id desc' : $param['order'];
+            $order = empty($param['order']) ? 'dateymd desc' : $param['order'];
             $list = Db::name('addons_baidupush')->where($where)->order($order)->paginate($rows, false, ['query' => $param]);
             return table_assign(0, '', $list);
         }
