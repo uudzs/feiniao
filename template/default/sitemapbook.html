@@ -3,7 +3,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     {volist name="list" id="v"}
 <url>
-        <loc>{:url('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']], 'html', true)}</loc>
+        <loc>{:furl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']], true, 'home')}</loc>
         <lastmod>{:time_format(time(), 'Y-m-d')}</lastmod>
         <changefreq>hourly</changefreq>
         <priority>0.9</priority>

@@ -11,6 +11,7 @@ use ZipArchive;
 use think\facade\Config;
 use app\admin\validate\LoginValidate;
 use think\exception\ValidateException;
+use think\facade\Request;
 
 set_time_limit(0);
 ini_set('memory_limit', '256M');
@@ -173,7 +174,7 @@ class Upgrade extends BaseController
                         $old_config = include_once $config_file;
                         $config = array_merge($new_config, $old_config);
                         if ($config) {
-                            file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';');                            
+                            file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';');
                         }
                         continue;
                     }
@@ -276,7 +277,7 @@ class Upgrade extends BaseController
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
-            $header = 'token:' . $token;
+            $header = ['token:' . $token, "X-Forwarded-Host:" . Request::domain()];
             $content = Http::doGet($url, 60, $header);
             if (empty($content)) return to_assign(1, '获取信息失败');
             $result = json_decode($content, true);
@@ -310,7 +311,7 @@ class Upgrade extends BaseController
             $plugin = array_column($list, null, 'name');
             if (isset($plugin[$name]) && $plugin[$name]) return to_assign(1, '已经安装过此插件了');
             $url = get_config('upgrade.official_api_url') . 'pluginupgrade' . '/' . $name;
-            $header = 'token:' . $token;
+            $header = ['token:' . $token, "X-Forwarded-Host:" . Request::domain()];
             $content = Http::doGet($url, 60, $header);
             if (empty($content)) return to_assign(1, '获取信息失败');
             $result = json_decode($content, true);
@@ -677,7 +678,7 @@ class Http
     {
         $header = "User-Agent:Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36\r\n";
         $header .= "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n";
-        $header .= "Accept-Language:zh-CN,zh;q=0.9\r\n";
+        $header .= "X-Forwarded-Host:" . Request::domain() . "\r\n";
         return $header;
     }
 

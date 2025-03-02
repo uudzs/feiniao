@@ -1498,41 +1498,50 @@ if (!function_exists('furl')) {
      * @param string      $url    路由地址
      * @param array       $vars   变量
      * @param bool|string $suffix 生成的URL后缀
-     * @param bool|string $domain 域名
+     * @param bool|string $model 模块
      * @return UrlBuild
      */
-    function furl(string $url = '', array $vars = [], $suffix = true, $domain = false)
+    function furl(string $url = '', array $vars = [], $suffix = true, $model = 'home')
     {
 
-        if ($domain != false) {
+        if ($model) {
             $domain_bind = get_config('app.domain_bind');
             if ($domain_bind) {
                 $domain_bind = $domain_bind ? array_flip($domain_bind) : [];
-                if (isset($domain_bind[$domain]) && $domain_bind[$domain]) {
-                    if ($domain_bind[$domain] == '*') {
+                if (isset($domain_bind[$model]) && $domain_bind[$model]) {
+                    if ($domain_bind[$model] == '*') {
                         $home_domain = get_config('app.home_domain');
                         return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($home_domain ? $home_domain : true);
                     } else {
-                        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain_bind[$domain]);
+                        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain_bind[$model] ? $domain_bind[$model] : true);
                     }
                 } else {
                     return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(true);
                 }
             } else {
-                $rurl = (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(false);
-                if (strpos($rurl, (string) $domain) !== false) {
-                    return $rurl;
+                $rurl = url($url, $vars, $suffix, true);
+                $parse = parse_url($rurl);
+                if ($parse) {
+                    if (isset($parse['path']) && $parse['path']) {
+                        if ($parse['path'] == '/' || strpos($parse['path'], $model) !== false) {
+                            return $rurl;
+                        } else {
+                            if ($model == 'api') {
+                                $fChar = substr($url, 0, 1);
+                                if ($fChar != '/') {
+                                    $url = '/' . $url;
+                                }
+                                $url = '/' . $model . $url;
+                                return url($url, $vars, $suffix, true);
+                            }
+                            return (isset($parse['scheme']) ? $parse['scheme'] : 'http') . '://' . (isset($parse['host']) ? $parse['host'] : '') . (isset($parse['port']) ? $parse['port'] : '') . '/' . $model . (isset($parse['path']) ? $parse['path'] : '') . (isset($parse['query']) ? ('?' . $parse['query']) : '');
+                        }
+                    }
                 }
-                $fChar = substr($url, 0, 1);
-                if ($fChar != '/') {
-                    $url = '/' . $url;
-                }
-                $url = '/' . $domain . $url;
-                $domain = true;
-                return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain);
+                return $rurl;
             }
         }
-        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(false);
+        return url($url, $vars, $suffix, false);
     }
 }
 if (!function_exists('get_addons_is_enable')) {

@@ -2,32 +2,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>{:url('/', [], '', true)}</loc>
+        <loc>{:furl('/', [], true, 'home')}</loc>
         <lastmod>{:time_format(time(), 'Y-m-d')}</lastmod>
         <changefreq>hourly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>{:url('shuku', [], 'html', true)}</loc>
+        <loc>{:furl('shuku', [], true, 'home')}</loc>
         <lastmod>{:time_format(time(), 'Y-m-d')}</lastmod>
         <changefreq>hourly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>{:url('rank', [], 'html', true)}</loc>
+        <loc>{:furl('rank', [], true, 'home')}</loc>
         <lastmod>{:time_format(time(), 'Y-m-d')}</lastmod>
         <changefreq>hourly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>{:url('quanben', [], 'html', true)}</loc>
+        <loc>{:furl('quanben', [], true, 'home')}</loc>
         <lastmod>{:time_format(time(), 'Y-m-d')}</lastmod>
         <changefreq>hourly</changefreq>
         <priority>0.9</priority>
     </url>
     {volist name=":model('category')->field('id,key')->where(['status' => 1,'pid' => 0])->order('ordernum asc')->select()" id="vo"}
 <url>
-        <loc>{:url('book_cates', ['id' => $vo['key'] ? $vo['key'] : $vo['id']], 'html', true)}</loc>
+        <loc>{:furl('book_cates', ['id' => $vo['key'] ? $vo['key'] : $vo['id']], true, 'home')}</loc>
         <lastmod>{:time_format(time(), 'Y-m-d')}</lastmod>
         <changefreq>hourly</changefreq>
         <priority>0.9</priority>
