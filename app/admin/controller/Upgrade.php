@@ -487,7 +487,7 @@ class Http
     //通过curl get数据
     static public function curlGet($url, $timeout = 60, $header = "", $proxy = "")
     {
-        $header = empty($header) ? explode("\r\n", self::defaultHeader()) : [$header];
+        $header = empty($header) ? explode("\r\n", self::defaultHeader()) : (is_array($header) ? $header : [$header]);
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -516,7 +516,7 @@ class Http
     //通过curl post数据
     static public function curlPost($url, $post_data = [], $timeout = 60, $header = "", $post_file = false)
     {
-        $header = empty($header) ? explode("\r\n", self::defaultHeader()) : [$header];
+        $header = empty($header) ? explode("\r\n", self::defaultHeader()) : (is_array($header) ? $header : [$header]);
         if ($post_file) {
             $post_string = ['file' => new \CURLFile(realpath(substr($post_data['file'], 1)))];
         } else {
