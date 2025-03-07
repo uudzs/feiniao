@@ -511,6 +511,7 @@ class Book extends BaseController
                         list($wordnum, $content) = countWordsAndContent($v['content'], true);
                         $data = [
                             'bookid' => $bookid,
+                            'authorid' => $authorid,
                             'title' => $v['title'],
                             'chaps' => $k + 1,
                             'status' => 1,

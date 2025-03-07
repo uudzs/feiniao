@@ -81,10 +81,10 @@ class Plugin extends Addons    // 需继承think\Addons类
                     if ($res && isset($res['success']) && $res['success']) {
                         $success = intval($res['success']);
                         if ($success == count($ids)) {
-                            Db::name('addons_baidupush')->where(['id', 'in', $in])->strict(false)->field(true)->update(['remain' => $res['remain'], 'result' => $res['success'], 'update_time' => time(), 'status' => 1]);
+                            Db::name('addons_baidupush')->where('id', 'in', $in)->strict(false)->field(true)->update(['remain' => $res['remain'], 'result' => $res['success'], 'update_time' => time(), 'status' => 1]);
                         }
                     } else {
-                        Db::name('addons_baidupush')->where(['id', 'in', $in])->inc('num')->strict(false)->field(true)->update(['remain' => 0, 'result' => $res['message'], 'update_time' => time(), 'status' => 0]);
+                        Db::name('addons_baidupush')->where('id', 'in', $in)->inc('num')->strict(false)->field(true)->update(['remain' => 0, 'result' => $res['message'], 'update_time' => time(), 'status' => 0]);
                     }
                     set_cache($baidu_push_token, count($ids), 86400);
                 } else {

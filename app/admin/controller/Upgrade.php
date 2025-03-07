@@ -376,7 +376,7 @@ class Upgrade extends BaseController
             $result = json_decode($content, true);
             if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
             if (!isset($result['data']['token']) || empty($result['data']['token'])) return to_assign(1, '登录失败');
-            set_cache(self::$tokenKey, $result['data']['token'], 7200);
+            set_cache(self::$tokenKey, $result['data']['token'], 604800);
             return to_assign(0, '登录成功');
         } else {
             return view('union_login', ['official_url' => str_replace('api/', '', get_config('upgrade.official_api_url')), 'islogin' => get_cache(self::$tokenKey) ? 1 : 0]);
