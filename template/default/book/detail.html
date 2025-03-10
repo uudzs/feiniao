@@ -161,7 +161,10 @@
                     {if isset($pageconf['book_detail_first_chapter_isshow']) && $pageconf['book_detail_first_chapter_isshow']}
                         <h2 class="ypc-column-name">{$title}</h2>
                         {$content|raw}      
-                    {/if}              
+                    {/if}
+                    {eq name=":get_addons_is_enable('cover')" value="1"}
+                    {:hook('synchCoverHook', ['bookid' => $book['id']])}
+                    {/eq}
                 </div>
                 <div class="layui-tab-item">
                     {notempty name="$new_chapter"}

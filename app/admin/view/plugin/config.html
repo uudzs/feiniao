@@ -52,7 +52,7 @@
                     <td>
                         <div class="layui-form-item">
                             {volist name="vo.options" id="item" key="k"}                        
-                                <input type="checkbox" name="{$kv}" value="{$key}" title="{$item}" {in name="$key" value="$vo.value"}checked{/in}>
+                                <input type="checkbox" name="{$kv}[]" value="{$key}" title="{$item}" {in name="$key" value="$vo.value"}checked{/in}>
                             {/volist}
                         </div>
                         {notempty name="$vo.tips" }
