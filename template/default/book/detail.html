@@ -254,7 +254,7 @@
                                         <h4 class="book-title">{$v.title}</h4>
                                     </a>
                                 </div>
-                                <div class="book-intro">{:dsubstr($v.remark,80)}</div>
+                                <div class="book-intro">{$v.remark ? dsubstr($v.remark,80) : '无'}</div>
                                 <div class="book-other">
                                     <div class="book-survey">
                                         <span class="author">{$v.author}</span>
