@@ -57,7 +57,7 @@
     
 第三步：下载PHP依赖包
     
-composer install  
+composer install （依赖包默认已集成，可以忽略。）
     
 第四步：添加虚拟主机并绑定到项目的public目录， **实际部署中，确保绑定域名访问到的是public目录** 。
 
