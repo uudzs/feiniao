@@ -67,9 +67,9 @@ abstract class BaseController
         $domain_bind = get_config('app.domain_bind');
         $params['domain_bind'] = $domain_bind ? array_flip($domain_bind) : [];
         if (Request::isMobile() || isWeChat()) {
-            View::config(['view_path' => CMS_ROOT . 'template/' . (get_system_config('web', 'template') ?: 'default') . '/mobile/']);
+            View::config(['view_path' => CMS_ROOT . 'template/' . (get_config('theme.template_mobile') ?: 'default_mobile') . '/']);
         } else {
-            View::config(['view_path' => CMS_ROOT . 'template/' . (get_system_config('web', 'template') ?: 'default') . '/']);
+            View::config(['view_path' => CMS_ROOT . 'template/' . (get_config('theme.template_pc') ?: 'default_pc') . '/']);
         }
         if (isWeChat()) {
             // $config = get_config('wechat');
@@ -141,7 +141,7 @@ abstract class BaseController
         } else {
             $path = $rootPath . 'runtime/html/pc/';
         }
-        $view_suffix = get_config('view.view_suffix');        
+        $view_suffix = get_config('view.view_suffix');
         if (!empty($content)) {
             $current_url = Request::url();
             if ($current_url) {

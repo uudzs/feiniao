@@ -30,19 +30,9 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="layui-td-gray">网站域名</td>
-			<td>
-				<input type="text" name="domain" autocomplete="off" placeholder="请输入网站域名"class="layui-input" {notempty name="$config.domain" } value="{$config.domain}"{/notempty}>
-			</td>
 			<td class="layui-td-gray">ICP备案号</td>
 			<td>
 				<input type="text" name="icp" autocomplete="off" placeholder="请输入ICP备案号" class="layui-input" {notempty name="$config.icp"} value="{$config.icp}" {/notempty}>
-			</td>
-		</tr>
-		<tr>
-			<td class="layui-td-gray-2">代码版本号</td>
-			<td>
-				<input type="text" name="version" autocomplete="off" placeholder="请输入版本号" class="layui-input" {notempty name="$config.version"} value="{$config.version}" {/notempty}>
 			</td>
 			<td class="layui-td-gray-2">公安备案号</td>
 			<td>
@@ -50,15 +40,6 @@
 			</td>
 		</tr>
 		<tr>
-			<td class="layui-td-gray">网站模板</td>
-			<td>
-				<select name="template">
-					<option value="">请选择网站模板</option>
-					{volist name="themes" id="v"}
-						<option value="{$v}" {notempty name="$config.template"}{eq name="$config.template" value="$v"}selected{/eq}{/notempty}>{$v}</option>
-					{/volist}
-				</select>
-			</td>
 			<td class="layui-td-gray">验证码发送</td>
 			<td>
 				<select name="send_captcha">

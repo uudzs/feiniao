@@ -1,0 +1,204 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+    .layui-card-body .layui-timeline-title {
+        padding-bottom: 0;
+        font-size: 14px;
+    }
+    .layui-card-body {
+        overflow: hidden;
+    }
+    .layui-bg-gray {
+        padding: 20px;
+    }
+    .theme_image {
+        width: 100%;
+        border-radius: 5px;
+    }
+    .theme_intro {
+        padding-left: 20px;
+    }
+    .theme_intro p {
+        height: 96px;
+        overflow: hidden;
+    }
+    .layui-card-header button {
+        float: right;
+        margin-top: 10px;
+    }
+    .layui-card-header h3 span {
+        float: right;
+    }
+    .payment {
+        display: block;
+        padding: 20px 20px 0 20px;
+    }
+    .payment img {
+        width: 50%;
+        margin-left: 25%;
+    }
+    .payment h3 {
+        font-size: 25px;
+        color: #ff0000;
+        text-align: center;
+    }
+    .payment .ordersn {
+        display: block;
+        text-align: center;
+        padding: 9px;
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <h3>主题市场
+                <span>
+                    <button class="layui-btn layui-btn-sm" type="button" lay-event="loginunion" data-title="登录联盟">登录联盟</button>
+                    <button class="layui-btn layui-btn-sm layui-bg-red" type="button" lay-event="release" data-title="发布主题">发布主题</button>
+                </span>                
+            </h3>       
+        </div>
+        <div class="layui-card-body">
+            {notempty name="list"}
+            <div class="layui-bg-gray">
+                <div class="layui-row layui-col-space15">
+                    {volist name="list" id="v"}
+                        <div class="layui-col-md6">
+                            <div class="layui-card">
+                                <div class="layui-card-header">
+                                    {$v.title}<button type="button" data-name="{$v.name}" class="layui-btn layui-btn-sm layui-bg-blue" data-price="{$v.price}" lay-filter="theme-install">安装</button>
+                                </div>
+                                <div class="layui-card-body">
+                                    <div class="layui-col-xs3">
+                                        <img src="{$v.image}" class="theme_image" alt="{$v.title}" onclick="showBigImage(this)">
+                                    </div>
+                                    <div class="layui-col-xs9 theme_intro">
+                                        <p>{$v.intro}</p>
+                                        <hr>
+                                        <div class="layui-col-xs6 layui-col-md12">
+                                            版本：<span class="layui-badge layui-bg-cyan">v{$v.version}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;支持平台：<span class="layui-badge layui-bg-cyan">{$v.platform}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;价格：<span class="layui-badge layui-bg-cyan">{$v.price}</span>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                            </div>
+                        </div>
+                    {/volist}                    
+                </div>
+            </div>
+            {else/}
+                <h5>无插件数据！</h5>
+            {/notempty}
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+    function feiniaoInit() {
+        var form = layui.form, tool = layui.tool;
+        $('body').on('click', '[lay-filter="theme-install"]', function() {
+            var name = $(this).data('name');
+            var price = $(this).data('price');
+            layer.confirm('确定要安装该主题吗?', { icon: 3, title: '安装提示' }, function (index) {
+                var loadIndex = layer.load(0);
+                $.ajax({
+                    url: "{:url('upgrade/theme_install')}",
+                    type: 'POST',
+                    data: { name: name },
+                    async: true,
+                    success: function(response) {
+                        layer.close(loadIndex);
+                        layer.msg(response.msg);
+                        if (response.code == 0) {
+                            parent.layui.tool.close(1000);	
+                        } else if (response.code == 300) {
+                            layer.open({
+                                type: 1,
+                                area: ['500px', '720px'],
+                                title: '支付提示',
+                                shade: 0.6,
+                                shadeClose: false,
+                                maxmin: false,
+                                anim: 0,
+                                closeBtn: 0,
+                                btn: ['已付款并提交支付单号', '关闭'],
+                                btnAlign: 'c',
+                                content: `<div class="payment layui-form">
+                                            <img src="${response.data.qrcode}">
+                                            <hr>
+                                            <h3>${price}元</h3>
+                                            <div class="layui-form-item ordersn">
+                                                订单号：<span class="layui-badge layui-bg-green">${response.data.ordersn}</span> 订单号可用于查询订单状态                               
+                                            </div>
+                                            <div class="layui-form-item">
+                                                <label class="layui-form-label">支付单号</label>
+                                                <div class="layui-input-block">
+                                                    <input type="text" name="paynumber" autocomplete="off" placeholder="请填写支付单号" class="layui-input">
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <blockquote class="layui-elem-quote">
+                                                <p>1、请按对应金额支付费用。</p>
+                                                <p>2、支付成功后请将微信支付单号复制并过来填写并提交。</p>
+                                                <p>3、客服QQ：${response.data.qq}，售前与售后请联系客服。</p>
+                                            </blockquote>                                            
+                                        </div>`,
+                                btn1: function(index, layero, that) {
+                                    var paynumber = $('input[name="paynumber"]').val();
+                                    if(!paynumber) return layer.msg('请填写支付单号！');
+                                    $.ajax({
+                                        url: "{:url('upgrade/theme_pay')}",
+                                        type: 'POST',
+                                        data: { ordersn: response.data.ordersn, paynumber: paynumber },
+                                        async: true,
+                                        success: function(res) {
+                                            layer.msg(res.msg);
+                                            if (res.code == 0) {
+                                                layer.close(index);
+                                            }
+                                        },
+                                    });
+                                    return false
+                                },
+                                btn2: function(index, layero, that) {},
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        layer.close(loadIndex);
+                        parent.layui.tool.close(1000);
+                    }
+                });
+            });
+        });
+        $('body').on('click', '[lay-event="loginunion"]', function() {
+            tool.side("{:url('upgrade/union_login')}");
+			return false;
+        });
+        $('body').on('click', '[lay-event="release"]', function() {
+            tool.side("{:url('upgrade/theme_release')}");
+			return false;
+        });
+        window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+    }
+</script>
+{/block}
+<!-- /脚本 -->

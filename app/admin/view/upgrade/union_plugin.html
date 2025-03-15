@@ -37,7 +37,7 @@
 <div class="p-3">
     <div class="layui-card">
         <div class="layui-card-header">
-            <h3>插件市场<span class="layui-btn layui-btn-sm" lay-event="loginunion" data-title="登录联盟">登录联盟</span></h3>            
+            <h3>插件市场<span class="layui-btn layui-btn-sm" lay-event="loginunion" data-title="登录联盟"><i class="layui-icon layui-icon-user"></i> 登录联盟</span></h3>            
         </div>
         <div class="layui-card-body">
             {notempty name="list"}
@@ -58,7 +58,7 @@
                                         <hr>
                                         <div class="layui-col-xs6 layui-col-md12">
                                             版本：<span class="layui-badge layui-bg-cyan">v{$v.version}</span>
-                                            &nbsp;&nbsp;&nbsp;&nbsp;支持平台：<span class="layui-badge layui-bg-cyan">{$v.platform|strtoupper}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;支持平台：<span class="layui-badge layui-bg-cyan">{$v.platform}</span>
                                             &nbsp;&nbsp;&nbsp;&nbsp;免费：<span class="layui-badge layui-bg-cyan">{$v.is_free == '1' ? '是' : '否'}</span>
                                         </div>
                                     </div>                                    

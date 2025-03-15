@@ -1,0 +1,170 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+	.layui-card-body .layui-timeline-title {
+		padding-bottom: 0;
+		font-size: 14px;
+	}
+    .theme {
+        display: flex;
+    }
+    .theme .cover {
+        width: 100%;
+        height: 100%;
+    }
+    .theme .layui-card-body {
+        height: auto;
+        overflow: hidden;
+    }
+    .theme .item {
+        padding: 10px;
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <div class="layui-bg-gray">
+        <div class="layui-row">
+            <div class="layui-card">
+                <div class="layui-card-body">
+                    <button class="layui-btn layui-btn-sm" type="button" lay-filter="market"><i class="layui-icon layui-icon-theme"></i> 主题市场</button>
+                    <span class="layui-btn layui-btn-sm layui-bg-blue" lay-filter="loginunion" data-title="登录联盟"><i class="layui-icon layui-icon-user"></i> 登录联盟</span>
+                </div>
+            </div>                     
+        </div>
+        <div class="layui-row layui-col-space15 theme" style="margin-top: 10px;">
+            {notempty name="themes"}
+                {volist name="$themes" id="v"}
+                    <div class="layui-col-md3">
+                        <div class="layui-card platform-{:strtoupper($v.platform)}">
+                            <div class="layui-card-header">
+                                {$v.name}
+                                {eq name="v.isuse" value="1"}<i class="layui-icon layui-icon-ok-circle" style="font-size: 20px; color: #1E9FFF;"></i>{/eq}
+                            </div>
+                            <div class="layui-card-body">
+                                <div class="layui-col-md5">
+                                    <img src="{$v.cover}" onerror="javascript:this.src='{__ASSETS__}/init/images/nonepic600x360.jpg';this.onerror=null;" class="cover" onclick="showBigImage(this)" alt="{$v.name}">
+                                </div>
+                                <div class="layui-col-md7 item">
+                                    <p>作者：{$v.author}</p>
+                                    <p>版本：v{$v.ver}</p>
+                                    <p>价格：{$v.price}</p>
+                                    <p>终端：{$v.platform}</p>
+                                    <p>
+                                        {eq name="v.isuse" value="0"}
+                                            <button class="layui-btn layui-btn-xs" type="button" lay-filter="setup" data-name="{$v.floder}" data-platform="{:strtoupper($v.platform)}">安装</button>
+                                        {else/}
+                                            <button class="layui-btn layui-btn-xs" type="button" lay-filter="setup" data-name="{$v.floder}" style="display: none;" data-platform="{:strtoupper($v.platform)}">安装</button>
+                                        {/eq}
+                                        <button class="layui-btn layui-btn-xs layui-btn-normal" type="button" lay-filter="upgrade" data-name="{$v.floder}" data-version="{$v.ver}">更新</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {/volist}
+            {else/}
+                <h5>暂无主题！</h5>
+            {/notempty}
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+	function feiniaoInit() {
+        var tool = layui.tool;
+		$('#upgrade').on('click',function() {
+            var id = $(this).data('id');
+            if(!id) return layer.msg('ID错误！');
+			$.ajax({
+                url: "{:url('upgrade/index')}",
+                type: 'post',
+                data: {id: id},
+                success: function(e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        location.reload();
+                    }
+                }
+            })
+		})
+        $('[lay-filter="upgrade"]').on('click', function() {            
+            var name = $(this).data('name').trim();
+			var version = $(this).data('version');
+            if(!name) return layer.msg('名称为空！');
+            if(!version) return layer.msg('版本号为空！');
+			let callback = function (e) {
+					if (e.code == 0) {
+						if(e.data == 1) {		
+							layer.confirm('此主题有新版本，现在更新该主题吗?', { icon: 3, title: '更新提示', btn: ['更新', '关闭'] }, function (index) {
+								var loadIndex = layer.load(0);
+								let callback = function (r) {
+									layer.msg(r.msg);
+									if (r.code == 0) {
+										layer.close(loadIndex);
+										layer.close(index);
+                                        location.reload();
+									} else {
+										layer.close(loadIndex);
+										return layer.msg(r.msg);
+									}
+								}								
+								tool.post("{:url('upgrade/theme_update')}", { name: name, version: version }, callback);
+								return false;
+							});
+						} else {
+							layer.msg('不需要更新！');
+						}
+					} else {
+						layer.msg(e.msg);
+					}
+				}
+				tool.post("{:url('upgrade/theme_check')}", { name: name, version: version }, callback);
+				return false;
+        });
+        $('[lay-filter="market"]').on('click', function() {
+            tool.side("{:url('upgrade/theme_market')}");
+			return false;
+        });
+        $('[lay-filter="loginunion"]').on('click', function() {
+            tool.side("{:url('upgrade/union_login')}");
+			return false;
+        });
+        $('[lay-filter="setup"]').on('click', function() {
+			var name = $(this).data('name').trim();
+			var platform = $(this).data('platform').trim();
+            var self = this;
+            if(!name) return layer.msg('参数为空！');
+            if(!platform) return layer.msg('参数为空！');
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    $('.platform-' + platform).find('.layui-card-header i').remove();
+                    $('.platform-' + platform).find('[lay-filter="setup"]').show();
+                    $(self).closest(".layui-card").find('.layui-card-header').append('<i class="layui-icon layui-icon-ok-circle" style="font-size: 20px; color: #1E9FFF;"></i>');
+                    $(self).hide();
+                }
+            }
+            tool.delete("{:url('themes/setup')}", { name: name }, callback);
+            return false;
+        });
+        window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+	}
+</script>
+{/block}
+<!-- /脚本 -->

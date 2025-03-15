@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<config> 
+	<name>官方-默认电脑版</name> 
+	<author>飞鸟阅读</author> 
+	<ver>1</ver> 
+	<price>0.00</price>
+	<url>https://feiniao.paheng.net</url>
+	<platform>pc</platform>
+</config> 

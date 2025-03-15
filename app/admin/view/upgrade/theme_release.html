@@ -1,0 +1,139 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+	.layui-card-body .layui-timeline-title {
+		padding-bottom: 0;
+		font-size: 14px;
+	}
+    .layui-text ul {
+        padding-left: 15px;
+    }
+    .layui-text ul li {
+        margin-top: 5px;
+        list-style-type: none;
+    }
+    .layui-text h4 {
+        margin: 11px 0;
+        font-size: 16px;
+    }
+    .layui-text pre, .layui-text xmp {
+        padding: 0;
+        margin: 0;
+        line-height: 25px;
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+	<div class="layui-card">
+		<div class="layui-card-header"><h3>主题发布</h3></div>
+		<div class="layui-card-body layui-text">
+            <ul>
+                <li>
+                    <h5>一、主题配置文件</h5>
+                    <ul>
+                        <li>1、主题根目录下必须要有copyright.xml配置文件。</li>
+                        <li>2、格式示例：
+                            <blockquote class="layui-elem-quote">                            
+                         
+                                <xmp>
+<?xml version="1.0" encoding="utf-8"?> 
+<config> 
+	<name>官方-默认电脑版</name> 名称
+	<author>飞鸟阅读</author> 作者
+	<ver>1</ver> 版本号，只能是数字
+	<price>0.00</price> 价格
+	<url>https://demo.feiniao.paheng.net/</url> 演示地址
+	<platform>pc</platform> 支持平台，暂时只允许：pc/mobile
+</config> 
+                                </xmp>
+                        </blockquote>
+                        </li>
+                        <li>3、版本号作为升级判断标识，只能递增，价格单位为人民币，精确到分。</li>
+                    </ul>
+                </li>
+                <li>
+                    <h5>二、封面图</h5>
+                    <ul>
+                        <li>1、封面图必须为cover.jpg名称，宽度500px的相对比例。</li>
+                    </ul>
+                </li>
+                <li>
+                    <h5>三、命名</h5>
+                    <ul>
+                        <li>1、template下文件夹名称便是主题的唯一标识，不可重复，不建议用中文或特殊字符。</li>
+                    </ul>
+                </li>
+                <li>
+                    <h5>四、公共文件</h5>
+                    <ul>
+                        <li>1、如涉及到图片，样式，js等公共文件，需要在对应主题目录下创建public目，将文件放到此目录下。</li>
+                        <li>2、主题目录public下的所有文件会复制到站点的public下。</li>
+                        <li>3、注意与站点public下的结构或文件不可冲突。</li>
+                    </ul>
+                </li>
+                <li>
+                    <h5>五、其他说明</h5>
+                    <ul>
+                        <li>1、系统会自动将选择的主题进行打包并提交到主题市场进行审核。</li>
+                        <li>2、经人工审核无问题后，才会在主题市场显示与售卖。</li>
+                    </ul>
+                </li>		
+            </ul>
+            <hr>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">可提交主题</label>
+                    <div class="layui-input-inline">
+                        {php}$theme = list_dir('template');{/php}
+                        <select name="theme">
+                            <option value="">请选择</option>
+                            {volist name="theme" id="item" key="k"}
+                                <option value="{$item}">{$item}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="layui-input-inline"><button class="layui-btn" lay-filter="release">立即提交</button></div>          
+                </div>
+            </div>       
+		</div>
+	</div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+	function feiniaoInit() {
+        var form = layui.form, tool = layui.tool;
+        $('body').on('click', '[lay-filter="release"]', function() {
+            var name = $('select[name="theme"]').val();
+            if(!name) return layer.msg('请选择主题！');
+            layer.confirm('确定要提交该主题吗?', { icon: 3, title: '提交提示' }, function (index) {
+                var loadIndex = layer.load(0);
+                $.ajax({
+                    url: "{:url('upgrade/theme_release')}",
+                    type: 'POST',
+                    data: { name: name },
+                    async: true,
+                    success: function(response) {
+                        layer.close(loadIndex);
+                        layer.msg(response.msg);
+                        if (response.code == 0) {
+                            parent.layui.tool.close(1000);	
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        layer.close(loadIndex);
+                        parent.layui.tool.close(1000);
+                    }
+                });
+            });
+        });
+	}
+</script>
+{/block}
+<!-- /脚本 -->

@@ -277,8 +277,7 @@ class Upgrade extends BaseController
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
-            $header = ['token:' . $token, "X-Forwarded-Host:" . Request::domain()];
-            $content = Http::doGet($url, 60, $header);
+            $content = Http::doGet($url);
             if (empty($content)) return to_assign(1, '获取信息失败');
             $result = json_decode($content, true);
             if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
@@ -311,11 +310,10 @@ class Upgrade extends BaseController
             $plugin = array_column($list, null, 'name');
             if (isset($plugin[$name]) && $plugin[$name]) return to_assign(1, '已经安装过此插件了');
             $url = get_config('upgrade.official_api_url') . 'pluginupgrade' . '/' . $name;
-            $header = ['token:' . $token, "X-Forwarded-Host:" . Request::domain()];
-            $content = Http::doGet($url, 60, $header);
+            $content = Http::doGet($url);
             if (empty($content)) return to_assign(1, '获取信息失败');
             $result = json_decode($content, true);
-            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!empty($result['code'])) return to_assign($result['code'], $result['msg'] ?? '请求错误', $result['data'] ?? []);
             if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
             $info = $result['data'];
             if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '插件无效');
@@ -338,6 +336,296 @@ class Upgrade extends BaseController
         if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
         if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
         return view('union_plugin', ['list' => $result['data']]);
+    }
+
+    public function theme_market()
+    {
+        $url = get_config('upgrade.official_api_url') . 'theme';
+        $content = Http::doGet($url);
+        if (empty($content)) return to_assign(1, '获取信息失败');
+        $result = json_decode($content, true);
+        if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+        if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+        return view('theme_market', ['list' => $result['data']]);
+    }
+
+    public function theme_install()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $name = isset($param['name']) ? trim($param['name']) : '';
+            if (empty($name)) {
+                return to_assign(1, '主题信息不存在');
+            }
+            $token = get_cache(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $list = list_dir('template');
+            if (in_array($name, $list)) {
+                return to_assign(1, '已经安装过此主题了');
+            }
+            $url = get_config('upgrade.official_api_url') . 'themeupgrade' . '/' . $name;
+            $content = Http::doGet($url);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign($result['code'], $result['msg'] ?? '请求错误', $result['data'] ?? []);
+            if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+            $info = $result['data'];
+            if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '主题无效');
+            if (!empty($info['path'])) {
+                $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['name'] . DIRECTORY_SEPARATOR;
+                $path = app()->getRootPath() . $relativepath;
+                if (!createDirectory($path)) {
+                    return to_assign(1, '创建' . $path . '目录失败');
+                }
+                $zipfile = Http::doGet($info['path']);
+                if (!$zipfile || empty($zipfile)) {
+                    return to_assign(1, '读取远程文件错误，请检测网络！');
+                }
+                $filepath = $path . $info['name'] . '.zip';
+                if (false === @file_put_contents($filepath, $zipfile)) {
+                    return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
+                }
+                if (!is_file($filepath)) return to_assign(1, '文件保存失败');
+                if (!class_exists('ZipArchive')) {
+                    return to_assign(1, '请手动解压' . $filepath . '到根目录。');
+                }
+                try {
+                    $zip = new ZipArchive;
+                    $res = $zip->open($filepath);
+                    if ($res === TRUE) {
+                        $zip->extractTo($path);
+                        $zip->close();
+                        unlink($filepath);
+                        self::get_allfiles($path, $files);
+                        foreach ($files as $key => $value) {
+                            if (strpos($value, 'public') !== false) {
+                                $destination =  str_replace('runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['name'] . DIRECTORY_SEPARATOR, '', $value);
+                            } else {
+                                $destination =  str_replace('runtime' . DIRECTORY_SEPARATOR . 'upgrade', 'template', $value);
+                            }
+                            if ($this->copyfile($value, $destination)) {
+                                unlink($value);
+                            }
+                        }
+                        $this->deleteDir($path);
+                    } else {
+                        unlink($filepath);
+                        return to_assign(1, '解压文件失败，请检查目录权限。');
+                    }
+                } catch (\Exception $e) {
+                    return to_assign(1, $e->getMessage());
+                }
+            }
+            if (!empty($info['sql'])) {
+                $this->runsql($info['sql']);
+            }
+            $path = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $name;
+            if (is_dir($path)) {
+                $public = $path . DIRECTORY_SEPARATOR . 'public';
+                if (is_dir($public)) $this->deleteDir($public);
+                return to_assign(0, '安装成功');
+            } else {
+                return to_assign(1, '安装失败');
+            }
+        }
+    }
+
+    public function theme_pay()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $ordersn = isset($param['ordersn']) ? trim($param['ordersn']) : '';
+            if (empty($ordersn)) {
+                return to_assign(1, '订单号不存在！');
+            }
+            $paynumber = isset($param['paynumber']) ? trim($param['paynumber']) : '';
+            if (empty($paynumber)) {
+                return to_assign(1, '订单号不存在！');
+            }
+            $token = get_cache(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $url = get_config('upgrade.official_api_url') . 'themepay' . '/' . $ordersn . '/' . $paynumber;
+            $content = Http::doGet($url);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            return to_assign(0, '购买成功，审核中。');
+        }
+    }
+
+    public function theme_check()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $name = isset($param['name']) ? trim($param['name']) : '';
+            $version = isset($param['version']) ? trim($param['version']) : '';
+            if (empty($name) || empty($version)) {
+                return to_assign(1, '主题参数不存在');
+            }
+            $url = get_config('upgrade.official_api_url') . 'themecheck' . '/' . $name . '/' . $version;
+            $content = Http::doGet($url);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+            if (!isset($result['data']['update'])) return to_assign(1, '数据错误');
+            return to_assign(0, '检查成功', $result['data']['update']);
+        }
+    }
+
+    public function theme_update()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $name = isset($param['name']) ? trim($param['name']) : '';
+            if (empty($name)) {
+                return to_assign(1, '主题信息不存在');
+            }
+            $url = get_config('upgrade.official_api_url') . 'themeupgrade' . '/' . $name;
+            $token = get_cache(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $content = Http::doGet($url);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+            $info = $result['data'];
+            if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '不存在升级项');
+            if (!empty($info['path'])) {
+                $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['name'] . DIRECTORY_SEPARATOR;
+                $path = app()->getRootPath() . $relativepath;
+                if (!createDirectory($path)) {
+                    return to_assign(1, '创建' . $path . '目录失败');
+                }
+                $zipfile = Http::doGet($info['path']);
+                if (!$zipfile || empty($zipfile)) {
+                    return to_assign(1, '读取远程文件错误，请检测网络！');
+                }
+                $filepath = $path . $info['name'] . '.zip';
+                if (false === @file_put_contents($filepath, $zipfile)) {
+                    return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
+                }
+                if (!is_file($filepath)) return to_assign(1, '文件保存失败');
+                if (!class_exists('ZipArchive')) {
+                    return to_assign(1, '请手动解压' . $filepath . '到根目录。');
+                }
+                try {
+                    $zip = new ZipArchive;
+                    $res = $zip->open($filepath);
+                    if ($res === TRUE) {
+                        $zip->extractTo($path);
+                        $zip->close();
+                        unlink($filepath);
+                        self::get_allfiles($path, $files);
+                        foreach ($files as $key => $value) {
+                            if (strpos($value, 'public') !== false) {
+                                $destination =  str_replace('runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['name'] . DIRECTORY_SEPARATOR, '', $value);
+                            } else {
+                                $destination =  str_replace('runtime' . DIRECTORY_SEPARATOR . 'upgrade', 'template', $value);
+                            }
+                            if ($this->copyfile($value, $destination)) {
+                                unlink($value);
+                            }
+                        }
+                        $this->deleteDir($path);
+                    } else {
+                        unlink($filepath);
+                        return to_assign(1, '解压文件失败，请检查目录权限。');
+                    }
+                } catch (\Exception $e) {
+                    return to_assign(1, $e->getMessage());
+                }
+            }
+            if (!empty($info['sql'])) {
+                $this->runsql($info['sql']);
+            }
+            $path = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $name;
+            if (is_dir($path)) {
+                $public = $path . DIRECTORY_SEPARATOR . 'public';
+                if (is_dir($public)) $this->deleteDir($public);
+                return to_assign(0, '升级成功');
+            } else {
+                return to_assign(1, '升级失败');
+            }
+        }
+    }
+
+    public function theme_release()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $name = isset($param['name']) ? trim($param['name']) : '';
+            if (empty($name)) {
+                return to_assign(1, '请选择主题！');
+            }
+            $token = get_cache(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $path = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $name;
+            if (!is_dir($path)) return to_assign(1, '此主题不存在！');
+            $default = ['default_pc', 'default_mobile'];
+            if (in_array($name, $default)) return to_assign(1, '默认主题不可提交！');
+            $copyrightPath = $path . DIRECTORY_SEPARATOR . 'copyright.xml';
+            if (!file_exists($copyrightPath)) return to_assign(1, 'copyright.xml配置文件不存在！');
+            $xmlFile = file_get_contents($copyrightPath);
+            $ob = simplexml_load_string($xmlFile);
+            $json = json_encode($ob);
+            $config = json_decode($json, true);
+            if (empty($config)) return to_assign(1, '配置文件错误！');
+            $coverPath = $path . DIRECTORY_SEPARATOR . 'cover.jpg';
+            if (!file_exists($coverPath)) return to_assign(1, 'cover.jpg封面文件不存在！');
+            $zippath = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $name . '.zip';
+            if (file_exists($zippath)) {
+                unlink($zippath);
+            }
+            $zip = new ZipArchive;
+            if ($zip->open($zippath, ZipArchive::CREATE) === TRUE) {
+                $files = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($path),
+                    \RecursiveIteratorIterator::LEAVES_ONLY
+                );
+                foreach ($files as $file) {
+                    if ($file->isDir()) {
+                        continue;
+                    }
+                    $filePath = $file->getRealPath();
+                    $relativePath = substr($filePath, strlen($path) + 1);
+                    $zip->addFile($filePath, str_replace('\\', '/', $relativePath));
+                }
+                $zip->close();
+                if (!file_exists($zippath)) return to_assign(1, '压缩文件不存在！');
+                $data = ['file' => $zippath];
+                $url = get_config('upgrade.official_api_url') . 'upload/permanent?type=package';
+                $content = Http::doPost($url, $data, 60, [], true);
+                if (empty($content)) return to_assign(1, '上传失败');
+                $result = json_decode($content, true);
+                if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+                if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+                $info = $result['data'];
+                if (!isset($info['path']) || empty($info['path'])) return to_assign(1, '上传失败');
+                $url = get_config('upgrade.official_api_url') . 'themerelease';
+                $content = Http::doPost($url, [
+                    'name' => $name,
+                    'path' => $info['path'],
+                ]);
+                if (empty($content)) return to_assign(1, '提交失败');
+                $result = json_decode($content, true);
+                if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '提交错误');
+                unlink($zippath);
+                return to_assign(0, '提交成功。');
+            } else {
+                return to_assign(1, '压缩失败。');
+            }
+        } else {
+            return view('theme_release');
+        }
     }
 
     private function get_system_version()
@@ -387,6 +675,7 @@ class Upgrade extends BaseController
 class Http
 {
     static public $way = 0;
+    private static $tokenKey = 'union_token';
 
     //手动设置访问方式
     static public function setWay($way)
@@ -439,7 +728,7 @@ class Http
     }
 
     //通过POST方式发送数据
-    static public function doPost($url, $post_data = [], $timeout = 60, $header = "")
+    static public function doPost($url, $post_data = [], $timeout = 60, $header = "", $post_file = false)
     {
         if (empty($url) || empty($post_data) || empty($timeout))
             return false;
@@ -448,13 +737,13 @@ class Http
         $code = self::getSupport();
         switch ($code) {
             case 1:
-                return self::curlPost($url, $post_data, $timeout, $header);
+                return self::curlPost($url, $post_data, $timeout, $header, $post_file);
                 break;
             case 2:
-                return self::socketPost($url, $post_data, $timeout, $header);
+                return self::socketPost($url, $post_data, $timeout, $header, $post_file);
                 break;
             case 3:
-                return self::phpPost($url, $post_data, $timeout, $header);
+                return self::phpPost($url, $post_data, $timeout, $header, $post_file);
                 break;
             default:
                 return false;
@@ -518,7 +807,23 @@ class Http
     {
         $header = empty($header) ? explode("\r\n", self::defaultHeader()) : (is_array($header) ? $header : [$header]);
         if ($post_file) {
-            $post_string = ['file' => new \CURLFile(realpath(substr($post_data['file'], 1)))];
+            if (isset($post_data['file']) && $post_data['file']) {
+                $fileData = $post_data['file'];
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime_type = finfo_file($finfo, $fileData);
+                finfo_close($finfo);
+                unset($post_data['file']);
+                if (class_exists('\CURLFile')) {
+                    $post_string = array('file' => new \CURLFile($fileData, $mime_type, basename($fileData)), 'data' => http_build_query($post_data));
+                } else {
+                    $post_string = array(
+                        'file' => '@' . $fileData . ";type=" . $mime_type . ";filename=" . basename($fileData),
+                        'data' => http_build_query($post_data),
+                    );
+                }
+            } else {
+                $post_string = http_build_query($post_data);
+            }
         } else {
             $post_string = http_build_query($post_data);
         }
@@ -676,9 +981,11 @@ class Http
     //默认模拟的header头
     static private function defaultHeader()
     {
+        $token = get_cache(self::$tokenKey);
         $header = "User-Agent:Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36\r\n";
         $header .= "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n";
-        $header .= "X-Forwarded-Host:" . Request::domain() . "\r\n";
+        $header .= "Referer:" . Request::domain() . "\r\n";
+        $header .= "token:" . $token . "\r\n";
         return $header;
     }
 

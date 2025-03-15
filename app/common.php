@@ -1526,7 +1526,7 @@ if (!function_exists('furl')) {
                         if ($parse['path'] == '/' || strpos($parse['path'], $model) !== false) {
                             return $rurl;
                         } else {
-                            if ($model == 'api') {
+                            if ($model == 'api' || $model == 'author') {
                                 $fChar = substr($url, 0, 1);
                                 if ($fChar != '/') {
                                     $url = '/' . $url;
