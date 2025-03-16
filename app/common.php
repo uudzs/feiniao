@@ -1519,8 +1519,8 @@ if (!function_exists('furl')) {
                     return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(true);
                 }
             } else {
-                $rurl = url($url, $vars, $suffix, true);
-                $parse = parse_url($rurl);
+                $rurl = url($url, $vars, $suffix, true);               
+                $parse = parse_url($rurl);                
                 if ($parse) {
                     if (isset($parse['path']) && $parse['path']) {
                         if ($parse['path'] == '/' || strpos($parse['path'], $model) !== false) {
@@ -1531,8 +1531,8 @@ if (!function_exists('furl')) {
                                 if ($fChar != '/') {
                                     $url = '/' . $url;
                                 }
-                                $url = '/' . $model . $url;
-                                return url($url, $vars, $suffix, true);
+                                $url = '/' . $model . $url;                        
+                                return url($url, $vars, $suffix, false);
                             }
                             return (isset($parse['scheme']) ? $parse['scheme'] : 'http') . '://' . (isset($parse['host']) ? $parse['host'] : '') . (isset($parse['port']) ? $parse['port'] : '') . '/' . $model . (isset($parse['path']) ? $parse['path'] : '') . (isset($parse['query']) ? ('?' . $parse['query']) : '');
                         }
