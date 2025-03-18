@@ -29,9 +29,11 @@ class Themes extends BaseController
         $floderArr = list_dir('template');
         $config = get_config('theme');
         $themes = [];
+        $template_path = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR;
+        $separate_path = app()->getRootPath() . 'public' . DIRECTORY_SEPARATOR;
         if ($floderArr) {
             foreach ($floderArr as $k => $v) {
-                $result = self::getconfig($v);
+                $result = self::getconfig($template_path . $v);
                 if (empty($result) || !isset($result['name']) || empty($result['name'])) continue;
                 $themeKey = 'template_' . $result['platform'];
                 $result['floder'] = $v;
@@ -39,22 +41,32 @@ class Themes extends BaseController
                 $themes[] = $result;
             }
         }
+        if (isset($config['template_separate'])) {
+            $path = $separate_path . 'h5';
+            if (is_dir($path)) {
+                $result = self::getconfig($path);
+                if ($result) {
+                    $result['floder'] = $config['template_separate'] ?: 'h5';
+                    $result['isuse'] = $config['template_separate'] ? 1 : 0;
+                    $themes[] = $result;
+                }
+            }
+        }
         View::assign('themes', $themes);
         return view();
     }
 
-    static private function getconfig($name)
+    static private function getconfig($path)
     {
         $result = [];
-        $path = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR;
-        $copyrightPath = $path . $name . DIRECTORY_SEPARATOR . 'copyright.xml';
+        $copyrightPath = $path . DIRECTORY_SEPARATOR . 'copyright.xml';
         if (file_exists($copyrightPath)) {
             $xmlFile = file_get_contents($copyrightPath);
             $ob = simplexml_load_string($xmlFile);
             $json = json_encode($ob);
             $result = json_decode($json, true);
         }
-        $cover = $path . $name . DIRECTORY_SEPARATOR . 'cover.jpg';
+        $cover = $path . DIRECTORY_SEPARATOR . 'cover.jpg';
         if (file_exists($cover)) {
             $imageData = file_get_contents($cover);
             $finfo = new \finfo(FILEINFO_MIME_TYPE);
@@ -75,8 +87,19 @@ class Themes extends BaseController
             if (!isset($param['name']) || empty($param['name'])) {
                 return to_assign(1, '必要参数为空！');
             }
+            if (!isset($param['platform']) || empty($param['platform'])) {
+                return to_assign(1, '必要参数为空！');
+            }
             $name = trim($param['name']);
-            $result = self::getconfig($name);
+            $platform = trim($param['platform']);
+            $path = '';
+            $themeKey = 'template_' . strtolower($platform);
+            if ($themeKey == 'template_separate') {
+                $path = app()->getRootPath() . 'public' . DIRECTORY_SEPARATOR . $name;
+            } else {
+                $path = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $name;
+            }
+            $result = self::getconfig($path);
             if (empty($result)) {
                 return to_assign(1, '没有配置信息！');
             }
@@ -90,6 +113,9 @@ class Themes extends BaseController
             if (strtolower($result['platform']) == 'pc') {
                 $config['template_pc'] = $name;
             }
+            if (strtolower($result['platform']) == 'separate') {
+                $config['template_separate'] = $name;
+            }
             $config_file = app()->getRootPath() . 'config' . DIRECTORY_SEPARATOR . 'theme.php';
             if (file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';')) {
                 return to_assign(0, '安装成功');
@@ -99,11 +125,34 @@ class Themes extends BaseController
         }
     }
 
-    public function upgrade()
+    public function unload()
     {
         if (request()->isAjax()) {
             $param = get_params();
-            print_r($param);
+            if (!isset($param['name']) || empty($param['name'])) {
+                return to_assign(1, '必要参数为空！');
+            }
+            $name = trim($param['name']);
+            if (!isset($param['platform']) || empty($param['platform'])) {
+                return to_assign(1, '必要参数为空！');
+            }
+            $platform = trim($param['platform']);
+            $config = get_config('theme');
+            if (strtolower($platform) == 'mobile') {
+                $config['template_mobile'] = '';
+            }
+            if (strtolower($platform) == 'pc') {
+                $config['template_pc'] = '';
+            }
+            if (strtolower($platform) == 'separate') {
+                $config['template_separate'] = '';
+            }
+            $config_file = app()->getRootPath() . 'config' . DIRECTORY_SEPARATOR . 'theme.php';
+            if (file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';')) {
+                return to_assign(0, '安装成功');
+            } else {
+                return to_assign(1, '保存失败，请检查权限！');
+            }
         }
     }
 

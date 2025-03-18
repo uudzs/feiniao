@@ -105,7 +105,7 @@ $conf = get_system_config('other');
             </li>
         </ul>
     </div>
-    <div class="list version">版本：{$conf.version}</div>
+    <div class="list version">版本：{$version}</div>
 </div>
 {php}
 $agreement = model('pages')->where(['status' => 1, 'name' => 'agreement'])->value('content');

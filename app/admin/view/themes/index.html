@@ -19,6 +19,9 @@
     .theme .item {
         padding: 10px;
     }
+    .theme .layui-btn {
+        margin-left: 0;
+    }
 </style>
 {/block}
 <!-- 主体 -->
@@ -54,8 +57,10 @@
                                     <p>
                                         {eq name="v.isuse" value="0"}
                                             <button class="layui-btn layui-btn-xs" type="button" lay-filter="setup" data-name="{$v.floder}" data-platform="{:strtoupper($v.platform)}">安装</button>
+                                            <button class="layui-btn layui-btn-xs layui-bg-red" type="button" lay-filter="unload" data-name="{$v.floder}" style="display: none;" data-platform="{:strtoupper($v.platform)}">卸载</button>
                                         {else/}
                                             <button class="layui-btn layui-btn-xs" type="button" lay-filter="setup" data-name="{$v.floder}" style="display: none;" data-platform="{:strtoupper($v.platform)}">安装</button>
+                                            <button class="layui-btn layui-btn-xs layui-bg-red" type="button" lay-filter="unload" data-name="{$v.floder}" data-platform="{:strtoupper($v.platform)}">卸载</button>
                                         {/eq}
                                         <button class="layui-btn layui-btn-xs layui-btn-normal" type="button" lay-filter="upgrade" data-name="{$v.floder}" data-version="{$v.ver}">更新</button>
                                     </p>
@@ -147,12 +152,39 @@
                 if (e.code == 0) {
                     $('.platform-' + platform).find('.layui-card-header i').remove();
                     $('.platform-' + platform).find('[lay-filter="setup"]').show();
+                    $(self).siblings('[lay-filter="unload"]').show();
                     $(self).closest(".layui-card").find('.layui-card-header').append('<i class="layui-icon layui-icon-ok-circle" style="font-size: 20px; color: #1E9FFF;"></i>');
                     $(self).hide();
                 }
             }
-            tool.delete("{:url('themes/setup')}", { name: name }, callback);
+            tool.delete("{:url('themes/setup')}", { name: name, platform: platform }, callback);
             return false;
+        });
+        $('[lay-filter="unload"]').on('click', function() {
+            var name = $(this).data('name').trim();
+			var platform = $(this).data('platform').trim();
+            var self = this;
+            if(!name) return layer.msg('参数为空！');
+            if(!platform) return layer.msg('参数为空！');
+            layer.confirm('确定要卸载此主题吗?', { icon: 3, title: '卸载提示', btn: ['确定', '关闭'] }, function (index) {
+                var loadIndex = layer.load(0);
+                let callback = function (r) {
+                    layer.msg(r.msg);
+                    if (r.code == 0) {
+                        layer.close(loadIndex);
+                        layer.close(index);
+                        $(self).closest(".layui-card").find('.layui-card-header i').remove();
+                        $(self).siblings('[lay-filter="setup"]').show();
+                        $(self).hide();
+                        //location.reload();
+                    } else {
+                        layer.close(loadIndex);
+                        return layer.msg(r.msg);
+                    }
+                }								
+                tool.post("{:url('themes/unload')}", { name: name, platform: platform }, callback);
+                return false;
+            });
         });
         window.showBigImage = function (e) {
 			layer.open({

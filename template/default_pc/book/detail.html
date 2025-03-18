@@ -1,6 +1,6 @@
 {extend name="common/base"/}
 {block name="style"}
-<link rel="stylesheet" href="{__STATIC__}/home/style/book-detail.css?v={$conf.version}">
+<link rel="stylesheet" href="{__STATIC__}/home/style/book-detail.css?v={$version}">
 {/block}
 {block name="title"}
 <title>{:get_seo_str('book','book_title','',['bookid'=>$bid])}</title>	
@@ -318,7 +318,7 @@
 {/block}
 <!-- 脚本 -->
 {block name="script"}
-<script src="{__STATIC__}/home/script/jquery.qrcode.min.js?v={$conf.version}"></script>
+<script src="{__STATIC__}/home/script/jquery.qrcode.min.js?v={$version}"></script>
 <script>
     $(window).on('load', function () {
         $(".btn-fw").text('评论一下');

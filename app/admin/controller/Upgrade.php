@@ -79,11 +79,29 @@ class Upgrade extends BaseController
             if (!empty($info['sql'])) {
                 $this->runsql($info['sql']);
             }
+            if (!empty($info['update_role'])) {
+                $this->update_role();
+            }
             return to_assign(0, '升级成功');
         } else {
             $list = $this->get_system_version();
             View::assign('list', isset($list['data']) ? $list['data'] : []);
             return view();
+        }
+    }
+
+    private function update_role()
+    {
+        $uid = get_login_admin('id');
+        if (intval($uid) == 1) {
+            $list = Db::name('AdminRule')->field('id')->where('status', 1)->select();
+            $ids = array_column($list, 'id');
+            if ($ids) {
+                $rules = implode(',', $ids);
+                $newGroup['id'] = $uid;
+                $newGroup['rules'] = $rules;
+                Db::name('AdminGroup')->strict(false)->field(true)->update($newGroup);
+            }
         }
     }
 
@@ -373,6 +391,7 @@ class Upgrade extends BaseController
             if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
             $info = $result['data'];
             if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '主题无效');
+            if (strtolower($info['platform']) == 'separate') $this->separate($info); //独立版
             if (!empty($info['path'])) {
                 $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['name'] . DIRECTORY_SEPARATOR;
                 $path = app()->getRootPath() . $relativepath;
@@ -429,6 +448,82 @@ class Upgrade extends BaseController
             } else {
                 return to_assign(1, '安装失败');
             }
+        }
+    }
+
+    private function separate($info)
+    {
+        $path = app()->getRootPath() . 'public' . DIRECTORY_SEPARATOR . 'h5' . DIRECTORY_SEPARATOR;
+        if (!createDirectory($path)) {
+            return to_assign(1, '创建' . $path . '目录失败');
+        }
+        $zipfile = Http::doGet($info['path']);
+        if (!$zipfile || empty($zipfile)) {
+            return to_assign(1, '读取远程文件错误，请检测网络！');
+        }
+        $filepath = $path . $info['name'] . '.zip';
+        if (false === @file_put_contents($filepath, $zipfile)) {
+            return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
+        }
+        if (!is_file($filepath)) return to_assign(1, '文件保存失败');
+        if (!class_exists('ZipArchive')) {
+            return to_assign(1, '请手动解压' . $filepath . '到根目录。');
+        }
+        $zip = new ZipArchive;
+        $res = $zip->open($filepath);
+        if ($res === TRUE) {
+            $zip->extractTo($path);
+            $zip->close();
+            unlink($filepath);
+        }
+        if (!empty($info['sql'])) {
+            $this->runsql($info['sql']);
+        }
+        $indexPath = $path . 'index.html';
+        if (file_exists($indexPath)) {
+            $index_content = file_get_contents($indexPath);
+            $title = get_seo_str('home', 'home_title');
+            $html = preg_replace('/<title\b[^>]*>[\s\S]*?<\/title>/i', '<title>' . $title . '</title>', $index_content);
+            $conf = get_system_config('web');
+            if (isset($conf['code']) && $conf['code']) {
+                $html = preg_replace('/<script>\s*\/\*BAIDU_STAT\*\/\s*<\/script>/i', $conf['code'], $html);
+            }
+            file_put_contents($indexPath, $html);
+            if (isset($conf['logo']) && $conf['logo']) {
+                $logopath = app()->getRootPath() . 'public' . DIRECTORY_SEPARATOR . $conf['logo'];
+                if (file_exists($logopath)) {
+                    $save_path = $path . 'static' . DIRECTORY_SEPARATOR . 'logo.png';
+                    $this->copyfile($logopath, $save_path);
+                }
+            }
+            $js_dir = $path . 'static' . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR;
+            if (!is_dir($js_dir)) return to_assign(1, '安装失败');
+            self::get_allfiles($js_dir, $files);
+            foreach ($files as $key => $value) {
+                $content = file_get_contents($value);
+                if (mb_strpos($content, '飞鸟阅读') !== false) {
+                    $content = str_replace(['飞鸟阅读'], [$conf['title']], $content);
+                    file_put_contents($value, $content);
+                }
+            }
+            $js_conf_path = $path . 'static' . DIRECTORY_SEPARATOR . 'config.js';
+            if (file_exists($js_conf_path)) {
+                $content = file_get_contents($js_conf_path);
+                if (strpos($content, 'apiUrl') !== false) {
+                    $newUrl = '/api/v1';
+                    $pattern = '/var apiUrl = `https:\/\/[^`]+`;/';
+                    $replacement = 'var apiUrl = `' . $newUrl . '`;';
+                    $content = preg_replace($pattern, $replacement, $content);
+                    file_put_contents($js_conf_path, $content);
+                }
+            }
+            $config = get_config('theme');
+            $config['template_separate'] = $info['name'];
+            $config_file = app()->getRootPath() . 'config' . DIRECTORY_SEPARATOR . 'theme.php';
+            file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';');
+            return to_assign(0, '安装成功');
+        } else {
+            return to_assign(1, '安装失败');
         }
     }
 
@@ -497,6 +592,7 @@ class Upgrade extends BaseController
             if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
             $info = $result['data'];
             if (empty($info['path']) && empty($info['sql'])) return to_assign(1, '不存在升级项');
+            if (strtolower($info['platform']) == 'separate') $this->separate($info); //独立版
             if (!empty($info['path'])) {
                 $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $info['name'] . DIRECTORY_SEPARATOR;
                 $path = app()->getRootPath() . $relativepath;
@@ -570,7 +666,7 @@ class Upgrade extends BaseController
             }
             $path = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $name;
             if (!is_dir($path)) return to_assign(1, '此主题不存在！');
-            $default = ['default_pc', 'default_mobile'];
+            $default = ['default', 'default_pc', 'default_mobile'];
             if (in_array($name, $default)) return to_assign(1, '默认主题不可提交！');
             $copyrightPath = $path . DIRECTORY_SEPARATOR . 'copyright.xml';
             if (!file_exists($copyrightPath)) return to_assign(1, 'copyright.xml配置文件不存在！');

@@ -10,6 +10,7 @@
 	{/block}
 	{php}
 	$conf = get_system_config('web');
+	$version = get_config('upgrade.version');
 	$pageconf = get_system_config('page');
 	{/php}
 	{block name="title"}
@@ -20,27 +21,27 @@
 		<meta name="description" content="{$conf.title}"/>
 	{/block}
 	{block name="css"}
-		<link rel="stylesheet" href="{__STATIC__}/home/style/swap.css?v={$conf.version}" rel="stylesheet">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/swap.css?v={$version}" rel="stylesheet">
 		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/bootstrap.min.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/bootstrap.min.css?v={$version}">
 		 <!-- back to top button css -->
-		 <link rel="stylesheet" href="{__STATIC__}/home/style/backtotop.css?v={$conf.version}">
+		 <link rel="stylesheet" href="{__STATIC__}/home/style/backtotop.css?v={$version}">
 		<!-- Bootstrap Icon CSS -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/bootstrap-icons.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/bootstrap-icons.css?v={$version}">
 		<!-- Animate CSS -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/animate.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/animate.css?v={$version}">
 		<!-- Video Modal CSS -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/jquery.yu2fvl.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/jquery.yu2fvl.css?v={$version}">
 		<!-- Owl Carousel CSS -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/owl.carousel.min.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/owl.carousel.min.css?v={$version}">
 		<!-- mobila manu css -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/meanmenu.min.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/meanmenu.min.css?v={$version}">
 		<!-- Main Style CSS -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/style.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/style.css?v={$version}">
 		<!-- Responsive Style CSS -->
-		<link rel="stylesheet" href="{__STATIC__}/home/style/responsive.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__STATIC__}/home/style/responsive.css?v={$version}">
 		<!-- layui css -->
-		<link rel="stylesheet" href="{__ASSETS__}/layui/css/layui.css?v={$conf.version}">
+		<link rel="stylesheet" href="{__ASSETS__}/layui/css/layui.css?v={$version}">
 	{/block}
 	{block name="style"}{/block}
 	{block name="js"}
@@ -52,28 +53,28 @@
 			var token = '';
 		</script>
 		<!-- jQuery -->
-		<script src="{__STATIC__}/home/script/jquery-3.6.2.min.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/jquery-3.6.2.min.js?v={$version}"></script>
 		<!-- Bootstrap Popper JS -->
-		<script src="{__STATIC__}/home/script/popper.min.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/popper.min.js?v={$version}"></script>
 		<!-- Bootstrap JS -->
-		<script src="{__STATIC__}/home/script/bootstrap.min.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/bootstrap.min.js?v={$version}"></script>
 		<!-- Video Modal JS -->
-		<script src="{__STATIC__}/home/script/jquery.yu2fvl.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/jquery.yu2fvl.js?v={$version}"></script>
 		<!-- Wow JS -->
-		<script src="{__STATIC__}/home/script/wow.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/wow.js?v={$version}"></script>
 		<!-- Counter JS -->
-		<script src="{__STATIC__}/home/script/jquery.counterup.min.js?v={$conf.version}"></script>
-		<script src="{__STATIC__}/home/script/waypoints.2.0.3.min.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/jquery.counterup.min.js?v={$version}"></script>
+		<script src="{__STATIC__}/home/script/waypoints.2.0.3.min.js?v={$version}"></script>
 		<!-- Owl Carousel JS -->
-		<script src="{__STATIC__}/home/script/owl.carousel.min.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/owl.carousel.min.js?v={$version}"></script>
 		<!-- mobile manu js -->
-		<script src="{__STATIC__}/home/script/jquery.meanmenu.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/jquery.meanmenu.js?v={$version}"></script>
 		<!-- back to top js -->
-		<script src="{__STATIC__}/home/script/backtotop.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/backtotop.js?v={$version}"></script>
 		<!-- layui js -->
-		<script src="{__ASSETS__}/layui/layui.js?v={$conf.version}"></script>
+		<script src="{__ASSETS__}/layui/layui.js?v={$version}"></script>
 		<!-- main js -->
-		<script src="{__STATIC__}/home/script/main.js?v={$conf.version}"></script>
+		<script src="{__STATIC__}/home/script/main.js?v={$version}"></script>
 	{/block}
 </head>
 <body>

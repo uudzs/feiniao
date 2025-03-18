@@ -140,7 +140,7 @@ class User extends BaseController
         if (preg_match('/^data:image\/(\w+);base64,/', $avatar, $matches)) {
             $imageType = $matches[1]; // 获取图片类型，例如 'jpeg', 'png', 'gif' 等
         } else {
-            $this->apiError('不是图片');
+            $imageType = strtolower(pathinfo($avatar, PATHINFO_EXTENSION));            
         }
         if (!in_array($imageType, ['jpg', 'png', 'jpeg', 'gif'])) {
             $this->apiError('不是图片');

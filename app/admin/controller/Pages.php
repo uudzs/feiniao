@@ -17,9 +17,9 @@ use think\facade\View;
 class Pages extends BaseController
 
 {
-	
+
 	var $uid;
-    var $model;
+	var $model;
 
 	/**
 	 * 构造函数
@@ -93,7 +93,7 @@ class Pages extends BaseController
 			$param['admin_id'] = $this->uid;
 			$this->model->addPages($param);
 		} else {
-			$templatesDir = CMS_ROOT . 'template/' . (get_system_config('web', 'template') ?: 'default') . '/pages/';
+			$templatesDir = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . get_config('theme.template_pc') . DIRECTORY_SEPARATOR . 'pages' . DIRECTORY_SEPARATOR;
 			$templates = get_file_list($templatesDir);
 			View::assign('templates', $templates);
 			return view();
@@ -165,7 +165,7 @@ class Pages extends BaseController
 				$detail['keyword_names'] = implode(',', array_column($keyword_array, 'title'));
 				$detail['keyword_array'] = $keyword_array;
 
-				$templatesDir = CMS_ROOT . 'template/' . (get_system_config('web', 'template') ?: 'default') . '/pages/';
+				$templatesDir = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . get_config('theme.template_pc') . DIRECTORY_SEPARATOR . 'pages' . DIRECTORY_SEPARATOR;
 				$templates = get_file_list($templatesDir);
 				View::assign('templates', $templates);
 				View::assign('detail', $detail);

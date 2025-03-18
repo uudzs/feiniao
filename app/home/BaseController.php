@@ -62,14 +62,14 @@ abstract class BaseController
             'module' => \think\facade\App::initialize()->http->getName(),
             'controller' => app('request')->controller(),
             'action' => app('request')->action(),
-            'version' => get_config('webconfig.version'),
+            'version' => get_config('upgrade.version')
         ];
         $domain_bind = get_config('app.domain_bind');
         $params['domain_bind'] = $domain_bind ? array_flip($domain_bind) : [];
         if (Request::isMobile() || isWeChat()) {
-            View::config(['view_path' => CMS_ROOT . 'template/' . (get_config('theme.template_mobile') ?: 'default_mobile') . '/']);
+            View::config(['view_path' => CMS_ROOT . 'template/' . get_config('theme.template_mobile') . '/']);
         } else {
-            View::config(['view_path' => CMS_ROOT . 'template/' . (get_config('theme.template_pc') ?: 'default_pc') . '/']);
+            View::config(['view_path' => CMS_ROOT . 'template/' . get_config('theme.template_pc') . '/']);
         }
         if (isWeChat()) {
             // $config = get_config('wechat');

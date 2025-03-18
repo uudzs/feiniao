@@ -1,7 +1,10 @@
 var storage = bui.storage();
 var token = storage.get('token', 0);
 if (!token) gettoken();
-
+if (!token.includes('.')) {
+    token = storage.get('token');
+    if (!token) gettoken();
+}
 // 封装的POST请求函数
 async function post(url, data, callback) {
     try {

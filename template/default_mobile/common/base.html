@@ -3,6 +3,7 @@
 <head>
     {php}
 	$systemconf = get_system_config('web');
+    $version = get_config('upgrade.version');
 	{/php}
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
     {block name="title"}
@@ -15,9 +16,9 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     {block name="css"}
-        <link rel="stylesheet" href="{__STATIC__}/font-awesome/css/font-awesome.min.css?v={$systemconf.version}" />
-        <link rel="stylesheet" href="{__STATIC__}/bui/css/bui.css?v={$systemconf.version}" />
-        <link rel="stylesheet" href="{__MOBILE__}/default/css/style.css?v={$systemconf.version}" />
+        <link rel="stylesheet" href="{__STATIC__}/font-awesome/css/font-awesome.min.css?v={$version}" />
+        <link rel="stylesheet" href="{__STATIC__}/bui/css/bui.css?v={$version}" />
+        <link rel="stylesheet" href="{__MOBILE__}/default/css/style.css?v={$version}" />
     {/block}
     {block name="style"}{/block}
     {block name="js"}
@@ -28,9 +29,9 @@
             var sessioninvitename = "{:get_config('app.session_invite')}";
             var is_official_open = "{:get_system_config('wechat','official_open')}";
         </script>
-        <script src="{__STATIC__}/bui/js/zepto.js?v={$systemconf.version}"></script>
-        <script src="{__STATIC__}/bui/js/bui.js?v={$systemconf.version}"></script>
-        <script src="{__MOBILE__}/default/js/init.js?v=sv{$systemconf.version}"></script>
+        <script src="{__STATIC__}/bui/js/zepto.js?v={$version}"></script>
+        <script src="{__STATIC__}/bui/js/bui.js?v={$version}"></script>
+        <script src="{__MOBILE__}/default/js/init.js?v={$version}"></script>
         {if condition="isWeChat()"}
             <script src="https://res.wx.qq.com/open/js/jweixin-1.4.0.js" type="text/javascript" charset="utf-8"></script>
             {notempty name="$appconfig"}

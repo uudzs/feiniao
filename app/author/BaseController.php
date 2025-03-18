@@ -62,7 +62,7 @@ abstract class BaseController
             'isLogin' => 0,
             'uid' => 0,
             'nickname' => '',
-            'version' => get_config('webconfig.version'),
+            'version' => get_config('upgrade.version'),
         ];
         $info = $this->checkLogin();
         if ($info) {
