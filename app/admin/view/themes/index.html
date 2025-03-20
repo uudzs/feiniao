@@ -63,6 +63,7 @@
                                             <button class="layui-btn layui-btn-xs layui-bg-red" type="button" lay-filter="unload" data-name="{$v.floder}" data-platform="{:strtoupper($v.platform)}">卸载</button>
                                         {/eq}
                                         <button class="layui-btn layui-btn-xs layui-btn-normal" type="button" lay-filter="upgrade" data-name="{$v.floder}" data-version="{$v.ver}">更新</button>
+                                        <button class="layui-btn layui-btn-xs layui-btn-primary" type="button" lay-filter="files" data-path="{$v.path}">文件</button>
                                     </p>
                                 </div>
                             </div>
@@ -139,6 +140,12 @@
         });
         $('[lay-filter="loginunion"]').on('click', function() {
             tool.side("{:url('upgrade/union_login')}");
+			return false;
+        });
+        $('[lay-filter="files"]').on('click', function() {
+            var path = $(this).data('path').trim();
+            if(!path) return layer.msg('目录为空！');
+            tool.side("{:url('themes/files')}?path="+path);
 			return false;
         });
         $('[lay-filter="setup"]').on('click', function() {

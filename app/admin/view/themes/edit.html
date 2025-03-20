@@ -1,0 +1,69 @@
+{extend name="common/base"/}
+{block name="style"}
+<style type="text/css">
+
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+  <!-- CodeMirror CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
+  <!-- CodeMirror 主题 CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/panda-syntax.min.css">
+  <form class="layui-form p-4">
+	<h3 class="pb-3">文件编辑</h3>
+	<table class="layui-table layui-table-form">
+		<tr>
+			<td><textarea id="code-editor">{$content|default=""}</textarea></td>
+		</tr>
+	</table>
+	<div class="pt-3">
+		<input name="path" type="hidden" value="{$path|default=''}" />
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<!-- CodeMirror JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
+<!-- CodeMirror 语言模式 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/htmlmixed/htmlmixed.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/css/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/php/php.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/xml/xml.min.js"></script>
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+        // 初始化 CodeMirror
+        const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+            lineNumbers: true, // 显示行号
+            mode: 'htmlmixed', // 默认模式为 HTML 混合模式
+            theme: 'panda-syntax',  // 设置主题
+            indentUnit: 4,      // 缩进单位
+            smartIndent: true,  // 智能缩进
+            matchBrackets: true // 匹配括号
+        });
+        editor.setSize("100%", "80%");
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            const content = editor.getValue(); // 获取编辑器内容 
+            data.field.content = content;    
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    tool.sideClose(1000);
+                }
+            }
+            tool.post("{:url('themes/edit')}", data.field, callback);
+            return false;
+        });
+	}
+</script>
+{/block}
+<!-- /脚本 -->

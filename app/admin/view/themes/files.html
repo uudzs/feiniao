@@ -1,0 +1,113 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+	.layui-card-body .layui-timeline-title {
+		padding-bottom: 0;
+		font-size: 14px;
+	}
+    .theme {
+        display: flex;
+    }
+    .theme .cover {
+        width: 100%;
+        height: 100%;
+    }
+    .theme .layui-card-body {
+        height: auto;
+        overflow: hidden;
+    }
+    .theme .item {
+        padding: 10px;
+    }
+    .theme .layui-btn {
+        margin-left: 0;
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <div class="layui-bg-gray">
+        <div class="layui-row layui-col-space15 theme">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <div style="padding-bottom: 10px;">
+                        {if (strpos(dirname($parent_dir), 'template') !== false && strpos(dirname($parent_dir), 'public') !== false)}
+                            <a class="layui-btn layui-btn-sm" href="{:url('themes/files')}?path={:urlencode($parent_dir)}"><i class="layui-icon layui-icon-return"></i> 返回上级目录</a>
+                        {/if}
+                        </div>
+                        <table class="layui-table">
+                            <colgroup>
+                                <col>
+                                <col width="200">
+                                <col width="200">
+                                <col width="150">
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>文件大小</th>
+                                    <th>修改时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{if $vo['isDir']==1}<i class="layui-icon layui-icon-folder" style="color: #77c100;"></i>{else/}<i class="layui-icon layui-icon-file" style="color: #1E9FFF;"></i>{/if} {$vo['filename']}</td>
+                                    <td>{$vo['size']}</td>
+                                    <td>{$vo['mtime']|time_format="Y-m-d H:i"}</td>
+                                    <td>
+                                        {if $vo['isFile']==1}
+                                            {if ($vo['ext']=='js' or $vo['ext']=='css' or $vo['ext']=='html' or $vo['ext']=='htm' or $vo['ext']=='xml')}
+                                            <button data-path="{:url('themes/edit')}?path={:urlencode($vo['path'].'/'.$vo['filename'])}" class="layui-btn layui-btn-normal layui-btn-xs" lay-filter="edit"><i class="layui-icon layui-icon-edit"></i>编辑</button>
+                                            {/if}
+                                        {else/}
+                                            <a class="layui-btn layui-btn-xs" href="{:url('themes/files')}?path={:urlencode($vo['path'].'/'.$vo['filename'])}"><i class="iconfont icon-folder"></i>打开目录</a>
+                                        {/if}
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {else/}
+                                    <td colspan="5"> aOh! 暂时还没有内容! </td>
+                                {/notempty}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+	function feiniaoInit() {
+        var tool = layui.tool;
+        $('[lay-filter="edit"]').on('click', function() {
+            var path = $(this).data('path').trim();
+            var self = this;
+            if(!path) return layer.msg('参数为空！');
+            tool.side(path);
+			return false;
+        });
+        window.showBigImage = function (e) {
+			layer.open({
+				type: 1,
+				title: false,
+				closeBtn: true,
+				shadeClose: true, //点击阴影关闭
+				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
+				content: "<img src=" + $(e).attr('src') + " />"
+			});
+		};
+	}
+</script>
+{/block}
+<!-- /脚本 -->
