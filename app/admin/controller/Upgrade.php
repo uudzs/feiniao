@@ -94,7 +94,7 @@ class Upgrade extends BaseController
     {
         $uid = get_login_admin('id');
         if (intval($uid) == 1) {
-            $list = Db::name('AdminRule')->field('id')->where('status', 1)->select();
+            $list = Db::name('AdminRule')->field('id')->where('status', 1)->select()->toArray();
             $ids = array_column($list, 'id');
             if ($ids) {
                 $rules = implode(',', $ids);
