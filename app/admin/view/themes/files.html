@@ -33,7 +33,7 @@
                 <div class="layui-card">
                     <div class="layui-card-body">
                         <div style="padding-bottom: 10px;">
-                        {if (strpos(dirname($parent_dir), 'template') !== false && strpos(dirname($parent_dir), 'public') !== false)}
+                        {if (strpos(dirname($parent_dir), 'template') !== false || strpos(dirname($parent_dir), 'public') !== false)}
                             <a class="layui-btn layui-btn-sm" href="{:url('themes/files')}?path={:urlencode($parent_dir)}"><i class="layui-icon layui-icon-return"></i> 返回上级目录</a>
                         {/if}
                         </div>
