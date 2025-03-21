@@ -939,10 +939,12 @@ class Common extends BaseController
         }
         //手机
         if (preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-            if (get_addons_is_enable('aliyunsms')) {
-                $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
+            $obj = auto_run_addons('smssend', ['code' => $code, 'phone' => $mobile]);
+            if ($obj) {
+                $result = isset($obj[0]) ? $obj[0] : $obj;
+                if (!isJson($result)) $this->apiError('发送失败');
                 $result = json_decode($result, true);
-                if ($result && is_array($result) && $result['Code'] == 'OK') {
+                if (isset($result['code']) && intval($result['code']) == 0) {
                     if (!empty($verif)) {
                         $data = array(
                             'account' => $mobile,
@@ -973,8 +975,10 @@ class Common extends BaseController
                         }
                     }
                 } else {
-                    $this->apiError($result['Message']);
+                    $this->apiError($result['msg']);
                 }
+            } else {
+                $this->apiError('发送失败');
             }
         }
         $this->apiError('禁止相关功能');

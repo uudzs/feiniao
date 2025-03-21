@@ -1519,8 +1519,8 @@ if (!function_exists('furl')) {
                     return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(true);
                 }
             } else {
-                $rurl = url($url, $vars, $suffix, true);               
-                $parse = parse_url($rurl);                
+                $rurl = url($url, $vars, $suffix, true);
+                $parse = parse_url($rurl);
                 if ($parse) {
                     if (isset($parse['path']) && $parse['path']) {
                         if ($parse['path'] == '/' || strpos($parse['path'], $model) !== false) {
@@ -1531,7 +1531,7 @@ if (!function_exists('furl')) {
                                 if ($fChar != '/') {
                                     $url = '/' . $url;
                                 }
-                                $url = '/' . $model . $url;                        
+                                $url = '/' . $model . $url;
                                 return url($url, $vars, $suffix, false);
                             }
                             return (isset($parse['scheme']) ? $parse['scheme'] : 'http') . '://' . (isset($parse['host']) ? $parse['host'] : '') . (isset($parse['port']) ? $parse['port'] : '') . '/' . $model . (isset($parse['path']) ? $parse['path'] : '') . (isset($parse['query']) ? ('?' . $parse['query']) : '');
@@ -1573,18 +1573,35 @@ if (!function_exists('get_addons_list')) {
 if (!function_exists('load_addons_run')) {
     function load_addons_run()
     {
-        $html = '';
+        $obj = auto_run_addons('run');
+        if ($obj) {
+            if (is_array($obj)) return implode("\n", $obj);
+        }
+        return '';
+    }
+}
+if (!function_exists('auto_run_addons')) {
+    function auto_run_addons($action, $param = [])
+    {
+        $obj = [];
         $list = get_addons_list();
         foreach ($list as $k => $v) {
             if (empty($v['install']) || empty($v['status'])) continue;
             $addons_class = '\\addons\\' . $v['name'] . '\\Plugin';
             if (class_exists($addons_class)) {
                 $addon = app($addons_class);
-                if (method_exists($addon, 'run')) {
-                    $html .= $addon->run();
+                if (method_exists($addon, $action)) {
+                    $obj[] = $addon->$action($param);
                 }
             }
         }
-        return $html;
+        return $obj;
+    }
+}
+if (!function_exists('isJson')) {
+    function isJson($string)
+    {
+        $json = json_decode($string);
+        return (json_last_error() == JSON_ERROR_NONE) && (!is_null($json));
     }
 }

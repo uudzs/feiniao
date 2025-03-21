@@ -1,54 +1,41 @@
 <?php
+
 namespace addons\aliyunsms;
 
-use AlibabaCloud\Client\AlibabaCloud;
-use AlibabaCloud\Client\Exception\ClientException;
-use AlibabaCloud\Client\Exception\ServerException;
 use think\Addons;
 
-/**
- * 注意名字不可以修改，只能为Plugin
- */
-class Plugin extends Addons	// 需继承think\Addons类
+class Plugin extends Addons
 {
-    /**
-     * 插件安装方法
-     * @return bool
-     */
+
     public function install()
     {
         return true;
     }
 
-    /**
-     * 插件卸载方法
-     * @return bool
-     */
     public function uninstall()
     {
         return true;
     }
 
-    public function aliyunSmsSendHook($param)
+    public function smssend($param)
     {
-        // 当前插件的基础信息，系统优先获取info.ini中的配置信息
         $info = $this->getInfo();
-        // 插件禁用后不再进行上传
         if ($info['install'] == 0 || $info['status'] == 0) {
             return json_encode([
-                'Code' => 1,
-                'Message' => '阿里云sms短信插件已禁用或未安装，请启用或安装后再试。',
+                'code' => 1,
+                'msg' => '短信插件已禁用或未安装',
                 'data' => '',
             ]);
         }
         try {
             $config = $this->getConfig();
+            require_once app()->getRootPath() . 'addons' . DIRECTORY_SEPARATOR . $info['name'] . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
             # 转换成json
             $templateParam = json_encode(['code' => $param['code']]);
             // 创建客户端
-            AlibabaCloud::accessKeyClient($config['access_key_id'], $config['access_key_secret'])->regionId($config['region'])->asDefaultClient();
+            \AlibabaCloud\Client\AlibabaCloud::accessKeyClient($config['access_key_id'], $config['access_key_secret'])->regionId($config['region'])->asDefaultClient();
             // 发送请求
-            $result = AlibabaCloud::rpc()
+            $result = \AlibabaCloud\Client\AlibabaCloud::rpc()
                 # 具体产品
                 ->product($config['product'])
                 ->version('2017-05-25') # 指定版本不可修改
@@ -69,17 +56,30 @@ class Plugin extends Addons	// 需继承think\Addons类
                         'TemplateParam' => $templateParam,
                     ],
                 ])->request();
-            return json_encode($result->toArray());
-        } catch (ServerException $e) {
+            $result = $result->toArray();
+            if ($result && is_array($result) && $result['Code'] == 'OK') {
+                return json_encode([
+                    'code' => 0,
+                    'msg' => '发送成功',
+                    'data' => '',
+                ]);
+            } else {
+                return json_encode([
+                    'code' => 1,
+                    'msg' => $result['Message'],
+                    'data' => '',
+                ]);
+            }
+        } catch (\AlibabaCloud\Client\Exception\ServerException $e) {
             return json_encode([
-                'Code' => 'error',
-                'Message' => $e->getErrorMessage(),
+                'code' => 1,
+                'msg' => $e->getErrorMessage(),
                 'data' => '',
             ]);
-        } catch (ClientException $e) {
+        } catch (\AlibabaCloud\Client\Exception\ClientException $e) {
             return json_encode([
-                'Code' => 'error',
-                'Message' => $e->getErrorMessage(),
+                'code' => 1,
+                'msg' => $e->getErrorMessage(),
                 'data' => '',
             ]);
         }

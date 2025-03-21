@@ -125,10 +125,12 @@ class Login
         }
         //发送过程
         if (preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-            if (get_addons_is_enable('aliyunsms')) {
-                $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
+            $obj = auto_run_addons('smssend', ['code' => $code, 'phone' => $mobile]);
+            if ($obj) {
+                $result = isset($obj[0]) ? $obj[0] : $obj;
+                if (!isJson($result)) return to_assign(1, '发送失败');
                 $result = json_decode($result, true);
-                if ($result && is_array($result) && $result['Code'] == 'OK') {
+                if (isset($result['code']) && intval($result['code']) == 0) {
                     if (!empty($verif)) {
                         $data = array(
                             'account' => $mobile,
@@ -159,10 +161,10 @@ class Login
                         }
                     }
                 } else {
-                    return to_assign(1, $result['Message']);
+                    return to_assign(1, $result['msg']);
                 }
             } else {
-                return to_assign(1, '短信服务未开启');
+                return to_assign(1, '发送失败');
             }
         } else {
             return to_assign(1, '手机号格式错误');
@@ -215,10 +217,12 @@ class Login
         }
         //发送过程
         if (preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-            if (get_addons_is_enable('aliyunsms')) {
-                $result = hook('aliyunSmsSendHook', ['code' => $code, 'phone' => $mobile]);
+            $obj = auto_run_addons('smssend', ['code' => $code, 'phone' => $mobile]);
+            if ($obj) {
+                $result = isset($obj[0]) ? $obj[0] : $obj;
+                if (!isJson($result)) return to_assign(1, '发送失败');
                 $result = json_decode($result, true);
-                if ($result && is_array($result) && $result['Code'] == 'OK') {
+                if (isset($result['code']) && intval($result['code']) == 0) {
                     if (!empty($verif)) {
                         $data = array(
                             'account' => $mobile,
@@ -249,10 +253,10 @@ class Login
                         }
                     }
                 } else {
-                    return to_assign(1, $result['Message']);
+                    return to_assign(1, $result['msg']);
                 }
             } else {
-                return to_assign(1, '短信服务未开启');
+                return to_assign(1, '发送失败');
             }
         } else {
             return to_assign(1, '手机号格式错误');
