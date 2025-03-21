@@ -8,19 +8,15 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
-        'd767e4fc2dc52fe66584ab8c6684783e' => __DIR__ . '/..' . '/adbario/php-dot-notation/src/helpers.php',
         '9b552a3cc426e3287cc811caefa3cf53' => __DIR__ . '/..' . '/topthink/think-helper/src/helper.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '35fab96057f1bf5e7aba31a8a6d5fdde' => __DIR__ . '/..' . '/topthink/think-orm/stubs/load_stubs.php',
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '6b998e7ad3182c0d21d23780badfa07b' => __DIR__ . '/..' . '/yansongda/supports/src/Functions.php',
         '9c7a683baffd24f5595c1dc5f5273030' => __DIR__ . '/..' . '/hyperf/engine/src/Functions.php',
-        'b067bc7112e384b61c701452d53a14a8' => __DIR__ . '/..' . '/mtdowling/jmespath.php/src/JmesPath.php',
-        '66453932bc1be9fb2f910a27947d11b6' => __DIR__ . '/..' . '/alibabacloud/client/src/Functions.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         'c5521cebe610a9bf42c44b3a5163adfd' => __DIR__ . '/..' . '/overtrue/socialite/src/Contracts/FactoryInterface.php',
         'ccd11c8e7dd9b33638b248681bdfba27' => __DIR__ . '/..' . '/overtrue/socialite/src/Contracts/UserInterface.php',
@@ -53,10 +49,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             'liliuwei\\think\\' => 15,
         ),
-        'c' => 
-        array (
-            'clagiordano\\weblibs\\configmanager\\' => 34,
-        ),
         'a' => 
         array (
             'app\\' => 4,
@@ -80,11 +72,9 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
-            'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Contracts\\Service\\' => 26,
             'Symfony\\Contracts\\EventDispatcher\\' => 34,
             'Symfony\\Contracts\\Cache\\' => 24,
-            'Symfony\\Component\\Yaml\\' => 23,
             'Symfony\\Component\\VarExporter\\' => 30,
             'Symfony\\Component\\VarDumper\\' => 28,
             'Symfony\\Component\\HttpFoundation\\' => 33,
@@ -110,8 +100,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             'Overtrue\\Socialite\\' => 19,
             'Overtrue\\Pinyin\\' => 16,
-            'OneSm\\' => 6,
-            'OSS\\' => 4,
         ),
         'M' => 
         array (
@@ -126,10 +114,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             'League\\MimeTypeDetection\\' => 25,
             'League\\Flysystem\\' => 17,
-        ),
-        'J' => 
-        array (
-            'JmesPath\\' => 9,
         ),
         'H' => 
         array (
@@ -158,8 +142,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         'D' => 
         array (
             'DeepCopy\\' => 9,
-            'Darabonba\\OpenApi\\' => 18,
-            'Darabonba\\GatewaySpi\\' => 21,
             'DASPRiD\\Enum\\' => 13,
         ),
         'C' => 
@@ -169,19 +151,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         'B' => 
         array (
             'BaconQrCode\\' => 12,
-        ),
-        'A' => 
-        array (
-            'AlibabaCloud\\Tea\\XML\\' => 21,
-            'AlibabaCloud\\Tea\\Utils\\' => 23,
-            'AlibabaCloud\\Tea\\' => 17,
-            'AlibabaCloud\\SDK\\Dysmsapi\\V20170525\\' => 36,
-            'AlibabaCloud\\OpenApiUtil\\' => 25,
-            'AlibabaCloud\\Endpoint\\' => 22,
-            'AlibabaCloud\\Credentials\\' => 25,
-            'AlibabaCloud\\Client\\' => 20,
-            'AlibabaCloud\\' => 13,
-            'Adbar\\' => 6,
         ),
     );
 
@@ -220,10 +189,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             0 => __DIR__ . '/..' . '/liliuwei/thinkphp-jump/src',
         ),
-        'clagiordano\\weblibs\\configmanager\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/clagiordano/weblibs-configmanager/src',
-        ),
         'app\\' => 
         array (
             0 => __DIR__ . '/../..' . '/app',
@@ -260,10 +225,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Ctype\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
-        ),
         'Symfony\\Contracts\\Service\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/service-contracts',
@@ -275,10 +236,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         'Symfony\\Contracts\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/cache-contracts',
-        ),
-        'Symfony\\Component\\Yaml\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/yaml',
         ),
         'Symfony\\Component\\VarExporter\\' => 
         array (
@@ -357,14 +314,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             0 => __DIR__ . '/..' . '/overtrue/pinyin/src',
         ),
-        'OneSm\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/lizhichao/one-sm/src',
-        ),
-        'OSS\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/aliyuncs/oss-sdk-php/src/OSS',
-        ),
         'MyCLabs\\Enum\\' => 
         array (
             0 => __DIR__ . '/..' . '/myclabs/php-enum/src',
@@ -396,10 +345,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         'League\\Flysystem\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/flysystem/src',
-        ),
-        'JmesPath\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/mtdowling/jmespath.php/src',
         ),
         'Hyperf\\Pimple\\' => 
         array (
@@ -453,14 +398,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
-        'Darabonba\\OpenApi\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/darabonba-openapi/src',
-        ),
-        'Darabonba\\GatewaySpi\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/gateway-spi/src',
-        ),
         'DASPRiD\\Enum\\' => 
         array (
             0 => __DIR__ . '/..' . '/dasprid/enum/src',
@@ -472,46 +409,6 @@ class ComposerStaticInitf8ec0016be0d170d4691101b2316b38e
         'BaconQrCode\\' => 
         array (
             0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
-        ),
-        'AlibabaCloud\\Tea\\XML\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/tea-xml/src',
-        ),
-        'AlibabaCloud\\Tea\\Utils\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/tea-utils/src',
-        ),
-        'AlibabaCloud\\Tea\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/tea/src',
-        ),
-        'AlibabaCloud\\SDK\\Dysmsapi\\V20170525\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/dysmsapi-20170525/src',
-        ),
-        'AlibabaCloud\\OpenApiUtil\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/openapi-util/src',
-        ),
-        'AlibabaCloud\\Endpoint\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/endpoint-util/src',
-        ),
-        'AlibabaCloud\\Credentials\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/credentials/src',
-        ),
-        'AlibabaCloud\\Client\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/client/src',
-        ),
-        'AlibabaCloud\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/alibabacloud/sdk/src',
-        ),
-        'Adbar\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/adbario/php-dot-notation/src',
         ),
     );
 

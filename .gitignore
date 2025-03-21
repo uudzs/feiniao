@@ -8,9 +8,4 @@
 /public/.user.ini
 /public/storage/*
 /public/backup/*
-/addons/caiji/*
-/addons/caijipro/*
-/addons/import/*
-/addons/cover/*
-/addons/baiduspeech/*
-/addons/changyan/*
+/addons/*

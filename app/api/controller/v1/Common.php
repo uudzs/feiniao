@@ -80,36 +80,18 @@ class Common extends BaseController
             } else {
                 $realPath = CMS_ROOT . "public" . $path . '/' . $filename;
             }
-            $config_web = get_system_config('web');
-            if (is_array($config_web)) {
-                // 阿里云oss
-                if (isset($config_web['upload_driver']) && $config_web['upload_driver'] == 2) {
-                    if (get_addons_is_enable('aliyunoss')) {
-                        $urlArr = hook('aliyunOssHook', ['url' => $filename]);
-                        $urlArr = json_decode($urlArr, true);
-                        if (isset($urlArr['error']) && $urlArr['error'] == 0) {
-                            $filepath = $urlArr['data'];
-                        } else {
-                            return to_assign(1, $urlArr['msg']);
-                        }
-                    } else {
-                        return to_assign(1, '未开启OSS上传功能');
-                    }
+            $obj = auto_run_addons('storage', ['url' => $filename]);
+            if ($obj) {
+                $result = isset($obj[0]) ? $obj[0] : $obj;
+                if (!isJson($result)) return to_assign(1, '上传失败');
+                $result = json_decode($result, true);
+                if (isset($result['code']) && intval($result['code']) == 0) {
+                    $filepath = $result['data'] ?: $filepath;
+                } else {
+                    return to_assign(1, $result['msg']);
                 }
-                //腾讯云cos
-                if (isset($config_web['upload_driver']) && $config_web['upload_driver'] == 3) {
-                    if (get_addons_is_enable('qcloudcos')) {
-                        $urlArr = hook('qcloudCosHook', ['url' => $filename]);
-                        $urlArr = json_decode($urlArr, true);
-                        if (isset($urlArr['error']) && $urlArr['error'] == 0) {
-                            $filepath = $urlArr['data'];
-                        } else {
-                            return to_assign(1, $urlArr['msg']);
-                        }
-                    } else {
-                        return to_assign(1, '未开启COS上传功能');
-                    }
-                }
+            } else {
+                return to_assign(1, '上传失败');
             }
             //写入到附件表
             $data = [];
