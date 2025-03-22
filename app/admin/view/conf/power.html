@@ -13,19 +13,56 @@
 	<h3 class="pb-3">权限设置</h3>
     <div class="py-3">
         <div class="layui-card">
+            <div class="layui-card-header">用户设置</div>
+            <div class="layui-card-body">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否开启注册</label>
+                        <div class="layui-input-block">
+                            {if(!isset($config['register_open']))}
+                                <input type="radio" name="register_open" value="1" title="开启" checked>
+                                <input type="radio" name="register_open" value="0" title="关闭">
+                            {else/}
+                                <input type="radio" name="register_open" value="1" title="开启"{eq name="$config.register_open" value="1"} checked{/eq}>
+                                <input type="radio" name="register_open" value="0" title="关闭"{eq name="$config.register_open" value="0"} checked{/eq}>
+                            {/if}
+                        </div>
+                    </div>                
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">允许登录类型</label>
+                        <div class="layui-input-block">
+                            {empty name="$config.login_type"}
+                                <input type="checkbox" name="login_type[]" value="sms" title="短信登录">
+                                <input type="checkbox" name="login_type[]" value="account" title="账号登录">
+                                {volist name=":get_addons_type('login')" id="v"}
+                                    <input type="checkbox" name="login_type[]" value="{$v.name}" title="{$v.title}">
+                                {/volist}
+                            {else/}
+                                <input type="checkbox" name="login_type[]" value="sms" title="短信登录" {if(in_array('sms', $config['login_type']))}checked{/if}>
+                                <input type="checkbox" name="login_type[]" value="account" title="账号登录" {if(in_array('account', $config['login_type']))}checked{/if}>
+                                {volist name=":get_addons_type('login')" id="v"}
+                                    <input type="checkbox" name="login_type[]" value="{$v.name}" title="{$v.title}" {if(in_array($v['name'], $config['login_type']))}checked{/if}>
+                                {/volist}
+                            {/empty}
+                        </div>
+                        <div class="layui-form-mid layui-text-em">登录插件安装启用后需要在这里设置开启才会有效，如全未勾选则表示禁止登录。</div>
+                    </div>
+                </div>                
+            </div>
+            <hr>
             <div class="layui-card-header">阅读设置</div>
             <div class="layui-card-body">
                 <div class="layui-form">
                     <div class="layui-form-item">
                         <label class="layui-form-label">是否开启登录阅读</label>
                         <div class="layui-input-block">
-                            {empty name="$config.login_read_open"}
+                            {if(!isset($config['login_read_open']))}
                                 <input type="radio" name="login_read_open" value="1" title="是">
                                 <input type="radio" name="login_read_open" value="0" title="否" checked>
                             {else/}
                                 <input type="radio" name="login_read_open" value="1" title="是"{eq name="$config.login_read_open" value="1"} checked{/eq}>
                                 <input type="radio" name="login_read_open" value="0" title="否"{eq name="$config.login_read_open" value="0"} checked{/eq}>
-                            {/empty}
+                            {/if}
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -44,13 +81,13 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">是否开启TXT下载</label>
                         <div class="layui-input-block">
-                            {empty name="$config.txt_download_open"}
+                            {if(!isset($config['txt_download_open']))}
                                 <input type="radio" name="txt_download_open" value="1" title="是">
                                 <input type="radio" name="txt_download_open" value="0" title="否" checked>
                             {else/}
                                 <input type="radio" name="txt_download_open" value="1" title="是"{eq name="$config.txt_download_open" value="1"} checked{/eq}>
                                 <input type="radio" name="txt_download_open" value="0" title="否"{eq name="$config.txt_download_open" value="0"} checked{/eq}>
-                            {/empty}
+                            {/if}
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -63,13 +100,13 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label">下载是否必须登录</label>
                         <div class="layui-input-block">
-                            {empty name="$config.txt_download_islogin"}
+                            {if(!isset($config['txt_download_islogin']))}
                                 <input type="radio" name="txt_download_islogin" value="1" title="是" checked>
                                 <input type="radio" name="txt_download_islogin" value="0" title="否">
                             {else/}
                                 <input type="radio" name="txt_download_islogin" value="1" title="是"{eq name="$config.txt_download_islogin" value="1"} checked{/eq}>
                                 <input type="radio" name="txt_download_islogin" value="0" title="否"{eq name="$config.txt_download_islogin" value="0"} checked{/eq}>
-                            {/empty}
+                            {/if}
                         </div>
                     </div>
                     <div class="layui-form-item">
@@ -100,7 +137,7 @@
             </div>
         </div>
         <input type="hidden" name="id" value="{$id}">
-		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button class="layui-btn layui-btn-normal" type="button" lay-submit="" lay-filter="webform">立即提交</button>
 		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
 	</div>
 </form>

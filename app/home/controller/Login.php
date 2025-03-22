@@ -20,17 +20,14 @@ class Login extends BaseController
     public function index()
     {
         // 获取来路URL
+        $cookieKey = 'refererKey';
         $refererUrl = Request::instance()->server('HTTP_REFERER', '');
-        if (!empty($refererUrl)) {
-            $parsedUrl = parse_url($refererUrl);
-            if (!empty($parsedUrl) && isset($parsedUrl['path'])) {
-                $profileurl = furl('profile', [], true, 'home');
-                $loginurl = furl('login', [], true, 'home');
-                $regurl = furl('register', [], true, 'home');
-                if ($parsedUrl['path'] == $profileurl || $parsedUrl['path'] == $loginurl || $parsedUrl['path'] == $regurl) {
-                    $refererUrl = '';
-                }
-            }
+        if (!empty($refererUrl) && strpos($refererUrl, 'register') === false) {
+            Cookie::set($cookieKey, $refererUrl);
+        }
+        if (Cookie::has($cookieKey)) $refererUrl = Cookie::get($cookieKey);
+        if (!empty($refererUrl) && strpos($refererUrl, 'register') !== false) {
+            $refererUrl = furl('/', [], true, 'home');
         }
         $refererUrl = $refererUrl ? $refererUrl : furl('/', [], true, 'home');
         View::assign('refererUrl', $refererUrl);

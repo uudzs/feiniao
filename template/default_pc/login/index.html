@@ -6,35 +6,94 @@
 <title>登录-{$conf.title}</title>	
 {/block}
 {block name="body"}
+{include file="common/header" nav='index' /}
+{php}$power = get_system_config('power');{/php}
 <div class="main-body">
     <div class="login-main">
         <div class="login-top">
-            <span>{:get_system_config('web','title')}登录</span>
+            <span>{$conf['title']}登录</span>
             <span class="bg1"></span>
             <span class="bg2"></span>
         </div>
-        <div class="layui-form login-bottom">
-            <div class="center">
-                <div class="item">
-                    <span class="icon icon-2"></span>
-                    <input type="text" name="username" lay-verify="required" placeholder="请输入登录账号" maxlength="24">
-                </div>
-                <div class="item">
-                    <span class="icon icon-3"></span>
-                    <input type="password" name="password" lay-verify="required" placeholder="请输入密码" maxlength="20">
-                    <span class="bind-password icon icon-4"></span>
-                </div>
-                <div id="validatePanel" class="item" style="width: 137px;">
-                    <span class="icon icon-7"></span>
-                    <input type="text" name="captcha" placeholder="请输入验证码" maxlength="6">
-                    <img id="refreshCaptcha" class="validateImg" src="{:furl('v1/captcha', [], true, 'api')}" onclick="this.src='{:furl('v1/captcha', [], true, 'api')}?seed='+Math.random()">
-                </div>              
-            </div>
-            <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
-                <button class="login-btn" lay-submit="" lay-filter="login" style="margin-top: 0;">立即登录</button>
-            </div>
-            <div class="layui-form-item" style="text-align:center; margin-top: 20px;">
-                <a href="{:url('register')}">没有账号？前往注册</a>
+        <div class="layui-form login-bottom">            
+            {if !empty($power['login_type'])}
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        {if(in_array('account', $power['login_type']))}
+                        <li class="layui-this">账号登录</li>
+                        {/if}
+                        {if(in_array('sms', $power['login_type']))}
+                        <li>短信登录</li>
+                        {/if}
+                    </ul>
+                    <div class="layui-tab-content">
+                        {if(in_array('account', $power['login_type']))}
+                            <div class="layui-tab-item layui-show">
+                                <div class="center">                
+                                    <div class="item">
+                                        <span class="icon icon-2"></span>
+                                        <input type="text" name="username" lay-verify="required" placeholder="请输入账号、邮箱、手机" maxlength="24">
+                                    </div>
+                                    <div class="item">
+                                        <span class="icon icon-3"></span>
+                                        <input type="password" name="password" lay-verify="required" placeholder="请输入密码" maxlength="20">
+                                        <span class="bind-password icon icon-4"></span>
+                                    </div>
+                                    <div class="item" style="width: 137px;">
+                                        <span class="icon icon-7"></span>
+                                        <input type="text" name="captcha" placeholder="请输入验证码" maxlength="6">
+                                        <img id="refreshCaptcha" class="validateImg" src="{:furl('v1/captcha', [], true, 'api')}" onclick="this.src='{:furl('v1/captcha', [], true, 'api')}?seed='+Math.random()">
+                                    </div>              
+                                </div>
+                                <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
+                                    <button class="login-btn" lay-submit="" lay-filter="login" style="margin-top: 0;">立即登录</button>
+                                </div>                            
+                            </div>
+                        {/if}
+                        {if(in_array('sms', $power['login_type']))}
+                            <div class="layui-tab-item {if(!in_array('account', $power['login_type']))}layui-show{/if}">
+                                <div class="center">
+                                    <div class="layui-form-item">
+                                        <div class="layui-row">
+                                            <div class="layui-col-xs7">
+                                                <div class="layui-input-wrap">
+                                                    <div class="layui-input-prefix"><i class="layui-icon layui-icon-cellphone"></i></div>
+                                                    <input type="text" name="mobile" value="" lay-verify="required|phone" placeholder="手机号" lay-reqtext="请填写手机号" autocomplete="off" class="layui-input" id="mobile">
+                                                </div>
+                                            </div>
+                                            <div class="layui-col-xs5">
+                                                <div style="margin-left: 11px;"><button type="button" class="layui-btn layui-btn-fluid" lay-on="get-code">获取验证码</button></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-input-wrap">
+                                            <div class="layui-input-prefix">
+                                                <i class="layui-icon layui-icon-vercode"></i>
+                                            </div>
+                                            <input type="text" name="code" value="" lay-verify="required" placeholder="短信验证码" lay-reqtext="请填写短信验证码" autocomplete="off" class="layui-input">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
+                                        <button class="login-btn" lay-submit="" lay-filter="mobile_login" style="margin-top: 0;">立即登录</button>
+                                    </div> 
+                                </div>
+                            </div>
+                        {/if}
+                        <div class="layui-form-item other-login">
+                            <span>
+                              <a href="javascript:;"><i class="layui-icon layui-icon-login-qq" style="color: #3492ed;"></i></a>
+                              <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat" style="color: #4daf29;"></i></a>
+                              <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo" style="color: #cf1900;"></i></a>
+                            </span>
+                        </div>
+                    </div>
+                </div>                
+            {else/}
+                <div class="center" style="font-size: 20px; color: #000;text-align: center;"><i class="layui-icon layui-icon-face-surprised" style="font-size: 20px;"></i> 未开启登录</div>
+            {/if}
+            <div class="layui-form-item bottom-other">
+                <a href="{:url('register')}">没有账号？<span>前往注册</span></a>
             </div>
         </div>
     </div>
@@ -48,7 +107,7 @@
             var $ = layui.jquery,
             form = layui.form,
             layer = layui.layer;
-           
+            {if(in_array('account', $power['login_type']))}
             form.on('submit(login)', function (data) {
                 data = data.field;               
                 if (data.username == '') {
@@ -80,8 +139,76 @@
                     }
                 });                
             });
+            {/if}
+            {if(in_array('sms', $power['login_type']))}
+            form.on('submit(mobile_login)', function (data) {
+                data = data.field;               
+                if (data.mobile == '') {
+                    layer.msg('手机不能为空');
+                    return false;
+                }
+                if (!(/^1\d{10}$/.test(data.mobile))) return layer.msg('手机号不正确！');
+                if (data.code == '') {
+                    layer.msg('验证码不能为空');
+                    return false;
+                }
+                let layerIndex = layer.load();
+                var invite_code = $.getCookie(sessioninvitename);
+                var postData = {"mobile": data.mobile, "code": data.code, "invite_code": invite_code};
+                $.postApi("{:furl('v1/login', [], true, 'api')}", postData, function(result) {
+                    layer.close(layerIndex);
+                    layer.msg(result.msg);
+                    if(parseInt(result.code) == 0) {
+                        layui.data('feiniao', {
+                            key: 'token',
+                            value: result.data.token
+                        });
+                        window.location.href = refererUrl;
+                    }
+                });
+            });
+            {/if}
             return false;
         });
+        {if(in_array('sms', $power['login_type']))}
+        // 倒计时功能
+        function countdown(obj, seconds) {
+            var timer = null;
+            obj.prop('disabled', true);
+            function update() {
+                obj.text('倒计时 ' + seconds + ' 秒');
+                seconds--;
+                if (seconds < 0) {
+                    clearInterval(timer);
+                    obj.prop('disabled', false);
+                    obj.text('获取验证码');
+                }
+            }
+            update();
+            timer = setInterval(update, 1000);
+        }
+        // 获取验证码
+        layui.util.on('lay-on', {
+            'get-code': function(othis) {
+                var isvalid = layui.form.validate('#mobile');
+                if(isvalid) {
+                    var mobile = $("#mobile").val();
+                    if(!mobile) return layer.msg('请输入手机号！');
+                    if (!(/^1\d{10}$/.test(mobile))) return layer.msg('手机号不正确！');
+                    return countdown(othis, 60);
+                    $.postApi("{:furl('v1/smssend', [], true, 'api')}", {mobile: mobile}, function(result) {
+                        if(result.code == 0) {
+                            countdown(othis, 60);
+                        } else {
+                            layer.msg(result.msg);
+                        }
+                    });                    
+                }
+                return false;
+            }
+        });
+        {/if}
+        {if(in_array('account', $power['login_type']))}
         $('.bind-password').on('click', function () {            
             if ($(this).hasClass('icon-5')) {
                 $(this).removeClass('icon-5');
@@ -90,7 +217,8 @@
                 $(this).addClass('icon-5');
                 $("input[name='password']").attr('type', 'text');
             }
-        });       
+        });
+        {/if}
     });
 </script>
 {/block}

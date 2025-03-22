@@ -78,12 +78,12 @@ input:focus{
     width: 428px;
     background: #fff;
     border-radius: 0 0 12px 12px;
-    padding-bottom: 53px;
+    padding-bottom: 20px;
 }
 .login-main .login-bottom .center {
     width: 288px;
     margin: 0 auto;
-    padding-top: 40px;
+    padding-top: 15px;
     padding-bottom: 15px;
     position: relative;
 }
@@ -91,7 +91,7 @@ input:focus{
     width: 288px;
     height: 35px;
     border-bottom: 1px solid #dae1e6;
-    margin-bottom: 35px;
+    margin-bottom: 25px;
     box-sizing:unset;
 }
 .login-main .login-bottom .center .item .icon-2 {
@@ -144,7 +144,7 @@ input:focus{
     height: 40px;
     background-color: #1E9FFF;
     border-radius: 16px;
-    margin: 24px auto 0;
+    margin: 0 auto 0;
     text-align: center;
     line-height: 40px;
     color: #fff;
@@ -166,10 +166,41 @@ input:focus{
     background-color: #1E9FFF;
     color: #fff;
 }
-.footer-area {
-    display: none;
-}
 .agreement, .privacy {
     color: #1E9FFF;
     cursor: pointer;
+}
+.login-bottom .layui-tab {
+    padding: 20px 0 0 0;
+    margin: 0;
+}
+.login-bottom .layui-tab .layui-tab-title {
+    display: flex;
+    justify-content: center;
+}
+.login-bottom .layui-tab-brief>.layui-tab-title .layui-this {
+    color: #1E9FFF;
+}
+.login-bottom .layui-tab-brief>.layui-tab-title .layui-this:after {
+    border-bottom: 2px solid #1E9FFF;
+}
+.login-bottom .other-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 15px;
+}
+.login-bottom .other-login .layui-icon {
+    position: relative;
+    display: inline-block;
+    margin: 0 2px;
+    top: 2px;
+    font-size: 26px;
+}
+.login-bottom .bottom-other {
+    text-align:center;
+    margin-top: 15px;
+}
+.login-bottom .bottom-other span {
+    color: #1E9FFF;
 }

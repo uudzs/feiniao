@@ -57,7 +57,7 @@ class Conf extends BaseController
         } else {
             $id = isset($param['id']) ? $param['id'] : 0;
             if ($id > 0) {
-                $config = Db::name('Config')->where(['id' => $id])->find();
+                $config = Db::name('Config')->where(['id' => $id])->find();                
                 View::assign('config', $config);
             }
             View::assign('id', $id);
@@ -128,12 +128,7 @@ class Conf extends BaseController
             if ($conf['content']) {
                 $config = unserialize($conf['content']);
             }
-            $themes = list_dir('template');
-            if ($config && is_array($config) && !isset($config['template'])) {
-                $config['template'] = isset($themes[0]) ? $themes[0] : '';
-            }
             View::assign('id', $id);
-            View::assign('themes', $themes);
             View::assign('config', $config);
             if (isTemplate($template)) {
                 return view($conf['name']);

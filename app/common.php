@@ -1580,6 +1580,24 @@ if (!function_exists('load_addons_run')) {
         return '';
     }
 }
+if (!function_exists('get_addons_type')) {
+    function get_addons_type($name)
+    {
+        $result = [];
+        $list = get_addons_list();
+        foreach ($list as $k => $v) {
+            if (empty($v['install']) || empty($v['status'])) continue;
+            $addons_class = '\\addons\\' . $v['name'] . '\\Plugin';
+            if (class_exists($addons_class)) {
+                $addon = app($addons_class);
+                if (method_exists($addon, $name)) {
+                    $result[] = $v;
+                }
+            }
+        }
+        return $result;
+    }
+}
 if (!function_exists('auto_run_addons')) {
     function auto_run_addons($action, $param = [])
     {

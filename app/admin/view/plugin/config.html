@@ -13,7 +13,7 @@
                     <td>
                         <textarea placeholder="请输入{$vo.title}" name="{$key}" class="layui-textarea">{$vo.value}</textarea>
                         {notempty name="$vo.tips" }
-                        <div class="layui-form-mid layui-text-em">{$vo.tips}</div>
+                        <div class="layui-form-mid layui-text-em">{$vo.tips|raw}</div>
                         {/notempty}
                     </td>
                 </tr>
@@ -26,7 +26,7 @@
                             <input type="text" name="{$key}" autocomplete="off" placeholder="请输入{$vo.title}" class="layui-input" value="{$vo.value}">
                         </div>
                         {notempty name="$vo.tips" }
-                        <div class="layui-form-mid layui-text-em">{$vo.tips}</div>
+                        <div class="layui-form-mid layui-text-em">{$vo.tips|raw}</div>
                         {/notempty}
                     </td>
                 </tr>
@@ -41,7 +41,7 @@
                             {/volist}
                         </div>
                         {notempty name="$vo.tips" }
-                        <div class="layui-form-mid layui-text-em">{$vo.tips}</div>
+                        <div class="layui-form-mid layui-text-em">{$vo.tips|raw}</div>
                         {/notempty}
                     </td>
                 </tr>
@@ -56,7 +56,7 @@
                             {/volist}
                         </div>
                         {notempty name="$vo.tips" }
-                        <div class="layui-form-mid layui-text-em">{$vo.tips}</div>
+                        <div class="layui-form-mid layui-text-em">{$vo.tips|raw}</div>
                         {/notempty}
                     </td>
                 </tr>
@@ -72,7 +72,7 @@
                                 {/volist}
                             </select>
                         {notempty name="$vo.tips" }
-                        <div class="layui-form-mid layui-text-em">{$vo.tips}</div>
+                        <div class="layui-form-mid layui-text-em">{$vo.tips|raw}</div>
                         {/notempty}
                     </td>
                 </tr>
@@ -89,7 +89,7 @@
                             <button type="button" class="layui-btn layui-btn-normal" style="width: 100%;" id="uploadBtn">上传</button>                        
                         </div>
                         {notempty name="$vo.tips" }
-                        <div class="layui-form-mid layui-text-em">{$vo.tips}</div>
+                        <div class="layui-form-mid layui-text-em">{$vo.tips|raw}</div>
                         {/notempty}
                     </td>              
                 </tr>

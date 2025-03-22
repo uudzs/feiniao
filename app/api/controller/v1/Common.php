@@ -482,25 +482,55 @@ class Common extends BaseController
             $this->apiError('参数错误');
         }
         $user = [];
+        $power = get_system_config('power');
         if ($mobile) {
-            if (empty($param['code'])) {
+            if (empty($password) && empty($param['code'])) {
                 $this->apiError('参数错误');
             }
-            $code = intval($param['code']);
-            if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-                $this->apiError('手机号不正确');
-            }
-            $verif = Db::name('sms_log')->where(array('account' => $mobile, 'code' => $code))->find();
-            if (empty($verif)) {
-                $this->apiError('短信未发送');
+            if (empty($password)) {
+                if (isset($power['login_type'])) {
+                    if (!in_array('sms', $power['login_type'])) {
+                        $this->apiError('禁止短信方式登录');
+                    }
+                }
+                $code = intval($param['code']);
+                if (empty($code)) {
+                    $this->apiError('验证码不能为空');
+                }
+                if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
+                    $this->apiError('手机号不正确');
+                }
+                $verif = Db::name('sms_log')->where(array('account' => $mobile, 'code' => $code))->find();
+                if (empty($verif)) {
+                    $this->apiError('短信未发送');
+                } else {
+                    if ($verif['expire_time'] < time()) {
+                        $this->apiError('短信已超时');
+                    }
+                }
+                $user = Db::name('user')->where(['mobile' => $mobile])->find();
             } else {
-                if ($verif['expire_time'] < time()) {
-                    $this->apiError('短信已超时');
+                if (isset($power['login_type'])) {
+                    if (!in_array('account', $power['login_type'])) {
+                        $this->apiError('禁止账号方式登录');
+                    }
+                }
+                $user = Db::name('user')->where(['mobile' => $mobile])->find();
+                if (empty($user)) {
+                    $this->apiError('未找到此用户');
+                }
+                $pwd = set_password($password, $user['salt']);
+                if ($pwd !== $user['password']) {
+                    $this->apiError('密码错误');
                 }
             }
-            $user = Db::name('user')->where(['mobile' => $mobile])->find();
         }
         if ($username) {
+            if (isset($power['login_type'])) {
+                if (!in_array('account', $power['login_type'])) {
+                    $this->apiError('禁止账号方式登录');
+                }
+            }
             if (empty($password)) {
                 $this->apiError('参数错误');
             }
@@ -514,13 +544,18 @@ class Common extends BaseController
             }
         }
         if ($email) {
-            if (empty($param['code'])) {
-                $this->apiError('参数错误');
+            if (isset($power['login_type'])) {
+                if (!in_array('sms', $power['login_type'])) {
+                    $this->apiError('禁止短信方式登录');
+                }
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->apiError('邮箱格式不正确');
             }
             $code = intval($param['code']);
+            if (empty($code)) {
+                $this->apiError('验证码不能为空');
+            }
             $verif = Db::name('sms_log')->where(array('account' => $email, 'code' => $code))->find();
             if (empty($verif)) {
                 $this->apiError('验证码未发送');
@@ -533,6 +568,9 @@ class Common extends BaseController
         }
         // 校验
         if (empty($user)) {
+            if (isset($power['register_open']) && intval($power['register_open']) != 1) {
+                $this->apiError('未找到此用户');
+            }
             $session_invite = get_config('app.session_invite');
             $invite = Cookie::get($session_invite);
             $invite = $invite ?: $invite_code;
@@ -723,6 +761,10 @@ class Common extends BaseController
 
     public function register()
     {
+        $power = get_system_config('power');
+        if (isset($power['register_open']) && intval($power['register_open']) != 1) {
+            $this->apiError('禁止注册');
+        }
         $param = get_params();
         $username = isset($param['username']) ?  trim($param['username']) : '';
         $password = isset($param['password']) ?  trim($param['password']) : '';
@@ -883,7 +925,7 @@ class Common extends BaseController
         $code = mt_rand(100000, 999999);
         //邮箱
         if (filter_var($mobile, FILTER_VALIDATE_EMAIL)) {
-            $content = '【' . $config_web['title'] . '】验证码：' . $code . '（15分钟内有效），请勿泄露验证码，如非本人操作，请忽略。';
+            $content = '【' . $config_web['title'] . '】验证码：' . $code . '，请勿泄露验证码，如非本人操作，请忽略。';
             $send = send_email($mobile, $config_web['title'] . '注册邮件', $content);
             if ($send === true) {
                 if (!empty($verif)) {
