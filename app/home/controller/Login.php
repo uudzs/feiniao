@@ -101,7 +101,7 @@ class Login extends BaseController
                                 $data = [
                                     'user_id' => $uid,
                                     'platform' => 'wechat',
-                                    'apptype' => 'h5',
+                                    'apptype' => 'mp',
                                     'unionid' => isset($userinfo['raw']['unionid']) ? $userinfo['raw']['unionid'] : '',
                                     'openid' => $userinfo['raw']['openid'],
                                     'openname' => isset($userinfo['raw']['nickname']) ? $userinfo['raw']['nickname'] : '',

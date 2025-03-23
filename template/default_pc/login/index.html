@@ -80,13 +80,13 @@
                                 </div>
                             </div>
                         {/if}
+                        {if(in_array('third', $power['login_type']))}
                         <div class="layui-form-item other-login">
                             <span>
-                              <a href="javascript:;"><i class="layui-icon layui-icon-login-qq" style="color: #3492ed;"></i></a>
-                              <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat" style="color: #4daf29;"></i></a>
-                              <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo" style="color: #cf1900;"></i></a>
+                                {:implode("\n", auto_run_addons('login'))}
                             </span>
                         </div>
+                        {/if}
                     </div>
                 </div>                
             {else/}
