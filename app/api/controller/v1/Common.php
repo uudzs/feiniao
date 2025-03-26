@@ -90,8 +90,6 @@ class Common extends BaseController
                 } else {
                     return to_assign(1, $result['msg']);
                 }
-            } else {
-                return to_assign(1, '上传失败');
             }
             //写入到附件表
             $data = [];
@@ -725,6 +723,189 @@ class Common extends BaseController
         $this->apiError('注册失败');
     }
 
+    public function third()
+    {
+        $param = get_params();
+        $openid = isset($param['openid']) ? trim($param['openid']) : '';
+        $unionid = isset($param['unionid']) ? trim($param['unionid']) : '';
+        $platform = isset($param['platform']) ? trim($param['platform']) : '';
+        $apptype = isset($param['apptype']) ? trim($param['apptype']) : '';
+        $nickname = isset($param['nickname']) ? trim($param['nickname']) : '';
+        $headimg = isset($param['headimg']) ? trim($param['headimg']) : '';
+        $expires_in = isset($param['expires_in']) ? trim($param['expires_in']) : 0;
+        $access_token = isset($param['access_token']) ? trim($param['access_token']) : '';
+        if (empty($openid) && empty($unionid)) $this->apiError('参数错误');
+        if (empty($platform)) $this->apiError('参数错误');
+        $where = ['platform' => $platform];
+        if (!empty($unionid)) {
+            $where['unionid'] = $unionid;
+        } else {
+            $where['openid'] = $openid;
+        }
+        $third = Db::name('third')->where($where)->find();
+        if (empty($third)) {
+            $session_invite = get_config('app.session_invite');
+            $invite = Cookie::get($session_invite);
+            $pid = 0;
+            if (!empty($invite)) {
+                $senior = Db::name('user')->where(['qrcode_invite' => $invite])->find();
+                if (!empty($senior)) {
+                    $pid = $senior['id'];
+                }
+            }
+            $salt = set_salt(20);
+            $add = [
+                'nickname' => $nickname ? $nickname : randNickname(),
+                'inviter' => $pid,
+                'salt' => $salt,
+                'coin' => 0,
+                'mobile_status' => 0,
+                'headimgurl' => $headimg ? $headimg : '',
+                'email' => $platform == 'apple' ? $openid : '',
+                'password' => set_password(set_salt(20), $salt),
+                'register_time' => time(),
+                'qrcode_invite' => get_invite_code(),
+                'register_ip' => request()->ip(),
+                'last_login_time' => time(),
+                'last_login_ip' => request()->ip(),
+                'login_num' => 1,
+            ];
+            $uid = Db::name('user')->strict(false)->field(true)->insertGetId($add);
+            if ($uid) {
+                $member = Db::name('user')->where(['id' => $uid])->find();
+                if (!empty($member)) {
+                    $data = [
+                        'user_id' => $uid,
+                        'platform' => $platform,
+                        'apptype' => $apptype ?: 'app',
+                        'unionid' => $unionid,
+                        'openid' => $openid,
+                        'openname' => $nickname,
+                        'access_token' => $access_token,
+                        'refresh_token' => '',
+                        'expires_in' => $expires_in,
+                        'createtime' => time(),
+                        'logintime' => time(),
+                    ];
+                    $data['expiretime'] = time() + intval($expires_in);
+                    $tid = Db::name('third')->strict(false)->field(true)->insertGetId($data);
+                    //邀请
+                    if (!empty($invite)) {
+                        $conf = get_system_config('reward');
+                        Cookie::delete($session_invite);
+                        if ($pid > 0) {
+                            //邀请奖励
+                            if (intval($conf['invite_reward']) > 0) {
+                                Db::startTrans();
+                                try {
+                                    // 执行数据库操作
+                                    Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
+                                    add_coin_log($pid, intval($conf['invite_reward']), 2, '邀请一个好友奖励，好友ID：' . $uid);
+                                    Db::name('task')->strict(false)->field(true)->insertGetId([
+                                        'user_id' => $pid,
+                                        'taskid' => $uid,
+                                        'type' => 3,
+                                        'status' => 1,
+                                        'title' => '邀请一个好友奖励',
+                                        'task_date' => date('Y-m-d'),
+                                        'reward' => intval($conf['invite_reward']),
+                                        'ip' => app('request')->ip(),
+                                        'create_time' => time()
+                                    ]);
+                                    // 提交事务
+                                    Db::commit();
+                                } catch (\Exception $e) {
+                                    // 回滚事务
+                                    Db::rollback();
+                                }
+                            }
+                            //先生成奖励任务
+                            Db::name('task')->strict(false)->field(true)->insertGetId([
+                                'user_id' => $pid,
+                                'taskid' => $uid,
+                                'type' => 4,
+                                'status' => 0,
+                                'title' => '注册当天首次阅读章节',
+                                'task_date' => date('Y-m-d'),
+                                'reward' => intval($conf['invite_1_level']),
+                                'ip' => app('request')->ip(),
+                                'create_time' => time()
+                            ]);
+                            Db::name('task')->strict(false)->field(true)->insertGetId([
+                                'user_id' => $pid,
+                                'taskid' => $uid,
+                                'type' => 5,
+                                'status' => 0,
+                                'title' => '注册开始连续3天阅读章节',
+                                'task_date' => date('Y-m-d'),
+                                'reward' => intval($conf['invite_2_level']),
+                                'ip' => app('request')->ip(),
+                                'create_time' => time()
+                            ]);
+                            Db::name('task')->strict(false)->field(true)->insertGetId([
+                                'user_id' => $pid,
+                                'taskid' => $uid,
+                                'type' => 6,
+                                'status' => 0,
+                                'title' => '注册开始连续7天阅读章节',
+                                'task_date' => date('Y-m-d'),
+                                'reward' => intval($conf['invite_3_level']),
+                                'ip' => app('request')->ip(),
+                                'create_time' => time()
+                            ]);
+                        }
+                    }
+                }
+            }
+        } else {
+            $member = Db::name('user')->where(['id' => $third['user_id']])->find();
+            if (!empty($member)) {
+                $data = [
+                    'openname' => $nickname,
+                    'access_token' => $access_token,
+                    'expires_in' => $expires_in,
+                    'updatetime' => time(),
+                    'logintime' => time(),
+                ];
+                $data['expiretime'] = time() + intval($expires_in);
+                Db::name('third')->where('id', $third['id'])->update($data);
+                $data = [
+                    'last_login_time' => time(),
+                    'last_login_ip' => request()->ip(),
+                    'login_num' => $member['login_num'] + 1,
+                ];
+                $res = Db::name('user')->where(['id' => $member['id']])->update($data);
+            }
+        }
+        //登录
+        if (!empty($member)) {
+            $wechatcnf = get_system_config('token');
+            JWT::$leeway = 60; //当前时间减去60，把时间留点余地
+            $time = time(); //当前时间
+            $arr = [
+                'iss' => $wechatcnf['iss'], //签发者 可选
+                'aud' => $wechatcnf['aud'], //接收该JWT的一方，可选
+                'iat' => $time, //签发时间
+                'nbf' => $time - 1, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
+                'exp' => $time + $wechatcnf['exptime'], //过期时间,这里设置2个小时
+                'data' => [
+                    //自定义信息，不要定义敏感信息
+                    'userid' => $member['id'],
+                ]
+            ];
+            $token = JWT::encode($arr, $wechatcnf['secrect'], 'HS256');
+            if ($token) {
+                $session_user = get_config('app.session_user');
+                Cookie::set($session_user, $token);
+                $this->apiSuccess('登录成功', ['token' => $token]);
+            } else {
+                $this->apiError('登录失败');
+            }
+        } else {
+            $this->apiError('登录失败');
+        }
+    }
+
     public function pages()
     {
         $param = get_params();
@@ -771,15 +952,18 @@ class Common extends BaseController
         $confirmPassword = isset($param['confirmPassword']) ?  trim($param['confirmPassword']) : '';
         $nickname = isset($param['nickname']) ?  trim($param['nickname']) : '';
         $captcha = isset($param['captcha']) ? $param['captcha'] : '';
+        $isapp = isset($param['isapp']) ? intval($param['isapp']) : 0;
         $invite_code = isset($param['invite_code']) ? trim($param['invite_code']) : '';
         if (empty($username) || empty($password) || empty($confirmPassword) || empty($nickname)) {
             $this->apiError('参数错误');
         }
-        if (empty($captcha)) {
-            $this->apiError('参数错误');
-        }
-        if (!captcha_check($captcha)) {
-            $this->apiError('验证码错误');
+        if (empty($isapp)) {
+            if (empty($captcha)) {
+                $this->apiError('参数错误');
+            }
+            if (!captcha_check($captcha)) {
+                $this->apiError('验证码错误');
+            }
         }
         if ($password != $confirmPassword) {
             $this->apiError('两次密码输入不一致');

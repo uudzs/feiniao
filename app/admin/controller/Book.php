@@ -158,9 +158,13 @@ class Book extends BaseController
         } else {
             if (get_addons_is_enable('booktag')) {
                 $result = hook("bookTagHook");
-                $result = json_decode($result, true);
-                $tags = $result['data'];
-                View::assign('tags', $tags);
+                if ($result) {
+                    $result = json_decode($result, true);
+                    $tags = $result['data'];
+                    View::assign('tags', $tags);
+                } else {
+                    View::assign('tags', []);
+                }
             } else {
                 View::assign('tags', []);
             }

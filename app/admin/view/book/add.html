@@ -39,6 +39,7 @@
 				</select>
 			</td>
 		</tr>
+		{if $tags.style && $tags.ending}
 		<tr>
 			<td class="layui-td-gray-2">{$tags.style.name}</td>
 			<td>
@@ -64,10 +65,12 @@
 				<input type="radio" name="issign" value="1" title="是">
 			</td>
 		</tr>
+		{/if}
 		<tr>
 			<td class="layui-td-gray-2">简介</td>
 			<td colspan="5"><textarea name="remark" placeholder="请输入简介" class="layui-textarea"></textarea></td>
 		</tr>
+		{if $tags.identity && $tags.image && $tags.schools && $tags.element}
 		<tr>
 			<td class="layui-td-gray-2">作品标签</td>
 			<td colspan="5">
@@ -105,6 +108,7 @@
 				</div>
 			</td>
 		</tr>
+		{/if}
 		<tr>
 			<td class="layui-td-gray">自定义标签</td>
 			<td colspan="5">

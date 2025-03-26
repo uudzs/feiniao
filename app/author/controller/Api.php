@@ -86,8 +86,6 @@ class Api extends BaseController
                 } else {
                     return to_assign(1, $result['msg']);
                 }
-            } else {
-                return to_assign(1, '上传失败');
             }
             //写入到附件表
             $data = [];

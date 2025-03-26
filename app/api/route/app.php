@@ -4,6 +4,7 @@ use think\facade\Route;
 
 Route::group('v1', function () {
     Route::rule('login', 'api/v1.common/login', 'GET|POST');
+    Route::rule('third', 'api/v1.common/third', 'GET|POST');
     Route::rule('register', 'api/v1.common/register', 'GET|POST');
     Route::rule('captcha', 'api/v1.common/captcha', 'GET|POST');
     Route::rule('logout', 'api/v1.common/logout', 'GET|POST');
