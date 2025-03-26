@@ -2098,3 +2098,26 @@ CREATE TABLE `fn_withdraw` (
 -- ----------------------------
 -- Records of fn_withdraw
 -- ----------------------------
+
+
+-- ----------------------------
+-- Table structure for fn_app_version
+-- ----------------------------
+DROP TABLE IF EXISTS `fn_app_version`;
+CREATE TABLE `fn_app_version` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `describe` varchar(500) DEFAULT NULL COMMENT '描述',
+  `edition_url` varchar(250) DEFAULT NULL COMMENT 'apk、wgt包下载地址或者应用市场地址',
+  `platform` varchar(100) DEFAULT NULL COMMENT '平台',
+  `edition_force` tinyint(4) DEFAULT '0' COMMENT '是否强制更新 0代表否 1代表是',
+  `package_type` tinyint(4) DEFAULT '0' COMMENT '0是整包升级（apk或者appstore或者安卓应用市场） 1是wgt升级',
+  `edition_issue` tinyint(4) DEFAULT '0' COMMENT '是否发行  0否 1是 为了控制上架应用市场审核时不能弹出热更新框',
+  `edition_number` decimal(10,5) DEFAULT '0.00000' COMMENT '版本号',
+  `edition_name` varchar(50) DEFAULT NULL COMMENT '牐本号名称',
+  `edition_silence` tinyint(4) DEFAULT '0' COMMENT '是否静默更新 0代表否 1代表是',
+  `check_num` int(11) DEFAULT '0' COMMENT '检查次数',
+  `create_time` int(11) DEFAULT '0' COMMENT '创建时间',
+  `update_time` int(11) DEFAULT '0' COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='APP版本管理::crud';
