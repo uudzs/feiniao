@@ -37,7 +37,7 @@ CREATE TABLE `fn_admin_group` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL DEFAULT '',
   `status` int(1) NOT NULL DEFAULT '1',
-  `rules` varchar(1000) DEFAULT '' COMMENT '用户组拥有的规则id， 多个规则","隔开',
+  `rules` varchar(2000) DEFAULT '' COMMENT '用户组拥有的规则id， 多个规则","隔开',
   `desc` text COMMENT '备注',
   `create_time` int(11) NOT NULL DEFAULT '0',
   `update_time` int(11) NOT NULL DEFAULT '0',
