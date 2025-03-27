@@ -190,7 +190,7 @@ class Upgrade extends BaseController
                     if (basename($value) == 'config.php' && is_file($config_file)) {
                         $new_config = include_once $value;
                         $old_config = include_once $config_file;
-                        $config = array_merge($new_config, $old_config);
+                        $config = array_replace_recursive($old_config, $new_config);
                         if ($config) {
                             file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';');
                         }
