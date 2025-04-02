@@ -50,6 +50,7 @@
 第一步：克隆飞鸟阅读到你本地 **（如果不用git的可以在代码仓库上角打包下载代码，然后解压上传到服务器）** 
 
     git clone https://gitee.com/paheng/feiniao.git
+    git clone https://github.com/uudzs/feiniao.git
 
 第二步：进入目录
 
