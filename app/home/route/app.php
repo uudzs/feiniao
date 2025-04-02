@@ -1,54 +1,66 @@
 <?php
 
 use think\facade\Route;
+use think\facade\Db;
 
-Route::rule('/$', 'index/index', 'GET|POST')->name('/');
-Route::rule('cate-<id>', 'book/cate', 'GET|POST')->name('book_cates');
-Route::rule('book-:id', 'book/detail', 'GET|POST')->name('book_detail');
-Route::rule('rank', 'book/rank', 'GET|POST')->name('rank');
-Route::rule('shuku', 'book/list', 'GET|POST')->name('shuku');
-Route::rule('quanben', 'book/quanben', 'GET|POST')->name('quanben');
-Route::rule('author-:id', 'author/detail', 'GET|POST')->name('author_detail');
-Route::rule('chapter-:id', 'chapter/detail', 'GET|POST')->name('chapter_detail');
-Route::group('notice', function () {
-    Route::rule('/', 'info/index', 'GET|POST')->name('notice');
-    Route::rule('/<page>', 'info/index', 'GET|POST')->pattern(['page' => '\d+'])->name('notice');
-});
-Route::rule('page-<name>', 'pages/detail', 'GET|POST')->pattern(['name' => '\w+'])->name('pages');
-Route::rule('notice-:id', 'info/detail', 'GET|POST')->name('notice_detail');
-Route::rule('news-:id', 'article/detail', 'GET|POST')->name('news_detail');
-Route::rule('login$', 'login/index', 'GET|POST')->name('login');
-Route::rule('register$', 'login/register', 'GET|POST')->name('register');
-Route::rule('search', 'search/index', 'GET|POST')->name('search');
-Route::rule('my$', 'user/index', 'GET|POST')->name('my');
-Route::rule('message$', 'message/index', 'GET|POST')->name('message');
-Route::rule('profile$', 'user/profile', 'GET|POST')->name('profile');
-Route::rule('realnameauth$', 'user/realnameauth', 'GET|POST')->name('realnameauth');
-Route::rule('invite', 'invite/index', 'GET|POST')->name('invite');
-Route::rule('myinvite', 'user/invite', 'GET|POST')->name('myinvite');
-Route::rule('i/<name>', 'invite/index', 'GET|POST')->pattern(['name' => '\w+'])->name('inviteurl');
-Route::rule('task', 'task/index', 'GET|POST')->name('task');
-Route::rule('bookshelf$', 'bookshelf/index', 'GET|POST')->name('bookshelf');
-Route::rule('readlog$', 'user/readlog', 'GET|POST')->name('readlog');
-Route::rule('nickname$', 'user/nickname', 'GET|POST')->name('nickname');
-Route::rule('phone$', 'user/phone', 'GET|POST')->name('phone');
-Route::rule('security$', 'user/security', 'GET|POST')->name('security');
-Route::rule('service$', 'user/service', 'GET|POST')->name('service');
-Route::rule('about$', 'user/about', 'GET|POST')->name('about');
-Route::rule('agreement$', 'user/agreement', 'GET|POST')->name('agreement');
-Route::rule('privacy$', 'user/privacy', 'GET|POST')->name('privacy');
-Route::rule('vip$', 'vip/index', 'GET|POST')->name('vip');
-Route::rule('viplog$', 'vip/log', 'GET|POST')->name('viplog');
-Route::rule('coinlog$', 'coin/index', 'GET|POST')->name('coinlog');
-Route::rule('withdraw$', 'withdraw/index', 'GET|POST')->name('withdraw');
-Route::rule('withdrawlog$', 'withdraw/log', 'GET|POST')->name('withdrawlog');
-Route::rule('bankcard$', 'user/bankcard', 'GET|POST')->name('bankcard');
-Route::rule('order$', 'order/index', 'GET|POST')->name('order');
-Route::rule('wechatpay$', 'pay/wechat', 'GET|POST')->name('wechatpay');
-Route::rule('alipaypay$', 'pay/alipay', 'GET|POST')->name('alipaypay');
-Route::rule('becomeauthor$', 'user/author', 'GET|POST')->name('becomeauthor');
-Route::rule('report$', 'user/report', 'GET|POST')->name('report');
-Route::rule('wechat_oauth_callback', 'login/wechat_oauth_callback', 'GET|POST')->name('wechat_oauth_callback');
-Route::rule('wechat_pay_callback', 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
-Route::rule('alipay_h5_pay_callback', 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');
+try {
+    $rule = get_cache('routeRule');
+    if (!$rule) {
+        $rule = Db::name('route')->field('id,rule,name,group')->where(['status' => 1])->order('id asc')->select()->toArray();
+        set_cache('routeRule', $rule);
+    }
+    $data = array_column($rule, null, 'name');
+    if (isset($data['/']) && $data['/']['rule']) Route::rule($data['/']['rule'], 'index/index', 'GET')->name('/');
+    if (isset($data['book_cates']) && $data['book_cates']['rule']) Route::rule($data['book_cates']['rule'], 'book/cate', 'GET')->name('book_cates');
+    if (isset($data['book_detail']) && $data['book_detail']['rule']) Route::rule($data['book_detail']['rule'], 'book/detail', 'GET')->name('book_detail');
+    if (isset($data['rank']) && $data['rank']['rule']) Route::rule($data['rank']['rule'], 'book/rank', 'GET')->name('rank');
+    if (isset($data['shuku']) && $data['shuku']['rule']) Route::rule($data['shuku']['rule'], 'book/list', 'GET')->name('shuku');
+    if (isset($data['quanben']) && $data['quanben']['rule']) Route::rule($data['quanben']['rule'], 'book/quanben', 'GET')->name('quanben');
+    if (isset($data['author_detail']) && $data['author_detail']['rule']) Route::rule($data['author_detail']['rule'], 'author/detail', 'GET')->pattern(['id' => '\d+'])->name('author_detail');
+    if (isset($data['chapter_detail']) && $data['chapter_detail']['rule']) Route::rule($data['chapter_detail']['rule'], 'chapter/detail', 'GET')->pattern(['id' => '\d+'])->name('chapter_detail');
+    if (isset($data['notice'])) {
+        Route::group('notice', function () use ($data) {
+            if ($data['notice']['rule']) Route::rule($data['notice']['rule'], 'info/index', 'GET')->name('notice');
+            if (isset($data['notice_page']) && $data['notice_page']['rule']) Route::rule($data['notice_page']['rule'], 'info/index', 'GET')->pattern(['page' => '\d+'])->name('notice_page');
+        });
+    }
+    if (isset($data['notice_detail']) && $data['notice_detail']['rule']) Route::rule($data['notice_detail']['rule'], 'info/detail', 'GET')->pattern(['id' => '\d+'])->name('notice_detail');
+    if (isset($data['pages']) && $data['pages']['rule']) Route::rule($data['pages']['rule'], 'pages/detail', 'GET')->pattern(['name' => '[a-z-]+'])->name('pages');
+    if (isset($data['news_detail']) && $data['news_detail']['rule']) Route::rule($data['news_detail']['rule'], 'article/detail', 'GET')->pattern(['id' => '\d+'])->name('news_detail');
+    if (isset($data['login']) && $data['login']['rule']) Route::rule($data['login']['rule'], 'login/index', 'GET')->name('login');
+    if (isset($data['register']) && $data['register']['rule']) Route::rule($data['register']['rule'], 'login/register', 'GET')->name('register');
+    if (isset($data['search']) && $data['search']['rule']) Route::rule($data['search']['rule'], 'search/index', 'GET')->name('search');
+    if (isset($data['my']) && $data['my']['rule']) Route::rule($data['my']['rule'], 'user/index', 'GET')->name('my');
+    if (isset($data['message']) && $data['message']['rule']) Route::rule($data['message']['rule'], 'message/index', 'GET')->name('message');
+    if (isset($data['profile']) && $data['profile']['rule']) Route::rule($data['profile']['rule'], 'user/profile', 'GET')->name('profile');
+    if (isset($data['realnameauth']) && $data['realnameauth']['rule']) Route::rule($data['realnameauth']['rule'], 'user/realnameauth', 'GET')->name('realnameauth');
+    if (isset($data['invite']) && $data['invite']['rule']) Route::rule($data['invite']['rule'], 'invite/index', 'GET')->name('invite');
+    if (isset($data['myinvite']) && $data['myinvite']['rule']) Route::rule($data['myinvite']['rule'], 'user/invite', 'GET')->name('myinvite');
+    if (isset($data['inviteurl']) && $data['inviteurl']['rule']) Route::rule($data['inviteurl']['rule'], 'invite/index', 'GET')->pattern(['name' => '\w+'])->name('inviteurl');
+    if (isset($data['task']) && $data['task']['rule']) Route::rule($data['task']['rule'], 'task/index', 'GET')->name('task');
+    if (isset($data['bookshelf']) && $data['bookshelf']['rule']) Route::rule($data['bookshelf']['rule'], 'bookshelf/index', 'GET')->name('bookshelf');
+    if (isset($data['readlog']) && $data['readlog']['rule']) Route::rule($data['readlog']['rule'], 'user/readlog', 'GET')->name('readlog');
+    if (isset($data['nickname']) && $data['nickname']['rule']) Route::rule($data['nickname']['rule'], 'user/nickname', 'GET')->name('nickname');
+    if (isset($data['phone']) && $data['phone']['rule']) Route::rule($data['phone']['rule'], 'user/phone', 'GET')->name('phone');
+    if (isset($data['security']) && $data['security']['rule']) Route::rule($data['security']['rule'], 'user/security', 'GET')->name('security');
+    if (isset($data['service']) && $data['service']['rule']) Route::rule($data['service']['rule'], 'user/service', 'GET')->name('service');
+    if (isset($data['about']) && $data['about']['rule']) Route::rule($data['about']['rule'], 'user/about', 'GET')->name('about');
+    if (isset($data['agreement']) && $data['agreement']['rule']) Route::rule($data['agreement']['rule'], 'user/agreement', 'GET')->name('agreement');
+    if (isset($data['privacy']) && $data['privacy']['rule']) Route::rule($data['privacy']['rule'], 'user/privacy', 'GET')->name('privacy');
+    if (isset($data['vip']) && $data['vip']['rule']) Route::rule($data['vip']['rule'], 'vip/index', 'GET')->name('vip');
+    if (isset($data['viplog']) && $data['viplog']['rule']) Route::rule($data['viplog']['rule'], 'vip/log', 'GET')->name('viplog');
+    if (isset($data['coinlog']) && $data['coinlog']['rule']) Route::rule($data['coinlog']['rule'], 'coin/index', 'GET')->name('coinlog');
+    if (isset($data['withdraw']) && $data['withdraw']['rule']) Route::rule($data['withdraw']['rule'], 'withdraw/index', 'GET')->name('withdraw');
+    if (isset($data['withdrawlog']) && $data['withdrawlog']['rule']) Route::rule($data['withdrawlog']['rule'], 'withdraw/log', 'GET')->name('withdrawlog');
+    if (isset($data['bankcard']) && $data['bankcard']['rule']) Route::rule($data['bankcard']['rule'], 'user/bankcard', 'GET')->name('bankcard');
+    if (isset($data['order']) && $data['order']['rule']) Route::rule($data['order']['rule'], 'order/index', 'GET')->name('order');
+    if (isset($data['wechatpay']) && $data['wechatpay']['rule']) Route::rule($data['wechatpay']['rule'], 'pay/wechat', 'GET|POST')->name('wechatpay');
+    if (isset($data['alipaypay']) && $data['alipaypay']['rule']) Route::rule($data['alipaypay']['rule'], 'pay/alipay', 'GET|POST')->name('alipaypay');
+    if (isset($data['becomeauthor']) && $data['becomeauthor']['rule']) Route::rule($data['becomeauthor']['rule'], 'user/author', 'GET|POST')->name('becomeauthor');
+    if (isset($data['report']) && $data['report']['rule']) Route::rule($data['report']['rule'], 'user/report', 'GET|POST')->name('report');
+    if (isset($data['wechat_oauth_callback']) && $data['wechat_oauth_callback']['rule']) Route::rule($data['wechat_oauth_callback']['rule'], 'login/wechat_oauth_callback', 'GET|POST')->name('wechat_oauth_callback');
+    if (isset($data['wechat_pay_callback']) && $data['wechat_pay_callback']['rule']) Route::rule($data['wechat_pay_callback']['rule'], 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
+    if (isset($data['alipay_h5_pay_callback']) && $data['alipay_h5_pay_callback']['rule']) Route::rule($data['alipay_h5_pay_callback']['rule'], 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');
+} catch (Exception $e) {
+}
 Route::miss('\app\home\controller\Emptys::miss');

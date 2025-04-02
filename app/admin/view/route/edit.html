@@ -1,0 +1,64 @@
+{extend name="common/base"/}
+{block name="style"}
+<style type="text/css">
+.route.layui-td-gray {
+    width: 150px;
+}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4 route">
+	<h3 class="pb-3">路由设置</h3>
+    <blockquote class="layui-elem-quote"><p>路由设置可直接参考thinkphp官方手册，验证规则如无效，请先关闭生成html插件，请改动之前备份好上次正常的规则，以防无法正常访问。<a class="layui-btn layui-btn-xs" href="https://www.kancloud.cn/manual/thinkphp6_0/1037494" target="_blank">查阅更多</a></p>
+    </blockquote>
+	<table class="layui-table layui-table-form">
+        <tr>
+			<td class="layui-td-gray">路由名称</td>
+			<td>{$detail.title}</td>
+		</tr>
+        <tr>
+			<td class="layui-td-gray">路由标识</td>
+			<td>{$detail.name}</td>
+		</tr>
+		<tr>
+			<td class="layui-td-gray">路由规则<font>*</font></td>
+			<td><input type="text" name="rule" lay-verify="required" lay-reqText="请输入路由规则" autocomplete="off" placeholder="请输入路由规则" class="layui-input" value="{$detail.rule}"></td>
+		</tr>		
+	</table>
+	<div class="pt-3">
+		<input type="hidden" name="id" value="{$detail.id}"/>
+		<input type="hidden" name="title" value="{$detail.title}"/>
+		<input type="hidden" name="status" value="{$detail.status}"/>
+		<input type="hidden" name="name" value="{$detail.name}"/>
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	</div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	var moduleInit = ['tool'];
+    function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;  
+        form.on('submit(webform)', function (data) {
+            if (data.field.rule == '') {
+                layer.msg('请输入路由规则');
+                return false;
+            }
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    tool.sideClose(1000);
+                }
+            }
+            tool.post("{:url('route/edit')}", data.field, callback);
+            return false;
+        });
+	}
+</script>
+{/block}
+<!-- /脚本 -->

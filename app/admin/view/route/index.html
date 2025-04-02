@@ -1,0 +1,144 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+
+<div class="p-3">
+	<form class="layui-form gg-form-bar border-t border-x">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+		</div>
+		<div class="layui-input-inline">
+		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+		</div>
+	</form>
+	<table class="layui-hide" id="route" lay-filter="route"></table>
+</div>
+
+<script type="text/html" id="toolbarDemo"></script>
+
+<script type="text/html" id="status">
+	<input type="checkbox" name="status" value="{{= d.status }}" title="开|关" lay-skin="switch" lay-filter="status" {{= d.status == 1 ? "checked" : "" }}>
+</script>
+
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+	const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table,tool = layui.tool, form = layui.form;
+		layui.pageTable = table.render({
+			elem: '#route',
+			title: '路由列表',
+			toolbar: '#toolbarDemo',
+			url: '{:url("route/index")}',
+			page: true,
+			limit: 20,
+			cols: [
+				[
+				{
+					fixed: 'left',
+					field: 'id',
+					title: '编号',
+					width: 30
+				},{
+					field: 'title',
+					title: '路由名称',
+				},{
+					field: 'rule',
+					title: '路由规则',
+                    width: 200
+				},{
+					field: 'group',
+					title: '路由分组',
+                    width: 150,
+                    templet: function(d) {
+                        return d.group ? d.group : '--'
+                    }
+				},{
+                    title: '状态',
+                    width:85,
+                    templet: '#status'
+                },
+                {
+                    title: '操作',
+                    width:85,
+                    templet: function (d) {
+                        return '<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>'
+                    }
+                }
+            ]
+			]
+		});
+		
+		//监听表头工具栏事件
+		table.on('toolbar(route)', function(obj){
+			if (obj.event === 'add') {
+				tool.side("{:url('route/add')}");
+				return false;
+			}
+		});
+
+        // 状态 - 开关操作
+		form.on('switch(status)', function(obj) {
+			var id = obj.othis.parents('tr').find("td:first").text();
+			if(!obj.elem.checked) {
+				layer.confirm('确定要禁用此路由吗?', { icon: 3, title: '提示' }, function (index) {
+					let callback = function (e) {
+						layer.msg(e.msg);
+						if (e.code == 0) {
+							layui.pageTable.reload();
+						} else {
+							layui.pageTable.reload();
+						}
+					}
+					tool.post("{:url('route/status')}", { id: id }, callback);
+					layer.close(index);
+				}, function() {
+					obj.elem.checked = true;
+					obj.othis.parents('tr').find("td .layui-form-switch").addClass('layui-form-onswitch');
+					obj.othis.parents('tr').find("td input[name='status']").attr('checked', true);
+      			});
+			} else{
+				let callback = function (e) {
+					layer.msg(e.msg);
+					if (e.code == 0) {
+						layui.pageTable.reload()
+					} else {
+						obj.elem.checked = false;
+						obj.othis.parents('tr').find("td .layui-form-onswitch").removeClass('layui-form-onswitch');
+						obj.othis.parents('tr').find("td input[name='status']").attr('checked', false);
+					}
+				}
+				tool.post("{:url('route/status')}", { id: id }, callback);
+			}
+			return false;
+		});
+
+		//监听表格行工具事件
+		table.on('tool(route)', function(obj) {
+			var data = obj.data;
+			if (obj.event === 'edit') {
+				tool.side('{:url("route/edit")}?id='+obj.data.id);
+			}			
+			return false;
+		});
+
+		//监听搜索提交
+		form.on('submit(searchform)', function(data) {
+			layui.pageTable.reload({
+				where: {
+					keywords: data.field.keywords
+				},
+				page: {
+					curr: 1
+				}
+			});
+			return false;
+		});
+	}
+</script>
+{/block}
+<!-- /脚本 -->

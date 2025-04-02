@@ -1,6 +1,7 @@
 <?php
 
 use think\facade\Route;
+use think\facade\Db;
 
 Route::group('v1', function () {
     Route::rule('login', 'api/v1.common/login', 'GET|POST');
@@ -64,7 +65,16 @@ Route::group('v1', function () {
     Route::rule('caijibook', 'api/v1.caiji/book', 'GET|POST');
     Route::rule('caijichapter', 'api/v1.caiji/chapter', 'GET|POST');
 });
-Route::rule('book-:id', 'book/detail', 'GET|POST')->name('book_detail');
-Route::rule('author-:id', 'author/detail', 'GET|POST')->name('author_detail');
-Route::rule('chapter-:id', 'chapter/detail', 'GET|POST')->name('chapter_detail');
-Route::rule('i/<name>', 'invite/index', 'GET|POST')->pattern(['name' => '\w+'])->name('inviteurl');
+try {
+    $rule = get_cache('routeRule');
+    if (!$rule) {
+        $rule = Db::name('route')->field('id,rule,name,group')->where(['status' => 1])->order('id asc')->select()->toArray();
+        set_cache('routeRule', $rule);
+    }
+    $data = array_column($rule, null, 'name');
+    if (isset($data['book_detail']) && $data['book_detail']['rule']) Route::rule($data['book_detail']['rule'], 'book/detail', 'GET')->name('book_detail');
+    if (isset($data['author_detail']) && $data['author_detail']['rule']) Route::rule($data['author_detail']['rule'], 'author/detail', 'GET')->pattern(['id' => '\d+'])->name('author_detail');
+    if (isset($data['chapter_detail']) && $data['chapter_detail']['rule']) Route::rule($data['chapter_detail']['rule'], 'chapter/detail', 'GET')->pattern(['id' => '\d+'])->name('chapter_detail');
+    if (isset($data['inviteurl']) && $data['inviteurl']['rule']) Route::rule($data['inviteurl']['rule'], 'invite/index', 'GET')->pattern(['name' => '\w+'])->name('inviteurl');
+} catch (Exception $e) {
+}

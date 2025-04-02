@@ -13,7 +13,7 @@ use think\facade\Request;
 class Info extends BaseController
 {
 
-    public function index($page = 1)
+    public function index()
     {
         $ismakecache = $this->usecache();
         $param = get_params();

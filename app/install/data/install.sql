@@ -48,7 +48,7 @@ CREATE TABLE `fn_admin_group` (
 -- ----------------------------
 -- Records of fn_admin_group
 -- ----------------------------
-INSERT INTO `fn_admin_group` VALUES ('1', '超级管理员', '1', '1,9,257,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,288,289,290,2,120,121,122,123,124,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,3,166,167,168,169,170,172,173,174,175,176,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,115,116,117,118,4,138,139,140,141,142,162,179,180,181,182,183,185,186,187,188,189,204,205,206,207,208,210,211,212,213,214,216,217,218,219,220,222,223,224,225,226,228,229,230,231,232,234,235,236,237,238,240,241,242,243,244,246,247,248,249,250,252,253,254,255,256,259,260,261,262,263,79,80,81,82,83,84,85,86,87,125,126,127,128,129,130,144,145,146,147,148,150,151,152,153,154,163,177,190,132,133,134,135,136,161,156,157,158,159,160,164,191,192,193,194,195,196,198,199,200,201,202,5,88,89,90,91,92,93,94,95,96,6,97,98,99,100,101,102,103,104,105,7,106,107,108,109,110,111,112,113,114,282,283,284,285,286,287,291,292', '超级管理员，系统自动分配所有可操作权限及菜单。', '0', '1739715396');
+INSERT INTO `fn_admin_group` VALUES ('1', '超级管理员', '1', '1,9,257,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,288,289,290,2,120,121,122,123,124,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,3,166,167,168,169,170,172,173,174,175,176,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,115,116,117,118,4,138,139,140,141,142,162,179,180,181,182,183,185,186,187,188,189,204,205,206,207,208,210,211,212,213,214,216,217,218,219,220,222,223,224,225,226,228,229,230,231,232,234,235,236,237,238,240,241,242,243,244,246,247,248,249,250,252,253,254,255,256,259,260,261,262,263,79,80,81,82,83,84,85,86,87,125,126,127,128,129,130,144,145,146,147,148,150,151,152,153,154,163,177,190,132,133,134,135,136,161,156,157,158,159,160,164,191,192,193,194,195,196,198,199,200,201,202,5,88,89,90,91,92,93,94,95,96,6,97,98,99,100,101,102,103,104,105,7,106,107,108,109,110,111,112,113,114,282,283,284,285,286,287,291,292,293,294,295', '超级管理员，系统自动分配所有可操作权限及菜单。', '0', '1739715396');
 INSERT INTO `fn_admin_group` VALUES ('2', '测试角色', '1', '1,9,13,17,20,23,26,29,31,2,33,34,35,38,42,43,44,45,46,3,53,56,59,62,65,68,71,74,77,4,79,82,84,87,5,88,92,95,6,97,101,104,7,106,110,113,8,115,119', '测试角色', '0', '0');
 
 -- ----------------------------
@@ -415,6 +415,10 @@ INSERT INTO `fn_admin_rule` VALUES ('289', '288', 'themes/setup', '主题安装'
 INSERT INTO `fn_admin_rule` VALUES ('290', '288', 'themes/unload', '主题卸载', '主题卸载', '', '2', '0', '1', '', '', '1742206443', '0');
 INSERT INTO `fn_admin_rule` VALUES ('291', '288', 'themes/files', '主题文件管理', '主题文件管理', '', '2', '0', '1', '', '', '1742455554', '0');
 INSERT INTO `fn_admin_rule` VALUES ('292', '288', 'themes/edit', '主题文件编辑', '主题文件编辑', '', '2', '0', '1', '', '', '1742462227', '0');
+INSERT INTO `fn_admin_rule` VALUES ('293', '1', 'route/index', '路由管理', '路由管理', '', '1', '0', '1', '', '', '1743497620', '0');
+INSERT INTO `fn_admin_rule` VALUES ('294', '293', 'route/edit', '路由编辑', '路由编辑', '', '2', '0', '1', '', '', '1743497650', '0');
+INSERT INTO `fn_admin_rule` VALUES ('295', '293', 'route/status', '路由状态', '路由状态', '', '2', '0', '1', '', '', '1743497684', '0');
+
 -- ----------------------------
 -- Table structure for fn_adver
 -- ----------------------------
@@ -1827,6 +1831,75 @@ CREATE TABLE `fn_slide` (
 -- Records of fn_slide
 -- ----------------------------
 INSERT INTO `fn_slide` VALUES ('1', '首页轮播', 'INDEX_SLIDE', '1', '首页轮播组。', '0', '0');
+
+
+-- ----------------------------
+-- Table structure for fn_route
+-- ----------------------------
+DROP TABLE IF EXISTS `fn_route`;
+CREATE TABLE `fn_route` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '配置ID',
+  `rule` varchar(255) DEFAULT '' COMMENT '路由规则',
+  `title` varchar(50) DEFAULT NULL COMMENT '路由名称',
+  `group` varchar(30) DEFAULT NULL COMMENT '路由分组',
+  `value` varchar(1000) DEFAULT NULL COMMENT '配置值',
+  `status` tinyint(3) unsigned NOT NULL DEFAULT '1' COMMENT '状态',
+  `name` varchar(40) CHARACTER SET utf8 DEFAULT NULL COMMENT '路由标识',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  KEY `group` (`group`)
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='路由::crud';
+
+-- ----------------------------
+-- Records of fn_route
+-- ----------------------------
+INSERT INTO `fn_route` VALUES ('1', '/$', '首页', null, 'index/index', '1', '/');
+INSERT INTO `fn_route` VALUES ('2', 'cate-:id', '作品分类', null, 'book/cate', '1', 'book_cates');
+INSERT INTO `fn_route` VALUES ('3', 'book-:id', '作品详情', null, 'book/detail', '1', 'book_detail');
+INSERT INTO `fn_route` VALUES ('4', 'rank', '排行', null, 'book/rank', '1', 'rank');
+INSERT INTO `fn_route` VALUES ('5', 'shuku', '书库', null, 'book/list', '1', 'shuku');
+INSERT INTO `fn_route` VALUES ('6', 'quanben', '全书', null, 'book/quanben', '1', 'quanben');
+INSERT INTO `fn_route` VALUES ('7', 'author-:id', '作者详情', null, 'author/detail', '1', 'author_detail');
+INSERT INTO `fn_route` VALUES ('8', 'chapter-:id', '章节详情', null, 'chapter/detail', '1', 'chapter_detail');
+INSERT INTO `fn_route` VALUES ('9', '/', '公告首页', 'notice', 'info/index', '1', 'notice');
+INSERT INTO `fn_route` VALUES ('10', '/:page', '公告分页', 'notice', 'info/index', '1', 'notice_page');
+INSERT INTO `fn_route` VALUES ('11', 'notice-:id', '公告详情', 'notice', 'info/detail', '1', 'notice_detail');
+INSERT INTO `fn_route` VALUES ('12', 'page-:name', '单页详情', null, 'pages/detail', '1', 'pages');
+INSERT INTO `fn_route` VALUES ('13', 'news-:id', '文章详情', null, 'article/detail', '1', 'news_detail');
+INSERT INTO `fn_route` VALUES ('14', 'login$', '登录', null, 'login/index', '1', 'login');
+INSERT INTO `fn_route` VALUES ('15', 'register$', '注册', null, 'login/register', '1', 'register');
+INSERT INTO `fn_route` VALUES ('16', 'search', '搜索', null, 'search/index', '1', 'search');
+INSERT INTO `fn_route` VALUES ('17', 'my$', '个人中心', null, 'user/index', '1', 'my');
+INSERT INTO `fn_route` VALUES ('18', 'message$', '我的消息', null, 'message/index', '1', 'message');
+INSERT INTO `fn_route` VALUES ('19', 'profile$', '我的资料', null, 'user/profile', '1', 'profile');
+INSERT INTO `fn_route` VALUES ('20', 'realnameauth$', '实名认证', null, 'user/realnameauth', '1', 'realnameauth');
+INSERT INTO `fn_route` VALUES ('21', 'invite', '邀请', null, 'invite/index', '1', 'invite');
+INSERT INTO `fn_route` VALUES ('22', 'myinvite', '我的邀请', '', 'user/invite', '1', 'myinvite');
+INSERT INTO `fn_route` VALUES ('23', 'i/:name', '邀请链接', null, 'invite/index', '1', 'inviteurl');
+INSERT INTO `fn_route` VALUES ('24', 'task', '任务', null, 'task/index', '1', 'task');
+INSERT INTO `fn_route` VALUES ('25', 'bookshelf$', '书架', null, 'bookshelf/index', '1', 'bookshelf');
+INSERT INTO `fn_route` VALUES ('26', 'readlog$', '阅读记录', null, 'user/readlog', '1', 'readlog');
+INSERT INTO `fn_route` VALUES ('27', 'nickname$', '我的昵称', null, 'user/nickname', '1', 'nickname');
+INSERT INTO `fn_route` VALUES ('28', 'phone$', '我的手机', null, 'user/phone', '1', 'phone');
+INSERT INTO `fn_route` VALUES ('29', 'security$', '安全码', null, 'user/security', '1', 'security');
+INSERT INTO `fn_route` VALUES ('30', 'service$', '服务', null, 'user/service', '1', 'service');
+INSERT INTO `fn_route` VALUES ('31', 'about$', '关于', null, 'user/about', '1', 'about');
+INSERT INTO `fn_route` VALUES ('32', 'agreement$', '用户协议', null, 'user/agreement', '1', 'agreement');
+INSERT INTO `fn_route` VALUES ('33', 'privacy$', '隐私协议', null, 'user/privacy', '1', 'privacy');
+INSERT INTO `fn_route` VALUES ('34', 'vip$', 'VIP', null, 'vip/index', '1', 'vip');
+INSERT INTO `fn_route` VALUES ('35', 'viplog$', 'VIP记录', null, 'vip/log', '1', 'viplog');
+INSERT INTO `fn_route` VALUES ('36', 'coinlog$', '金币记录', null, 'coin/index', '1', 'coinlog');
+INSERT INTO `fn_route` VALUES ('37', 'withdraw$', '提现', null, 'withdraw/index', '1', 'withdraw');
+INSERT INTO `fn_route` VALUES ('38', 'withdrawlog$', '提现记录', null, 'withdraw/log', '1', 'withdrawlog');
+INSERT INTO `fn_route` VALUES ('39', 'bankcard$', '银行卡', null, 'user/bankcard', '1', 'bankcard');
+INSERT INTO `fn_route` VALUES ('40', 'order$', '我的订单', null, 'order/index', '1', 'order');
+INSERT INTO `fn_route` VALUES ('41', 'wechatpay$', '微信支付', null, 'pay/wechat', '1', 'wechatpay');
+INSERT INTO `fn_route` VALUES ('42', 'alipaypay$', '支付宝支付', null, 'pay/alipay', '1', 'alipaypay');
+INSERT INTO `fn_route` VALUES ('43', 'becomeauthor$', '成为作者', null, 'user/author', '1', 'becomeauthor');
+INSERT INTO `fn_route` VALUES ('44', 'report$', '举报', null, 'user/report', '1', 'report');
+INSERT INTO `fn_route` VALUES ('45', 'wechat_oauth_callback', '微信登录回调', null, 'login/wechat_oauth_callback', '1', 'wechat_oauth_callback');
+INSERT INTO `fn_route` VALUES ('46', 'wechat_pay_callback', '微信支付回调', null, 'pay/wechat_pay_callback', '1', 'wechat_pay_callback');
+INSERT INTO `fn_route` VALUES ('47', 'alipay_h5_pay_callback', '支付宝H5支付回调', null, 'pay/alipay_h5_pay_callback', '1', 'alipay_h5_pay_callback');
 
 -- ----------------------------
 -- Table structure for fn_slide_info
