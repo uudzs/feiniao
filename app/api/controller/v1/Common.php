@@ -37,7 +37,7 @@ class Common extends BaseController
         if (request()->file('file')) {
             $file = request()->file('file');
         } else {
-            return to_assign(1, '没有选择上传文件');
+            $this->apiError('upload.empty');
         }
         $sha1 = $file->hash('sha1');
         $md5 = $file->hash('md5');
@@ -60,7 +60,7 @@ class Common extends BaseController
         ]);
         $file_check['image'] = $file;
         if (!$validate->check($file_check)) {
-            return to_assign(1, $validate->getError());
+            $this->apiError('upload.err');
         }
         // 日期前綴
         $dataPath = date('Ym');
@@ -83,12 +83,12 @@ class Common extends BaseController
             $obj = auto_run_addons('storage', ['url' => $filename]);
             if ($obj) {
                 $result = isset($obj[0]) ? $obj[0] : $obj;
-                if (!isJson($result)) return to_assign(1, '上传失败');
+                if (!isJson($result)) $this->apiError('fail');
                 $result = json_decode($result, true);
                 if (isset($result['code']) && intval($result['code']) == 0) {
                     $filepath = $result['data'] ?: $filepath;
                 } else {
-                    return to_assign(1, $result['msg']);
+                    $this->apiError('fail');
                 }
             }
             //写入到附件表
@@ -112,10 +112,9 @@ class Common extends BaseController
             $res['filepath'] = $data['filepath'];
             $res['name'] = $data['name'];
             $res['filename'] = $data['filename'];
-            //普通上传返回
-            return to_assign(0, '上传成功', $res);
+            $this->apiSuccess('success', $res);
         } else {
-            return to_assign(1, '上传失败，请重试');
+            $this->apiError('fail');
         }
     }
 
@@ -141,7 +140,7 @@ class Common extends BaseController
         $page = (isset($param['page']) && intval($param['page']) > 0) ? intval($param['page']) : 1; //页码
         $pagesize = isset($param['pagesize']) ? intval($param['pagesize']) : 0; //条数
         if (empty($pid)) {
-            $this->apiError('参数错误');
+            $this->apiError(404);
         }
         $time = time();
         $table = config('database.connections.mysql.prefix') . 'advsr';
@@ -187,7 +186,7 @@ class Common extends BaseController
                                     $list[$k]['bigcate'] = $book['genre'];
                                     $list[$k]['subgenre'] = $book['subgenre'];
                                     $list[$k]['words'] = $book['words'];
-                                    $list[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
+                                    $list[$k]['finish'] = intval($book['isfinish']) == 2 ? getlang('finish') : getlang('serialize');
                                     $list[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                                 } else {
                                     $list[$k]['isfinish'] = 1;
@@ -229,10 +228,10 @@ class Common extends BaseController
         } else {
             $adver = Db::name('adver')->where(['id' => intval($pid)])->find();
             if (empty($adver)) {
-                $this->apiError('广告位不存在');
+                $this->apiError(404);
             }
             if (intval($adver['status']) != 1) {
-                $this->apiError('广告位已禁止');
+                $this->apiError(407);
             }
             $limit = $pagesize > 0 ? $pagesize : (intval($adver['viewnum']) > 0 ? intval($adver['viewnum']) : 0);
             if ($limit <= 0) $limit = get_config('app.page_size');
@@ -259,7 +258,7 @@ class Common extends BaseController
                             } else {
                                 $result[$k]['genre'] = '';
                             }
-                            $result[$k]['finish'] = intval($book['isfinish']) == 2 ? '完结' : '连载';
+                            $result[$k]['finish'] = intval($book['isfinish']) == 2 ? getlang('finish') : getlang('serialize');
                             $result[$k]['chapters'] = $book['chapters'];
                             $result[$k]['isfinish'] = $book['isfinish'];
                             $result[$k]['subgenre'] = $book['subgenre'];
@@ -303,7 +302,7 @@ class Common extends BaseController
                 }
             }
         }
-        $this->apiSuccess('请求成功', $result);
+        $this->apiSuccess('success', $result);
     }
 
     /**
@@ -315,81 +314,78 @@ class Common extends BaseController
     {
         $token = Request::header('Token');
         $config = get_system_config('token');
-        JWT::$leeway = 60; //当前时间减去60，把时间留点余地
-        $time = time(); //当前时间
+        JWT::$leeway = 60;
+        $time = time();
         if ($token) {
             if (count(explode('.', $token)) != 3) {
-                $this->apiError('token错误', 1);
+                $this->apiError('common.tokenerr');
             }
             try {
-                $decoded = JWT::decode($token, new Key($config['secrect'], 'HS256')); //HS256方式，这里要和签发的时候对应
+                $decoded = JWT::decode($token, new Key($config['secrect'], 'HS256'));
                 $data = json_decode(json_encode($decoded), TRUE);
                 $jwt_data = $data['data'];
                 $uid = $jwt_data['userid'];
                 $arr = [
-                    'iss' => $config['iss'], //签发者 可选
-                    'aud' => $config['aud'], //接收该JWT的一方，可选
-                    'iat' => $time, //签发时间
-                    'nbf' => $time - 1, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                    'exp' => $time + $config['exptime'], //过期时间,这里设置2个小时
+                    'iss' => $config['iss'],
+                    'aud' => $config['aud'],
+                    'iat' => $time,
+                    'nbf' => $time - 1,
+                    'exp' => $time + $config['exptime'],
                     'data' => [
-                        //自定义信息，不要定义敏感信息
                         'userid' => $uid,
                     ]
                 ];
                 $token = JWT::encode($arr, $config['secrect'], 'HS256');
-                return json(['code' => 0, 'msg' => '请求成功', 'data' => ['token' => $token]]);
-            } catch (\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
-                return json(['code' => 403, 'msg' => '签名错误']);
-            } catch (\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
+                $this->apiSuccess('success', ['token' => $token]);
+            } catch (\Firebase\JWT\SignatureInvalidException $e) {
+                $this->apiError('common.signerr', [], 403);
+            } catch (\Firebase\JWT\BeforeValidException $e) {
                 $arr = [
-                    'iss' => $config['iss'], //签发者 可选
-                    'aud' => $config['aud'], //接收该JWT的一方，可选
-                    'iat' => $time, //签发时间
-                    'nbf' => $time - 1, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                    'exp' => $time + $config['exptime'], //过期时间,这里设置2个小时
+                    'iss' => $config['iss'],
+                    'aud' => $config['aud'],
+                    'iat' => $time,
+                    'nbf' => $time - 1,
+                    'exp' => $time + $config['exptime'],
                     'data' => [
-                        //自定义信息，不要定义敏感信息
                         'userid' => '',
                     ]
                 ];
                 $token = JWT::encode($arr, $config['secrect'], 'HS256');
-                return json(['code' => 0, 'msg' => '请求成功', 'data' => ['token' => $token]]);
-            } catch (\Firebase\JWT\ExpiredException $e) {  // token过期
+                $this->apiSuccess('success', ['token' => $token]);
+            } catch (\Firebase\JWT\ExpiredException $e) {
                 $arr = [
-                    'iss' => $config['iss'], //签发者 可选
-                    'aud' => $config['aud'], //接收该JWT的一方，可选
-                    'iat' => $time, //签发时间
-                    'nbf' => $time - 1, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                    'exp' => $time + $config['exptime'], //过期时间,这里设置2个小时
+                    'iss' => $config['iss'],
+                    'aud' => $config['aud'],
+                    'iat' => $time,
+                    'nbf' => $time - 1,
+                    'exp' => $time + $config['exptime'],
                     'data' => [
-                        //自定义信息，不要定义敏感信息
                         'userid' => '',
                     ]
                 ];
                 $token = JWT::encode($arr, $config['secrect'], 'HS256');
-                return json(['code' => 0, 'msg' => '请求成功', 'data' => ['token' => $token]]);
-            } catch (\Exception $e) {  //其他错误
-                return json(['code' => 404, 'msg' => '非法请求']);
-            } catch (\UnexpectedValueException $e) {  //其他错误
-                return json(['code' => 404, 'msg' => '非法请求']);
-            } catch (\DomainException $e) {  //其他错误
-                return json(['code' => 404, 'msg' => '非法请求']);
+                $this->apiSuccess('success', ['token' => $token]);
+            } catch (\Exception $e) {
+                $this->apiError(403, [], 404);
+            } catch (\UnexpectedValueException $e) {
+                $this->apiError(403, [], 404);
+            } catch (\DomainException $e) {
+                $this->apiError(403, [], 404);
             }
         } else {
             $arr = [
-                'iss' => $config['iss'], //签发者 可选
-                'aud' => $config['aud'], //接收该JWT的一方，可选
-                'iat' => $time, //签发时间
-                'nbf' => $time - 1, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                'exp' => $time + $config['exptime'], //过期时间,这里设置2个小时
+                'iss' => $config['iss'],
+                'aud' => $config['aud'],
+                'iat' => $time,
+                'nbf' => $time - 1,
+                'exp' => $time + $config['exptime'],
                 'data' => [
-                    //自定义信息，不要定义敏感信息
+
                     'userid' => '',
                 ]
             ];
             $token = JWT::encode($arr, $config['secrect'], 'HS256');
-            $this->apiSuccess('请求成功', ['token' => $token]);
+            $this->apiSuccess('success', ['token' => $token]);
         }
     }
 
@@ -402,11 +398,11 @@ class Common extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $user = Db::name('user')->field('nickname,username,name,mobile,headimgurl,email,mobile_status,sex,desc,birthday,level,status,country,province,city,company,address,depament,position,qrcode_invite,coin,inviter,securitypwd,realname_status,id_card,author_id')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在', 98);
+            $this->apiError(404, [], 98);
         }
         if (empty($user['qrcode_invite'])) {
             $qrcode_invite = get_invite_code();
@@ -459,8 +455,8 @@ class Common extends BaseController
         $user['consecutive_days'] = intval($consecutive_days);
         $user['level_title'] = Db::name('UserLevel')->where(['id' => $user['level']])->value('title');
         $user['gender'] = $user['sex'];
-        $user['sex'] = ($user['sex'] == 1) ? '男' : ($user['sex'] == 2 ? '女' : '未知');
-        $this->apiSuccess('请求成功', ['userinfo' => $user]);
+        $user['sex'] = ($user['sex'] == 1) ? getlang('common.male') : ($user['sex'] == 2 ?  getlang('common.female') : getlang('common.unknown'));
+        $this->apiSuccess('success', ['userinfo' => $user]);
     }
 
     /**
@@ -477,89 +473,89 @@ class Common extends BaseController
         $password = isset($param['password']) ? trim($param['password']) : '';
         $invite_code = isset($param['invite_code']) ? trim($param['invite_code']) : '';
         if (empty($mobile) && empty($username) && empty($email)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $user = [];
         $power = get_system_config('power');
         if ($mobile) {
             if (empty($password) && empty($param['code'])) {
-                $this->apiError('参数错误');
+                $this->apiError('empty');
             }
             if (empty($password)) {
                 if (isset($power['login_type'])) {
                     if (!in_array('sms', $power['login_type'])) {
-                        $this->apiError('禁止短信方式登录');
+                        $this->apiError('login.prohibitsmslogin');
                     }
                 }
                 $code = intval($param['code']);
                 if (empty($code)) {
-                    $this->apiError('验证码不能为空');
+                    $this->apiError('login.captchaempty');
                 }
                 if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-                    $this->apiError('手机号不正确');
+                    $this->apiError('login.phoneerr');
                 }
                 $verif = Db::name('sms_log')->where(array('account' => $mobile, 'code' => $code))->find();
                 if (empty($verif)) {
-                    $this->apiError('短信未发送');
+                    $this->apiError('login.smsnotsend');
                 } else {
                     if ($verif['expire_time'] < time()) {
-                        $this->apiError('短信已超时');
+                        $this->apiError('login.smsexpire');
                     }
                 }
                 $user = Db::name('user')->where(['mobile' => $mobile])->find();
             } else {
                 if (isset($power['login_type'])) {
                     if (!in_array('account', $power['login_type'])) {
-                        $this->apiError('禁止账号方式登录');
+                        $this->apiError('login.prohibitaccountlogin');
                     }
                 }
                 $user = Db::name('user')->where(['mobile' => $mobile])->find();
                 if (empty($user)) {
-                    $this->apiError('未找到此用户');
+                    $this->apiError(404);
                 }
                 $pwd = set_password($password, $user['salt']);
                 if ($pwd !== $user['password']) {
-                    $this->apiError('密码错误');
+                    $this->apiError('login.passerr');
                 }
             }
         }
         if ($username) {
             if (isset($power['login_type'])) {
                 if (!in_array('account', $power['login_type'])) {
-                    $this->apiError('禁止账号方式登录');
+                    $this->apiError('login.prohibitaccountlogin');
                 }
             }
             if (empty($password)) {
-                $this->apiError('参数错误');
+                $this->apiError('empty');
             }
             $user = Db::name('user')->where(['username' => $username])->find();
             if (empty($user)) {
-                $this->apiError('未找到此用户');
+                $this->apiError(404);
             }
             $pwd = set_password($password, $user['salt']);
             if ($pwd !== $user['password']) {
-                $this->apiError('密码错误');
+                $this->apiError('login.passerr');
             }
         }
         if ($email) {
             if (isset($power['login_type'])) {
                 if (!in_array('sms', $power['login_type'])) {
-                    $this->apiError('禁止短信方式登录');
+                    $this->apiError('login.prohibitsmslogin');
                 }
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $this->apiError('邮箱格式不正确');
+                $this->apiError('login.emailerr');
             }
             $code = intval($param['code']);
             if (empty($code)) {
-                $this->apiError('验证码不能为空');
+                $this->apiError('login.captchaempty');
             }
             $verif = Db::name('sms_log')->where(array('account' => $email, 'code' => $code))->find();
             if (empty($verif)) {
-                $this->apiError('验证码未发送');
+                $this->apiError('login.smsnotsend');
             } else {
                 if ($verif['expire_time'] < time()) {
-                    $this->apiError('验证码已超时');
+                    $this->apiError('login.smsexpire');
                 }
             }
             $user = Db::name('user')->where(['email' => $email])->find();
@@ -567,7 +563,7 @@ class Common extends BaseController
         // 校验
         if (empty($user)) {
             if (isset($power['register_open']) && intval($power['register_open']) != 1) {
-                $this->apiError('未找到此用户');
+                $this->apiError(404);
             }
             $session_invite = get_config('app.session_invite');
             $invite = Cookie::get($session_invite);
@@ -595,7 +591,7 @@ class Common extends BaseController
             $add['register_ip'] = request()->ip();
             $uid = Db::name('user')->strict(false)->field(true)->insertGetId($add);
             if (!$uid) {
-                $this->apiError('登录失败');
+                $this->apiError();
             }
             $user = Db::name('user')->where(['id' => $uid])->find();
             if (!empty($user)) {
@@ -606,13 +602,13 @@ class Common extends BaseController
                     try {
                         // 执行数据库操作
                         Db::name('user')->where('id', $uid)->inc('coin', intval($conf['mobile']))->update();
-                        add_coin_log($uid, intval($conf['mobile']), 1, '绑定手机号奖励');
+                        add_coin_log($uid, intval($conf['mobile']), 1, getlang('reward.bindphone'));
                         Db::name('task')->strict(false)->field(true)->insertGetId([
                             'user_id' => $uid,
                             'taskid' => $conf['mobile_id'],
                             'type' => 1,
                             'status' => 1,
-                            'title' => '绑定手机号奖励',
+                            'title' => getlang('reward.bindphone'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['mobile']),
                             'ip' => app('request')->ip(),
@@ -635,13 +631,13 @@ class Common extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
-                                add_coin_log($pid, intval($conf['invite_reward']), 2, '邀请一个好友奖励，好友ID：' . $uid);
+                                add_coin_log($pid, intval($conf['invite_reward']), 2, getlang('reward.invitefriend') . getlang('reward.friendid') . $uid);
                                 Db::name('task')->strict(false)->field(true)->insertGetId([
                                     'user_id' => $pid,
                                     'taskid' => $uid,
                                     'type' => 3,
                                     'status' => 1,
-                                    'title' => '邀请一个好友奖励',
+                                    'title' => getlang('reward.invitefriend'),
                                     'task_date' => date('Y-m-d'),
                                     'reward' => intval($conf['invite_reward']),
                                     'ip' => app('request')->ip(),
@@ -660,7 +656,7 @@ class Common extends BaseController
                             'taskid' => $uid,
                             'type' => 4,
                             'status' => 0,
-                            'title' => '注册当天首次阅读章节',
+                            'title' => getlang('reward.firstread'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['invite_1_level']),
                             'ip' => app('request')->ip(),
@@ -671,7 +667,7 @@ class Common extends BaseController
                             'taskid' => $uid,
                             'type' => 5,
                             'status' => 0,
-                            'title' => '注册开始连续3天阅读章节',
+                            'title' => getlang('reward.day3read'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['invite_2_level']),
                             'ip' => app('request')->ip(),
@@ -682,7 +678,7 @@ class Common extends BaseController
                             'taskid' => $uid,
                             'type' => 6,
                             'status' => 0,
-                            'title' => '注册开始连续7天阅读章节',
+                            'title' => getlang('reward.day7read'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['invite_3_level']),
                             'ip' => app('request')->ip(),
@@ -693,7 +689,7 @@ class Common extends BaseController
             }
         }
         if (empty($user)) {
-            $this->apiError('注册失败');
+            $this->apiError('fail');
         }
         $data = [
             'last_login_time' => time(),
@@ -702,25 +698,24 @@ class Common extends BaseController
         ];
         $res = Db::name('user')->where(['id' => $user['id']])->update($data);
         if ($res) {
-            add_user_log('api', '登录');
             $config = get_system_config('token');
-            JWT::$leeway = 60; //当前时间减去60，把时间留点余地
-            $time = time(); //当前时间
+            JWT::$leeway = 60;
+            $time = time();
             $arr = [
-                'iss' => $config['iss'], //签发者 可选
-                'aud' => $config['aud'], //接收该JWT的一方，可选
-                'iat' => $time, //签发时间
-                'nbf' => $time - 1, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                'exp' => $time + $config['exptime'], //过期时间,这里设置2个小时
+                'iss' => $config['iss'],
+                'aud' => $config['aud'],
+                'iat' => $time,
+                'nbf' => $time - 1,
+                'exp' => $time + $config['exptime'],
                 'data' => [
-                    //自定义信息，不要定义敏感信息
+
                     'userid' => $user['id'],
                 ]
             ];
             $token = JWT::encode($arr, $config['secrect'], 'HS256');
-            $this->apiSuccess('登录成功', ['token' => $token]);
+            $this->apiSuccess('success', ['token' => $token]);
         }
-        $this->apiError('注册失败');
+        $this->apiError('fail');
     }
 
     public function third()
@@ -734,8 +729,8 @@ class Common extends BaseController
         $headimg = isset($param['headimg']) ? trim($param['headimg']) : '';
         $expires_in = isset($param['expires_in']) ? trim($param['expires_in']) : 0;
         $access_token = isset($param['access_token']) ? trim($param['access_token']) : '';
-        if (empty($openid) && empty($unionid)) $this->apiError('参数错误');
-        if (empty($platform)) $this->apiError('参数错误');
+        if (empty($openid) && empty($unionid)) $this->apiError('empty');
+        if (empty($platform)) $this->apiError('empty');
         $where = ['platform' => $platform];
         if (!empty($unionid)) {
             $where['unionid'] = $unionid;
@@ -800,13 +795,13 @@ class Common extends BaseController
                                 try {
                                     // 执行数据库操作
                                     Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
-                                    add_coin_log($pid, intval($conf['invite_reward']), 2, '邀请一个好友奖励，好友ID：' . $uid);
+                                    add_coin_log($pid, intval($conf['invite_reward']), 2, getlang('reward.invitefriend') . getlang('reward.friendid') . $uid);
                                     Db::name('task')->strict(false)->field(true)->insertGetId([
                                         'user_id' => $pid,
                                         'taskid' => $uid,
                                         'type' => 3,
                                         'status' => 1,
-                                        'title' => '邀请一个好友奖励',
+                                        'title' => getlang('reward.invitefriend'),
                                         'task_date' => date('Y-m-d'),
                                         'reward' => intval($conf['invite_reward']),
                                         'ip' => app('request')->ip(),
@@ -825,7 +820,7 @@ class Common extends BaseController
                                 'taskid' => $uid,
                                 'type' => 4,
                                 'status' => 0,
-                                'title' => '注册当天首次阅读章节',
+                                'title' => getlang('reward.firstread'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_1_level']),
                                 'ip' => app('request')->ip(),
@@ -836,7 +831,7 @@ class Common extends BaseController
                                 'taskid' => $uid,
                                 'type' => 5,
                                 'status' => 0,
-                                'title' => '注册开始连续3天阅读章节',
+                                'title' => getlang('reward.day3read'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_2_level']),
                                 'ip' => app('request')->ip(),
@@ -847,7 +842,7 @@ class Common extends BaseController
                                 'taskid' => $uid,
                                 'type' => 6,
                                 'status' => 0,
-                                'title' => '注册开始连续7天阅读章节',
+                                'title' => getlang('reward.day7read'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_3_level']),
                                 'ip' => app('request')->ip(),
@@ -880,16 +875,15 @@ class Common extends BaseController
         //登录
         if (!empty($member)) {
             $wechatcnf = get_system_config('token');
-            JWT::$leeway = 60; //当前时间减去60，把时间留点余地
-            $time = time(); //当前时间
+            JWT::$leeway = 60;
+            $time = time();
             $arr = [
-                'iss' => $wechatcnf['iss'], //签发者 可选
-                'aud' => $wechatcnf['aud'], //接收该JWT的一方，可选
-                'iat' => $time, //签发时间
-                'nbf' => $time - 1, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
-                'exp' => $time + $wechatcnf['exptime'], //过期时间,这里设置2个小时
+                'iss' => $wechatcnf['iss'],
+                'aud' => $wechatcnf['aud'],
+                'iat' => $time,
+                'nbf' => $time - 1,
+                'exp' => $time + $wechatcnf['exptime'],
                 'data' => [
-                    //自定义信息，不要定义敏感信息
                     'userid' => $member['id'],
                 ]
             ];
@@ -897,12 +891,12 @@ class Common extends BaseController
             if ($token) {
                 $session_user = get_config('app.session_user');
                 Cookie::set($session_user, $token);
-                $this->apiSuccess('登录成功', ['token' => $token]);
+                $this->apiSuccess('success', ['token' => $token]);
             } else {
-                $this->apiError('登录失败');
+                $this->apiError('fail');
             }
         } else {
-            $this->apiError('登录失败');
+            $this->apiError('fail');
         }
     }
 
@@ -911,10 +905,10 @@ class Common extends BaseController
         $param = get_params();
         $name = isset($param['name']) ? trim($param['name']) : '';
         if (empty($name)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $res = Db::name('pages')->where(['status' => 1, 'name' => $name])->find();
-        $this->apiSuccess('获取成功', $res ?: []);
+        $this->apiSuccess('success', $res ?: []);
     }
 
     public function system()
@@ -923,10 +917,10 @@ class Common extends BaseController
         $config = isset($param['config']) ? $param['config'] : '';
         $name = isset($param['name']) ? trim($param['name']) : '';
         if (empty($config) && empty($name)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         if (empty($config)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $res = [];
         if ($name) {
@@ -937,14 +931,14 @@ class Common extends BaseController
         if ($config == 'web' && isset($res['logo'])) {
             $res['logo'] = get_file($res['logo']);
         }
-        $this->apiSuccess('获取成功', $res);
+        $this->apiSuccess('success', $res);
     }
 
     public function register()
     {
         $power = get_system_config('power');
         if (isset($power['register_open']) && intval($power['register_open']) != 1) {
-            $this->apiError('禁止注册');
+            $this->apiError(403);
         }
         $param = get_params();
         $username = isset($param['username']) ?  trim($param['username']) : '';
@@ -955,26 +949,26 @@ class Common extends BaseController
         $isapp = isset($param['isapp']) ? intval($param['isapp']) : 0;
         $invite_code = isset($param['invite_code']) ? trim($param['invite_code']) : '';
         if (empty($username) || empty($password) || empty($confirmPassword) || empty($nickname)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         if (empty($isapp)) {
             if (empty($captcha)) {
-                $this->apiError('参数错误');
+                $this->apiError('empty');
             }
             if (!captcha_check($captcha)) {
-                $this->apiError('验证码错误');
+                $this->apiError('login.captchaerr');
             }
         }
         if ($password != $confirmPassword) {
-            $this->apiError('两次密码输入不一致');
+            $this->apiError('register.twopasserr');
         }
         $user = Db::name('user')->where(['username' => $username])->find();
         if (!empty($user)) {
-            $this->apiError('此用户名已被注册');
+            $this->apiError('register.alreadyreg');
         }
         $user = Db::name('user')->where(['nickname' => $nickname])->find();
         if (!empty($user)) {
-            $this->apiError('此昵称已被注册');
+            $this->apiError('register.nicknamealreadyreg');
         }
         $session_invite = get_config('app.session_invite');
         $invite = Cookie::get($session_invite);
@@ -1001,7 +995,7 @@ class Common extends BaseController
         $add['register_ip'] = request()->ip();
         $uid = Db::name('user')->strict(false)->field(true)->insertGetId($add);
         if (!$uid) {
-            $this->apiError('注册失败');
+            $this->apiError('fail');
         }
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (!empty($user)) {
@@ -1017,13 +1011,13 @@ class Common extends BaseController
                         try {
                             // 执行数据库操作
                             Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
-                            add_coin_log($pid, intval($conf['invite_reward']), 2, '邀请一个好友奖励，好友ID：' . $uid);
+                            add_coin_log($pid, intval($conf['invite_reward']), 2, getlang('reward.invitefriend') . getlang('reward.friendid') . $uid);
                             Db::name('task')->strict(false)->field(true)->insertGetId([
                                 'user_id' => $pid,
                                 'taskid' => $uid,
                                 'type' => 3,
                                 'status' => 1,
-                                'title' => '邀请一个好友奖励',
+                                'title' => getlang('reward.invitefriend'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_reward']),
                                 'ip' => app('request')->ip(),
@@ -1042,7 +1036,7 @@ class Common extends BaseController
                         'taskid' => $uid,
                         'type' => 4,
                         'status' => 0,
-                        'title' => '注册当天首次阅读章节',
+                        'title' => getlang('reward.firstread'),
                         'task_date' => date('Y-m-d'),
                         'reward' => intval($conf['invite_1_level']),
                         'ip' => app('request')->ip(),
@@ -1053,7 +1047,7 @@ class Common extends BaseController
                         'taskid' => $uid,
                         'type' => 5,
                         'status' => 0,
-                        'title' => '注册开始连续3天阅读章节',
+                        'title' => getlang('reward.day3read'),
                         'task_date' => date('Y-m-d'),
                         'reward' => intval($conf['invite_2_level']),
                         'ip' => app('request')->ip(),
@@ -1064,7 +1058,7 @@ class Common extends BaseController
                         'taskid' => $uid,
                         'type' => 6,
                         'status' => 0,
-                        'title' => '注册开始连续7天阅读章节',
+                        'title' => getlang('reward.day7read'),
                         'task_date' => date('Y-m-d'),
                         'reward' => intval($conf['invite_3_level']),
                         'ip' => app('request')->ip(),
@@ -1074,9 +1068,9 @@ class Common extends BaseController
             }
         }
         if (empty($user)) {
-            $this->apiError('注册失败');
+            $this->apiError('fail');
         }
-        $this->apiSuccess('注册成功');
+        $this->apiSuccess('success');
     }
 
     /**
@@ -1086,7 +1080,7 @@ class Common extends BaseController
      */
     public function logout()
     {
-        $this->apiSuccess('退出成功', []);
+        $this->apiSuccess('success', []);
     }
 
     /**
@@ -1103,14 +1097,18 @@ class Common extends BaseController
         $verif = Db::name('sms_log')->where(array('account' => $mobile))->find();
         if (!empty($verif)) {
             if ($verif['expire_time'] > time()) {
-                $this->apiError('已发出的验证码还有效，请输入！');
+                $this->apiError('common.captchavalid');
             }
         }
         $code = mt_rand(100000, 999999);
         //邮箱
         if (filter_var($mobile, FILTER_VALIDATE_EMAIL)) {
-            $content = '【' . $config_web['title'] . '】验证码：' . $code . '，请勿泄露验证码，如非本人操作，请忽略。';
-            $send = send_email($mobile, $config_web['title'] . '注册邮件', $content);
+            $content = str_replace(
+                ['{title}', '{code}'],
+                [$config_web['title'], $code],
+                getlang('common.smstemplate')
+            );
+            $send = send_email($mobile, $config_web['title'] . getlang('register.regemail'), $content);
             if ($send === true) {
                 if (!empty($verif)) {
                     $data = array(
@@ -1122,9 +1120,9 @@ class Common extends BaseController
                     );
                     $res = Db::name('sms_log')->where(['id' => $verif['id']])->strict(false)->field(true)->update($data);
                     if ($res) {
-                        $this->apiSuccess('发送成功', []);
+                        $this->apiSuccess('success', []);
                     } else {
-                        $this->apiError('发送失败');
+                        $this->apiError('fail');
                     }
                 } else {
                     $data = array(
@@ -1136,13 +1134,13 @@ class Common extends BaseController
                     );
                     $id = Db::name('sms_log')->strict(false)->field(true)->insertGetId($data);
                     if ($id > 0) {
-                        $this->apiSuccess('发送成功', []);
+                        $this->apiSuccess('success', []);
                     } else {
-                        $this->apiError('发送失败');
+                        $this->apiError('fail');
                     }
                 }
             } else {
-                $this->apiError('发送失败：' . $send);
+                $this->apiError('fail');
             }
         }
         //手机
@@ -1150,7 +1148,7 @@ class Common extends BaseController
             $obj = auto_run_addons('smssend', ['code' => $code, 'phone' => $mobile]);
             if ($obj) {
                 $result = isset($obj[0]) ? $obj[0] : $obj;
-                if (!isJson($result)) $this->apiError('发送失败');
+                if (!isJson($result)) $this->apiError('fail');
                 $result = json_decode($result, true);
                 if (isset($result['code']) && intval($result['code']) == 0) {
                     if (!empty($verif)) {
@@ -1163,9 +1161,9 @@ class Common extends BaseController
                         );
                         $res = Db::name('sms_log')->where(['id' => $verif['id']])->strict(false)->field(true)->update($data);
                         if ($res) {
-                            $this->apiSuccess('发送成功', []);
+                            $this->apiSuccess('success', []);
                         } else {
-                            $this->apiError('发送失败');
+                            $this->apiError('fail');
                         }
                     } else {
                         $data = array(
@@ -1177,18 +1175,18 @@ class Common extends BaseController
                         );
                         $id = Db::name('sms_log')->strict(false)->field(true)->insertGetId($data);
                         if ($id > 0) {
-                            $this->apiSuccess('发送成功', []);
+                            $this->apiSuccess('success', []);
                         } else {
-                            $this->apiError('发送失败');
+                            $this->apiError('fail');
                         }
                     }
                 } else {
-                    $this->apiError($result['msg']);
+                    $this->apiError('fail');
                 }
             } else {
-                $this->apiError('发送失败');
+                $this->apiError('fail');
             }
         }
-        $this->apiError('禁止相关功能');
+        $this->apiError(407);
     }
 }

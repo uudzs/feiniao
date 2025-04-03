@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
@@ -33,7 +32,7 @@ class Search extends BaseController
         $keyword = isset($param['keywords']) ? trim($param['keywords']) : '';
         $client = isset($param['client']) ? intval($param['client']) : 1;
         if (empty($keyword)) {
-            $this->apiSuccess('请求成功', []);
+            $this->apiSuccess('success', []);
         }
         $where = [];
         if (!empty($keyword)) {
@@ -87,7 +86,7 @@ class Search extends BaseController
         }
         //写记录
         $res = Db::name('search_log')->strict(false)->field(true)->insertGetId($data);
-        $this->apiSuccess('请求成功', $result);
+        $this->apiSuccess('success', $result);
     }
 
     /**
@@ -112,7 +111,7 @@ class Search extends BaseController
             ->order($order)
             ->limit($start, $limit)
             ->select();
-        $this->apiSuccess('请求成功', $list);
+        $this->apiSuccess('success', $list);
     }
 
     /**
@@ -124,12 +123,12 @@ class Search extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $page = (isset($param['page']) && intval($param['page']) > 0) ? intval($param['page']) : 1; //页码
         $limit = (isset($param['limit']) && intval($param['limit']) > 0) ? intval($param['limit']) : 10; //条数
@@ -146,7 +145,7 @@ class Search extends BaseController
             ->order($order)
             ->limit($start, $limit)
             ->select();
-        $this->apiSuccess('请求成功', $list);
+        $this->apiSuccess('success', $list);
     }
 
     /**
@@ -158,15 +157,15 @@ class Search extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $keyword = $param['keyword'];
         Db::name('search_log')->where(['keyword' => $keyword, 'user_id' => $uid])->delete();
-        $this->apiSuccess('删除成功', []);
+        $this->apiSuccess('success', []);
     }
 }

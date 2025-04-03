@@ -8,7 +8,6 @@ use app\api\BaseController;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
-use app\admin\model\Readhistory;
 use app\admin\model\Follow;
 use app\admin\model\User as UserModel;
 use think\Image;
@@ -41,14 +40,14 @@ class User extends BaseController
         $param = get_params();
         $pid = intval($param['bookid']); //ID
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($pid)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $fav = Db::name('favorites')->where(['user_id' => JWT_UID, 'pid' => $pid])->find();
         if (empty($fav)) {
@@ -59,16 +58,16 @@ class User extends BaseController
             );
             $fid = Db::name('favorites')->strict(false)->field(true)->insertGetId($data);
             if ($fid != false) {
-                $this->apiSuccess('添加成功', ['fid' => $fid]);
+                $this->apiSuccess('success', ['fid' => $fid]);
             } else {
-                $this->apiError('添加失败', ['fid' => 0]);
+                $this->apiError('fail', ['fid' => 0]);
             }
         } else {
             //取消收藏！
             if (Db::name('favorites')->where(['user_id' => JWT_UID, 'pid' => $pid])->delete()) {
-                $this->apiSuccess('取消成功', ['fid' => 0]);
+                $this->apiSuccess('success', ['fid' => 0]);
             } else {
-                $this->apiError('添加失败', ['fid' => 0]);
+                $this->apiError('fail', ['fid' => 0]);
             }
         }
     }
@@ -84,17 +83,17 @@ class User extends BaseController
         $from_id = isset($param['from_id']) ?  intval($param['from_id']) : 0; //ID
         $type = isset($param['type']) ? intval($param['type']) : 1; //1作者2用户
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($from_id)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         if (JWT_UID == $from_id) {
-            $this->apiError('不能关注自己');
+            $this->apiError('user.refusefollow');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $follow = Db::name('follow')->where(['user_id' => JWT_UID, 'from_id' => $from_id])->find();
         if (empty($follow)) {
@@ -106,14 +105,14 @@ class User extends BaseController
             );
             $fid = Db::name('follow')->strict(false)->field(true)->insertGetId($data);
             if ($fid != false) {
-                $this->apiSuccess('添加成功', ['fid' => $fid]);
+                $this->apiSuccess('success', ['fid' => $fid]);
             } else {
-                $this->apiError('添加失败');
+                $this->apiError('fail');
             }
         } else {
             //取消关注！
             Db::name('follow')->where(['user_id' => JWT_UID, 'from_id' => $from_id])->delete();
-            $this->apiSuccess('取消成功', []);
+            $this->apiSuccess('success', []);
         }
     }
 
@@ -127,30 +126,30 @@ class User extends BaseController
         $param = get_params();
         $avatar = trim($param['avatar']);
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($avatar)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $imageType = '';
         if (preg_match('/^data:image\/(\w+);base64,/', $avatar, $matches)) {
             $imageType = $matches[1]; // 获取图片类型，例如 'jpeg', 'png', 'gif' 等
         } else {
-            $imageType = strtolower(pathinfo($avatar, PATHINFO_EXTENSION));            
+            $imageType = strtolower(pathinfo($avatar, PATHINFO_EXTENSION));
         }
         if (!in_array($imageType, ['jpg', 'png', 'jpeg', 'gif'])) {
-            $this->apiError('不是图片');
+            $this->apiError('common.notpicture');
         }
         // 日期前綴
         $img_name = md5('avatar' . JWT_UID . time());
         $path = date('Ymd', time()) . '/';
         $upload_path = app()->getRootPath() . 'public/storage/' . $path;
         if (!createDirectory($upload_path)) {
-            $this->apiError('无写入权限');
+            $this->apiError(407);
         }
         $filename = $img_name . "." . $imageType;
         $localpath = get_config('filesystem.disks.public.url') . '/' . $path . $filename;
@@ -158,13 +157,13 @@ class User extends BaseController
         $base64Data = str_replace('data:image/' . $imageType . ';base64,', '', $avatar);
         $imageData = base64_decode($base64Data);
         if (false === @file_put_contents($save_path, $imageData)) {
-            return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
+            $this->apiError('common.nopermission');
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['headimgurl' => $localpath, 'update_time' => time()]);
         if ($result === false) {
-            $this->apiError('上传失败');
+            $this->apiError('fail');
         } else {
-            $this->apiSuccess('上传成功');
+            $this->apiSuccess('success');
         }
     }
 
@@ -179,29 +178,29 @@ class User extends BaseController
         $securitypwd = trim($param['securitypwd']);
         $oldsecuritypwd = trim($param['oldsecuritypwd']);
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($securitypwd)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if ($user['securitypwd']) {
             if (empty($oldsecuritypwd)) {
-                $this->apiError('旧安全密码为空');
+                $this->apiError('user.oldpassempty');
             }
             if (!password_verify($oldsecuritypwd, $user['securitypwd'])) {
-                $this->apiError('旧安全密码错误');
+                $this->apiError('user.oldpasserr');
             }
         }
         $securitypwd = password_hash($securitypwd, PASSWORD_DEFAULT);
         $result = Db::name('user')->where('id', $user['id'])->update(['securitypwd' => $securitypwd]);
         if ($result === false) {
-            $this->apiError('设置失败');
+            $this->apiError('fail');
         } else {
-            $this->apiSuccess('设置成功');
+            $this->apiSuccess('success');
         }
     }
 
@@ -215,27 +214,27 @@ class User extends BaseController
         $param = get_params();
         $nickname = trim($param['nickname']);
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($nickname)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if ($nickname == $user['nickname']) {
-            $this->apiError('昵称相同');
+            $this->apiError('repeat');
         }
         $count = Db::name('user')->where([['nickname', '=', $nickname], ['id', '<>', $user['id']]])->count();
         if (intval($count) > 0) {
-            $this->apiError('此昵称已被使用');
+            $this->apiError('common.alreadyused');
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['nickname' => $nickname, 'update_time' => time()]);
         if ($result === false) {
-            $this->apiError('设置失败');
+            $this->apiError('fail');
         } else {
-            $this->apiSuccess('设置成功');
+            $this->apiSuccess('success');
         }
     }
 
@@ -249,26 +248,26 @@ class User extends BaseController
         $param = get_params();
         $sex = intval($param['sex']);
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($sex)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         if (!in_array($sex, [1, 2])) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if (intval($user['sex']) > 0) {
-            $this->apiError('性别已设置不可更改');
+            $this->apiError(407);
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['sex' => $sex, 'update_time' => time()]);
         if ($result === false) {
-            $this->apiError('设置失败');
+            $this->apiError('fail');
         } else {
-            $this->apiSuccess('设置成功');
+            $this->apiSuccess('success');
         }
     }
 
@@ -284,35 +283,35 @@ class User extends BaseController
         $code = intval($param['code']);
         $securitypwd = trim($param['securitypwd']);
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($mobile) || empty($code) || empty($securitypwd)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $verif = Db::name('sms_log')->where(array('account' => $mobile, 'code' => $code))->find();
         if (empty($verif)) {
-            $this->apiError('短信未发送');
+            $this->apiError('login.smsnotsend');
         } else {
             if ($verif['expire_time'] < time()) {
-                $this->apiError('短信已超时');
+                $this->apiError('login.smsexpire');
             }
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if ($mobile == $user['mobile']) {
-            $this->apiError('新旧手机号相同');
+            $this->apiError('repeat');
         }
         if (empty($user['securitypwd'])) {
-            $this->apiError('请先设置安全密码');
+            $this->apiError('user.setuppass');
         }
         if (!password_verify($securitypwd, $user['securitypwd'])) {
-            $this->apiError('安全密码错误');
+            $this->apiError('user.oldpasserr');
         }
         $count = Db::name('user')->where([['mobile', '=', $mobile], ['id', '<>', $user['id']]])->count();
         if (intval($count) > 0) {
-            $this->apiError('此手机号已被使用');
+            $this->apiError('common.alreadyused');
         }
         $uid = $user['id'];
         $conf = get_system_config('reward');
@@ -322,7 +321,7 @@ class User extends BaseController
             try {
                 // 执行数据库操作
                 Db::name('user')->where('id', $uid)->inc('coin', intval($task['reward']))->update();
-                add_coin_log($uid, intval($task['reward']), 1, '绑定手机号奖励');
+                add_coin_log($uid, intval($task['reward']), 1, getlang('reward.bindphone'));
                 Db::name('task')->where('id', $task['id'])->update(['status' => 1, 'update_time' => time()]);
                 // 提交事务
                 Db::commit();
@@ -333,9 +332,9 @@ class User extends BaseController
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['mobile' => $mobile, 'update_time' => time()]);
         if ($result === false) {
-            $this->apiError('设置失败');
+            $this->apiError('fail');
         } else {
-            $this->apiSuccess('设置成功');
+            $this->apiSuccess('success');
         }
     }
 
@@ -349,27 +348,27 @@ class User extends BaseController
         $param = get_params();
         $code = trim($param['code']);
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($code)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if (intval($user['inviter'] > 0)) {
-            $this->apiError('已经有邀请人了！');
+            $this->apiError('repeat');
         }
         $member = Db::name('user')->where(['qrcode_invite' => $code])->find();
         if (empty($member)) {
-            $this->apiError('邀请用户不存在');
+            $this->apiError(404);
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['inviter' => $member['id'], 'update_time' => time()]);
         if ($result === false) {
-            $this->apiError('邀请绑定失败');
+            $this->apiError('fail');
         } else {
-            $this->apiSuccess('邀请绑定成功');
+            $this->apiSuccess('success');
         }
     }
 
@@ -384,10 +383,10 @@ class User extends BaseController
         $path = trim($param['path']);
         $inviteurl = trim($param['inviteurl']);
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($path) || empty($inviteurl)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $conf = get_system_config('invite');
         $bglist = [];
@@ -395,21 +394,21 @@ class User extends BaseController
             $bglist = explode(',', $conf['bglist']);
         }
         if (count($bglist) <= 0) {
-            $this->apiError('未设置皮肤');
+            $this->apiError('empty');
         }
         if (!in_array($path, $bglist)) {
-            $this->apiError('当前皮肤不存在');
+            $this->apiError(404);
         }
         $bgPath = CMS_ROOT . "public" . $path;
         if (!is_file($bgPath)) {
-            $this->apiError('当前皮肤文件不存在');
+            $this->apiError(404);
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if (empty($user['qrcode_invite'])) {
-            $this->apiError('邀请码不存在');
+            $this->apiError(404);
         }
         $title = $conf['invite_content'];
         $replace = array(get_system_config('web', 'title'), $user['nickname']);
@@ -430,7 +429,7 @@ class User extends BaseController
             if (!is_file($qrFile)) {
                 $logoPath = CMS_ROOT . 'public/static/home/images/logo-invite.png';
                 if (!is_file($logoPath)) {
-                    $this->apiError('LOGO文件不存在');
+                    $this->apiError(404);
                 }
                 $result = Builder::create()
                     ->writer(new PngWriter())
@@ -444,7 +443,7 @@ class User extends BaseController
                     ->logoPath($logoPath)
                     ->logoResizeToWidth(50)
                     ->logoResizeToHeight(50)
-                    ->labelText('长按识别二维码')
+                    ->labelText(getlang('user.longpressqrcode'))
                     ->labelFont(new NotoSans(15))
                     ->labelAlignment(new LabelAlignmentCenter())
                     ->validateResult(false)
@@ -452,7 +451,7 @@ class User extends BaseController
                 $result->saveToFile($qrFile);
             }
             if (!is_file($qrFile)) {
-                $this->apiError('二维码生成失败');
+                $this->apiError('fail');
             }
             //加载图片
             $image = Image::open($bgPath);
@@ -491,9 +490,9 @@ class User extends BaseController
             // 释放图片资源
             imagedestroy($image);
             if (is_file($filePath)) {
-                return json(['code' => 0, 'msg' => '生成成功', 'data' => ['path' => $posterPath]]);
+                $this->apiError('success');
             } else {
-                return json(['code' => 1, 'msg' => '生成失败']);
+                $this->apiError('fail');
             }
         } catch (\Exception $e) {
             return json(['code' => 1, 'msg' => $e->getMessage()]);
@@ -529,12 +528,12 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if (isset($param['bookshelf']) && $param['bookshelf']) {
             $list = json_decode($param['bookshelf'], true);
@@ -592,7 +591,7 @@ class User extends BaseController
         }
         $starttime = strtotime("today midnight");
         $result['todayreadnum'] = Db::name('readhistory')->where(['user_id' => $uid, ['create_time', '>=', $starttime]])->count();
-        $this->apiSuccess('请求成功', $result);
+        $this->apiSuccess('success', $result);
     }
 
     /**
@@ -604,12 +603,12 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $where = ['user_id' => $uid];
         $param['order'] = 'create_time desc';
@@ -651,7 +650,7 @@ class User extends BaseController
                 'per_page' => 0
             ];
         }
-        $this->apiSuccess('请求成功', $result);
+        $this->apiSuccess('success', $result);
     }
 
     /**
@@ -663,12 +662,12 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $bid = trim($param['bid']);
         if (strpos($bid, ',') !== false) {
@@ -676,19 +675,19 @@ class User extends BaseController
         } else {
             Db::name('favorites')->where(['user_id' => JWT_UID, 'pid' => intval($bid)])->delete();
         }
-        $this->apiSuccess('删除成功', []);
+        $this->apiSuccess('success', []);
     }
 
     public function readlog()
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         //最多可以载加多少页
         if (!isset($param['page']) || empty($param['page'])) $param['page'] = 1;
@@ -712,7 +711,7 @@ class User extends BaseController
             $result[$k] = $v;
             $result[$k]['authorurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
             $result[$k]['bookurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['book_id']]));
-            $result[$k]['chapterurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('chapter_detail', ['id' => $v['chapter_id']]));
+            $result[$k]['chapterurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('chapter_detail', ['id' => $v['chapter_id'], 'bookid' => $v['book_id']]));
             $chapter = Db::name('chapter')->field('id')->where(['id' => $v['chapter_id']])->find();
             //如果章节不存在，则删除阅读记录
             if (empty($chapter)) {
@@ -742,7 +741,7 @@ class User extends BaseController
             'data' => array_slice($result, $limit_start, $limit_end),
             'total' => count($result),
         ];
-        $this->apiSuccess('请求成功', $res);       
+        $this->apiSuccess('success', $res);
     }
 
     /**
@@ -754,18 +753,18 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $conf = get_system_config('reward');
         if (empty($conf) || intval($conf['open']) != 1) {
-            $this->apiError('未开启该功能');
+            $this->apiError(407);
         }
         $uid = JWT_UID;
         $today = date('Y-m-d'); // 当天日期
         // 检查今天是否已签到
         $isSigned = Db::name('sign_log')->where('user_id', $uid)->where('sign_date', $today)->find();
         if ($isSigned) {
-            $this->apiError('已签过到了');
+            $this->apiError('repeat');
         }
         // 计算连续签到天数
         $yesterday = date('Y-m-d', strtotime('-1 day'));
@@ -803,22 +802,22 @@ class User extends BaseController
             try {
                 // 执行数据库操作
                 Db::name('user')->where('id', $uid)->inc('coin', $reward)->update();
-                add_coin_log($uid, $reward, 1, '签到奖励');
+                add_coin_log($uid, $reward, 1, getlang('reward.sign'));
                 Db::name('sign_log')->strict(false)->field(true)->insertGetId($data);
                 // 提交事务
                 Db::commit();
-                return json(['code' => 0, 'msg' => '签到成功']);
+                $this->apiSuccess('success');
             } catch (\Exception $e) {
                 // 回滚事务
                 Db::rollback();
-                return json(['code' => 1, 'msg' => $e->getMessage()]);
+                $this->apiError('fail');
             }
         } else {
             $result = Db::name('sign_log')->strict(false)->field(true)->insertGetId($data);
             if ($result != false) {
-                $this->apiSuccess('签到成功');
+                $this->apiSuccess('success');
             } else {
-                $this->apiError('签到失败');
+                $this->apiError('fail');
             }
         }
     }
@@ -832,31 +831,31 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $chapter_id = isset($param['chapter_id']) ? intval($param['chapter_id']) : 0;
         $book_id = isset($param['book_id']) ? intval($param['book_id']) : 0;
         if (empty($chapter_id) || empty($chapter_id)) {
-            $this->apiError('参数为空');
+            $this->apiError('empty');
         }
         $conf = get_system_config('reward');
         if (empty($conf)) {
-            $this->apiError('未开启该功能');
+            $this->apiError(407);
         }
         $book = Db::name('book')->field('id')->where('id', $book_id)->find();
         if (empty($book)) {
-            $this->apiError('作品不存在');
+            $this->apiError(404);
         }
         $chapter = Db::name('chapter')->field('id')->where('id', $chapter_id)->find();
         if (empty($chapter)) {
-            $this->apiError('章节不存在');
+            $this->apiError(404);
         }
         $uid = JWT_UID;
         $today = date('Y-m-d'); // 当天日期
         // 检查今天是否已点赞
         $like = Db::name('like_log')->where(['user_id' => $uid, 'book_id' => $book_id, 'chapter_id' => $chapter_id, 'like_date' => $today])->count();
         if (intval($like) > 0) {
-            $this->apiError('已点过赞了');
+            $this->apiError('repeat');
         }
         //添加信息
         $data = [
@@ -889,24 +888,24 @@ class User extends BaseController
                     try {
                         // 执行数据库操作
                         Db::name('user')->where('id', $uid)->inc('coin', $reward)->update();
-                        add_coin_log($uid, $reward, 1, '每日点赞奖励奖励');
+                        add_coin_log($uid, $reward, 1, getlang('reward.daylike'));
                         Db::name('task')->where('id', $already['id'])->update(['status' => 1, 'update_time' => time()]);
                         // 提交事务
                         Db::commit();
-                        return json(['code' => 0, 'msg' => '点赞成功']);
+                        $this->apiSuccess('success');
                     } catch (\Exception $e) {
                         // 回滚事务
                         Db::rollback();
-                        return json(['code' => 1, 'msg' => $e->getMessage()]);
+                        $this->apiError('fail');
                     }
                 } else {
-                    $this->apiSuccess('点赞成功');
+                    $this->apiSuccess('success');
                 }
             } else {
-                $this->apiSuccess('点赞成功');
+                $this->apiSuccess('success');
             }
         } else {
-            $this->apiError('点赞失败');
+            $this->apiError('fail');
         }
     }
 
@@ -919,12 +918,12 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if (!isset($param['limit']) || intval($param['limit']) <= 0) {
             $param['limit'] = get_config('app.page_size');
@@ -958,7 +957,7 @@ class User extends BaseController
             }
             $result['data'][$k]['list'] = $likelist;
         }
-        $this->apiSuccess('请求成功', $result);
+        $this->apiSuccess('success', $result);
     }
 
     /**
@@ -969,7 +968,7 @@ class User extends BaseController
     public function bankcard()
     {
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $param = get_params();
         $where = ['user_id' => JWT_UID, 'status' => 1];
@@ -982,7 +981,7 @@ class User extends BaseController
             $list[$k]['mobile'] = $v['mobile'] ? substr_replace($v['mobile'], '****', 3, 4) : '';
             $list[$k]['card_no'] = $v['card_no'] ? substr_replace($v['card_no'], '****', 3, 4) : '';
         }
-        $this->apiSuccess('请求成功', $list);
+        $this->apiSuccess('success', $list);
     }
 
     private static function isValidBankCardNumber($cardNumber)
@@ -1024,7 +1023,7 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $card_no = isset($param['card_no']) ? intval($param['card_no']) : 0;
         $mobile = isset($param['mobile']) ? intval($param['mobile']) : 0;
@@ -1033,27 +1032,27 @@ class User extends BaseController
         $card_image = isset($param['card_image']) ? trim($param['card_image']) : '';
         $bank_address = isset($param['bank_address']) ? trim($param['bank_address']) : '';
         if (!self::validateMobile((string)$mobile)) {
-            $this->apiError('手机号有误');
+            $this->apiError('paramerror');
         }
         if (!self::isValidBankCardNumber((string)$card_no)) {
-            $this->apiError('银行卡号有误');
+            $this->apiError('paramerror');
         }
         if (empty($bank_name) || empty($full_name) || empty($card_image) || empty($bank_address)) {
-            $this->apiError('必填信息未填写');
+            $this->apiError('empty');
         }
         $card = Db::name('bank_card')->where(['card_no' => $card_no])->find();
         if (!empty($card)) {
-            $this->apiError('此卡已存在');
+            $this->apiError('repeat');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if (intval($user['realname_status']) != 1) {
-            $this->apiError('请先完成实名认证');
+            $this->apiError('user.authentication');
         }
         if ($full_name != $user['name']) {
-            $this->apiError('卡主与实名名称不一致');
+            $this->apiError('inconsistent');
         }
         $result = Db::name('bank_card')->strict(false)->field(true)->insertGetId([
             'user_id' => JWT_UID,
@@ -1077,7 +1076,7 @@ class User extends BaseController
                 try {
                     // 执行数据库操作
                     Db::name('user')->where('id', JWT_UID)->inc('coin', $reward)->update();
-                    add_coin_log(JWT_UID, $reward, 1, '绑定收款账号奖励');
+                    add_coin_log(JWT_UID, $reward, 1, getlang('reward.bindaccount'));
                     Db::name('task')->where('id', $task['id'])->update(['status' => 1, 'update_time' => time()]);
                     // 提交事务
                     Db::commit();
@@ -1086,9 +1085,9 @@ class User extends BaseController
                     Db::rollback();
                 }
             }
-            $this->apiSuccess('添加成功');
+            $this->apiSuccess('success');
         } else {
-            $this->apiError('添加失败');
+            $this->apiError('fail');
         }
     }
 
@@ -1101,21 +1100,21 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $id = isset($param['id']) ? intval($param['id']) : 0;
         if (empty($id)) {
-            $this->apiError('参数有误');
+            $this->apiError('empty');
         }
         $card = Db::name('bank_card')->where(['id' => $id])->find();
         if (empty($card)) {
-            $this->apiError('数据不存在');
+            $this->apiError(404);
         }
         if ($card['user_id'] != JWT_UID) {
-            $this->apiError('数据不存在');
+            $this->apiError(404);
         }
         Db::name('bank_card')->where(['id' => $id])->delete();
-        $this->apiSuccess('删除成功', []);
+        $this->apiSuccess('success', []);
     }
 
     /**
@@ -1127,38 +1126,38 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $realname = isset($param['realname']) ? trim($param['realname']) : '';
         $id_card_photo = isset($param['id_card_photo']) ? trim($param['id_card_photo']) : '';
         $id_card = isset($param['id_card']) ? trim($param['id_card']) : '';
         if (empty($realname) || empty($id_card_photo) || empty($id_card)) {
-            $this->apiError('参数有误');
+            $this->apiError('empty');
         }
         if (!isIdcard($id_card)) {
-            $this->apiError('身份证号有误');
+            $this->apiError('paramerror');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if ($user['realname_status'] == 1) {
-            $this->apiError('已实名认证过了');
+            $this->apiError('repeat');
         }
         if ($user['realname_status'] == 2) {
-            $this->apiError('实名认证审核中');
+            $this->apiError('examineing');
         }
         $card = Db::name('user')->where(['id_card' => $id_card])->find();
         if (!empty($card)) {
             if ($card['id'] != $user['id']) {
-                $this->apiError('此身份证已被使用');
+                $this->apiError('common.alreadyused');
             }
         }
         $res = Db::name('user')->where(['id' => $user['id']])->strict(false)->field(true)->update(['name' => $realname, 'id_card_photo' => $id_card_photo, 'id_card' => $id_card, 'realname_status' => 2, 'update_time' => time()]);
         if ($res) {
-            $this->apiSuccess('提交成功', []);
+            $this->apiSuccess('success', []);
         } else {
-            $this->apiError('提交失败');
+            $this->apiError('fail');
         }
     }
 
@@ -1171,7 +1170,7 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $where = ['inviter' => JWT_UID, 'status' => 1];
         $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
@@ -1181,7 +1180,7 @@ class User extends BaseController
             ->each(function ($item, $key) {
                 $item->register_time = date('Y-m-d H:i:s', $item->register_time);
             });
-        $this->apiSuccess('成功', $list);
+        $this->apiSuccess('success', $list);
     }
 
     /**
@@ -1193,31 +1192,31 @@ class User extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $nickname = isset($param['nickname']) ? trim($param['nickname']) : '';
         $mobile = isset($param['mobile']) ? trim($param['mobile']) : '';
         $password = isset($param['password']) ? trim($param['password']) : '';
         if (empty($nickname) || empty($mobile) || empty($password)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         if (!preg_match('/^1[3-9]\d{9}$/', $mobile)) {
-            $this->apiError('手机号不正确');
+            $this->apiError('paramerror');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         if (intval($user['author_id'] > 0)) {
-            $this->apiError('已经是作者了！');
+            $this->apiError('repeat');
         }
         $author = Db::name('author')->where(['nickname' => $nickname])->find();
         if (!empty($author)) {
-            $this->apiError('笔名已被使用');
+            $this->apiError('common.alreadyused');
         }
         $author = Db::name('author')->where(['mobile' => $mobile])->find();
         if (!empty($author)) {
-            $this->apiError('手机已被使用');
+            $this->apiError('common.alreadyused');
         }
         $time = (string) time();
         $salt = substr(MD5($time), 0, 6);
@@ -1242,7 +1241,7 @@ class User extends BaseController
                 try {
                     // 执行数据库操作
                     Db::name('user')->where('id', JWT_UID)->inc('coin', $reward)->update();
-                    add_coin_log(JWT_UID, $reward, 1, '成为作者奖励');
+                    add_coin_log(JWT_UID, $reward, 1, getlang('reward.becomeauthor'));
                     Db::name('task')->where('id', $task['id'])->update(['status' => 1, 'update_time' => time()]);
                     // 提交事务
                     Db::commit();
@@ -1251,9 +1250,9 @@ class User extends BaseController
                     Db::rollback();
                 }
             }
-            $this->apiSuccess('注册成功');
+            $this->apiSuccess('success');
         } else {
-            $this->apiError('注册失败');
+            $this->apiError('fail');
         }
     }
 }

@@ -30,7 +30,7 @@ if(!empty($book_list)) {
             $search = array(" ", "\n", '\n');
             $book_list[$k]['remark'] = str_replace($search, $replace, $remark);
         }
-        $book_list[$k]['chapter'] = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $v['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
+        $book_list[$k]['chapter'] = model('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $v['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
         $book_list[$k]['words'] = model('chapter')->where(['bookid' => $v['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
     }
     $book_count = count($book_list);            
@@ -86,7 +86,7 @@ $follow_count = model('follow')->where(['from_id' => $author['id']])->count();
                                         {notempty name="$v.chapter"}
                                         <div class="update">
                                             <span class="ttit">最新章节：</span>
-                                            <a href="{:url('chapter_detail',['id'=>$v['chapter']['id']])}" class="gonew" target="_blank">{$v.chapter.title}</a>
+                                            <a href="{:url('chapter_detail',['id'=>$v['chapter']['id'], 'bookid'=>$v['chapter']['bookid']])}" class="gonew" target="_blank">{$v.chapter.title}</a>
                                             <div class="uptime">{:time_format($v.chapter.create_time,'Y-m-d')}</div>
                                         </div>
                                         {/notempty}

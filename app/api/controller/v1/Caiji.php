@@ -27,13 +27,13 @@ class Caiji extends BaseController
     {
         $param = get_params();
         if (empty($param)) {
-            self::return_msg('参数错误');
+            self::return_msg('caiji.error');
         }
         if (empty($param['token'])) {
-            self::return_msg('参数错误');
+            self::return_msg('caiji.error');
         }
         if (trim($param['token']) != $this->token) {
-            self::return_msg('参数错误');
+            self::return_msg('caiji.error');
         }
         unset($param['token']);
         return $param;
@@ -54,10 +54,10 @@ class Caiji extends BaseController
     {
         $param = $this->Auth();
         if (empty($param['title'])) {
-            self::return_msg('标题为空');
+            self::return_msg('caiji.titleerr');
         }
         if (empty($param['author'])) {
-            self::return_msg('作者为空');
+            self::return_msg('caiji.authorempty');
         }
         $title = trim($param['title']);
         $author = trim($param['author']);
@@ -81,7 +81,7 @@ class Caiji extends BaseController
             $authorid = $user['id'];
         }
         if (empty($authorid)) {
-            self::return_msg('作者错误');
+            self::return_msg('caiji.authorerr');
         }
         if (empty($book)) {
             $remark = isset($param['intro']) ? str_replace("'", "\'", trim($param['intro'])) : '';
@@ -113,10 +113,10 @@ class Caiji extends BaseController
                             $cate = Db::name('category')->where(['name' => $name])->find();
                         }
                         if (empty($cate)) {
-                            $cate = Db::name('category')->where(['name' => '其他'])->find();
+                            $cate = Db::name('category')->where(['name' => getlang('other')])->find();
                         }
                     } else {
-                        $cate = Db::name('category')->where(['name' => '其他'])->find();
+                        $cate = Db::name('category')->where(['name' => getlang('other')])->find();
                     }
                     if (!empty($cate)) {
                         if (intval($cate['pid']) > 0) {
@@ -136,7 +136,7 @@ class Caiji extends BaseController
                 }
             }
             $isfinish = isset($param['isfinish']) ? trim($param['isfinish']) : '';
-            $finish_arr = ['完结' => 2, '连载' => 1];
+            $finish_arr = [getlang('finish') => 2, getlang('serialize') => 1];
             if (!empty($isfinish) && isset($finish_arr[$isfinish])) {
                 $isfinish = $finish_arr[$isfinish];
             } else {
@@ -159,12 +159,12 @@ class Caiji extends BaseController
             ];
             $res = Db::name('book')->strict(false)->field(true)->insertGetId($data);
             if ($res !== false) {
-                self::return_msg('发布成功');
+                self::return_msg('caiji.success');
             } else {
-                self::return_msg('作品错误');
+                self::return_msg('caiji.bookerr');
             }
         }
-        self::return_msg('采集错误');
+        self::return_msg('caiji.fail');
     }
 
     /**
@@ -177,20 +177,20 @@ class Caiji extends BaseController
         $booktitle = isset($param['booktitle']) ? trim($param['booktitle']) : '';
         $content = isset($param['content']) ? trim($param['content']) : '';
         if (empty($title)) {
-            self::return_msg('章节名称为空');
+            self::return_msg('caiji.chapternameempty');
         }
         if (empty($booktitle)) {
-            self::return_msg('作品名称为空');
+            self::return_msg('caiji.booknameempty');
         }
         if (empty($content)) {
-            self::return_msg('章节内容为空');
+            self::return_msg('caiji.chaptercontentempty');
         }
         $addtime = isset($param['addtime']) ? strtotime(trim($param['addtime'])) : 0;
         $edittime = isset($param['edittime']) ? strtotime(trim($param['edittime'])) : 0;
         $bookid = 0;
         $book = Db::name('book')->field('id,authorid')->where(['title' => $booktitle])->find();
         if (empty($book)) {
-            self::return_msg('作品不存在-跳过');
+            self::return_msg('caiji.bookskip');
         }
         $bookid = $book['id'];
         $authorid = $book['authorid'];
@@ -223,10 +223,10 @@ class Caiji extends BaseController
                     self::return_msg('ok');
                 } else {
                     Db::name('chapter')->where('id', $sid)->delete(); //删除章节
-                    self::return_msg('入库失败');
+                    self::return_msg('addfail');
                 }
             } else {
-                self::return_msg('发布失败');
+                self::return_msg('caiji.releasefail');
             }
         } else {
             $chapterContent = Db::name($chaptertable)->where(['sid' => $chapterData['id']])->find();
@@ -236,10 +236,10 @@ class Caiji extends BaseController
                     self::return_msg('ok');
                 } else {
                     Db::name('chapter')->where('id', $chapterData['id'])->delete(); //删除章节
-                    self::return_msg('入库失败');
+                    self::return_msg('caiji.addfail');
                 }
             } else {
-                self::return_msg('重复跳过');
+                self::return_msg('caiji.repeatskip');
             }
         }
     }
@@ -252,7 +252,7 @@ class Caiji extends BaseController
      */
     protected static function return_msg($msg)
     {
-        echo $msg;
+        echo getlang($msg);
         exit;
     }
 }

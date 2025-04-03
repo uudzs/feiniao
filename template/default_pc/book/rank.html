@@ -123,7 +123,7 @@
                 <div class="zh-modules-rank-box">
                     {php}
                         $followers = model('follow')
-                        ->field('from_id,type, COUNT(*) as followers')
+                        ->field('from_id, ANY_VALUE(type) AS type, COUNT(*) as followers')
                         ->group('from_id')
                         ->order('followers', 'DESC')
                         ->limit(10)

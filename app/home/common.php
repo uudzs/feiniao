@@ -2,7 +2,6 @@
 
 use think\facade\Db;
 use think\facade\Cache;
-use think\facade\Route;
 
 //读取导航列表，用于前台
 function get_navs($name)
@@ -18,4 +17,15 @@ function get_navs($name)
     }
     $navs = get_cache('homeNav' . $name);
     return $navs;
+}
+
+/**
+ * 判断是否为移动端访问
+ */
+if (!function_exists('is_mobile')) {
+    function is_mobile()
+    {
+        $userAgent = request()->header('user-agent');
+        return preg_match('/(iphone|android|mobile|wap)/i', $userAgent);
+    }
 }

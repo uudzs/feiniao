@@ -8,9 +8,7 @@ use think\App;
 use think\facade\View;
 use think\exception\HttpResponseException;
 use think\facade\Request;
-use think\facade\Session;
-use think\facade\Db;
-use EasyWeChat\Factory;
+use think\Response;
 
 /**
  * 控制器基础类
@@ -169,6 +167,45 @@ abstract class BaseController
                 exit;
             }
         }
+    }
+
+    /**
+     * 成功跳转方法
+     * @param string $msg 提示信息
+     * @param string $url 跳转地址
+     * @param int $wait 等待时间（秒）
+     */
+    protected function success($msg = '', $url = null, $wait = 3)
+    {
+        $this->jumpTemplate(1, $msg, $url, $wait);
+    }
+
+    /**
+     * 错误跳转方法
+     * @param string $msg 提示信息
+     * @param string $url 跳转地址
+     * @param int $wait 等待时间（秒）
+     */
+    protected function error($msg = '', $url = null, $wait = 0)
+    {
+        $this->jumpTemplate(0, $msg, $url, $wait);
+    }
+
+    /**
+     * 通用跳转模板处理
+     */
+    private function jumpTemplate($code, $msg, $url, $wait)
+    {
+        $url = $url ? url($url)->build() : 'javascript:history.back(-1);';
+        $msg = getlang($msg);
+        $result = [
+            'code'  => $code,
+            'msg'  => $msg,
+            'url'  => $url,
+            'wait' => $wait,
+        ];
+        $response = Response::create(View::fetch(get_config('app.dispatch_error_tmpl'), $result));
+        throw new HttpResponseException($response);
     }
 
     //页面跳转方法

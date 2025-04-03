@@ -32,7 +32,7 @@ class Order extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $where = ['user_id' => JWT_UID, 'is_del' => 0, 'is_system_del' => 0];
         if (isset($param['product_type']) && !empty($param['product_type'])) {
@@ -63,7 +63,7 @@ class Order extends BaseController
             $list[$k]['add_time'] = date('Y-m-d H:i:s', $v['add_time']);
             $list[$k]['pay_time'] = $v['pay_time'] ? date('Y-m-d H:i:s', $v['pay_time']) : '--';
         }
-        $this->apiSuccess('请求成功', $list);
+        $this->apiSuccess('success', $list);
     }
 
     /**
@@ -78,30 +78,30 @@ class Order extends BaseController
         $channel_type = isset($param['channel_type']) ? trim($param['channel_type']) : 'wechat';
         $pid = isset($param['pid']) ? intval($param['pid']) : 0;
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($type) || empty($pid)) {
-            $this->apiError('参数为空');
+            $this->apiError('empty');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $price = $day = 0;
         if ($type == 'vip') {
             $conf = get_system_config('vip');
             if (intval($conf['open'] != 1)) {
-                $this->apiError('未开启VIP功能');
+                $this->apiError('vip.unopened');
             }
             $day_key = 'level_' . $pid . '_day';
             $priceKey = 'level_' . $pid;
             if (!isset($conf[$day_key]) || !isset($conf[$priceKey])) {
-                $this->apiError('VIP必要参数不存在');
+                $this->apiError('empty');
             }
             $day = intval($conf[$day_key]);
             $price = intval($conf[$priceKey]);
             if ($price <= 0 || $day <= 0) {
-                $this->apiError('此VIP级别未开启');
+                $this->apiError('vip.unopened');
             }
             $where = [
                 'user_id' => JWT_UID,
@@ -114,6 +114,11 @@ class Order extends BaseController
             ];
             $order = Db::name('order')->where($where)->find();
             if (empty($order)) {
+                $virtual_info = str_replace(
+                    ['{price}', '{day}'],
+                    [$price, $day],
+                    getlang('vip.virtual_info')
+                );
                 $data = [
                     'user_id' => JWT_UID,
                     'pid' => $pid,
@@ -130,18 +135,18 @@ class Order extends BaseController
                     'is_del' => 0,
                     'is_system_del' => 0,
                     'virtual_type' => 1,
-                    'virtual_info' => '购买VIP会员，价格：' . $price . '元，时长：' . $day . '天。',
+                    'virtual_info' => $virtual_info,
                     'channel_type' => $channel_type
                 ];
                 $result = Db::name('order')->strict(false)->field(true)->insertGetId($data);
                 if ($result != false) {
                     $data['id'] = $result;
-                    $this->apiSuccess('创建成功', $data);
+                    $this->apiSuccess('success', $data);
                 } else {
-                    $this->apiError('创建失败');
+                    $this->apiError('fail');
                 }
             } else {
-                $this->apiSuccess('获取成功', $order);
+                $this->apiSuccess('success', $order);
             }
         }
     }
@@ -154,18 +159,18 @@ class Order extends BaseController
         $param = get_params();
         $id = isset($param['id']) ? intval($param['id']) : 0;
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($id)) {
-            $this->apiError('参数为空');
+            $this->apiError('empty');
         }
         $order = Db::name('order')->where(['id' => $id])->find();
         if (empty($order)) {
-            $this->apiError('订单不存在');
+            $this->apiError(404);
         }
         if ($order['user_id'] != JWT_UID) {
-            $this->apiError('订单不存在');
+            $this->apiError(404);
         }
-        $this->apiSuccess('获取成功', $order);
+        $this->apiSuccess('success', $order);
     }
 }

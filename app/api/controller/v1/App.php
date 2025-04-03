@@ -32,7 +32,7 @@ class App extends BaseController
         $edition_number = isset($param['edition_number']) ? floatval($param['edition_number']) : 0;
         $platform = isset($param['platform']) ? strtolower(trim($param['platform'])) : '';
         if ($edition_number <= 0 || empty($platform)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $where = ['edition_issue' => 1, 'platform' => $platform, ['edition_number', '>', $edition_number]];
         if ($platform == 'harmony') {
@@ -45,6 +45,6 @@ class App extends BaseController
             Db::name('app_version')->where('id', $version['id'])->inc('check_num')->update();
             $version['edition_url']=get_file($version['edition_url']);
         }
-        $this->apiSuccess('请求成功', $version ?: []);
+        $this->apiSuccess('success', $version ?: []);
     }
 }

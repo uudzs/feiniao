@@ -1532,14 +1532,14 @@ CREATE TABLE `fn_nav_info` (
   `create_time` int(11) NOT NULL DEFAULT '0',
   `update_time` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COMMENT='导航详情表';
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COMMENT='导航详情表';
 
 -- ----------------------------
 -- Records of fn_nav_info
 -- ----------------------------
 INSERT INTO `fn_nav_info` VALUES ('1', '0', '1', '首页', '/', '', '0', '1', '9', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('6', '0', '1', '公告', '/home/notice.html', '', '0', '1', '5', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('7', '0', '1', '手机版', '', '', '0', '1', '2', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('7', '0', '1', '书库', '/home/shuku.html', '', '0', '1', '8', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('8', '0', '2', '关于我们', '/home/page-about.html', '', '1', '1', '9', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('9', '0', '2', '用户协议', '/home/page-agreement.html', '', '1', '1', '3', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('10', '0', '2', '隐私政策', '/home/page-privacy.html', '', '1', '1', '2', '0', '0');
@@ -1551,7 +1551,7 @@ INSERT INTO `fn_nav_info` VALUES ('15', '0', '3', '怎么管理自己的账号',
 INSERT INTO `fn_nav_info` VALUES ('16', '0', '4', '成为飞鸟阅读的签约作者利用人工智能为您赋能', '/home/page-homeai.html', '', '1', '1', '0', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('17', '0', '5', '阅读小说，轻松赚现金！', '/home/page-homecoin.html', '', '1', '1', '0', '0', '0');
 INSERT INTO `fn_nav_info` VALUES ('18', '0', '1', '排行', '/home/rank.html', '', '0', '1', '7', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('19', '0', '1', '排行', '/home/quanben.html', '', '0', '1', '6', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('19', '0', '1', '全本', '/home/quanben.html', '', '0', '1', '6', '0', '0');
 
 -- ----------------------------
 -- Table structure for fn_order

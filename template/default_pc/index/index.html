@@ -11,7 +11,7 @@
 {/block}
 <!-- 主体 -->
 {block name="body"}
-	{include file="common/header" nav='info' /}
+	{include file="common/header" nav='info' /}	
 	<section class="hero-area">
 		<div class="hero-circle">
 		</div>
@@ -31,7 +31,7 @@
 			</div>
 		</div>
 	</section>
-	
+
 	<div class="container">
 		<section class="home-tap-link">
 			<div class="home-tap-link__left" >
@@ -336,7 +336,7 @@
 					$update_list[$k]['genrelink'] = 'javascript:;';
 				}
 				$chapter = model('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $vo['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('create_time desc')->find();
-				$update_list[$k]['chapterlink'] = $chapter ? (string) url('chapter_detail', ['id' => $chapter['id']]) : 'javascript:;';
+				$update_list[$k]['chapterlink'] = $chapter ? (string) url('chapter_detail', ['id' => $chapter['id'], 'bookid' => $chapter['bookid']]) : 'javascript:;';
 				$update_list[$k]['title'] = $chapter ? $chapter['title'] : '--';
 			}
 		}

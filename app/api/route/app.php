@@ -74,7 +74,7 @@ try {
     $data = array_column($rule, null, 'name');
     if (isset($data['book_detail']) && $data['book_detail']['rule']) Route::rule($data['book_detail']['rule'], 'book/detail', 'GET')->name('book_detail');
     if (isset($data['author_detail']) && $data['author_detail']['rule']) Route::rule($data['author_detail']['rule'], 'author/detail', 'GET')->pattern(['id' => '\d+'])->name('author_detail');
-    if (isset($data['chapter_detail']) && $data['chapter_detail']['rule']) Route::rule($data['chapter_detail']['rule'], 'chapter/detail', 'GET')->pattern(['id' => '\d+'])->name('chapter_detail');
+    if (isset($data['chapter_detail']) && $data['chapter_detail']['rule']) Route::rule($data['chapter_detail']['rule'], 'chapter/detail', 'GET')->pattern(['bookid' => '\d+', 'id' => '\d+'])->name('chapter_detail');
     if (isset($data['inviteurl']) && $data['inviteurl']['rule']) Route::rule($data['inviteurl']['rule'], 'invite/index', 'GET')->pattern(['name' => '\w+'])->name('inviteurl');
 } catch (Exception $e) {
 }

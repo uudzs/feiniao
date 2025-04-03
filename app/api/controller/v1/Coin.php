@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
 use app\api\middleware\Auth;
-use think\facade\Db;
-use think\facade\Route;
-use idwork\Idwork;
 use app\admin\model\CoinLog as CoinLogModel;
 
 class Coin extends BaseController
@@ -32,7 +28,7 @@ class Coin extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $where = ['user_id' => JWT_UID];
         if (!isset($param['order']) || empty($param['order'])) {
@@ -42,6 +38,6 @@ class Coin extends BaseController
             $param['limit'] = intval($param['limit']);
         }
         $list = (new CoinLogModel())->getCoinLogList($where, $param); 
-        $this->apiSuccess('请求成功', $list);
+        $this->apiSuccess('success', $list);
     }
 }

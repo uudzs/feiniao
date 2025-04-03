@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
 use app\api\middleware\Auth;
 use think\facade\Db;
-use think\facade\Route;
-use app\admin\model\Book as BookModel;
 
 class Task extends BaseController
 {
@@ -32,10 +29,10 @@ class Task extends BaseController
         $param = get_params();
         $name = isset($param['name']) ? trim($param['name']) : '';
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($name)) {
-            $this->apiError('参数为空');
+            $this->apiError('empty');
         }
         $conf = get_system_config('reward');
         $type = '';
@@ -55,7 +52,7 @@ class Task extends BaseController
         ];
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError('用户不存在');
+            $this->apiError(404);
         }
         $vip = Db::name('vip_log')->where(['status' => 1, 'user_id' => JWT_UID, ['expire_time', '>', time()]])->find();
         $vip_reward = 0;
@@ -66,41 +63,41 @@ class Task extends BaseController
         }
         if ($type == 'account_id') {
             $data['type'] = 1;
-            $data['title'] = '绑定收款账号奖励';
+            $data['title'] = getlang('reward.bindaccount');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['account'])) : $conf['account'];
         }
         if ($type == 'mobile_id') {
             if (!empty($user['mobile'])) {
-                $this->apiError('手机已绑定，不可领取。');
+                $this->apiError('task.phonealreadybind');
             }
             $data['type'] = 1;
-            $data['title'] = '绑定手机号奖励';
+            $data['title'] = getlang('reward.bindphone');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['mobile'])) : $conf['mobile'];
         }
         if ($type == 'author_id') {
             if (isset($user['author_id']) && intval($user['author_id']) > 0) {
-                $this->apiError('已经是作者，不可领取。');
+                $this->apiError('task.alreadyauthor');
             }
             $data['type'] = 1;
-            $data['title'] = '成为作者奖励';
+            $data['title'] = getlang('reward.becomeauthor');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['author'])) : $conf['author'];
         }
         if ($type == 'vip_id') {
             if (!empty($vip)) {
-                $this->apiError('已经是VIP，不可领取。');
+                $this->apiError('task.alreadyvip');
             }
             $data['type'] = 1;
-            $data['title'] = '成为VIP奖励';
+            $data['title'] = getlang('reward.becomevip');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['vip'])) : $conf['vip'];
         }
         if ($type == 'chapter_id') {
             $data['type'] = 2;
-            $data['title'] = '每日阅读章节奖励';
+            $data['title'] = getlang('reward.dayreadchapter');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['chapter_reward'])) : $conf['chapter_reward'];
         }
         if ($type == 'like_id') {
             $data['type'] = 2;
-            $data['title'] = '每日点赞奖励奖励';
+            $data['title'] = getlang('reward.daylike');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['like_reward'])) : $conf['like_reward'];
         }
         if ($data['type'] == 2) {
@@ -109,13 +106,13 @@ class Task extends BaseController
             $already = Db::name('task')->where(['user_id' => JWT_UID, 'taskid' => $name])->find();
         }
         if (!empty($already)) {
-            $this->apiSuccess('已领取过了');
+            $this->apiSuccess('repeat');
         }
         $result = Db::name('task')->strict(false)->field(true)->insertGetId($data);
         if ($result != false) {
-            $this->apiSuccess('任务领取成功');
+            $this->apiSuccess('success');
         } else {
-            $this->apiError('任务领取失败');
+            $this->apiError('fail');
         }
     }
 
@@ -128,7 +125,7 @@ class Task extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $res = [];
@@ -146,6 +143,6 @@ class Task extends BaseController
         $res['like'] = Db::name('task')->where(['user_id' => $uid, 'task_date' => $today, 'taskid' => $conf['like_id']])->find();
         //日任务
         $res['other'] = Db::name('task')->where(['user_id' => $uid, ['type', 'in', '3,4,5,6']])->order('create_time Desc')->select()->toArray(); //所有其他任务
-        $this->apiSuccess('请求成功', $res);
+        $this->apiSuccess('success', $res);
     }
 }

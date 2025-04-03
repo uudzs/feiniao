@@ -8,8 +8,6 @@ use think\App;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Response;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 
 /**
  * 控制器基础类
@@ -64,7 +62,7 @@ abstract class BaseController
     {
         //每页显示数据量
         $this->pageSize = Request::param('page_size', \think\facade\Config::get('app.page_size'));
-    } 
+    }
 
     /**
      * Api处理成功结果返回方法
@@ -106,7 +104,7 @@ abstract class BaseController
     {
         $result = [
             'code' => $code,
-            'msg' => $msg,
+            'msg' => getlang($msg),
             'time' => time(),
             'data' => $data,
         ];

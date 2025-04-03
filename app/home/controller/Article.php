@@ -8,7 +8,6 @@ use app\home\BaseController;
 use app\admin\model\Article as ArticleModel;
 use think\facade\Db;
 use think\facade\View;
-use think\facade\Request;
 
 class Article extends BaseController
 {
@@ -18,11 +17,11 @@ class Article extends BaseController
 		$param = get_params();
 		$id = isset($param['id']) ? intval($param['id']) : 0;
 		if (empty($id)) {
-			throw new \think\exception\HttpException(406, '访问错误');
+			$this->error(406);
 		}
 		$detail = (new ArticleModel())->getArticleById($id);
 		if (empty($detail)) {
-			throw new \think\exception\HttpException(406, '找不到相关记录');
+			$this->error(404);
 		}
 		ArticleModel::where('id', $param['id'])->inc('read')->update();
 		$keyword_array = Db::name('ArticleKeywords')

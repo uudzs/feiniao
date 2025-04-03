@@ -42,7 +42,7 @@
             $subgenrelink = url('book_cates', ['id' => $book['genre']]);
         }
         $author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();        
-        $chapterlist = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
+        $chapterlist = model('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
         if(!empty($chapterlist)) {
             foreach ($chapterlist as $k => $v) {
                 $chapterlist[$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
@@ -105,7 +105,7 @@
                 {notempty name="$last_chapter"}
                 <p class="book-info__time">
                     <span>更新时间：{:time_format($last_chapter.create_time,'Y-m-d')}</span>
-                    <a class="book-info__lastChapter ypc-link" href="{:url('chapter_detail',['id'=>$last_chapter['id']])}" target="_blank"> 最新章节：{$last_chapter.title}</a>
+                    <a class="book-info__lastChapter ypc-link" href="{:url('chapter_detail',['id'=>$last_chapter['id'], 'bookid'=>$last_chapter['bookid']])}" target="_blank"> 最新章节：{$last_chapter.title}</a>
                 </p>
                 {/notempty}
                 <div class="btn-box">
@@ -173,7 +173,7 @@
                             <ul class="catalogue">
                                 {volist name="$new_chapter" id="v"}
                                     <li class="catalogue-list">
-                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
+                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id'], 'bookid'=>$v['bookid']])}" target="_blank" class="ypc-link catalogue-list__link">
                                             <span class="catalogue-list__title">{$v.title}</span>
                                             <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
                                         </a>
@@ -188,7 +188,7 @@
                             <ul class="catalogue">
                                 {volist name="$chapterlist" id="v"}
                                     <li class="catalogue-list">
-                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id']])}" target="_blank" class="ypc-link catalogue-list__link">
+                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id'], 'bookid'=>$v['bookid']])}" target="_blank" class="ypc-link catalogue-list__link">
                                             <span class="catalogue-list__title">{$v.title}</span>
                                             <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
                                         </a>

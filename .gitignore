@@ -2,7 +2,6 @@
 /.vscode
 /.gitee
 *.log
-*.env
 *.lock
 /runtime/*
 /public/.user.ini

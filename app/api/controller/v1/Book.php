@@ -34,14 +34,14 @@ class Book extends BaseController
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         if (empty($id)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $uid = JWT_UID;
         $detail = Db::name('book')->where(['id' => $id])->find();
         $model_name = \think\facade\App::initialize()->http->getName();
         if ($detail) {
             if (intval($detail['status']) != 1) {
-                $this->apiError('作品被禁止');
+                $this->apiError(407);
             }
             $detail['bigclassname'] = Db::name('category')->where(['id' => $detail['genre']])->value('name');
             $detail['smallclassname'] = Db::name('category')->where(['id' => $detail['subgenre']])->value('name');
@@ -57,7 +57,7 @@ class Book extends BaseController
                 $first_chapter = $detail['chapter'][0]; //第一章
                 $last_chapter = end($detail['chapter']); //最后一章
                 foreach ($detail['chapter'] as $k => $v) {
-                    $url = (string) Route::buildUrl('chapter_detail', ['id' => $v['id']]);
+                    $url = (string) Route::buildUrl('chapter_detail', ['id' => $v['id'], 'bookid' => $v['bookid']]);
                     $detail['chapter'][$k]['chapter_url'] = str_replace($model_name, 'home', $url);
                     $detail['chapter'][$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
                 }
@@ -84,10 +84,10 @@ class Book extends BaseController
             //查询是否有该章节记录
             if (!empty($reads)) {
                 $detail['continueread'] = 1;
-                $detail['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $reads['chapter_id']]);
+                $detail['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $reads['chapter_id'], 'bookid' => $reads['book_id']]);
             } else {
                 if ($first_chapter) {
-                    $detail['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id']]);
+                    $detail['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id'], 'bookid' => $first_chapter['bookid']]);
                 } else {
                     $detail['chapter_url'] = 'javascript:;';
                 }
@@ -111,9 +111,9 @@ class Book extends BaseController
                 $detail['label'] = [];
             }
         } else {
-            $this->apiError('作品不存在');
+            $this->apiError(404);
         }
-        $this->apiSuccess('请求成功', $detail);
+        $this->apiSuccess('success', $detail);
     }
 
     /**
@@ -139,7 +139,7 @@ class Book extends BaseController
             $category = Db::name('category')->field('id,name,pid')->where(['status' => 1])->order('ordernum asc')->select()->toArray();
             if ($areaid == 2) {
                 foreach ($category as $key => $value) {
-                    if (intval($value['pid']) == 0 && strpos($value['name'], '女生') !== false) {
+                    if (intval($value['pid']) == 0 && strpos($value['name'], getlang('common.girl')) !== false) {
                         $big = $value['id'];
                         break;
                     }
@@ -149,7 +149,7 @@ class Book extends BaseController
                 }
             } else {
                 foreach ($category as $key => $value) {
-                    if (intval($value['pid']) == 0 && strpos($value['name'], '女生') === false) {
+                    if (intval($value['pid']) == 0 && strpos($value['name'], getlang('common.girl')) === false) {
                         $big[] = $value['id'];
                     }
                 }
@@ -250,7 +250,7 @@ class Book extends BaseController
                 $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $v['subgenre']])->value('name');
                 $result['data'][$k]['headpic'] = get_file($author['headimg']);
                 $result['data'][$k]['cover_str'] = get_file($v['cover']);
-                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? '完结' : '连载';
+                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? getlang('finish') : getlang('serialize');
                 $result['data'][$k]['words_str'] = intval($v['words']) > 0 ? wordCount($v['words']) : 0;
                 $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
                 $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']]));
@@ -264,7 +264,7 @@ class Book extends BaseController
                 'per_page' => 0
             ];
         }
-        $this->apiSuccess('请求成功', $result);
+        $this->apiSuccess('success', $result);
     }
 
     /**
@@ -278,31 +278,31 @@ class Book extends BaseController
         $bookid = isset($param['bookid']) ? $param['bookid'] : 0;
         $type = isset($param['type']) ? $param['type'] : 'txt';
         if (empty($bookid)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $uid = JWT_UID;
         $power_config = get_system_config('power');
         if (isset($power_config['txt_download_open']) && intval($power_config['txt_download_open']) == 1) {
             $txt_download_islogin = isset($power_config['txt_download_islogin']) ? intval($power_config['txt_download_islogin']) : 0;
             if ($txt_download_islogin == 1 && empty($uid)) {
-                $this->apiError('请先登录');
+                $this->apiError('common.isnotlogin');
             }
             $book = Db::name('book')->where(['id' => $bookid])->find();
             if (empty($book)) {
-                $this->apiError('作品不存在');
+                $this->apiError(404);
             }
             if (intval($book['status']) != 1) {
-                $this->apiError('作品被禁止');
+                $this->apiError(407);
             }
             $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'down' . DIRECTORY_SEPARATOR . $book['id'] . DIRECTORY_SEPARATOR;
             $path = app()->getRootPath() . $relativepath;
             if (!createDirectory($path)) {
-                return to_assign(1, '创建' . $path . '目录失败');
+                $this->apiError('common.createdirerr');
             }
             $token = uuid('down_' . $book['id'] . '_' . $type . '_');
             $down_path = get_cache($token);
             if (!empty($down_path)) {
-                $this->apiSuccess('请求成功', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
+                $this->apiSuccess('success', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
             }
             $file = $path . $book['id'] . '.' . $type;
             if (is_file($file)) {
@@ -311,14 +311,14 @@ class Book extends BaseController
                     $file_time =  filectime($file);
                     if ($file_time > intval($newChapter['order_time'])) {
                         set_cache($token, $file, 60);
-                        $this->apiSuccess('请求成功', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
+                        $this->apiSuccess('success', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
                     }
                 }
             }
             $chaptertable = calc_hash_db($book['id']);
             $chapters = Db::name('chapter')->field('id,title,chaps,wordnum')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
             if (empty($chapters)) {
-                $this->apiError('章节为空');
+                $this->apiError(404);
             }
             $txt_download_num = isset($power_config['txt_download_num']) ? intval($power_config['txt_download_num']) : 0;
             $txt_download_promotion_type = isset($power_config['txt_download_promotion_type']) ? intval($power_config['txt_download_promotion_type']) : 0;
@@ -375,21 +375,21 @@ class Book extends BaseController
             try {
                 $stream = fopen($file, "w");
                 if ($stream === false) {
-                    $this->apiError('生成文件失败');
+                    $this->apiError('fail');
                 }
                 fwrite($stream, "\xEF\xBB\xBF"); // UTF-8 BOM
                 fwrite($stream, $novelContent); // 写入内容
                 fclose($stream); // 关闭文件
             } catch (\Exception $e) {
-                $this->apiError('生成文件失败');
+                $this->apiError('fail');
             }
             if (!is_file($file)) {
-                $this->apiError('生成文件失败');
+                $this->apiError('fail');
             }
             set_cache($token, $file, 60);
-            $this->apiSuccess('请求成功', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
+            $this->apiSuccess('success', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
         } else {
-            $this->apiError('禁止下载');
+            $this->apiError(407);
         }
     }
 
@@ -398,28 +398,28 @@ class Book extends BaseController
         $param = get_params();
         $token = isset($param['token']) ? $param['token'] : '';
         if (empty($token)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         list($action, $bookid, $type) = explode('_', $token);
         if (empty($bookid)) {
-            $this->apiError('token错误');
+            $this->apiError('empty');
         }
         if (empty($type)) {
-            $this->apiError('token错误');
+            $this->apiError('empty');
         }
         $book = Db::name('book')->where(['id' => $bookid])->find();
         if (empty($book)) {
-            $this->apiError('作品不存在');
+            $this->apiError(404);
         }
         if (intval($book['status']) != 1) {
-            $this->apiError('作品被禁止');
+            $this->apiError(407);
         }
         $down_path = get_cache($token);
         if (empty($down_path)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         if (!is_file($down_path)) {
-            $this->apiError('下载文件不存在');
+            $this->apiError(404);
         }
         if ($type == 'txt') {
             $filename = $book['title'] . '.txt';

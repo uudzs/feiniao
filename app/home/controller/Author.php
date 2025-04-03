@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace app\home\controller;
 
 use app\home\BaseController;
-use think\facade\Db;
 use think\facade\View;
-use think\facade\Request;
 
 class Author extends BaseController
 {

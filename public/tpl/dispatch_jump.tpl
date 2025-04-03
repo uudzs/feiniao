@@ -1,69 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="renderer" content="webkit"/>
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>跳转提示</title>
-    <?php if(is_mobile()==true){?>
-    <style type="text/css">
-        body, h1, h2, p,dl,dd,dt{margin: 0;padding: 0;font: 15px/1.5 微软雅黑,tahoma,arial;}
-        body{background:#efefef;}
-        h1, h2, h3, h4, h5, h6 {font-size: 100%;cursor:default;}
-        ul, ol {list-style: none outside none;}
-        a {text-decoration: none;color:#447BC4}
-        a:hover {text-decoration: underline;}
-        .ip-attack{width:100%; margin:200px auto 0;}
-        .ip-attack dl{ background:#fff; padding:30px; border-radius:8px;border: 1px solid #ddd;-webkit-box-shadow: 0 0 8px #ddd;-moz-box-shadow: 0 0 8px #ddd;box-shadow: 0 0 8px #ddd;}
-        .ip-attack dt{text-align:center;}
-        .ip-attack dd{font-size:16px; color:#333; text-align:center;}
-        .tips{text-align:center; font-size:14px; line-height:50px; color:#999;}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{:lang('common.jumptitle')}</title>
+    <style>
+        /* 原有CSS保持不变 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .error-logo {
+            max-width: 220px;
+            height: auto;
+            margin-bottom: 40px;
+        }
+
+        .error-message {
+            font-size: 24px;
+            color: #636e72;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .home-button {
+            padding: 15px 40px;
+            background: #0984e3;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .countdown-text {
+            display: inline-block;
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        @media (max-width: 768px) {
+            /* 原有媒体查询保持不变 */
+            .error-logo {
+                max-width: 180px;
+                margin-bottom: 30px;
+            }
+
+            .error-message {
+                font-size: 20px;
+                padding: 0 15px;
+            }
+
+            .home-button {
+                padding: 12px 30px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .error-message {
+                font-size: 18px;
+            }
+        }
     </style>
-<?php }else{ ?>
-<style type="text/css">
-        body, h1, h2, p,dl,dd,dt{margin: 0;padding: 0;font: 15px/1.5 微软雅黑,tahoma,arial;}
-        body{background:#efefef;}
-        h1, h2, h3, h4, h5, h6 {font-size: 100%;cursor:default;}
-        ul, ol {list-style: none outside none;}
-        a {text-decoration: none;color:#447BC4}
-        a:hover {text-decoration: underline;}
-        .ip-attack{width:600px; margin:200px auto 0;}
-        .ip-attack dl{ background:#fff; padding:30px; border-radius:8px;border: 1px solid #ddd;-webkit-box-shadow: 0 0 8px #ddd;-moz-box-shadow: 0 0 8px #ddd;box-shadow: 0 0 8px #ddd;}
-        .ip-attack dt{text-align:center;}
-        .ip-attack dd{font-size:16px; color:#333; text-align:center;}
-        .tips{text-align:center; font-size:14px; line-height:50px; color:#999;}
-    </style>
-<?php }?>
-    
 </head>
 <body>
-    <div class="ip-attack"><dl>
-        <?php switch ($code) {?>
-            <?php case 1:?>
-            <dt style="color: green"><?php echo(strip_tags($msg));?></dt>
-            <?php break;?>
-            <?php case 0:?>
-            <dt style="color: red"><?php echo(strip_tags($msg));?></dt>
-            <?php break;?>
-        <?php } ?>
-        <br>
-        <dt>
-            页面自动 <a id="href" href="<?php echo($url);?>">跳转</a>，等待时间： <b id="wait"><?php echo($wait);?></b>
-        </dt></dl>
+    <div class="container">
+        <img src="{:get_system_config('web','logo')}" alt="{:get_system_config('web','title')}" class="error-logo">
+        <p class="error-message">{$msg}</p>
+        <a href="{$url ? $url : '/'}" class="home-button" id="countdownButton">
+            {:lang('common.jumplink')}
+            <span class="countdown-text" id="countdown"></span>
+        </a>
     </div>
-    <script type="text/javascript">
-        (function(){
-            var wait = document.getElementById('wait'),
-                href = document.getElementById('href').href;
-            var interval = setInterval(function(){
-                var time = --wait.innerHTML;
-                if(time <= 0) {
-                    location.href = href;
-                    clearInterval(interval);
-                };
-            }, 1000);
-        })();
+
+    <script>
+        // 倒计时设置
+        let seconds = parseInt({$wait ? $wait : 0});  // 设置倒计时秒数
+        const countdownEl = document.getElementById('countdown');
+        const buttonEl = document.getElementById('countdownButton');
+
+        // 更新倒计时显示
+        function updateCountdown() {
+            countdownEl.innerHTML = `(${seconds}{:lang('common.jumpsecond')})`;
+            if(seconds <= 0) {
+                window.location.href = '{$url ? $url : "/"}';  // 跳转目标地址
+            }
+            seconds--;
+        }
+
+        // 立即跳转功能
+        buttonEl.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = this.href;
+        });
+
+        // 初始化倒计时
+        if(seconds > 0) {
+            updateCountdown();  // 立即执行第一次显示
+            const countdownInterval = setInterval(updateCountdown, 1000);
+        }        
     </script>
 </body>
 </html>

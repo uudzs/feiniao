@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
@@ -32,24 +31,24 @@ class Chapter extends BaseController
         $id = intval($param['id']);
         $uid = JWT_UID;
         if (empty($id)) {
-            $this->apiError('参数为空');
+            $this->apiError('empty');
         }
         $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->find();
         if (empty($chapter)) {
-            $this->apiError('章节不存在！');
+            $this->apiError(404);
         }
         if (intval($chapter['status']) != 1) {
-            $this->apiError('章节被禁止');
+            $this->apiError(407);
         }
         if (intval($chapter['verify']) == 2) {
-            $this->apiError('章节被禁止');
+            $this->apiError(407);
         }
         $book = Db::name('book')->field('id,title,cover,status')->where(array('id' => $chapter['bookid']))->find();
         if (empty($book)) {
-            $this->apiError('作品不存在');
+            $this->apiError(404);
         }
         if (intval($book['status']) != 1) {
-            $this->apiError('作品被禁止');
+            $this->apiError(407);
         }
         $hide_content = false;
         $power_config = get_system_config('power');
@@ -89,7 +88,7 @@ class Chapter extends BaseController
             }
             unset($chapter['info']);
         } else {
-            $chapter['content'] = '请登录后再阅读！';
+            $chapter['content'] = getlang('common.isnotlogin');
         }
         $bookid = $book['id'];
         $chapter_id = $id;
@@ -142,7 +141,7 @@ class Chapter extends BaseController
                         try {
                             // 执行数据库操作
                             Db::name('user')->where('id', $member['id'])->inc('coin', $reward)->update();
-                            add_coin_log($member['id'], $reward, 1, '每日阅读章节奖励');
+                            add_coin_log($member['id'], $reward, 1, getlang('reward.dayreadchapter'));
                             Db::name('task')->where('id', $already['id'])->update(['status' => 1, 'update_time' => time()]);
                             // 提交事务
                             Db::commit();
@@ -190,7 +189,7 @@ class Chapter extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $senior['id'])->inc('coin', $reward)->update();
-                                add_coin_log($senior['id'], $reward, 1, '注册当天首次阅读章节');
+                                add_coin_log($senior['id'], $reward, 1, getlang('login.firstread'));
                                 Db::name('task')->where('id', $level_1['id'])->update(['status' => 1, 'update_time' => time()]);
                                 // 提交事务
                                 Db::commit();
@@ -213,7 +212,7 @@ class Chapter extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $senior['id'])->inc('coin', $reward)->update();
-                                add_coin_log($senior['id'], $reward, 1, '注册开始连续3天阅读章节');
+                                add_coin_log($senior['id'], $reward, 1, getlang('login.day3read'));
                                 Db::name('task')->where('id', $level_2['id'])->update(['status' => 1, 'update_time' => time()]);
                                 // 提交事务
                                 Db::commit();
@@ -236,7 +235,7 @@ class Chapter extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $senior['id'])->inc('coin', $reward)->update();
-                                add_coin_log($senior['id'], $reward, 1, '注册开始连续7天阅读章节');
+                                add_coin_log($senior['id'], $reward, 1, getlang('login.day7read'));
                                 Db::name('task')->where('id', $level_3['id'])->update(['status' => 1, 'update_time' => time()]);
                                 // 提交事务
                                 Db::commit();
@@ -276,27 +275,27 @@ class Chapter extends BaseController
             }
         }
         //前一章
-        $front = Db::name('chapter')->field('id,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '<', $chapter['chaps']]])->order('chaps DESC')->find();
+        $front = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '<', $chapter['chaps']]])->order('chaps DESC')->find();
         if (!empty($front)) {
             $chapter['front_chapter'] = $front['id'];
-            $chapter['front_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $front['id']]));
+            $chapter['front_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $front['id'], 'bookid' => $front['bookid']]));
         } else {
             $chapter['front_chapter'] = 0;
             $chapter['front_url'] = '';
         }
         //后一章
-        $after = Db::name('chapter')->field('id,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
+        $after = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
         if (!empty($after)) {
             $chapter['after_chapter'] = $after['id'];
-            $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id']]));
+            $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id'], 'bookid' => $after['bookid']]));
         } else {
             if (get_addons_is_enable('caijipro')) {
                 $isNewChapter = hook('caijiproUpgradeHook', ['bookid' => $bookid]);
                 if ($isNewChapter) {
-                    $after = Db::name('chapter')->field('id,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
+                    $after = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
                     if (!empty($after)) {
                         $chapter['after_chapter'] = $after['id'];
-                        $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id']]));
+                        $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id'], 'bookid' => $after['bookid']]));
                     } else {
                         $chapter['after_chapter'] = 0;
                         $chapter['after_url'] = '';
@@ -310,7 +309,7 @@ class Chapter extends BaseController
                 $chapter['after_url'] = '';
             }
         }
-        $chapter['chaps'] = '第' . numConvertWord($chapter['chaps']) . '章';
+        $chapter['chaps'] = getlang('common.numbers') . numConvertWord($chapter['chaps']) . getlang('common.chapter');
         $total = Db::name('chapter')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->count();
         if ($uid) {
             $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $bookid])->count();
@@ -338,6 +337,6 @@ class Chapter extends BaseController
             'last_page' => 0,
             'per_page' => isset($param['limit']) ? $param['limit'] : 0
         ];
-        $this->apiSuccess('请求成功', $result);
+        $this->apiSuccess('success', $result);
     }
 }

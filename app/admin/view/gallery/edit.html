@@ -188,7 +188,7 @@
 		});
 		
 		var upload_one = new uploadplus({
-			'url': '{:url("api/upload/thumb/500")}',
+			'url': '{:url("api/upload")}?thumb=500',
 			'target': 'upload-one',
 			'type': 1,
 			'callback':function(res){
@@ -198,7 +198,7 @@
 		});
 
 		var upload_more = new uploadplus({
-			'url': '{:url("api/upload/thumb/500")}',
+			'url': '{:url("api/upload")}?thumb=500',
 			'target': 'upload-more',
 			'type': 2,
 			'callback':function(res){
@@ -213,7 +213,7 @@
 			let id=$(this).data('id');
 			let that = $(this);
 			var upload_one = new uploadplus({
-				'url': '{:url("api/upload/thumb/500")}',
+				'url': '{:url("api/upload")}?thumb=500',
 				'target': that,
 				'type': 1,
 				'callback':function(res){
@@ -231,7 +231,7 @@
 		//缩略图上传
 		var uploadInst = upload.render({
 			elem: '#uploadBtn'
-			, url: '{:url("api/upload/thumb/500")}'
+			, url: '{:url("api/upload")}?thumb=500'
 			, done: function (res) {
 				//如果上传失败
 				if (res.code == 1) {

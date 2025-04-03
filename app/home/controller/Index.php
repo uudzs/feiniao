@@ -10,8 +10,7 @@ use think\facade\Cookie;
 use think\facade\View;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use think\facade\Request;
-use think\facade\App;
+use think\facade\Lang;
 
 class Index extends BaseController
 {
@@ -40,7 +39,7 @@ class Index extends BaseController
                         $token = Cookie::get($session_user);
                         if (count(explode('.', $token)) != 3) {
                             Cookie::delete($session_user);
-                            return view('login/wechat', ['token' => '', 'code' => 1, 'msg' => '非法请求', 'url' => furl('/', [], true, 'home')]);
+                            return view('login/wechat', ['token' => '', 'code' => 1, 'msg' => Lang::get(403), 'url' => furl('/', [], true, 'home')]);
                         }
                         $decoded = JWT::decode($token, new Key($config['secrect'], 'HS256')); //HS256方式，这里要和签发的时候对应
                         $data = json_decode(json_encode($decoded), TRUE);

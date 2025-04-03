@@ -37,7 +37,7 @@ class Category extends BaseController
     {
         $param = get_params();
         if (empty($param['pid'])) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $list = Db::name('category')->where(['status' => 1, 'pid' => $param['pid']])->order('ordernum asc')->select()->toArray();
         $this->apiSuccess('success', $list);

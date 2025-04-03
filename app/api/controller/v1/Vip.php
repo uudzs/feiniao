@@ -29,7 +29,7 @@ class Vip extends BaseController
     {
         $param = get_params();
         if (empty(JWT_UID)) {
-            $this->apiError('请先登录', [], 99);
+            $this->apiError('common.isnotlogin', [], 99);
         }
         $uid = JWT_UID;
         $conf = get_system_config('vip');
@@ -45,6 +45,6 @@ class Vip extends BaseController
             $list[$k]['expire_time'] = date('Y-m-d', $v['expire_time']);
             $list[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
         }
-        $this->apiSuccess('请求成功', $list);
+        $this->apiSuccess('success', $list);
     }
 }

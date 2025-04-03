@@ -17,7 +17,7 @@ try {
     if (isset($data['shuku']) && $data['shuku']['rule']) Route::rule($data['shuku']['rule'], 'book/list', 'GET')->name('shuku');
     if (isset($data['quanben']) && $data['quanben']['rule']) Route::rule($data['quanben']['rule'], 'book/quanben', 'GET')->name('quanben');
     if (isset($data['author_detail']) && $data['author_detail']['rule']) Route::rule($data['author_detail']['rule'], 'author/detail', 'GET')->pattern(['id' => '\d+'])->name('author_detail');
-    if (isset($data['chapter_detail']) && $data['chapter_detail']['rule']) Route::rule($data['chapter_detail']['rule'], 'chapter/detail', 'GET')->pattern(['id' => '\d+'])->name('chapter_detail');
+    if (isset($data['chapter_detail']) && $data['chapter_detail']['rule']) Route::rule($data['chapter_detail']['rule'], 'chapter/detail', 'GET')->pattern(['bookid' => '\d+', 'id' => '\d+'])->name('chapter_detail');
     if (isset($data['notice'])) {
         Route::group('notice', function () use ($data) {
             if ($data['notice']['rule']) Route::rule($data['notice']['rule'], 'info/index', 'GET')->name('notice');

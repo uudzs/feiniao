@@ -31,7 +31,7 @@ class Author extends BaseController
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
         if (empty($id)) {
-            $this->apiError('参数错误');
+            $this->apiError('empty');
         }
         $uid = JWT_UID;
         $detail = Db::name('author')->field('id,nickname,headimg,true_name,mobile,email,create_time,update_time,authstate,bankstate,birth,qq,issign')->where(['id' => $id])->find();
@@ -67,8 +67,8 @@ class Author extends BaseController
                 $detail['books'][$key]['url'] = str_replace($model_name, 'home', (string) Route::buildUrl('book_detail', ['id' => $value['filename'] ? $value['filename'] : $value['id']]));
             }
         } else {
-            $this->apiError('作者不存在');
+            $this->apiError(404);
         }
-        $this->apiSuccess('请求成功', $detail);
+        $this->apiSuccess('success', $detail);
     }
 }

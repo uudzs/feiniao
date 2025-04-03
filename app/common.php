@@ -8,6 +8,7 @@ use think\facade\Request;
 use avatars\MDAvatars;
 use think\Image;
 use think\facade\Route;
+use think\facade\Lang;
 
 //设置缓存
 function set_cache($key, $value, $date = 86400)
@@ -1621,5 +1622,15 @@ if (!function_exists('isJson')) {
     {
         $json = json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE) && (!is_null($json));
+    }
+}
+
+if (!function_exists('getlang')) {
+    function getlang($name)
+    {
+        if (Lang::has($name)) {
+           return Lang::get($name);
+        }
+        return Lang::get('none');
     }
 }

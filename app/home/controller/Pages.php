@@ -18,11 +18,11 @@ class Pages extends BaseController
 		$param = get_params();
 		$name = isset($param['name']) ? trim($param['name']) : '';
 		if (empty($name)) {
-			throw new \think\exception\HttpException(406, '访问错误');
+			$this->error(404);
 		}
 		$detail = Db::name('Pages')->where(['name' => $name])->find();
 		if (empty($detail)) {
-			throw new \think\exception\HttpException(406, '找不到相关记录');
+			$this->error(404);
 		}
 		//轮播图
 		if (!empty($detail['banner'])) {

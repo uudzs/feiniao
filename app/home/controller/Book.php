@@ -7,7 +7,6 @@ namespace app\home\controller;
 use app\home\BaseController;
 use think\facade\Db;
 use think\facade\View;
-use think\facade\Request;
 use think\facade\Route;
 
 class Book extends BaseController
@@ -95,18 +94,18 @@ class Book extends BaseController
             $book['cover'] = get_file($book['cover']);
             $book['words'] = wordCount($book['words']);
             $book['author'] = trim($book['author']);
-            $book['remark'] = $book['remark'] ? strip_tags($book['remark']) : '暂无简介';
-            $first_chapter = Db::name('chapter')->field('id,title')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->find();
+            $book['remark'] = $book['remark'] ? strip_tags($book['remark']) : '';
+            $first_chapter = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->find();
             if (!empty($first_chapter)) {
-                $book['first_chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id']])->domain(true);
+                $book['first_chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id'], 'bookid' => $first_chapter['bookid']])->domain(true);
                 $book['first_chapter_title'] = $first_chapter['title'];
             } else {
                 $book['first_chapter_url'] = '';
                 $book['first_chapter_title'] = '';
             }
-            $chapter = Db::name('chapter')->field('id,title,create_time,update_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
+            $chapter = Db::name('chapter')->field('id,bookid,title,create_time,update_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
             if (!empty($chapter)) {
-                $book['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $chapter['id']])->domain(true);
+                $book['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $chapter['id'], 'bookid' => $chapter['bookid']])->domain(true);
                 $book['chapter_title'] = $chapter['title'];
                 $book['update_time'] =  $chapter['update_time'] ? date('Y-m-d H:i:s', $chapter['update_time']) : date('Y-m-d H:i:s', $chapter['create_time']);
             } else {
