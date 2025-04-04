@@ -10,6 +10,7 @@ use app\admin\validate\ChapterVerifyValidate;
 use think\exception\ValidateException;
 use think\facade\Db;
 use think\facade\View;
+use content\Content;
 
 class ChapterVerify extends BaseController
 {
@@ -95,8 +96,7 @@ class ChapterVerify extends BaseController
             }
             Db::name('chapter')->where(['id' => $verify['cid']])->strict(false)->field(true)->update($param);
             if ($param['verify'] == 1) {
-                $chaptertable = calc_hash_db($verify['bid']); //章节内容表名
-                Db::name($chaptertable)->where(['sid' => $verify['cid']])->strict(false)->field(true)->update(['info' => $content]);
+                Content::update($verify['bid'], $verify['cid'], $content);
                 //更新时间
                 $res = Db::name('book')->where(['id' => $verify['bid']])->strict(false)->field(true)->update(['update_time' => time()]);
                 Db::name('chapter_verify')->where('id', $id)->delete(); //删除
@@ -180,8 +180,7 @@ class ChapterVerify extends BaseController
                 $detail['author'] = '--';
             }
             if (!empty($chapter)) {
-                $chaptertable = calc_hash_db($detail['bid']); //章节内容表名
-                $chapter['content'] = Db::name($chaptertable)->where(['sid' => $detail['cid']])->value('info');
+                $chapter['content'] = Content::get($detail['bid'], $detail['cid']);
                 $chapter['content'] = htmlspecialchars_decode($chapter['content']);
                 $chapter['content'] = str_replace($search, $replace, $chapter['content']);
             } else {

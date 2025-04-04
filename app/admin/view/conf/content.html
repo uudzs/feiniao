@@ -1,31 +1,93 @@
 {extend name="common/base"/}
 <!-- 主体 -->
 {block name="body"}
+<style>
+.layui-form-label {
+	min-width: 150px;
+}
+.layui-inline {
+	width: auto;
+}
+</style>
 <form class="layui-form p-4">
 	<h3 class="pb-3">内容配置</h3>
-	<table class="layui-table layui-table-form">
-		<tr>
-			<td class="layui-td-gray-2">章节字数</td>
-			<td>
-				<div class="layui-form-item" style="margin-bottom: 0;">
+	<div class="layui-card layui-form-pane">
+		<div class="layui-card-body">
+			<div class="layui-form-item">
+				<label class="layui-form-label">章节保存类型</label>
+				<div class="layui-input-block">
+					{empty name="$config.chapter_save_type"}
+						<input type="radio" name="chapter_save_type" value="1" title="数据库" checked>
+						<input type="radio" name="chapter_save_type" value="2" title="TXT">
+					{else/}
+						<input type="radio" name="chapter_save_type" value="1" title="数据库" {eq name="$config.chapter_save_type" value="1"} checked{/eq}>
+						<input type="radio" name="chapter_save_type" value="2" title="TXT" {eq name="$config.chapter_save_type" value="2"} checked{/eq}>
+					{/empty}
+				</div>
+				<div class="layui-form-mid layui-word-aux">如果之前是保存数据库，改为txt类型后，系统会自动将数据库里的内容转成txt，并删除数据库对应的章节数据。</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">是否开启数据压缩</label>
+				<div class="layui-input-block">
+					{empty name="$config.chapter_compress_open"}
+						<input type="radio" name="chapter_compress_open" value="0" title="关闭" checked lay-filter="compressOpen">					
+						<input type="radio" name="chapter_compress_open" value="1" title="开启" lay-filter="compressOpen">
+					{else/}
+						<input type="radio" name="chapter_compress_open" value="0" title="关闭" {eq name="$config.chapter_compress_open" value="0"} checked{/eq} lay-filter="compressOpen">
+						<input type="radio" name="chapter_compress_open" value="1" title="开启" {eq name="$config.chapter_compress_open" value="1"} checked{/eq} lay-filter="compressOpen">
+					{/empty}
+				</div>
+				<div class="layui-form-mid layui-word-aux">是否启用数据压缩，启用后会降低空间占用大小，也会增加一些读取性能。</div>
+			</div>
+			<div class="chapter_compress_seting">
+				<div class="layui-form-item" {if !isset($config.chapter_compress_open) || $config.chapter_compress_open == 0}style="display: none;"{/if}>
+					<label class="layui-form-label">数据压缩等级</label>
+					<div class="layui-input-inline">
+						<select name="compress_level">
+							<option value="0"{empty name="$config.compress_level"} selected{/empty}>不压缩</option>
+							<option value="1"{if isset($config.compress_level) && $config.compress_level == 1} selected{/if}>普通</option>
+							<option value="6"{if isset($config.compress_level) && $config.compress_level == 6} selected{/if}>一般</option>
+							<option value="9"{if isset($config.compress_level) && $config.compress_level == 3} selected{/if}>最高</option>
+						</select>					
+					</div>
+					<div class="layui-form-mid layui-word-aux">压缩等级越高，性能消耗越大，请合理选择。</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">压缩算法</label>
+					<div class="layui-input-block">
+						{empty name="$config.compress_algorithm"}
+							<input type="radio" name="compress_algorithm" value="gzip" title="gzip" checked>
+							<input type="radio" name="compress_algorithm" value="zlib" title="zlib">
+							<input type="radio" name="compress_algorithm" value="brotli" title="brotli">
+						{else/}
+							<input type="radio" name="compress_algorithm" value="gzip" title="gzip" {eq name="$config.compress_algorithm" value="gzip"} checked{/eq}>
+							<input type="radio" name="compress_algorithm" value="zlib" title="zlib" {eq name="$config.compress_algorithm" value="zlib"} checked{/eq}>
+							<input type="radio" name="compress_algorithm" value="brotli" title="brotli" {eq name="$config.compress_algorithm" value="brotli"} checked{/eq}>
+						{/empty}
+					</div>
+					<div class="layui-form-mid layui-word-aux">按自己的需求及环境来设置。</div>
+				</div>
+			</div>			
+			<div class="layui-form-item">
+				<label class="layui-form-label">章节字数</label>
+				<div class="layui-input-block">
 					<div class="layui-inline">
-					  <label class="layui-form-label">最小字数</label>
-					  <div class="layui-input-block" style="max-width: 100px;">
-						<input type="text" name="chapter_min_num" value="{$config.chapter_min_num ? $config.chapter_min_num : 0}" autocomplete="off" class="layui-input">
-					  </div>
+						<label class="layui-form-label">最小字数</label>
+						<div class="layui-input-inline" style="max-width: 100px;">
+							<input type="text" name="chapter_min_num" value="{$config.chapter_min_num ? $config.chapter_min_num : 0}" autocomplete="off" class="layui-input">
+						</div>
 					</div>
 					<div class="layui-inline">
-					  <label class="layui-form-label">最大字数</label>
-					  <div class="layui-input-inline" style="max-width: 100px;">
-						<input type="text" name="chapter_max_num" value="{$config.chapter_max_num ? $config.chapter_max_num : 0}" autocomplete="off" class="layui-input">
-					  </div>
+						<label class="layui-form-label">最大字数</label>
+						<div class="layui-input-inline" style="max-width: 100px;">
+							<input type="text" name="chapter_max_num" value="{$config.chapter_max_num ? $config.chapter_max_num : 0}" autocomplete="off" class="layui-input">
+						</div>
 					</div>
-					<div class="layui-inline layui-text-em">设为0时为不限制，但最大字数不可超过数据库最大限制。</div>
-				</div>				
-			</td>			
-		</tr>
-		
-	</table>
+				</div>
+				<div class="layui-inline layui-text-em">设为0时为不限制，但最大字数不可超过数据库最大限制。</div>
+			</div>
+		</div>
+	</div>
 
 	<div class="py-3">
 		<input type="hidden" name="id" value="{$id}">
@@ -42,6 +104,15 @@
 	const moduleInit = ['tool'];
 	function feiniaoInit() {
 		var form = layui.form, tool = layui.tool, upload = layui.upload;
+
+		form.on('radio(compressOpen)', function(data) {
+			if(data.value == 1) {
+				$('.chapter_compress_seting').show();
+			} else {
+				$('.chapter_compress_seting').hide();
+			}
+		});
+
 		//监听提交
 		form.on('submit(webform)', function (data) {
 			let callback = function (e) {
@@ -52,21 +123,6 @@
 			}
 			tool.post("{:url('conf/edit')}", data.field, callback);
 			return false;
-		});
-
-		//logo上传
-		var uploadInst = upload.render({
-			elem: '#uploadBtn',
-			url: "{:url('api/upload')}",
-			done: function (res) {
-				if (res.code == 1) {
-					layer.msg('上传失败');
-				} else {
-					layer.msg('上传成功');
-					$('#demo1 input').attr('value', res.data.filepath);
-					$('#demo1 img').attr('src', res.data.filepath);
-				}
-			}
 		});
 	}
 </script>

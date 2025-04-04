@@ -11,6 +11,7 @@ use think\facade\Route;
 use PhpOffice\PhpWord\IOFactory;
 use think\exception\ValidateException;
 use think\facade\App;
+use content\Content;
 
 class Chapter extends BaseController
 {
@@ -277,12 +278,11 @@ class Chapter extends BaseController
                     'chapstitle' => '第' . numConvertWord($chapter['chaps']) . '章 '
                 ];
                 if (empty($verify)) {
-                    $chaptertable = calc_hash_db($book['id']); //章节内容表名
-                    $content = Db::name($chaptertable)->where(['sid' => $chapter['id']])->find();
+                    $content = Content::get($book['id'], $chapter['id']);
                     if (empty($content)) {
                         to_assign(1, '章节内容不存在');
                     }
-                    $info['content'] = $content['info'];
+                    $info['content'] = $content;
                 } else {
                     $info['content'] = $chapter['content'];
                 }
@@ -447,7 +447,6 @@ class Chapter extends BaseController
         }
         unset($param['id'], $param['bid'], $param['content'], $param['draftid']);
         $param['ip'] = app('request')->ip();
-        $chaptertable = calc_hash_db($book['id']); //章节内容表名
         //修改
         if ($id > 0) {
             $sid = $id;
@@ -468,14 +467,14 @@ class Chapter extends BaseController
             } else {
                 unset($param['chaps']);
                 Db::name('chapter')->where(['id' => $id])->strict(false)->field(true)->update($param);
-                Db::name($chaptertable)->where(['sid' => $id])->strict(false)->field(true)->update(['info' => $content]);
+                Content::update($book['id'], $id, $content);
             }
             Db::name('chapter_draft')->where('cid', $id)->delete(); //删除草稿
         } else {
             $param['verifytime'] = 9999; //新章节
             $sid = Db::name('chapter')->strict(false)->field(true)->insertGetId($param);
             if ($sid !== false) {
-                Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $sid, 'info' => $content]);
+                Content::add($book['id'], $sid, $content);
             } else {
                 to_assign(1, '操作失败');
             }
@@ -747,7 +746,6 @@ class Chapter extends BaseController
             if (empty($file)) {
                 return to_assign(1, '上传文件不存在！');
             }
-            $chaptertable = calc_hash_db($book['id']); //章节内容表名
             try {
                 $filePath = App::getRootPath() . 'public' . $file['filepath'];
                 if (!is_file($filePath)) {
@@ -833,7 +831,7 @@ class Chapter extends BaseController
                     ];
                     $sid = Db::name('chapter')->strict(false)->field(true)->insertGetId($data);
                     if ($sid !== false) {
-                        Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $sid, 'info' => $content]);
+                        Content::add($book['id'], $sid, $content);
                         $success++;
                     }
                 }

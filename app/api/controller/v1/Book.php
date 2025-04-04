@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-//use think\Request;
+use content\Content;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
@@ -315,7 +315,6 @@ class Book extends BaseController
                     }
                 }
             }
-            $chaptertable = calc_hash_db($book['id']);
             $chapters = Db::name('chapter')->field('id,title,chaps,wordnum')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
             if (empty($chapters)) {
                 $this->apiError(404);
@@ -328,30 +327,14 @@ class Book extends BaseController
             }
             $novelContent = '';
             foreach ($chapters as $key => $value) {
-                if (intval($value['wordnum']) <= 0) {
-                    if (get_addons_is_enable('caijipro')) {
-                        $content = hook('caijiproChapterHook', ['chapterid' => $value['id']]);
-                        if ($content && mb_strlen($content) > 0) {
-                            list($wordnum, $content) = countWordsAndContent($content);
-                            $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
-                            $novelContent .= $content;
-                        }
-                    }
+                $content = Content::get($book['id'], $value['id']);
+                if ($content && mb_strlen($content) > 0) {
+                    list($wordnum, $content) = countWordsAndContent($content);
+                    $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
+                    $novelContent .= $content;
                 } else {
-                    $content = Db::name($chaptertable)->where(['sid' => $value['id']])->value('info');
-                    if (empty($content)) {
-                        if (get_addons_is_enable('caijipro')) {
-                            $content = hook('caijiproChapterHook', ['chapterid' => $value['id']]);
-                            if ($content && mb_strlen($content) > 0) {
-                                list($wordnum, $content) = countWordsAndContent($content);
-                                $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
-                                $novelContent .= $content;
-                            }
-                        }
-                    } else {
-                        $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
-                        $novelContent .= $content;
-                    }
+                    $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
+                    $novelContent .= $content;
                 }
                 if (mb_strlen($txt_download_promotion_content) > 0 && $txt_download_promotion_type > 0) {
                     //头部添加

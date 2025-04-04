@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
+use content\Content;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\View;
@@ -194,7 +194,6 @@ class Caiji extends BaseController
         }
         $bookid = $book['id'];
         $authorid = $book['authorid'];
-        $chaptertable = calc_hash_db($bookid); //章节内容表名
         $chapterData = Db::name('chapter')->field('id')->where(['bookid' => $bookid, 'title' => $title])->find();
         list($wordnum, $str) = countWordsAndContent($content, true);
         if (empty($chapterData)) {
@@ -218,7 +217,7 @@ class Caiji extends BaseController
             $chapter['update_time'] = $edittime;
             $sid = Db::name('chapter')->strict(false)->field(true)->insertGetId($chapter);
             if ($sid !== false) {
-                $cid = Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $sid, 'info' => $str]);
+                $cid = Content::add($bookid, $sid, $str);
                 if ($cid !== false) {
                     self::return_msg('ok');
                 } else {
@@ -229,9 +228,9 @@ class Caiji extends BaseController
                 self::return_msg('caiji.releasefail');
             }
         } else {
-            $chapterContent = Db::name($chaptertable)->where(['sid' => $chapterData['id']])->find();
+            $chapterContent = Content::get($bookid, $chapterData['id']);
             if (empty($chapterContent)) {
-                $cid = Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $chapterData['id'], 'info' => $str]);
+                $cid = Content::add($bookid, $chapterData['id'], $str);
                 if ($cid !== false) {
                     self::return_msg('ok');
                 } else {

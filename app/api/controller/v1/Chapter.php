@@ -8,6 +8,7 @@ use app\api\BaseController;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
+use content\Content;
 
 class Chapter extends BaseController
 {
@@ -66,27 +67,17 @@ class Chapter extends BaseController
         $book['cover'] = get_file($book['cover']);
         $chapter['book'] = $book;
         if (!$hide_content) {
-            $chaptertable = calc_hash_db($book['id']); //章节内容表名
-            $chapter['info'] = Db::name($chaptertable)->where(['sid' => $chapter['id']])->value('info');
-            if (empty($chapter['info'])) {
-                if (get_addons_is_enable('caijipro')) {
-                    $content = hook('caijiproChapterHook', ['chapterid' => $chapter['id']]);
-                    if ($content && mb_strlen($content) > 0) {
-                        list($wordnum, $content) = countWordsAndContent($content, true);
-                        $chapter['info'] = $content;
-                        $chapter['wordnum'] = $wordnum;
-                    }
-                }
-            }
-            if (!empty($chapter['info'])) {
-                $chapter['info'] = htmlspecialchars_decode($chapter['info']);
+            $content = Content::get($book['id'], $chapter['id']);
+            if ($content && mb_strlen($content) > 0) {
+                list($wordnum, $content) = countWordsAndContent($content, true);
+                $chapter['wordnum'] = $wordnum;
+                $chapter['content'] = htmlspecialchars_decode($content);
                 $replace = array("", "<br>", "<br>");
                 $search = array(" ", "\n", '\n');
-                $chapter['content'] = str_replace($search, $replace, $chapter['info']);
+                $chapter['content'] = str_replace($search, $replace, $chapter['content']);
             } else {
                 $chapter['content'] = '';
             }
-            unset($chapter['info']);
         } else {
             $chapter['content'] = getlang('common.isnotlogin');
         }

@@ -10,6 +10,7 @@ use app\admin\validate\ChapterValidate;
 use think\exception\ValidateException;
 use think\facade\Db;
 use think\facade\View;
+use content\Content;
 
 class Chapter extends BaseController
 {
@@ -130,14 +131,12 @@ class Chapter extends BaseController
             if ($chapter_max_num > 0 && $wordnum > $chapter_max_num) {
                 to_assign(1, '章节内容字数大于' . $chapter_max_num . '字，无法发布。');
             }
-            $chaptertable = calc_hash_db($book['id']); //章节内容表名
             $data = [
                 'title' => $title,
                 'bookid' => $book['id'],
                 'authorid' => $book['authorid'],
                 'title' => $title,
                 'chaps' => $serial,
-                'content' => $content,
                 'wordnum' => $wordnum,
                 'firstverifyword' => $wordnum,
                 'status' => 1,
@@ -149,7 +148,7 @@ class Chapter extends BaseController
             ];
             $sid = Db::name('chapter')->strict(false)->field(true)->insertGetId($data);
             if ($sid !== false) {
-                Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $sid, 'info' => $content]);
+                Content::add($book['id'], $sid, $content);
                 to_assign(0, '添加成功');
             } else {
                 to_assign(1, '操作失败');
@@ -218,24 +217,19 @@ class Chapter extends BaseController
             $param['verifytime'] = time();
             $param['verifyresult'] = '编辑修改章节内容';
             Db::name('chapter')->where(['id' => $id])->strict(false)->field(true)->update($param);
-            $chaptertable = calc_hash_db($chapter['bookid']); //章节内容表名
-            Db::name($chaptertable)->where(['sid' => $id])->strict(false)->field(true)->update(['info' => $content]);
+            Content::update($chapter['bookid'], $id, $content);
             $res = Db::name('book')->where(['id' => $chapter['bookid']])->strict(false)->field(true)->update(['update_time' => time()]);
             return to_assign();
         } else {
             $id = isset($param['id']) ? $param['id'] : 0;
             $chapter = Db::name('chapter')->where(['id' => $id])->find();
-            // if ($chapter['verify'] != 1) {
-            //     return to_assign(1, '只有已审理核章节才能编辑章节内容');
-            // }
             $verify = Db::name('chapter_verify')->where('cid', $id)->find();
             if (!empty($verify)) {
                 return to_assign(1, '请先审核章节');
             }
-            $chaptertable = calc_hash_db($chapter['bookid']); //章节内容表名
-            $content = Db::name($chaptertable)->where(['sid' => $id])->find();
+            $content = Content::get($chapter['bookid'], $id);
             if (!empty($content)) {
-                $chapter['info'] = htmlspecialchars_decode($content['info']);
+                $chapter['info'] = htmlspecialchars_decode($content);
                 View::assign('chapter', $chapter);
                 return view();
             } else {
@@ -277,7 +271,6 @@ class Chapter extends BaseController
                 }
             }
             $param['verifypeople'] = get_login_admin('nickname');
-            $chaptertable = calc_hash_db($chapter['bookid']); //章节内容表名
             Db::name('chapter')->where(['id' => $id])->strict(false)->field(true)->update($param);
             if ($param['verify'] == 1) {
                 $res = Db::name('book')->where(['id' => $chapter['bookid']])->strict(false)->field(true)->update(['update_time' => time()]);
@@ -290,10 +283,9 @@ class Chapter extends BaseController
             if (!empty($verify)) {
                 return to_assign(1, '请前往【修改章节审核】');
             }
-            $chaptertable = calc_hash_db($chapter['bookid']); //章节内容表名
-            $content = Db::name($chaptertable)->where(['sid' => $id])->find();
-            if (!empty($content)) {
-                $chapter['info'] = htmlspecialchars_decode($content['info']);
+            $content = Content::get($chapter['bookid'], $id);
+            if ($content && mb_strlen($content) > 0) {
+                $chapter['info'] = htmlspecialchars_decode($content);
                 $replace = array("&nbsp;", "<br>");
                 $search = array(" ", "\n");
                 $chapter['info'] = str_replace($search, $replace, $chapter['info']);
@@ -321,11 +313,7 @@ class Chapter extends BaseController
         if (empty($chapter)) {
             return to_assign(1, '章节不存在');
         }
-        $chaptertable = calc_hash_db($chapter['bookid']); //章节内容表名
-        Db::name('chapter')->where(['id' => $id])->delete();
-        Db::name('chapter_draft')->where(['cid' => $id])->delete(); //草稿箱
-        Db::name('chapter_verify')->where(['cid' => $id])->delete(); //审核库
-        Db::name($chaptertable)->where(['sid' => $id])->delete();
+        Content::delete($chapter['bookid'], $id);
         return to_assign();
     }
 }

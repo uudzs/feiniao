@@ -89,32 +89,33 @@ class Book extends BaseController
                 Db::name('book')->where('id', $id)->inc('hits')->update();
             }
         }
-        if (!empty($book)) {
-            $book['bigclassname'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
-            $book['cover'] = get_file($book['cover']);
-            $book['words'] = wordCount($book['words']);
-            $book['author'] = trim($book['author']);
-            $book['remark'] = $book['remark'] ? strip_tags($book['remark']) : '';
-            $first_chapter = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->find();
-            if (!empty($first_chapter)) {
-                $book['first_chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id'], 'bookid' => $first_chapter['bookid']])->domain(true);
-                $book['first_chapter_title'] = $first_chapter['title'];
-            } else {
-                $book['first_chapter_url'] = '';
-                $book['first_chapter_title'] = '';
-            }
-            $chapter = Db::name('chapter')->field('id,bookid,title,create_time,update_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
-            if (!empty($chapter)) {
-                $book['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $chapter['id'], 'bookid' => $chapter['bookid']])->domain(true);
-                $book['chapter_title'] = $chapter['title'];
-                $book['update_time'] =  $chapter['update_time'] ? date('Y-m-d H:i:s', $chapter['update_time']) : date('Y-m-d H:i:s', $chapter['create_time']);
-            } else {
-                $book['chapter_url'] = '';
-                $book['chapter_title'] = '';
-                $book['update_time'] = '';
-            }
-            $book['authorurl'] = (string) Route::buildUrl('author_detail', ['id' => $book['authorid']])->domain(true);
+        if (empty($book)) {
+            $this->error(404);
         }
+        $book['bigclassname'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
+        $book['cover'] = get_file($book['cover']);
+        $book['words'] = wordCount($book['words']);
+        $book['author'] = trim($book['author']);
+        $book['remark'] = $book['remark'] ? strip_tags($book['remark']) : '';
+        $first_chapter = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->find();
+        if (!empty($first_chapter)) {
+            $book['first_chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id'], 'bookid' => $first_chapter['bookid']])->domain(true);
+            $book['first_chapter_title'] = $first_chapter['title'];
+        } else {
+            $book['first_chapter_url'] = '';
+            $book['first_chapter_title'] = '';
+        }
+        $chapter = Db::name('chapter')->field('id,bookid,title,create_time,update_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
+        if (!empty($chapter)) {
+            $book['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $chapter['id'], 'bookid' => $chapter['bookid']])->domain(true);
+            $book['chapter_title'] = $chapter['title'];
+            $book['update_time'] =  $chapter['update_time'] ? date('Y-m-d H:i:s', $chapter['update_time']) : date('Y-m-d H:i:s', $chapter['create_time']);
+        } else {
+            $book['chapter_url'] = '';
+            $book['chapter_title'] = '';
+            $book['update_time'] = '';
+        }
+        $book['authorurl'] = (string) Route::buildUrl('author_detail', ['id' => $book['authorid']])->domain(true);
         View::assign('book', $book);
         View::assign('bid', $id);
         if ($ismakecache) $this->makecache(View::fetch());

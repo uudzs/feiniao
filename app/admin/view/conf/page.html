@@ -3,14 +3,14 @@
 {block name="body"}
 <style>
     .layui-form-label {
-        width: 150px;
+        width: 250px !important;
     }
 </style>
 {php}$adver = model('adver')->where(['status' => 1])->order('id asc')->select()->toArray();{/php}
 {php}$navs = model('nav')->where(['status' => 1])->order('id asc')->select()->toArray();{/php}
 <form class="layui-form p-4">
     <h3 class="pb-3">页面设置</h3>
-    <table class="layui-table layui-table-form">        
+    <table class="layui-table layui-table-form layui-form-pane">        
         <tr>
             <td class="layui-td-gray">PC端</td>
             <td>

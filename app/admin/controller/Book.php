@@ -11,7 +11,7 @@ use think\exception\ValidateException;
 use think\facade\Db;
 use think\facade\View;
 use Overtrue\Pinyin\Pinyin;
-use think\facade\Config;
+use content\Content;
 
 class Book extends BaseController
 {
@@ -504,7 +504,6 @@ class Book extends BaseController
                     } else {
                         $bookid = $book['id'];
                     }
-                    $chaptertable = calc_hash_db($bookid); //章节内容表名
                     $skip = $success = $fail = 0; //跳过、成功、失败
                     foreach ($chapter as $k => $v) {
                         $istitle = Db::name('chapter')->where(['bookid' => $bookid, 'title' => $v['title']])->find();
@@ -528,7 +527,7 @@ class Book extends BaseController
                         ];
                         $sid = Db::name('chapter')->strict(false)->field(true)->insertGetId($data);
                         if ($sid !== false) {
-                            Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $sid, 'info' => $content]);
+                            Content::add($bookid, $sid, $content);
                             $success++;
                         } else {
                             $fail++;
@@ -586,14 +585,10 @@ class Book extends BaseController
             foreach ($list as $key => $value) {
                 $book = Db::name('book')->where(['id' => $value])->find();
                 if (!empty($book)) {
-                    $chaptertable = calc_hash_db($book['id']); //章节内容表名
                     $chapter = Db::name('chapter')->where(['bookid' => $book['id']])->select();
                     $chapter = $chapter ? $chapter->toArray() : [];
                     foreach ($chapter as $k => $v) {
-                        Db::name('chapter')->where(['id' => $v['id']])->delete();
-                        Db::name('chapter_draft')->where(['cid' => $v['id']])->delete(); //草稿箱
-                        Db::name('chapter_verify')->where(['cid' => $v['id']])->delete(); //审核库
-                        Db::name($chaptertable)->where(['sid' => $v['id']])->delete();
+                        Content::delete($book['id'], $v['id']);
                     }
                     Db::name('book')->where(['id' => $book['id']])->delete(); //作品
                     $this->syncdelcaiji($book['id']);
@@ -605,14 +600,10 @@ class Book extends BaseController
             if (empty($book)) {
                 return to_assign(1, '作品不存在');
             }
-            $chaptertable = calc_hash_db($book['id']); //章节内容表名
             $chapter = Db::name('chapter')->where(['bookid' => $book['id']])->select();
             $chapter = $chapter ? $chapter->toArray() : [];
             foreach ($chapter as $k => $v) {
-                Db::name('chapter')->where(['id' => $v['id']])->delete();
-                Db::name('chapter_draft')->where(['cid' => $v['id']])->delete(); //草稿箱
-                Db::name('chapter_verify')->where(['cid' => $v['id']])->delete(); //审核库
-                Db::name($chaptertable)->where(['sid' => $v['id']])->delete();
+                Content::delete($book['id'], $v['id']);
             }
             Db::name('book')->where(['id' => $book['id']])->delete(); //作品
             $this->syncdelcaiji($book['id']);
