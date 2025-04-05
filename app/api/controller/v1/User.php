@@ -321,7 +321,7 @@ class User extends BaseController
             try {
                 // 执行数据库操作
                 Db::name('user')->where('id', $uid)->inc('coin', intval($task['reward']))->update();
-                add_coin_log($uid, intval($task['reward']), 1, getlang('reward.bindphone'));
+                add_coin_log($uid, intval($task['reward']), 1, lang('reward.bindphone'));
                 Db::name('task')->where('id', $task['id'])->update(['status' => 1, 'update_time' => time()]);
                 // 提交事务
                 Db::commit();
@@ -443,7 +443,7 @@ class User extends BaseController
                     ->logoPath($logoPath)
                     ->logoResizeToWidth(50)
                     ->logoResizeToHeight(50)
-                    ->labelText(getlang('user.longpressqrcode'))
+                    ->labelText(lang('user.longpressqrcode'))
                     ->labelFont(new NotoSans(15))
                     ->labelAlignment(new LabelAlignmentCenter())
                     ->validateResult(false)
@@ -802,7 +802,7 @@ class User extends BaseController
             try {
                 // 执行数据库操作
                 Db::name('user')->where('id', $uid)->inc('coin', $reward)->update();
-                add_coin_log($uid, $reward, 1, getlang('reward.sign'));
+                add_coin_log($uid, $reward, 1, lang('reward.sign'));
                 Db::name('sign_log')->strict(false)->field(true)->insertGetId($data);
                 // 提交事务
                 Db::commit();
@@ -888,7 +888,7 @@ class User extends BaseController
                     try {
                         // 执行数据库操作
                         Db::name('user')->where('id', $uid)->inc('coin', $reward)->update();
-                        add_coin_log($uid, $reward, 1, getlang('reward.daylike'));
+                        add_coin_log($uid, $reward, 1, lang('reward.daylike'));
                         Db::name('task')->where('id', $already['id'])->update(['status' => 1, 'update_time' => time()]);
                         // 提交事务
                         Db::commit();
@@ -1076,7 +1076,7 @@ class User extends BaseController
                 try {
                     // 执行数据库操作
                     Db::name('user')->where('id', JWT_UID)->inc('coin', $reward)->update();
-                    add_coin_log(JWT_UID, $reward, 1, getlang('reward.bindaccount'));
+                    add_coin_log(JWT_UID, $reward, 1, lang('reward.bindaccount'));
                     Db::name('task')->where('id', $task['id'])->update(['status' => 1, 'update_time' => time()]);
                     // 提交事务
                     Db::commit();
@@ -1241,7 +1241,7 @@ class User extends BaseController
                 try {
                     // 执行数据库操作
                     Db::name('user')->where('id', JWT_UID)->inc('coin', $reward)->update();
-                    add_coin_log(JWT_UID, $reward, 1, getlang('reward.becomeauthor'));
+                    add_coin_log(JWT_UID, $reward, 1, lang('reward.becomeauthor'));
                     Db::name('task')->where('id', $task['id'])->update(['status' => 1, 'update_time' => time()]);
                     // 提交事务
                     Db::commit();

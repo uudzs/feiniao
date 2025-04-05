@@ -63,7 +63,7 @@ class Task extends BaseController
         }
         if ($type == 'account_id') {
             $data['type'] = 1;
-            $data['title'] = getlang('reward.bindaccount');
+            $data['title'] = lang('reward.bindaccount');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['account'])) : $conf['account'];
         }
         if ($type == 'mobile_id') {
@@ -71,7 +71,7 @@ class Task extends BaseController
                 $this->apiError('task.phonealreadybind');
             }
             $data['type'] = 1;
-            $data['title'] = getlang('reward.bindphone');
+            $data['title'] = lang('reward.bindphone');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['mobile'])) : $conf['mobile'];
         }
         if ($type == 'author_id') {
@@ -79,7 +79,7 @@ class Task extends BaseController
                 $this->apiError('task.alreadyauthor');
             }
             $data['type'] = 1;
-            $data['title'] = getlang('reward.becomeauthor');
+            $data['title'] = lang('reward.becomeauthor');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['author'])) : $conf['author'];
         }
         if ($type == 'vip_id') {
@@ -87,17 +87,17 @@ class Task extends BaseController
                 $this->apiError('task.alreadyvip');
             }
             $data['type'] = 1;
-            $data['title'] = getlang('reward.becomevip');
+            $data['title'] = lang('reward.becomevip');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['vip'])) : $conf['vip'];
         }
         if ($type == 'chapter_id') {
             $data['type'] = 2;
-            $data['title'] = getlang('reward.dayreadchapter');
+            $data['title'] = lang('reward.dayreadchapter');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['chapter_reward'])) : $conf['chapter_reward'];
         }
         if ($type == 'like_id') {
             $data['type'] = 2;
-            $data['title'] = getlang('reward.daylike');
+            $data['title'] = lang('reward.daylike');
             $data['reward'] = $vip_reward > 1 ? floor($vip_reward * floatval($conf['like_reward'])) : $conf['like_reward'];
         }
         if ($data['type'] == 2) {

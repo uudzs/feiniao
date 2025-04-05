@@ -202,7 +202,7 @@ class Content
     private static function validateId($id)
     {
         if ($id <= 0) {
-            throw new \InvalidArgumentException(getlang('paramerror'));
+            throw new \InvalidArgumentException(lang('paramerror'));
         }
     }
 
@@ -215,7 +215,7 @@ class Content
         }
         $algorithm = strtolower($conf['algorithm']);
         if (!isset(self::$compressors[$algorithm])) {
-            throw new RuntimeException(getlang("empty"));
+            throw new RuntimeException(lang("empty"));
         }
         $compressed = call_user_func(
             self::$compressors[$algorithm]['compress'],

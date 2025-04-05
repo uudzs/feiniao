@@ -29,7 +29,7 @@ return [
         'female' => '女',
         'girl' => '女生',
         'captchavalid' => '已发出的验证码还有效，请输入！',
-        'smstemplate' => '【{title}】验证码：{code}请勿泄露验证码，如非本人操作，请忽略。',
+        'smstemplate' => '【{:title}】验证码：{:code}请勿泄露验证码，如非本人操作，请忽略。',
         'createdirerr' => '创建目录失败',
         'numbers' => '第',
         'chapter' => '章',
@@ -91,7 +91,7 @@ return [
     ],
     'vip' => [
         'unopened' => '未开启VIP功能',
-        'virtual_info' => '购买VIP会员，价格：{price}元，时长：{day}天。'
+        'virtual_info' => '购买VIP会员，价格：{:price}元，时长：{:day}天。'
     ],
     'task' => [
         'phonealreadybind' => '手机已绑定，不可领取。',

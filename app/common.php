@@ -1624,13 +1624,3 @@ if (!function_exists('isJson')) {
         return (json_last_error() == JSON_ERROR_NONE) && (!is_null($json));
     }
 }
-
-if (!function_exists('getlang')) {
-    function getlang($name)
-    {
-        if (Lang::has($name)) {
-           return Lang::get($name);
-        }
-        return Lang::get('none');
-    }
-}

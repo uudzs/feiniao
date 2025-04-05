@@ -113,10 +113,10 @@ class Caiji extends BaseController
                             $cate = Db::name('category')->where(['name' => $name])->find();
                         }
                         if (empty($cate)) {
-                            $cate = Db::name('category')->where(['name' => getlang('other')])->find();
+                            $cate = Db::name('category')->where(['name' => lang('other')])->find();
                         }
                     } else {
-                        $cate = Db::name('category')->where(['name' => getlang('other')])->find();
+                        $cate = Db::name('category')->where(['name' => lang('other')])->find();
                     }
                     if (!empty($cate)) {
                         if (intval($cate['pid']) > 0) {
@@ -136,7 +136,7 @@ class Caiji extends BaseController
                 }
             }
             $isfinish = isset($param['isfinish']) ? trim($param['isfinish']) : '';
-            $finish_arr = [getlang('finish') => 2, getlang('serialize') => 1];
+            $finish_arr = [lang('finish') => 2, lang('serialize') => 1];
             if (!empty($isfinish) && isset($finish_arr[$isfinish])) {
                 $isfinish = $finish_arr[$isfinish];
             } else {
@@ -251,7 +251,7 @@ class Caiji extends BaseController
      */
     protected static function return_msg($msg)
     {
-        echo getlang($msg);
+        echo lang($msg);
         exit;
     }
 }

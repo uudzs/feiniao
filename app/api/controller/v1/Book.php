@@ -139,7 +139,7 @@ class Book extends BaseController
             $category = Db::name('category')->field('id,name,pid')->where(['status' => 1])->order('ordernum asc')->select()->toArray();
             if ($areaid == 2) {
                 foreach ($category as $key => $value) {
-                    if (intval($value['pid']) == 0 && strpos($value['name'], getlang('common.girl')) !== false) {
+                    if (intval($value['pid']) == 0 && strpos($value['name'], lang('common.girl')) !== false) {
                         $big = $value['id'];
                         break;
                     }
@@ -149,7 +149,7 @@ class Book extends BaseController
                 }
             } else {
                 foreach ($category as $key => $value) {
-                    if (intval($value['pid']) == 0 && strpos($value['name'], getlang('common.girl')) === false) {
+                    if (intval($value['pid']) == 0 && strpos($value['name'], lang('common.girl')) === false) {
                         $big[] = $value['id'];
                     }
                 }
@@ -250,7 +250,7 @@ class Book extends BaseController
                 $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $v['subgenre']])->value('name');
                 $result['data'][$k]['headpic'] = get_file($author['headimg']);
                 $result['data'][$k]['cover_str'] = get_file($v['cover']);
-                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? getlang('finish') : getlang('serialize');
+                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? lang('finish') : lang('serialize');
                 $result['data'][$k]['words_str'] = intval($v['words']) > 0 ? wordCount($v['words']) : 0;
                 $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
                 $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']]));

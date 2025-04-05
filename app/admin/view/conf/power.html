@@ -72,6 +72,35 @@
                         </div>
                         <div class="layui-form-mid layui-text-em">开启登录阅读后此项才会生效，为0或空则表示所有章节都需要登录后才能阅读。</div>
                     </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">阅读收费模式</label>
+                        <div class="layui-input-inline" style="min-width: 300px;">
+                            {if(!isset($config['charge_read_type']))}
+                                <input type="checkbox" name="charge_read_type[]" value="free" title="免费" checked>
+                                <input type="checkbox" name="charge_read_type[]" value="vip" title="会员">
+                                <input type="checkbox" name="charge_read_type[]" value="coin" title="金币">
+                            {else/}
+                                <input type="checkbox" name="charge_read_type[]" value="free" title="免费" {if(in_array('free', $config['charge_read_type']))}checked{/if}>
+                                <input type="checkbox" name="charge_read_type[]" value="vip" title="会员" {if(in_array('vip', $config['charge_read_type']))}checked{/if}>
+                                <input type="checkbox" name="charge_read_type[]" value="coin" title="金币" {if(in_array('coin', $config['charge_read_type']))}checked{/if}>
+                            {/if}
+                        </div>
+                        <div class="layui-form-mid layui-word-aux">免费模式为全站免费，会员模式需购买VIP会员，金币模式用于消耗金币阅读，<br>会员模式与金币模式同时开启时，优先使用会员模式，免费模式不可与其他模式共存，<br>免费模式优先于其他模式，非免费模式时登录免费章节则无效。</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">千字金币</label>
+                        <div class="layui-input-inline layui-input-wrap">
+                          <input type="text" name="read_thousand_price" value="{$config.read_thousand_price|default='0'}" placeholder="请填写章节数" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-text-em">此此设仅对金币模式有效，选择金币模式后此价格不能为0，最好为整数。</div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">前多少章免费</label>
+                        <div class="layui-input-inline layui-input-wrap">
+                          <input type="text" name="front_free_chapter_num" value="{$config.front_free_chapter_num|default='0'}" placeholder="请填写章节数" autocomplete="off" class="layui-input">
+                        </div>
+                        <div class="layui-form-mid layui-text-em">此章节数仅对金币模式有效，为0则表示所有章节不免费。</div>
+                    </div>
                 </div>                
             </div>
             <hr>

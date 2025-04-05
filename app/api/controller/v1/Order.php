@@ -114,11 +114,6 @@ class Order extends BaseController
             ];
             $order = Db::name('order')->where($where)->find();
             if (empty($order)) {
-                $virtual_info = str_replace(
-                    ['{price}', '{day}'],
-                    [$price, $day],
-                    getlang('vip.virtual_info')
-                );
                 $data = [
                     'user_id' => JWT_UID,
                     'pid' => $pid,
@@ -135,7 +130,7 @@ class Order extends BaseController
                     'is_del' => 0,
                     'is_system_del' => 0,
                     'virtual_type' => 1,
-                    'virtual_info' => $virtual_info,
+                    'virtual_info' => lang('vip.virtual_info', ['price' => $price, 'day' => $day]),
                     'channel_type' => $channel_type
                 ];
                 $result = Db::name('order')->strict(false)->field(true)->insertGetId($data);

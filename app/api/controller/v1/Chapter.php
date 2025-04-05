@@ -79,7 +79,7 @@ class Chapter extends BaseController
                 $chapter['content'] = '';
             }
         } else {
-            $chapter['content'] = getlang('common.isnotlogin');
+            $chapter['content'] = lang('common.isnotlogin');
         }
         $bookid = $book['id'];
         $chapter_id = $id;
@@ -132,7 +132,7 @@ class Chapter extends BaseController
                         try {
                             // 执行数据库操作
                             Db::name('user')->where('id', $member['id'])->inc('coin', $reward)->update();
-                            add_coin_log($member['id'], $reward, 1, getlang('reward.dayreadchapter'));
+                            add_coin_log($member['id'], $reward, 1, lang('reward.dayreadchapter'));
                             Db::name('task')->where('id', $already['id'])->update(['status' => 1, 'update_time' => time()]);
                             // 提交事务
                             Db::commit();
@@ -180,7 +180,7 @@ class Chapter extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $senior['id'])->inc('coin', $reward)->update();
-                                add_coin_log($senior['id'], $reward, 1, getlang('login.firstread'));
+                                add_coin_log($senior['id'], $reward, 1, lang('login.firstread'));
                                 Db::name('task')->where('id', $level_1['id'])->update(['status' => 1, 'update_time' => time()]);
                                 // 提交事务
                                 Db::commit();
@@ -203,7 +203,7 @@ class Chapter extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $senior['id'])->inc('coin', $reward)->update();
-                                add_coin_log($senior['id'], $reward, 1, getlang('login.day3read'));
+                                add_coin_log($senior['id'], $reward, 1, lang('login.day3read'));
                                 Db::name('task')->where('id', $level_2['id'])->update(['status' => 1, 'update_time' => time()]);
                                 // 提交事务
                                 Db::commit();
@@ -226,7 +226,7 @@ class Chapter extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $senior['id'])->inc('coin', $reward)->update();
-                                add_coin_log($senior['id'], $reward, 1, getlang('login.day7read'));
+                                add_coin_log($senior['id'], $reward, 1, lang('login.day7read'));
                                 Db::name('task')->where('id', $level_3['id'])->update(['status' => 1, 'update_time' => time()]);
                                 // 提交事务
                                 Db::commit();
@@ -300,7 +300,7 @@ class Chapter extends BaseController
                 $chapter['after_url'] = '';
             }
         }
-        $chapter['chaps'] = getlang('common.numbers') . numConvertWord($chapter['chaps']) . getlang('common.chapter');
+        $chapter['chaps'] = lang('common.numbers') . numConvertWord($chapter['chaps']) . lang('common.chapter');
         $total = Db::name('chapter')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->count();
         if ($uid) {
             $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $bookid])->count();

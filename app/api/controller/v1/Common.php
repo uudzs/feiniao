@@ -186,7 +186,7 @@ class Common extends BaseController
                                     $list[$k]['bigcate'] = $book['genre'];
                                     $list[$k]['subgenre'] = $book['subgenre'];
                                     $list[$k]['words'] = $book['words'];
-                                    $list[$k]['finish'] = intval($book['isfinish']) == 2 ? getlang('finish') : getlang('serialize');
+                                    $list[$k]['finish'] = intval($book['isfinish']) == 2 ? lang('finish') : lang('serialize');
                                     $list[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
                                 } else {
                                     $list[$k]['isfinish'] = 1;
@@ -258,7 +258,7 @@ class Common extends BaseController
                             } else {
                                 $result[$k]['genre'] = '';
                             }
-                            $result[$k]['finish'] = intval($book['isfinish']) == 2 ? getlang('finish') : getlang('serialize');
+                            $result[$k]['finish'] = intval($book['isfinish']) == 2 ? lang('finish') : lang('serialize');
                             $result[$k]['chapters'] = $book['chapters'];
                             $result[$k]['isfinish'] = $book['isfinish'];
                             $result[$k]['subgenre'] = $book['subgenre'];
@@ -455,7 +455,7 @@ class Common extends BaseController
         $user['consecutive_days'] = intval($consecutive_days);
         $user['level_title'] = Db::name('UserLevel')->where(['id' => $user['level']])->value('title');
         $user['gender'] = $user['sex'];
-        $user['sex'] = ($user['sex'] == 1) ? getlang('common.male') : ($user['sex'] == 2 ?  getlang('common.female') : getlang('common.unknown'));
+        $user['sex'] = ($user['sex'] == 1) ? lang('common.male') : ($user['sex'] == 2 ?  lang('common.female') : lang('common.unknown'));
         $this->apiSuccess('success', ['userinfo' => $user]);
     }
 
@@ -602,13 +602,13 @@ class Common extends BaseController
                     try {
                         // 执行数据库操作
                         Db::name('user')->where('id', $uid)->inc('coin', intval($conf['mobile']))->update();
-                        add_coin_log($uid, intval($conf['mobile']), 1, getlang('reward.bindphone'));
+                        add_coin_log($uid, intval($conf['mobile']), 1, lang('reward.bindphone'));
                         Db::name('task')->strict(false)->field(true)->insertGetId([
                             'user_id' => $uid,
                             'taskid' => $conf['mobile_id'],
                             'type' => 1,
                             'status' => 1,
-                            'title' => getlang('reward.bindphone'),
+                            'title' => lang('reward.bindphone'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['mobile']),
                             'ip' => app('request')->ip(),
@@ -631,13 +631,13 @@ class Common extends BaseController
                             try {
                                 // 执行数据库操作
                                 Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
-                                add_coin_log($pid, intval($conf['invite_reward']), 2, getlang('reward.invitefriend') . getlang('reward.friendid') . $uid);
+                                add_coin_log($pid, intval($conf['invite_reward']), 2, lang('reward.invitefriend') . lang('reward.friendid') . $uid);
                                 Db::name('task')->strict(false)->field(true)->insertGetId([
                                     'user_id' => $pid,
                                     'taskid' => $uid,
                                     'type' => 3,
                                     'status' => 1,
-                                    'title' => getlang('reward.invitefriend'),
+                                    'title' => lang('reward.invitefriend'),
                                     'task_date' => date('Y-m-d'),
                                     'reward' => intval($conf['invite_reward']),
                                     'ip' => app('request')->ip(),
@@ -656,7 +656,7 @@ class Common extends BaseController
                             'taskid' => $uid,
                             'type' => 4,
                             'status' => 0,
-                            'title' => getlang('reward.firstread'),
+                            'title' => lang('reward.firstread'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['invite_1_level']),
                             'ip' => app('request')->ip(),
@@ -667,7 +667,7 @@ class Common extends BaseController
                             'taskid' => $uid,
                             'type' => 5,
                             'status' => 0,
-                            'title' => getlang('reward.day3read'),
+                            'title' => lang('reward.day3read'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['invite_2_level']),
                             'ip' => app('request')->ip(),
@@ -678,7 +678,7 @@ class Common extends BaseController
                             'taskid' => $uid,
                             'type' => 6,
                             'status' => 0,
-                            'title' => getlang('reward.day7read'),
+                            'title' => lang('reward.day7read'),
                             'task_date' => date('Y-m-d'),
                             'reward' => intval($conf['invite_3_level']),
                             'ip' => app('request')->ip(),
@@ -795,13 +795,13 @@ class Common extends BaseController
                                 try {
                                     // 执行数据库操作
                                     Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
-                                    add_coin_log($pid, intval($conf['invite_reward']), 2, getlang('reward.invitefriend') . getlang('reward.friendid') . $uid);
+                                    add_coin_log($pid, intval($conf['invite_reward']), 2, lang('reward.invitefriend') . lang('reward.friendid') . $uid);
                                     Db::name('task')->strict(false)->field(true)->insertGetId([
                                         'user_id' => $pid,
                                         'taskid' => $uid,
                                         'type' => 3,
                                         'status' => 1,
-                                        'title' => getlang('reward.invitefriend'),
+                                        'title' => lang('reward.invitefriend'),
                                         'task_date' => date('Y-m-d'),
                                         'reward' => intval($conf['invite_reward']),
                                         'ip' => app('request')->ip(),
@@ -820,7 +820,7 @@ class Common extends BaseController
                                 'taskid' => $uid,
                                 'type' => 4,
                                 'status' => 0,
-                                'title' => getlang('reward.firstread'),
+                                'title' => lang('reward.firstread'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_1_level']),
                                 'ip' => app('request')->ip(),
@@ -831,7 +831,7 @@ class Common extends BaseController
                                 'taskid' => $uid,
                                 'type' => 5,
                                 'status' => 0,
-                                'title' => getlang('reward.day3read'),
+                                'title' => lang('reward.day3read'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_2_level']),
                                 'ip' => app('request')->ip(),
@@ -842,7 +842,7 @@ class Common extends BaseController
                                 'taskid' => $uid,
                                 'type' => 6,
                                 'status' => 0,
-                                'title' => getlang('reward.day7read'),
+                                'title' => lang('reward.day7read'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_3_level']),
                                 'ip' => app('request')->ip(),
@@ -1011,13 +1011,13 @@ class Common extends BaseController
                         try {
                             // 执行数据库操作
                             Db::name('user')->where('id', $pid)->inc('coin', intval($conf['invite_reward']))->update();
-                            add_coin_log($pid, intval($conf['invite_reward']), 2, getlang('reward.invitefriend') . getlang('reward.friendid') . $uid);
+                            add_coin_log($pid, intval($conf['invite_reward']), 2, lang('reward.invitefriend') . lang('reward.friendid') . $uid);
                             Db::name('task')->strict(false)->field(true)->insertGetId([
                                 'user_id' => $pid,
                                 'taskid' => $uid,
                                 'type' => 3,
                                 'status' => 1,
-                                'title' => getlang('reward.invitefriend'),
+                                'title' => lang('reward.invitefriend'),
                                 'task_date' => date('Y-m-d'),
                                 'reward' => intval($conf['invite_reward']),
                                 'ip' => app('request')->ip(),
@@ -1036,7 +1036,7 @@ class Common extends BaseController
                         'taskid' => $uid,
                         'type' => 4,
                         'status' => 0,
-                        'title' => getlang('reward.firstread'),
+                        'title' => lang('reward.firstread'),
                         'task_date' => date('Y-m-d'),
                         'reward' => intval($conf['invite_1_level']),
                         'ip' => app('request')->ip(),
@@ -1047,7 +1047,7 @@ class Common extends BaseController
                         'taskid' => $uid,
                         'type' => 5,
                         'status' => 0,
-                        'title' => getlang('reward.day3read'),
+                        'title' => lang('reward.day3read'),
                         'task_date' => date('Y-m-d'),
                         'reward' => intval($conf['invite_2_level']),
                         'ip' => app('request')->ip(),
@@ -1058,7 +1058,7 @@ class Common extends BaseController
                         'taskid' => $uid,
                         'type' => 6,
                         'status' => 0,
-                        'title' => getlang('reward.day7read'),
+                        'title' => lang('reward.day7read'),
                         'task_date' => date('Y-m-d'),
                         'reward' => intval($conf['invite_3_level']),
                         'ip' => app('request')->ip(),
@@ -1103,12 +1103,7 @@ class Common extends BaseController
         $code = mt_rand(100000, 999999);
         //邮箱
         if (filter_var($mobile, FILTER_VALIDATE_EMAIL)) {
-            $content = str_replace(
-                ['{title}', '{code}'],
-                [$config_web['title'], $code],
-                getlang('common.smstemplate')
-            );
-            $send = send_email($mobile, $config_web['title'] . getlang('register.regemail'), $content);
+            $send = send_email($mobile, $config_web['title'] . lang('register.regemail'), lang('common.smstemplate', ['title' => $config_web['title'], 'code' => $code]));
             if ($send === true) {
                 if (!empty($verif)) {
                     $data = array(
