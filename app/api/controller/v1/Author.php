@@ -67,7 +67,7 @@ class Author extends BaseController
                 $detail['books'][$key]['url'] = str_replace($model_name, 'home', (string) Route::buildUrl('book_detail', ['id' => $value['filename'] ? $value['filename'] : $value['id']]));
             }
         } else {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $this->apiSuccess('success', $detail);
     }

@@ -1,0 +1,425 @@
+<link rel="stylesheet" href="{__STATIC__}/home/style/comment.css?v={$version}">
+
+<style>
+.custom-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 9996;
+}
+.custom-dialog {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 180px;
+    background: #fff;
+    border-radius: 10px 10px 0 0;
+    animation: slideUp 0.3s;
+    z-index: 9999;
+}
+.custom-dialog-header {
+    padding: 15px 15px;
+    border-bottom: 1px solid #eee;
+}
+.custom-dialog-close {
+    float: right;
+    cursor: pointer;
+    font-size: 20px;
+}
+.custom-dialog-body {
+    height: calc(100% - 40px);
+    overflow-y: auto;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+    gap: 5px;
+}
+.custom-dialog-body .emoji-panel {
+    display: grid;
+    gap: 18px;
+}
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+</style>
+
+<div class="comment-container">
+    <!-- 评论输入区域 -->
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+                <textarea id="commentContent" 
+                          class="layui-textarea"
+                          rows="3" 
+                          placeholder="请输入您的评论..."></textarea>
+            </div>
+            <div class="layui-form-item">
+                <button class="layui-btn layui-btn-sm layui-btn-primary layui-btn-radius" id="btnEmoji">😀</button>
+                <button class="layui-btn layui-btn-sm layui-btn-normal" id="btnSubmit">提交评论</button>
+            </div>
+        </div>
+    </div>    
+    <div id="commentList"></div>
+    <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- 表情面板 -->
+<div id="emojiPanel" class="emoji-panel" style="display: none;">
+    <div class="emoji-item">😀</div>
+    <div class="emoji-item">😁</div>
+    <div class="emoji-item">😂</div>
+    <div class="emoji-item">🤣</div>
+    <div class="emoji-item">😃</div>
+    <div class="emoji-item">😄</div>
+    <div class="emoji-item">😅</div>
+    <div class="emoji-item">😆</div>
+    <div class="emoji-item">😉</div>
+    <div class="emoji-item">😊</div>
+    <div class="emoji-item">😋</div>
+    <div class="emoji-item">😎</div>
+    <div class="emoji-item">😍</div>
+    <div class="emoji-item">😘</div>
+    <div class="emoji-item">😗</div>
+    <div class="emoji-item">😙</div>
+</div>
+
+<div id="customOverlay" class="custom-overlay" style="display:none;">
+    <div class="custom-dialog">
+        <div class="custom-dialog-header">
+            <span class="custom-dialog-title">选择表情</span>
+            <span class="custom-dialog-close">&times;</span>
+        </div>
+        <div class="custom-dialog-body"></div>
+    </div>
+</div>
+
+<script>
+$(window).on('load', function () {
+
+    const paginationConfig = {
+        currentPage: 1,
+        pageSize: 20,
+        total: 0,
+        visiblePages: 5 // 显示5个页码
+    };
+
+    const target_id = parseInt('{$target_id}');
+    const targetType = parseInt('{$targetType}');
+
+    // 全局数据存储
+    let comments = [];
+
+    // 递归渲染回复
+    window.renderReplies = function(childReplies, parentId = null, level = 0) {
+        return childReplies.map(reply => {
+            return `
+            <div class="${level > 0 ? 'nested-reply' : 'reply-item'}" data-id="${reply.id}">
+                <div class="comment-header">
+                    <div class="comment-author">${reply.user.nickname}</div>
+                    ${reply.parent_id ? `<div class="reply-to">回复于</div>` : ''}
+                    <div class="comment-time">${reply.create_time}</div>
+                </div>
+                <div class="comment-content">${reply.content}</div>
+                <div class="comment-actions">
+                    <button class="layui-btn layui-btn-xs layui-btn-primary layui-btn-radius" 
+                            onclick="likeComment(${reply.id}, this, 2)">
+                        <i class="layui-icon">&#xe6c6;</i> 
+                        <span class="like-count">${reply.like_count}</span>
+                    </button>
+                    <button class="layui-btn layui-btn-xs layui-btn-primary reply" 
+                            onclick="showReply(
+                                ${reply.id}, 
+                                '${reply.user.nickname}', 
+                                2, 
+                                ${reply.comment_id}, 
+                                ${reply.id}
+                            )">回复</button>
+                </div>
+                ${reply.childReplies?.length ? `
+                <div class="reply-children">
+                    ${renderReplies(reply.childReplies, reply.id, level + 1)}
+                </div>
+                ` : ''}
+            </div>`;
+        }).join('');
+    }
+
+    window.insertTextAtCursor = function(targetId, text) {
+        const el = document.getElementById(targetId);
+        if (!el) return;        
+        const start = el.selectionStart;
+        const end = el.selectionEnd;
+        el.value = el.value.slice(0, start) + text + el.value.slice(end);
+        el.focus();
+        el.selectionStart = el.selectionEnd = start + text.length;        
+        // 触发输入事件
+        const event = new Event('input', { bubbles: true });
+        el.dispatchEvent(event);
+    }
+
+    window.loadComments = function() {
+        post("{:furl('v1/comment/list', [], true, 'api')}", {
+            target_type: targetType,
+            target_id: target_id,
+            page: paginationConfig.currentPage,
+            limit: paginationConfig.pageSize,
+        }, function(res) {
+            if(res.code == 0) {
+                renderComments(res.data.data);
+                renderPagination(res.data.total);
+                if(targetType ==1) $('.book-detail-tab ul li:nth-child(3)').text('作品评论('+res.data.total+')');
+            } else {
+                layer.msg(res.msg);
+            }
+        });       
+    }
+
+    // 全局渲染函数
+    window.renderComments = function(data) {
+        let html = '';
+        data.forEach(comment => {
+            html += `
+            <div class="comment-item" data-id="${comment.id}">
+                <div class="comment-header">
+                    <div class="comment-author">${comment.user.nickname}</div>
+                    <div class="comment-time">${comment.create_time}</div>
+                </div>
+                <div class="comment-content">${comment.content}</div>  
+                <div class="comment-actions">
+                    <button class="layui-btn layui-btn-xs layui-btn-primary" 
+                            onclick="likeComment(${comment.id}, this, 1)">
+                        <i class="layui-icon">&#xe6c6;</i> 
+                        <span class="like-count">${comment.like_count}</span>
+                    </button>
+                    <button class="layui-btn layui-btn-xs layui-btn-primary reply" 
+                            onclick="showReply(
+                                ${comment.id}, 
+                                '${comment.user.nickname}', 
+                                1, 
+                                ${comment.id}, 
+                                null
+                            )">回复</button>
+                </div>
+                ${comment.replies?.length ? `
+                <div class="reply-list">
+                    ${renderReplies(comment.replies)}
+                </div>
+                ` : ''}
+            </div>`;
+        });
+        $('#commentList').html(html);
+        renderPagination();
+    }
+
+    window.renderPagination = function() {
+        const totalPages = Math.ceil(paginationConfig.total / paginationConfig.pageSize);
+        let html = '';
+        
+        // 上一页按钮
+        html += `<button ${paginationConfig.currentPage === 1 ? 'disabled' : ''} 
+                onclick="changePage(${paginationConfig.currentPage - 1})" class="layui-btn layui-btn-xs layui-btn-primary">上一页</button>`;
+
+        // 页码按钮
+        const startPage = Math.max(1, paginationConfig.currentPage - Math.floor(paginationConfig.visiblePages/2));
+        const endPage = Math.min(totalPages, startPage + paginationConfig.visiblePages - 1);
+
+        for(let i = startPage; i <= endPage; i++) {
+            html += `<button class="${i === paginationConfig.currentPage ? 'layui-btn layui-btn-xs layui-btn-primary active' : 'layui-btn layui-btn-xs layui-btn-primary'}" 
+                    onclick="changePage(${i})">${i}</button>`;
+        }
+
+        // 下一页按钮
+        html += `<button ${paginationConfig.currentPage === totalPages ? 'disabled' : ''} 
+                onclick="changePage(${paginationConfig.currentPage + 1})" class="layui-btn layui-btn-xs layui-btn-primary">下一页</button>`;
+
+        $('#pagination').html(html);
+    }
+
+    window.changePage = function(page) {
+        if(page < 1 || page > Math.ceil(paginationConfig.total / paginationConfig.pageSize)) return;
+        paginationConfig.currentPage = page;
+        loadComments();
+        window.scrollTo(0, 0);
+    }
+
+    // 点赞功能
+    window.likeComment = function(id, obj, target_type) {
+        const $btn = $(obj).prop('disabled', true);
+        const originalCount = parseInt($btn.find('span').text()) || 0;        
+        post("{:furl('v1/comment/like', [], true, 'api')}", {
+            target_id: id,
+            target_type: target_type,
+        }, function(res) {
+            $btn.prop('disabled', false);
+            if(res.code == 0) {
+                loadComments();            
+            } else {
+                layer.msg(res.msg || '操作失败');
+            }
+        })
+    }
+
+    window.showReply = function(
+        targetId, 
+        targetUser, 
+        replyType, 
+        commentId,
+        parentId = null
+    ) {
+        const dynamicId = `replyContent_${Date.now()}`;
+        const replyHtml = `
+        <div class="reply-box" style="padding:20px;">
+            <input type="hidden" class="targetUser" value="${targetUser}">
+            <input type="hidden" id="replyType" value="${replyType}">
+            <input type="hidden" id="parentId" value="${parentId || 0}">
+            <input type="hidden" id="commentId" value="${commentId}">
+            <textarea id="${dynamicId}" 
+                    class="layui-textarea" 
+                    rows="3" 
+                    placeholder="@${targetUser.replace(/"/g, '&quot;')}"></textarea>
+            <div style="margin-top:10px;">
+                <button class="layui-btn layui-btn-sm layui-btn-primary layui-btn-radius" 
+                        onclick="showEmojiPanel('${dynamicId}')">😀</button>
+                <button class="layui-btn layui-btn-sm layui-btn-normal" 
+                        onclick="submitReply('${dynamicId}')" 
+                        style="float:right">提交</button>
+            </div>
+        </div>`;
+        layer.open({
+            type: 1,
+            title: `回复 ${targetUser}`,
+            content: replyHtml,
+            zIndex: 20,
+            shade: 0,
+            area: ['100%', '250px'],
+            success: function(layerElem, index){
+                const nativeElem = layerElem[0] || document.getElementById(layerElem.id);
+                const $textarea = $(nativeElem).find(`#${dynamicId}`);
+                // 添加存在性检查
+                if (!$textarea.length) {
+                    console.error('未找到文本框:', dynamicId);
+                    return;
+                }
+                $textarea.val( 
+                    parentId 
+                    ? $textarea.val() + ' @' + targetUser + ' '
+                    : '@' + targetUser + ' '
+                );
+                $(nativeElem).on('input', `#${dynamicId}`, function(){
+                    const value = $(this).val().trim();
+                    const submitBtn = $(nativeElem).find('button.layui-btn-normal');
+                    submitBtn.prop('disabled', !value || value === `@${targetUser}`);
+                });
+            }
+        });
+    }
+
+    window.hideEmojiPanel = function () {
+        document.getElementById('customOverlay').style.display = 'none';
+    }
+
+    let currentTargetId = null;
+    // 初始化只执行一次的事件绑定
+    document.getElementById('customOverlay').addEventListener('click', function(e) {
+        // 点击关闭按钮或遮罩
+        if (e.target.classList.contains('custom-dialog-close') || e.target === this) {
+            this.style.display = 'none';
+        }        
+        // 点击表情项
+        if (e.target.classList.contains('emoji-item')) {
+            if (currentTargetId) {
+                insertTextAtCursor(currentTargetId, e.target.textContent);
+            }
+        }
+    });
+
+    window.showEmojiPanel = function(targetId) {
+        currentTargetId = targetId;
+        const overlay = document.getElementById('customOverlay');
+        const dialogBody = overlay.querySelector('.custom-dialog-body');
+        // 克隆原始面板并过滤重复
+        const source = document.getElementById('emojiPanel');
+        const clone = source.cloneNode(true);
+        clone.id = '';
+        clone.style.display = 'grid';
+        // 更新内容
+        dialogBody.innerHTML = '';
+        dialogBody.appendChild(clone);
+        overlay.style.display = 'block';       
+    }
+
+    window.submitReply = function(textareaId) {
+        const $replyBox = $(`#${textareaId}`).closest('.reply-box');
+        const targetUser = $replyBox.find('.targetUser').val();
+        let content = $replyBox.find('textarea').val().trim();
+        content = content.replace(new RegExp(`^@${targetUser}\\s*`), '');
+        const params = {            
+            content: content,
+            reply_type: parseInt($replyBox.find('#replyType').val()),
+            parent_id: parseInt($replyBox.find('#parentId').val()) || 0,
+            comment_id: parseInt($replyBox.find('#commentId').val())
+        };
+
+        if (!params.content) {
+            return layer.msg('回复内容不能为空');
+        }
+        post("{:furl('v1/comment/reply', [], true, 'api')}", params, function(res) {
+            layer.msg(res.msg);
+            if(res.code == 0) {
+                layer.closeAll();
+                loadComments();
+            }
+        });
+    }
+
+    // 递归查找评论
+    window.findComment = function(id, list = comments) {
+        for(const item of list) {
+            if(item.id === id) return item;
+            if(item.replies?.length) {
+                const found = findComment(id, item.replies);
+                if(found) return found;
+            }
+        }
+        console.warn('未找到对应评论:', id);
+        return null;
+    }
+    
+    layui.use(['form', 'jquery'], function () {
+        var $ = layui.jquery,      
+            layer = layui.layer,
+            form = layui.form;
+        
+        // 初始化表情面板
+        $('#btnEmoji').click(function(){
+            showEmojiPanel('commentContent');
+        });
+
+        // 提交主评论
+        $('#btnSubmit').click(function(){
+            const content = $('#commentContent').val().trim();
+            if(!content) return layer.msg('评论内容不能为空');
+            post("{:furl('v1/comment/create', [], true, 'api')}", {
+                target_type: targetType,
+                target_id: target_id,
+                content: content,
+            }, function(res) {
+                layer.msg(res.msg);
+                if(res.code == 0) {
+                    $('#commentContent').val('');
+                    paginationConfig.currentPage = 1;
+                    loadComments();
+                }
+            });            
+        });
+
+        loadComments();
+        
+    });
+});
+</script>

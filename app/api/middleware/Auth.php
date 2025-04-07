@@ -14,7 +14,7 @@ class Auth
 		$token = Request::header('Token');
 		if ($token) {
 			if (count(explode('.', $token)) != 3) {
-				return json(['code' => 404, 'msg' => '非法请求']);
+				return json(['code' => 404, 'msg' => lang('403')]);
 			}
 			$config = get_system_config('token');
 			try {
@@ -28,20 +28,20 @@ class Auth
 				$response = $next($request);
 				return $response;
 			} catch (\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
-				return json(['code' => 403, 'msg' => '签名错误']);
+				return json(['code' => 403, 'msg' => lang('common.signerr')]);
 			} catch (\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
-				return json(['code' => 401, 'msg' => 'token失效']);
+				return json(['code' => 401, 'msg' => lang('common.tokenerr')]);
 			} catch (\Firebase\JWT\ExpiredException $e) {  // token过期
-				return json(['code' => 401, 'msg' => 'token已过期']);
+				return json(['code' => 401, 'msg' => lang('common.tokenerr')]);
 			} catch (\Exception $e) {  //其他错误
-				return json(['code' => 404, 'msg' => '非法请求']);
+				return json(['code' => 404, 'msg' => lang('403')]);
 			} catch (\UnexpectedValueException $e) {  //其他错误
-				return json(['code' => 404, 'msg' => '非法请求']);
+				return json(['code' => 404, 'msg' => lang('403')]);
 			} catch (\DomainException $e) {  //其他错误
-				return json(['code' => 404, 'msg' => '非法请求']);
+				return json(['code' => 404, 'msg' => lang('403')]);
 			}
 		} else {
-			return json(['code' => 404, 'msg' => 'token不能为空']);
+			return json(['code' => 404, 'msg' => lang('404')]);
 		}
 		return $next($request);
 	}

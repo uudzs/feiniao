@@ -77,6 +77,10 @@
     <div class="bui-tab-main">
         <ul>
             <li>
+              {if get_system_config('content', 'comment_open')}              
+                  {php} $targetType = 1; $target_id = $bid; {/php}
+                  {include file="common/comment" /}
+              {/if}
               {eq name=":get_addons_is_enable('changyan')" value="1"}
               {:hook('commentsHook', ['terminal' => 'wap_script', 'bookid' => $bid])}
               {/eq}
@@ -138,13 +142,13 @@
         },
         mounted: function () {
             var that = this;
-            var uiTab = bui.tab({
-                id: "#comments",
-                width: "100%",
-                onTo(index) {
-                    console.log(index)
-                }
-            });
+            // var uiTab = bui.tab({
+            //     id: "#comments",
+            //     width: "100%",
+            //     onTo(index) {
+            //         console.log(index)
+            //     }
+            // });
             post("{:furl('v1/bookdetail', ['id' => $bid], true, 'api')}", {}, function(result) {
                 if(result.code == 0) {
                     that.bookinfo = result.data || [];     

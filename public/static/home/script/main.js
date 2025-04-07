@@ -51,7 +51,11 @@
                   }
               },
               error: function (xhr, status, error) {
-                console.error('发生错误:', error);  
+                if(xhr.getResponseHeader('Content-Type')?.includes('text/html')){
+                    layer.msg('接口返回了错误页面，请检查路径');
+                    return;
+                }
+                console.error('请求错误:', xhr.status, error);
                 layer.msg("发生错误:" + JSON.stringify(error));
               }
           });

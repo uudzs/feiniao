@@ -52,7 +52,7 @@ class Task extends BaseController
         ];
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $vip = Db::name('vip_log')->where(['status' => 1, 'user_id' => JWT_UID, ['expire_time', '>', time()]])->find();
         $vip_reward = 0;

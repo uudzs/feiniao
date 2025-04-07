@@ -36,20 +36,20 @@ class Chapter extends BaseController
         }
         $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->find();
         if (empty($chapter)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($chapter['status']) != 1) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         if (intval($chapter['verify']) == 2) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $book = Db::name('book')->field('id,title,cover,status')->where(array('id' => $chapter['bookid']))->find();
         if (empty($book)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($book['status']) != 1) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $hide_content = false;
         $power_config = get_system_config('power');

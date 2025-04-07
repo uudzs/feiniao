@@ -1,10 +1,10 @@
 <?php
 return [
-    200 => 'Request successful',
-    403 => 'illegal request',
-    404 => 'No relevant records found',
-    406 => 'ACCESS ERROR',
-    407 => 'Prohibited',
+    '200' => 'Request successful',
+    '403' => 'illegal request',
+    '404' => 'No relevant records found',
+    '406' => 'ACCESS ERROR',
+    '407' => 'Prohibited',
     'success' => 'Operation successful',
     'fail' => 'operation failed',
     'empty' => 'Parameter is empty',

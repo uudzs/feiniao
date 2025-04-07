@@ -85,7 +85,7 @@ class Order extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $price = $day = 0;
         if ($type == 'vip') {
@@ -161,10 +161,10 @@ class Order extends BaseController
         }
         $order = Db::name('order')->where(['id' => $id])->find();
         if (empty($order)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if ($order['user_id'] != JWT_UID) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $this->apiSuccess('success', $order);
     }

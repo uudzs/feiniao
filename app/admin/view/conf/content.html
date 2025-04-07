@@ -86,6 +86,32 @@
 				</div>
 				<div class="layui-inline layui-text-em">设为0时为不限制，但最大字数不可超过数据库最大限制。</div>
 			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">评论功能开启</label>
+				<div class="layui-input-block">
+					{empty name="$config.comment_open"}
+						<input type="radio" name="comment_open" value="1" title="开启">
+						<input type="radio" name="comment_open" value="0" title="关闭" checked>
+					{else/}
+						<input type="radio" name="comment_open" value="1" title="开启" {eq name="$config.comment_open" value="1"} checked{/eq}>
+						<input type="radio" name="comment_open" value="0" title="关闭" {eq name="$config.comment_open" value="0"} checked{/eq}>
+					{/empty}
+				</div>
+				<div class="layui-form-mid layui-word-aux">如开启此功能，请关闭其他评论，如畅言评论插件。</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">评论审核开启</label>
+				<div class="layui-input-block">
+					{empty name="$config.comment_verify_open"}
+						<input type="radio" name="comment_verify_open" value="1" title="开启">
+						<input type="radio" name="comment_verify_open" value="0" title="关闭" checked>
+					{else/}
+						<input type="radio" name="comment_verify_open" value="1" title="开启" {eq name="$config.comment_verify_open" value="1"} checked{/eq}>
+						<input type="radio" name="comment_verify_open" value="0" title="关闭" {eq name="$config.comment_verify_open" value="0"} checked{/eq}>
+					{/empty}
+				</div>
+				<div class="layui-form-mid layui-word-aux">如开启此功能，请关闭其他评论，如畅言评论插件。</div>
+			</div>
 		</div>
 	</div>
 

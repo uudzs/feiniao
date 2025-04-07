@@ -58,7 +58,7 @@ class Withdraw extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($user['realname_status']) != 1) {
             $this->apiError('user.authentication');
@@ -68,10 +68,10 @@ class Withdraw extends BaseController
         }
         $card = Db::name('bank_card')->where(['id' => $card_id])->find();
         if (empty($card)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($card['user_id'] != JWT_UID)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($card['auth_status'] != 1)) {
             $this->apiError('user.receivingaccountauthentication');
@@ -81,7 +81,7 @@ class Withdraw extends BaseController
         }
         $conf = get_system_config('withdraw');
         if (intval($conf['open'] != 1)) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $tax = floatval($conf['tax']);
         $ratio = floatval($conf['ratio']);

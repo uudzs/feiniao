@@ -128,7 +128,7 @@ class Search extends BaseController
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $page = (isset($param['page']) && intval($param['page']) > 0) ? intval($param['page']) : 1; //页码
         $limit = (isset($param['limit']) && intval($param['limit']) > 0) ? intval($param['limit']) : 10; //条数
@@ -162,7 +162,7 @@ class Search extends BaseController
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $keyword = $param['keyword'];
         Db::name('search_log')->where(['keyword' => $keyword, 'user_id' => $uid])->delete();

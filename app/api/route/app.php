@@ -64,7 +64,17 @@ Route::group('v1', function () {
     Route::rule('caijicategory', 'api/v1.caiji/category', 'GET|POST');
     Route::rule('caijibook', 'api/v1.caiji/book', 'GET|POST');
     Route::rule('caijichapter', 'api/v1.caiji/chapter', 'GET|POST');
-});
+    Route::group('comment', function () {
+        // 评论列表
+        Route::rule('list', 'api/v1.comment/list', 'POST');
+        // 发表评论
+        Route::rule('create', 'api/v1.comment/create', 'POST');
+        // 点赞
+        Route::rule('like', 'api/v1.comment/like', 'POST');
+        // 回复评论
+        Route::rule('reply', 'api/v1.comment/reply', 'POST');
+    });
+})->prefix('v1.');
 try {
     $rule = get_cache('routeRule');
     if (!$rule) {

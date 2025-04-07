@@ -47,7 +47,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $fav = Db::name('favorites')->where(['user_id' => JWT_UID, 'pid' => $pid])->find();
         if (empty($fav)) {
@@ -93,7 +93,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $follow = Db::name('follow')->where(['user_id' => JWT_UID, 'from_id' => $from_id])->find();
         if (empty($follow)) {
@@ -133,7 +133,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $imageType = '';
         if (preg_match('/^data:image\/(\w+);base64,/', $avatar, $matches)) {
@@ -149,7 +149,7 @@ class User extends BaseController
         $path = date('Ymd', time()) . '/';
         $upload_path = app()->getRootPath() . 'public/storage/' . $path;
         if (!createDirectory($upload_path)) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $filename = $img_name . "." . $imageType;
         $localpath = get_config('filesystem.disks.public.url') . '/' . $path . $filename;
@@ -185,7 +185,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if ($user['securitypwd']) {
             if (empty($oldsecuritypwd)) {
@@ -221,7 +221,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if ($nickname == $user['nickname']) {
             $this->apiError('repeat');
@@ -258,10 +258,10 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($user['sex']) > 0) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['sex' => $sex, 'update_time' => time()]);
         if ($result === false) {
@@ -298,7 +298,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if ($mobile == $user['mobile']) {
             $this->apiError('repeat');
@@ -355,14 +355,14 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($user['inviter'] > 0)) {
             $this->apiError('repeat');
         }
         $member = Db::name('user')->where(['qrcode_invite' => $code])->find();
         if (empty($member)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $result = Db::name('user')->where('id', $user['id'])->update(['inviter' => $member['id'], 'update_time' => time()]);
         if ($result === false) {
@@ -397,18 +397,18 @@ class User extends BaseController
             $this->apiError('empty');
         }
         if (!in_array($path, $bglist)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $bgPath = CMS_ROOT . "public" . $path;
         if (!is_file($bgPath)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (empty($user['qrcode_invite'])) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $title = $conf['invite_content'];
         $replace = array(get_system_config('web', 'title'), $user['nickname']);
@@ -429,7 +429,7 @@ class User extends BaseController
             if (!is_file($qrFile)) {
                 $logoPath = CMS_ROOT . 'public/static/home/images/logo-invite.png';
                 if (!is_file($logoPath)) {
-                    $this->apiError(404);
+                    $this->apiError('404');
                 }
                 $result = Builder::create()
                     ->writer(new PngWriter())
@@ -533,7 +533,7 @@ class User extends BaseController
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (isset($param['bookshelf']) && $param['bookshelf']) {
             $list = json_decode($param['bookshelf'], true);
@@ -608,7 +608,7 @@ class User extends BaseController
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $where = ['user_id' => $uid];
         $param['order'] = 'create_time desc';
@@ -667,7 +667,7 @@ class User extends BaseController
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $bid = trim($param['bid']);
         if (strpos($bid, ',') !== false) {
@@ -687,7 +687,7 @@ class User extends BaseController
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         //最多可以载加多少页
         if (!isset($param['page']) || empty($param['page'])) $param['page'] = 1;
@@ -757,7 +757,7 @@ class User extends BaseController
         }
         $conf = get_system_config('reward');
         if (empty($conf) || intval($conf['open']) != 1) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $uid = JWT_UID;
         $today = date('Y-m-d'); // 当天日期
@@ -840,15 +840,15 @@ class User extends BaseController
         }
         $conf = get_system_config('reward');
         if (empty($conf)) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $book = Db::name('book')->field('id')->where('id', $book_id)->find();
         if (empty($book)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $chapter = Db::name('chapter')->field('id')->where('id', $chapter_id)->find();
         if (empty($chapter)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $uid = JWT_UID;
         $today = date('Y-m-d'); // 当天日期
@@ -923,7 +923,7 @@ class User extends BaseController
         $uid = JWT_UID;
         $user = Db::name('user')->where(['id' => $uid])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (!isset($param['limit']) || intval($param['limit']) <= 0) {
             $param['limit'] = get_config('app.page_size');
@@ -1046,7 +1046,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($user['realname_status']) != 1) {
             $this->apiError('user.authentication');
@@ -1108,10 +1108,10 @@ class User extends BaseController
         }
         $card = Db::name('bank_card')->where(['id' => $id])->find();
         if (empty($card)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if ($card['user_id'] != JWT_UID) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         Db::name('bank_card')->where(['id' => $id])->delete();
         $this->apiSuccess('success', []);
@@ -1139,7 +1139,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if ($user['realname_status'] == 1) {
             $this->apiError('repeat');
@@ -1205,7 +1205,7 @@ class User extends BaseController
         }
         $user = Db::name('user')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($user['author_id'] > 0)) {
             $this->apiError('repeat');

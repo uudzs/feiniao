@@ -140,7 +140,7 @@ class Common extends BaseController
         $page = (isset($param['page']) && intval($param['page']) > 0) ? intval($param['page']) : 1; //页码
         $pagesize = isset($param['pagesize']) ? intval($param['pagesize']) : 0; //条数
         if (empty($pid)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $time = time();
         $table = config('database.connections.mysql.prefix') . 'advsr';
@@ -228,10 +228,10 @@ class Common extends BaseController
         } else {
             $adver = Db::name('adver')->where(['id' => intval($pid)])->find();
             if (empty($adver)) {
-                $this->apiError(404);
+                $this->apiError('404');
             }
             if (intval($adver['status']) != 1) {
-                $this->apiError(407);
+                $this->apiError('407');
             }
             $limit = $pagesize > 0 ? $pagesize : (intval($adver['viewnum']) > 0 ? intval($adver['viewnum']) : 0);
             if ($limit <= 0) $limit = get_config('app.page_size');
@@ -366,11 +366,11 @@ class Common extends BaseController
                 $token = JWT::encode($arr, $config['secrect'], 'HS256');
                 $this->apiSuccess('success', ['token' => $token]);
             } catch (\Exception $e) {
-                $this->apiError(403, [], 404);
+                $this->apiError('403', [], 404);
             } catch (\UnexpectedValueException $e) {
-                $this->apiError(403, [], 404);
+                $this->apiError('403', [], 404);
             } catch (\DomainException $e) {
-                $this->apiError(403, [], 404);
+                $this->apiError('403', [], 404);
             }
         } else {
             $arr = [
@@ -402,7 +402,7 @@ class Common extends BaseController
         }
         $user = Db::name('user')->field('nickname,username,name,mobile,headimgurl,email,mobile_status,sex,desc,birthday,level,status,country,province,city,company,address,depament,position,qrcode_invite,coin,inviter,securitypwd,realname_status,id_card,author_id')->where(['id' => JWT_UID])->find();
         if (empty($user)) {
-            $this->apiError(404, [], 98);
+            $this->apiError('404', [], 98);
         }
         if (empty($user['qrcode_invite'])) {
             $qrcode_invite = get_invite_code();
@@ -511,7 +511,7 @@ class Common extends BaseController
                 }
                 $user = Db::name('user')->where(['mobile' => $mobile])->find();
                 if (empty($user)) {
-                    $this->apiError(404);
+                    $this->apiError('404');
                 }
                 $pwd = set_password($password, $user['salt']);
                 if ($pwd !== $user['password']) {
@@ -530,7 +530,7 @@ class Common extends BaseController
             }
             $user = Db::name('user')->where(['username' => $username])->find();
             if (empty($user)) {
-                $this->apiError(404);
+                $this->apiError('404');
             }
             $pwd = set_password($password, $user['salt']);
             if ($pwd !== $user['password']) {
@@ -563,7 +563,7 @@ class Common extends BaseController
         // 校验
         if (empty($user)) {
             if (isset($power['register_open']) && intval($power['register_open']) != 1) {
-                $this->apiError(404);
+                $this->apiError('404');
             }
             $session_invite = get_config('app.session_invite');
             $invite = Cookie::get($session_invite);
@@ -938,7 +938,7 @@ class Common extends BaseController
     {
         $power = get_system_config('power');
         if (isset($power['register_open']) && intval($power['register_open']) != 1) {
-            $this->apiError(403);
+            $this->apiError('403');
         }
         $param = get_params();
         $username = isset($param['username']) ?  trim($param['username']) : '';
@@ -1182,6 +1182,6 @@ class Common extends BaseController
                 $this->apiError('fail');
             }
         }
-        $this->apiError(407);
+        $this->apiError('407');
     }
 }

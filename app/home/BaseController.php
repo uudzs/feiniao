@@ -197,7 +197,7 @@ abstract class BaseController
     private function jumpTemplate($code, $msg, $url, $wait)
     {
         $url = $url ? url($url)->build() : 'javascript:history.back(-1);';
-        $msg = lang($msg);
+        $msg = lang((string)$msg);
         $result = [
             'code'  => $code,
             'msg'  => $msg,

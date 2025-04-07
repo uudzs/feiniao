@@ -112,6 +112,10 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
             <div class="reader-forum">
                 <div class="close"><i class="bi bi-x-lg"></i></div>
                 <div class="forum-wrap JforumWrap">
+                    {if get_system_config('content', 'comment_open')}
+                        {php} $targetType = 2; $target_id = $chapter['id']; {/php}
+                        {include file="common/comment" /}
+                    {/if}
                     {eq name=":get_addons_is_enable('changyan')" value="1"}
                     {:hook('commentsHook', ['terminal' => 'pc_script', 'chapterid' => $chapter['id']])}
                     {/eq}

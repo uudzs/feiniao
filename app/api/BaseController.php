@@ -104,7 +104,7 @@ abstract class BaseController
     {
         $result = [
             'code' => $code,
-            'msg' => lang($msg),
+            'msg' => lang((string)$msg),
             'time' => time(),
             'data' => $data,
         ];

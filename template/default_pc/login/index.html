@@ -15,7 +15,7 @@
             <span class="bg1"></span>
             <span class="bg2"></span>
         </div>
-        <div class="layui-form login-bottom">            
+        <div class="login-bottom">            
             {if !empty($power['login_type'])}
                 <div class="layui-tab layui-tab-brief">
                     <ul class="layui-tab-title">
@@ -28,57 +28,61 @@
                     </ul>
                     <div class="layui-tab-content">
                         {if(in_array('account', $power['login_type']))}
-                            <div class="layui-tab-item layui-show">
-                                <div class="center">                
-                                    <div class="item">
-                                        <span class="icon icon-2"></span>
-                                        <input type="text" name="username" lay-verify="required" placeholder="请输入账号、邮箱、手机" maxlength="24">
-                                    </div>
-                                    <div class="item">
-                                        <span class="icon icon-3"></span>
-                                        <input type="password" name="password" lay-verify="required" placeholder="请输入密码" maxlength="20">
-                                        <span class="bind-password icon icon-4"></span>
-                                    </div>
-                                    <div class="item" style="width: 137px;">
-                                        <span class="icon icon-7"></span>
-                                        <input type="text" name="captcha" placeholder="请输入验证码" maxlength="6">
-                                        <img id="refreshCaptcha" class="validateImg" src="{:furl('v1/captcha', [], true, 'api')}" onclick="this.src='{:furl('v1/captcha', [], true, 'api')}?seed='+Math.random()">
-                                    </div>              
-                                </div>
-                                <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
-                                    <button class="login-btn" lay-submit="" lay-filter="login" style="margin-top: 0;">立即登录</button>
-                                </div>                            
-                            </div>
-                        {/if}
-                        {if(in_array('sms', $power['login_type']))}
-                            <div class="layui-tab-item {if(!in_array('account', $power['login_type']))}layui-show{/if}">
-                                <div class="center">
-                                    <div class="layui-form-item">
-                                        <div class="layui-row">
-                                            <div class="layui-col-xs7">
-                                                <div class="layui-input-wrap">
-                                                    <div class="layui-input-prefix"><i class="layui-icon layui-icon-cellphone"></i></div>
-                                                    <input type="text" name="mobile" value="" lay-verify="required|phone" placeholder="手机号" lay-reqtext="请填写手机号" autocomplete="off" class="layui-input" id="mobile">
-                                                </div>
-                                            </div>
-                                            <div class="layui-col-xs5">
-                                                <div style="margin-left: 11px;"><button type="button" class="layui-btn layui-btn-fluid" lay-on="get-code">获取验证码</button></div>
-                                            </div>
+                            <form class="layui-form" lay-filter="login">
+                                <div class="layui-tab-item layui-show">
+                                    <div class="center">                
+                                        <div class="item">
+                                            <span class="icon icon-2"></span>
+                                            <input type="text" name="username" lay-verify="required" placeholder="请输入账号、邮箱、手机" maxlength="24">
                                         </div>
-                                    </div>
-                                    <div class="layui-form-item">
-                                        <div class="layui-input-wrap">
-                                            <div class="layui-input-prefix">
-                                                <i class="layui-icon layui-icon-vercode"></i>
-                                            </div>
-                                            <input type="text" name="code" value="" lay-verify="required" placeholder="短信验证码" lay-reqtext="请填写短信验证码" autocomplete="off" class="layui-input">
+                                        <div class="item">
+                                            <span class="icon icon-3"></span>
+                                            <input type="password" name="password" lay-verify="required" placeholder="请输入密码" maxlength="20">
+                                            <span class="bind-password icon icon-4"></span>
                                         </div>
+                                        <div class="item" style="width: 137px;">
+                                            <span class="icon icon-7"></span>
+                                            <input type="text" name="captcha" placeholder="请输入验证码" maxlength="6">
+                                            <img id="refreshCaptcha" class="validateImg" src="{:furl('v1/captcha', [], true, 'api')}" onclick="this.src='{:furl('v1/captcha', [], true, 'api')}?seed='+Math.random()">
+                                        </div>              
                                     </div>
                                     <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
-                                        <button class="login-btn" lay-submit="" lay-filter="mobile_login" style="margin-top: 0;">立即登录</button>
-                                    </div> 
+                                        <button class="login-btn" lay-submit="" lay-filter="login" style="margin-top: 0;">立即登录</button>
+                                    </div>                            
                                 </div>
-                            </div>
+                            </form>
+                        {/if}
+                        {if(in_array('sms', $power['login_type']))}
+                            <form class="layui-form" lay-filter="mobile_login">
+                                <div class="layui-tab-item {if(!in_array('account', $power['login_type']))}layui-show{/if}">
+                                    <div class="center">
+                                        <div class="layui-form-item">
+                                            <div class="layui-row">
+                                                <div class="layui-col-xs7">
+                                                    <div class="layui-input-wrap">
+                                                        <div class="layui-input-prefix"><i class="layui-icon layui-icon-cellphone"></i></div>
+                                                        <input type="text" name="mobile" value="" lay-verify="required|phone" placeholder="手机号" lay-reqtext="请填写手机号" autocomplete="off" class="layui-input" id="mobile">
+                                                    </div>
+                                                </div>
+                                                <div class="layui-col-xs5">
+                                                    <div style="margin-left: 11px;"><button type="button" class="layui-btn layui-btn-fluid" lay-on="get-code">获取验证码</button></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item">
+                                            <div class="layui-input-wrap">
+                                                <div class="layui-input-prefix">
+                                                    <i class="layui-icon layui-icon-vercode"></i>
+                                                </div>
+                                                <input type="text" name="code" value="" lay-verify="required" placeholder="短信验证码" lay-reqtext="请填写短信验证码" autocomplete="off" class="layui-input">
+                                            </div>
+                                        </div>
+                                        <div class="layui-form-item" style="text-align:center; width:100%;height:100%;margin:0px;">
+                                            <button class="login-btn" lay-submit="" lay-filter="mobile_login" style="margin-top: 0;">立即登录</button>
+                                        </div> 
+                                    </div>
+                                </div>
+                            </form>
                         {/if}
                         {if(in_array('third', $power['login_type']))}
                         <div class="layui-form-item other-login">
@@ -137,7 +141,8 @@
                     } else {
                         $('#refreshCaptcha').attr("src", "{:furl('v1/captcha', [], true, 'api')}" + "?" + Math.random());
                     }
-                });                
+                });
+                return false;               
             });
             {/if}
             {if(in_array('sms', $power['login_type']))}
@@ -166,6 +171,7 @@
                         window.location.href = refererUrl;
                     }
                 });
+                return false;
             });
             {/if}
             return false;

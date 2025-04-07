@@ -41,7 +41,7 @@ class Book extends BaseController
         $model_name = \think\facade\App::initialize()->http->getName();
         if ($detail) {
             if (intval($detail['status']) != 1) {
-                $this->apiError(407);
+                $this->apiError('407');
             }
             $detail['bigclassname'] = Db::name('category')->where(['id' => $detail['genre']])->value('name');
             $detail['smallclassname'] = Db::name('category')->where(['id' => $detail['subgenre']])->value('name');
@@ -111,7 +111,7 @@ class Book extends BaseController
                 $detail['label'] = [];
             }
         } else {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         $this->apiSuccess('success', $detail);
     }
@@ -289,10 +289,10 @@ class Book extends BaseController
             }
             $book = Db::name('book')->where(['id' => $bookid])->find();
             if (empty($book)) {
-                $this->apiError(404);
+                $this->apiError('404');
             }
             if (intval($book['status']) != 1) {
-                $this->apiError(407);
+                $this->apiError('407');
             }
             $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'down' . DIRECTORY_SEPARATOR . $book['id'] . DIRECTORY_SEPARATOR;
             $path = app()->getRootPath() . $relativepath;
@@ -317,7 +317,7 @@ class Book extends BaseController
             }
             $chapters = Db::name('chapter')->field('id,title,chaps,wordnum')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
             if (empty($chapters)) {
-                $this->apiError(404);
+                $this->apiError('404');
             }
             $txt_download_num = isset($power_config['txt_download_num']) ? intval($power_config['txt_download_num']) : 0;
             $txt_download_promotion_type = isset($power_config['txt_download_promotion_type']) ? intval($power_config['txt_download_promotion_type']) : 0;
@@ -372,7 +372,7 @@ class Book extends BaseController
             set_cache($token, $file, 60);
             $this->apiSuccess('success', ['url' => (string) Route::buildUrl('download', ['token' => $token])]);
         } else {
-            $this->apiError(407);
+            $this->apiError('407');
         }
     }
 
@@ -392,17 +392,17 @@ class Book extends BaseController
         }
         $book = Db::name('book')->where(['id' => $bookid])->find();
         if (empty($book)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if (intval($book['status']) != 1) {
-            $this->apiError(407);
+            $this->apiError('407');
         }
         $down_path = get_cache($token);
         if (empty($down_path)) {
             $this->apiError('empty');
         }
         if (!is_file($down_path)) {
-            $this->apiError(404);
+            $this->apiError('404');
         }
         if ($type == 'txt') {
             $filename = $book['title'] . '.txt';
