@@ -108,7 +108,7 @@ $(window).on('load', function () {
     }
 
     window.loadComments = function() {
-        $.postApi("{:furl('v1/comment/list', [], true, 'api')}", {
+        $.postApi("{:furl('v1/commentlist', [], true, 'api')}", {
             target_type: targetType,
             target_id: target_id,
             page: paginationConfig.currentPage,
@@ -196,7 +196,7 @@ $(window).on('load', function () {
     window.likeComment = function(id, obj, target_type) {
         const $btn = $(obj).prop('disabled', true);
         const originalCount = parseInt($btn.find('span').text()) || 0;        
-        $.postApi("{:furl('v1/comment/like', [], true, 'api')}", {
+        $.postApi("{:furl('v1/commentlike', [], true, 'api')}", {
             target_id: id,
             target_type: target_type,
         }, function(res) {
@@ -304,7 +304,7 @@ $(window).on('load', function () {
             return layer.msg('回复内容不能为空');
         }
         var loadIndex = layer.load(0);
-        $.postApi("{:furl('v1/comment/reply', [], true, 'api')}", params, function(res) {
+        $.postApi("{:furl('v1/commentreply', [], true, 'api')}", params, function(res) {
             layer.close(loadIndex);
             layer.msg(res.msg);
             if(res.code == 0) {
@@ -342,7 +342,7 @@ $(window).on('load', function () {
             const content = $('#commentContent').val().trim();
             if(!content) return layer.msg('评论内容不能为空');
             var loadIndex = layer.load(0);
-            $.postApi("{:furl('v1/comment/create', [], true, 'api')}", {
+            $.postApi("{:furl('v1/commentcreate', [], true, 'api')}", {
                 target_type: targetType,
                 target_id: target_id,
                 content: content,
