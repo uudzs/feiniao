@@ -408,6 +408,9 @@ $(window).on('load', function () {
         $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
             if(result.code == 0) {
                 const info = result.data.data[0];
+                chapter_info = info;
+                $('.read-speed').find('i').css('width', info.speed + '%');
+                $('.read-speed').find('font').text('阅读进度：' + info.speed + '%');
                 if(info && info.hide_content) $('.content').html(info.content);
                 if(info.front_url) $('.btn-pagination a').eq(0).attr('href', info.front_url);
                 if(info.after_url) $('.btn-pagination a').eq(1).attr('href', info.after_url);
