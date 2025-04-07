@@ -66,15 +66,20 @@ class Chapter extends BaseController
         }
         $book['cover'] = get_file($book['cover']);
         $chapter['book'] = $book;
+        $chapter['hide_content'] = $hide_content;
         if (!$hide_content) {
-            $content = Content::get($book['id'], $chapter['id']);
-            if ($content && mb_strlen($content) > 0) {
-                list($wordnum, $content) = countWordsAndContent($content, true);
-                $chapter['wordnum'] = $wordnum;
-                $chapter['content'] = htmlspecialchars_decode($content);
-                $replace = array("", "<br>", "<br>");
-                $search = array(" ", "\n", '\n');
-                $chapter['content'] = str_replace($search, $replace, $chapter['content']);
+            if (!get_system_config('content', 'chapter_pages_content_open')) {
+                $content = Content::get($book['id'], $chapter['id']);
+                if ($content && mb_strlen($content) > 0) {
+                    list($wordnum, $content) = countWordsAndContent($content, true);
+                    $chapter['wordnum'] = $wordnum;
+                    $chapter['content'] = htmlspecialchars_decode($content);
+                    $replace = array("", "<br>", "<br>");
+                    $search = array(" ", "\n", '\n');
+                    $chapter['content'] = str_replace($search, $replace, $chapter['content']);
+                } else {
+                    $chapter['content'] = '';
+                }
             } else {
                 $chapter['content'] = '';
             }

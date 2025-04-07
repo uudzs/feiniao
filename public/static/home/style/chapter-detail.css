@@ -356,6 +356,26 @@ em, i {
     position: relative;
     height: 46px;
     margin-bottom: 20px;
+    display: flex;          /* 新增flex布局 */
+    justify-content: center; /* 新增水平居中 */
+    gap: 15px;   
+}
+.reader .reader-wrap .reader-main .reader-content .btn-pagination {
+    display: inline-flex;
+    gap: 10px;
+}
+.reader .reader-wrap .reader-main .reader-content .btn-pagination a {
+    color: #333;
+    font-size: 14px;
+    padding: 5px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+.reader .reader-wrap .reader-main .reader-content .btn-pagination a:hover {
+    background: #39F;
+    color: #fff;
+    border: 1px solid #39F;
 }
 .reader .reader-wrap .reader-main .reader-content .btn-w .btn-report {
     color: #999;

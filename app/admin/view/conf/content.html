@@ -27,6 +27,19 @@
 				<div class="layui-form-mid layui-word-aux">如果之前是保存数据库，改为txt类型后，系统会自动将数据库里的内容转成txt，并删除数据库对应的章节数据。</div>
 			</div>
 			<div class="layui-form-item">
+				<label class="layui-form-label">章节内容开启</label>
+				<div class="layui-input-block">
+					{empty name="$config.chapter_pages_content_open"}
+						<input type="radio" name="chapter_pages_content_open" value="1" title="开启">
+						<input type="radio" name="chapter_pages_content_open" value="0" title="关闭" checked>
+					{else/}
+						<input type="radio" name="chapter_pages_content_open" value="1" title="开启" {eq name="$config.chapter_pages_content_open" value="1"} checked{/eq}>
+						<input type="radio" name="chapter_pages_content_open" value="0" title="关闭" {eq name="$config.chapter_pages_content_open" value="0"} checked{/eq}>
+					{/empty}
+				</div>
+				<div class="layui-form-mid layui-word-aux">开启后章节内容会，不会动态填充内容，而是直接显示章节内容，搜索可识别到章节内容，更利于SEO。</div>
+			</div>
+			<div class="layui-form-item">
 				<label class="layui-form-label">是否开启数据压缩</label>
 				<div class="layui-input-block">
 					{empty name="$config.chapter_compress_open"}
@@ -111,7 +124,7 @@
 					{/empty}
 				</div>
 				<div class="layui-form-mid layui-word-aux">如开启此功能，请关闭其他评论，如畅言评论插件。</div>
-			</div>
+			</div>			
 		</div>
 	</div>
 

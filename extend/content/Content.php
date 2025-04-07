@@ -228,6 +228,10 @@ class Content
     public static function uncompress($data)
     {
         foreach (self::$compressors as $algo => $func) {
+            // 添加扩展检测
+            if (!function_exists($func['uncompress'])) {
+                continue;
+            }            
             $decompressed = @call_user_func($func['uncompress'], $data);
             if ($decompressed !== false) {
                 return $decompressed;

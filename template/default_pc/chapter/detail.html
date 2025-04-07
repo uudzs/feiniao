@@ -16,20 +16,20 @@
 </style>
 {php}$book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();{/php}
 {notempty name="book"}
-{php}
-if($book['genre']) {
-    $genrename = model('category')->where(['status' => 1, 'id' => $book['genre']])->value('name');
-    $genrelink = url('book_cates', ['id' => $book['genre']]);
-}
-if($book['subgenre']) {
-    $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
-    $subgenrelink = url('book_cates', ['id' => $book['genre']]);
-}
-$chapterlist = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
-$author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();            
-$chapter = model('chapter')->where(['id'=>$id, 'status' => 1, ['verify', 'in', '0,1']])->find();            
-$book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
-{/php}
+    {php}
+        if($book['genre']) {
+            $genrename = model('category')->where(['status' => 1, 'id' => $book['genre']])->value('name');
+            $genrelink = url('book_cates', ['id' => $book['genre']]);
+        }
+        if($book['subgenre']) {
+            $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
+            $subgenrelink = url('book_cates', ['id' => $book['genre']]);
+        }
+        $chapterlist = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
+        $author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();            
+        $chapter = model('chapter')->where(['id'=>$id, 'status' => 1, ['verify', 'in', '0,1']])->find();            
+        $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
+    {/php}
 {/notempty}
 <div class="reader" id="page_reader">
     <div class="reader-crumb">
@@ -78,6 +78,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
     </style>
     <div class="reader-wrap">
         <div class="reader-main">
+            {if !get_system_config('content', 'chapter_pages_content_open')}            
             <div class="reader-top">
                 <div class="bookimg"><a href="{:url('book_detail', ['id' => $book['id']])}"><img src="{:get_file($book.cover)}" alt="{$book.title}" onerror="this.src='{__STATIC__}/home/images/logo-ico.png'"><em></em></a></div>
                 <div class="name">{$book.title}</div>
@@ -91,6 +92,7 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
                     <div class="b">版权所有 · 侵权必究</div>
                 </div>
             </div>
+            {/if}
             <div class="reader-content" id="Jcontent">
                 <div class="reader-box">
                     <div class="title">
@@ -101,8 +103,16 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
                         <span>更新时间：<i>{:time_format($chapter.create_time)}</i></span>
                     </div>
                     <div class="reader-line"></div>
-                    <div class="content"></div>
+                    <div class="content">
+                        {if get_system_config('content', 'chapter_pages_content_open')}
+                        {$content|raw}
+                        {/if}
+                    </div>
                     <div class="btn-w">
+                        <div class="btn-pagination">
+                            <a href="javascript:void(0)">← 上一页</a>
+                            <a href="javascript:void(0)">下一页 →</a>
+                        </div>
                         <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                     </div>
                 </div>
@@ -184,11 +194,12 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
             </div>
             <div class="gpd-wrap gpd-listen-wrap" style="display:none">
                 <h3>听书阅读</h3>
-                <div class="tit">{eq name=":get_addons_is_enable('baiduspeech')" value="1"}{:hook('baiduspeechHook', ['terminal' => 'web', 'bookid' => $chapter['bookid'], 'chapterid' => $chapter['id']])}{/eq}</div>
+                <div class="tit">{eq name=":get_addons_is_enable('baiduspeech')" value="1"}{:hook('baiduspeechHook', ['terminal' => 'web', 'bookid' => $bookid, 'chapterid' => $chapter['id']])}{/eq}</div>
             </div>            
         </div>
     </div>
 </div>
+{eq name=":get_addons_is_enable('changyan')" value="1"}
 <style>
     #SOHUCS #SOHU_MAIN .module-cmt-footer .section-service-w .service-wrap-w a {
         display: none!important
@@ -228,19 +239,25 @@ $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' =
         clip-path: inset(0 round 20px);
     }
 </style>
+{/eq}
 {/block}
 <!-- 脚本 -->
 {block name="script"}
 <script>
+{eq name=":get_addons_is_enable('changyan')" value="1"}
+var SOHUCS = false;
+{/eq}
 $(window).on('load', function () {
+    {eq name=":get_addons_is_enable('changyan')" value="1"}
     $(".btn-fw").text('评论一下');
+    {/eq}
     var chapter_id = '{$id}';
+    var bookid = '{$bookid}';
     window.chapter_info = {};
     var info = {};
     var config = layui.data('feiniao').readconfig;
     var fontsizes = [16, 18, 20, 22, 24, 26, 28, 30];
-    var isupperpage = false;
-    var SOHUCS = false;
+    var isupperpage = false;    
     if(!config) {
         config = {
                 "theme": "theme1",
@@ -290,7 +307,7 @@ $(window).on('load', function () {
     })
     //书架
     $('.bookshelf').on('click', function (obj, index) {
-        $.postApi("{:furl('v1/favorites', [], true, 'api')}", {bookid: chapter_info.bookid}, function(result) {
+        $.postApi("{:furl('v1/favorites', [], true, 'api')}", {bookid: bookid}, function(result) {
             layer.msg(result.msg);
             if(result.code == 0) {
                 if(parseInt(chapter_info.fav) > 0) {
@@ -305,7 +322,7 @@ $(window).on('load', function () {
     $('.like').on('click', function (obj, index) {
         if(!isupperpage && parseInt(chapter_info.like) > 0) return layer.msg('已点过赞了');
         if(isupperpage && parseInt(info.like) > 0) return layer.msg('已点过赞了');
-        $.postApi("{:furl('v1/like', [], true, 'api')}", {book_id: chapter_info.bookid, chapter_id: (isupperpage == true ? info.id : chapter_info.id)}, function(result) {
+        $.postApi("{:furl('v1/like', [], true, 'api')}", {book_id: bookid, chapter_id: (isupperpage == true ? info.id : chapter_info.id)}, function(result) {
             layer.msg(result.msg);
             if(result.code == 0) {
                 $('.like').find('i').attr('class','bi bi-heart-fill');
@@ -364,6 +381,7 @@ $(window).on('load', function () {
         $('#adom_reader_font_size').text(fontsizes[config.fontsize]);
     })
     //初始化
+    {if !get_system_config('content', 'chapter_pages_content_open')}
     $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
         if(result.code == 0) {
             chapter_info = result.data.data[0];
@@ -386,8 +404,21 @@ $(window).on('load', function () {
             layer.msg(result.msg);
         }
     });
+    {else}
+        $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
+            if(result.code == 0) {
+                const info = result.data.data[0];
+                if(info && info.hide_content) $('.content').html(info.content);
+                if(info.front_url) $('.btn-pagination a').eq(0).attr('href', info.front_url);
+                if(info.after_url) $('.btn-pagination a').eq(1).attr('href', info.after_url);
+            }
+        });
+    {/if}
+    {eq name=":get_addons_is_enable('changyan')" value="1"}
     if($('#SOHUCS').length > 0) SOHUCS = true;
+    {/eq}
     //滚动
+    {if !get_system_config('content', 'chapter_pages_content_open')}
     var isLoading = false;
     $(window).scroll(function() {
         if($(window).scrollTop() > 69) {
@@ -419,7 +450,9 @@ $(window).on('load', function () {
         $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
             isLoading = false;
             if(result.code == 0) {
+                {eq name=":get_addons_is_enable('changyan')" value="1"}
                 get_sohucs(chapter_id);
+                {/eq}
                 info = result.data.data[0];
                 chapter_id = info.front_chapter;
                 $('#JcatalogListWrap ul li').removeClass('active');
@@ -459,7 +492,9 @@ $(window).on('load', function () {
             $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_info.after_chapter}, function(result) {
                 isLoading = false;
                 if(result.code == 0) {
+                    {eq name=":get_addons_is_enable('changyan')" value="1"}
                     get_sohucs(chapter_info.after_chapter);
+                    {/eq}
                     chapter_info = result.data.data[0];
                     $('.read-speed').find('i').css('width', chapter_info.speed + '%');
                     $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
@@ -497,16 +532,16 @@ $(window).on('load', function () {
     var format_chapter = function(chapter) {
         return '<p>' + chapter.split("<br>").join("</p><p>") + "</p>";
     };
-
+    {/if}
+    {eq name=":get_addons_is_enable('changyan')" value="1"}
     function get_sohucs(id) {
-        {eq name=":get_addons_is_enable('changyan')" value="1"}
         $.postApi("{:addons_url('changyan://index/sohucs')}", {id: id}, function(result) {
             if(result.code == 0) {
                 if(result.data.sid) $('#SOHUCS').attr('sid', result.data.sid);
             }
-        });
-        {/eq}
+        });       
     }
+    {/eq}
 });
 </script>
 {/block}
