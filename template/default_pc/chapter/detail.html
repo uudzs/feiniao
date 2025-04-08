@@ -110,8 +110,8 @@
                     </div>
                     <div class="btn-w">
                         <div class="btn-pagination">
-                            <a href="javascript:void(0)">← 上一页</a>
-                            <a href="javascript:void(0)">下一页 →</a>
+                            <a href="{$front_url}">← 上一章</a>
+                            <a href="{$after_url}">下一章 →</a>
                         </div>
                         <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                     </div>
@@ -412,8 +412,6 @@ $(window).on('load', function () {
                 $('.read-speed').find('i').css('width', info.speed + '%');
                 $('.read-speed').find('font').text('阅读进度：' + info.speed + '%');
                 if(info && info.hide_content) $('.content').html(info.content);
-                if(info.front_url) $('.btn-pagination a').eq(0).attr('href', info.front_url);
-                if(info.after_url) $('.btn-pagination a').eq(1).attr('href', info.after_url);
             }
         });
     {/if}

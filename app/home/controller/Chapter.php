@@ -51,7 +51,23 @@ class Chapter extends BaseController
             } else {
                 $content = '';
             }
+            //前一章
+            $front = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '<', $chapter['chaps']]])->order('chaps DESC')->find();
+            if (!empty($front)) {
+                $front_url =  (string) Route::buildUrl('chapter_detail', ['id' => $front['id'], 'bookid' => $front['bookid']]);
+            } else {
+                $front_url = 'javascript:;';
+            }
+            //后一章
+            $after = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
+            if (!empty($after)) {
+                $after_url = (string) Route::buildUrl('chapter_detail', ['id' => $after['id'], 'bookid' => $after['bookid']]);
+            } else {
+                $after_url = 'javascript:;';
+            }
             View::assign('content', $content);
+            View::assign('front_url', $front_url);
+            View::assign('after_url', $after_url);
         }
         View::assign('id', $id);
         View::assign('bookid', $chapter['bookid']);
