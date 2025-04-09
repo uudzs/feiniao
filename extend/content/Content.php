@@ -128,7 +128,14 @@ class Content
             return Db::name($chaptertable)->where(['sid' => $chapterId])->delete();
         } else {
             $path = self::getPath($chapterId);
-            return @unlink($path);
+            if (!file_exists($path)) {
+                $chaptertable = calc_hash_db($bookId);
+                Db::name('chapter')->where(['id' => $chapterId])->delete();
+                Db::name('chapter_draft')->where(['cid' => $chapterId])->delete(); //草稿箱
+                Db::name('chapter_verify')->where(['cid' => $chapterId])->delete(); //审核库
+                return Db::name($chaptertable)->where(['sid' => $chapterId])->delete();
+            }
+            return unlink($path);
         }
     }
 
@@ -231,7 +238,7 @@ class Content
             // 添加扩展检测
             if (!function_exists($func['uncompress'])) {
                 continue;
-            }            
+            }
             $decompressed = @call_user_func($func['uncompress'], $data);
             if ($decompressed !== false) {
                 return $decompressed;

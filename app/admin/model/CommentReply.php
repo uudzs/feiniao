@@ -33,24 +33,6 @@ class CommentReply extends Model
         return $this->belongsTo(Comment::class);
     }
 
-    // 关联子回复 
-    // public function childReplies()
-    // {
-    //     return $this->hasMany(self::class, 'parent_id')
-    //         ->order('create_time', 'asc')
-    //         ->with(['childReplies' => function ($query) {
-    //             // 递归加载子回复
-    //             $query->with(['user', 'parentReply.user']);
-    //         }, 'user']);
-    //}
-
-    // public function childReplies()
-    // {
-    //     return $this->hasMany(self::class, 'parent_id')
-    //         ->order('create_time', 'asc')
-    //         ->with(['childReplies', 'user', 'parentReply.user']);
-    // }
-
     public function childReplies()
     {
         return $this->hasMany(self::class, 'parent_id')

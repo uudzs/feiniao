@@ -110,8 +110,8 @@
                     </div>
                     <div class="btn-w">
                         <div class="btn-pagination">
-                            <a href="{$front_url}">← 上一章</a>
-                            <a href="{$after_url}">下一章 →</a>
+                            <a href="{$front_url|default=''}">← 上一章</a>
+                            <a href="{$after_url|default=''}">下一章 →</a>
                         </div>
                         <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                     </div>

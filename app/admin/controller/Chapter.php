@@ -313,7 +313,10 @@ class Chapter extends BaseController
         if (empty($chapter)) {
             return to_assign(1, '章节不存在');
         }
-        Content::delete($chapter['bookid'], $id);
-        return to_assign();
+        if (Content::delete($chapter['bookid'], $id)) {
+            return to_assign();
+        } else {
+            return to_assign(1, '删除失败');
+        }
     }
 }

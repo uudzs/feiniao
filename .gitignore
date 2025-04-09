@@ -7,4 +7,6 @@
 /public/.user.ini
 /public/storage/*
 /public/backup/*
+/public/static/home/feiniao/*
 /addons/*
+/template/*
