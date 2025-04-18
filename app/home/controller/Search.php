@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace app\home\controller;
 
 use app\home\BaseController;
-use think\facade\View;
+use app\common\model\Novel;
+use think\facade\Request;
 
 class Search extends BaseController
 {
     public function index()
     {
-        $param = get_params();
-        $keyword = isset($param['keyword']) ? $param['keyword'] : '';
-        View::assign('keyword', $keyword);
-        return view();
+        $keyword = Request::get('keyword', '');
+        $page = Request::get('page', 1);
+        $result = Novel::search($keyword, $page);
+        $result['hotNovels'] = Novel::getHotKeywordNovels(10);
+        return view('index', $result);
     }
 }

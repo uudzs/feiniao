@@ -61,6 +61,34 @@ try {
     if (isset($data['wechat_oauth_callback']) && $data['wechat_oauth_callback']['rule']) Route::rule($data['wechat_oauth_callback']['rule'], 'login/wechat_oauth_callback', 'GET|POST')->name('wechat_oauth_callback');
     if (isset($data['wechat_pay_callback']) && $data['wechat_pay_callback']['rule']) Route::rule($data['wechat_pay_callback']['rule'], 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
     if (isset($data['alipay_h5_pay_callback']) && $data['alipay_h5_pay_callback']['rule']) Route::rule($data['alipay_h5_pay_callback']['rule'], 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');
+    if (isset($data['comments']) && $data['comments']['rule']) Route::rule($data['comments']['rule'], 'user/comments', 'GET')->name('comments');
+    if (isset($data['novelfilter']) && $data['novelfilter']['rule']) Route::rule($data['novelfilter']['rule'], 'novel/index', 'GET')
+        ->pattern([
+            'channel' => '\d+',
+            'status'  => '[a-z0-9]+',
+            'cat'     => '\d+',
+            'word'    => '\d+',
+            'order'   => '[a-z]+',
+            'page'    => '\d+',
+            'cid'     => '\d+',
+            'mode'    => '\d+'
+        ])->name('novelfilter');
+    if (isset($data['novel']) && $data['novel']['rule']) Route::get($data['novel']['rule'], 'novel/index')->name('novel');
+    if (isset($data['girls']) && $data['girls']['rule']) Route::get($data['girls']['rule'], 'novel/girls')->name('girls');
+    if (isset($data['top_main']) && $data['top_main']['rule']) Route::rule($data['top_main']['rule'], 'rank/index', 'GET')
+        ->ext('html')
+        ->pattern(['channel' => 'male|female', 'cid' => '\w+',])
+        ->name('top_main');
+    if (isset($data['top_detail']) && $data['top_detail']['rule']) Route::rule($data['top_detail']['rule'], 'rank/detail', 'GET')
+        ->ext('html')
+        ->pattern([
+            'channel' => 'male|female',
+            'type'    => 'hits|new|comments|chapters|finish|words',
+            'cid'     => '\w+',
+            'page'    => '\d+'
+        ])
+        ->default(['page' => 1])
+        ->name('top_detail');
 } catch (Exception $e) {
 }
 Route::miss('\app\home\controller\Emptys::miss');

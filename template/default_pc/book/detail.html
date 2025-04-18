@@ -39,7 +39,7 @@
         }
         if($book['subgenre']) {
             $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
-            $subgenrelink = url('book_cates', ['id' => $book['genre']]);
+            $subgenrelink = url('book_cates', ['id' => $book['subgenre']]);
         }
         $author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();        
         $chapterlist = model('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();

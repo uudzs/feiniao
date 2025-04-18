@@ -209,6 +209,45 @@
             </td>
 		</tr>
         <tr>
+			<td class="layui-td-gray">女频</td>
+			<td>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">标题(title)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.girl_title"}
+                            <input type="text" value="" name="girl_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.girl_title}" name="girl_title" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">关键字(keywords)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.girl_keywords"}
+                            <input type="text" value="" name="girl_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.girl_keywords}" name="girl_keywords" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">描述(description)：</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.girl_description"}
+                            <input type="text" value="" name="girl_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.girl_description}" name="girl_description" placeholder="请设置相关SEO内容" class="layui-input">
+                        {/empty}
+                    </div>                    
+                </div>
+			</td>
+            <td class="layui-td-gray test">
+                <input type="hidden" name="type" value="girl">
+                <button type="button" lay-submit class="layui-btn layui-btn-xs layui-btn-normal" lay-filter="test">测试</button>
+            </td>
+		</tr>
+        <tr>
 			<td class="layui-td-gray">排行</td>
 			<td>
                 <div class="layui-form-item">

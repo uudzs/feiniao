@@ -689,57 +689,141 @@ class User extends BaseController
         if (empty($user)) {
             $this->apiError('404');
         }
-        //最多可以载加多少页
-        if (!isset($param['page']) || empty($param['page'])) $param['page'] = 1;
-        if (isset($param['page']) && intval($param['page']) > 10) {
-            $param['page'] = 10;
+
+        // 参数处理
+        $page = isset($param['page']) ? max(1, min(intval($param['page']), 10)) : 1;
+        $rows = isset($param['limit']) ? intval($param['limit']) : get_config('app.page_size');
+        $offset = ($page - 1) * $rows;
+
+        // 1. 获取有效阅读记录总数（按book_id去重）
+        $total = Db::name('readhistory')
+            ->where('user_id', $uid)
+            ->group('book_id')
+            ->count();
+
+        // 2. 获取分页后的最新阅读记录
+        $subQuery = Db::name('readhistory')
+            ->field('book_id, MAX(GREATEST(IFNULL(update_time,0), create_time)) as max_time')
+            ->where('user_id', $uid)
+            ->group('book_id')
+            ->buildSql();
+
+        $readHistoryList = Db::name('readhistory')
+            ->alias('rh') // 正确使用别名
+            ->field('rh.*')
+            ->join(
+                [$subQuery => 'latest'],
+                'rh.book_id = latest.book_id AND 
+            GREATEST(IFNULL(rh.update_time,0), rh.create_time) = latest.max_time'
+            )
+            ->order('latest.max_time DESC')
+            ->limit($offset, $rows)
+            ->select()
+            ->toArray();
+
+        if (empty($readHistoryList)) {
+            $this->apiSuccess('success', ['data' => [], 'total' => $total]);
         }
-        $rows = empty($param['limit']) ? get_config('app.page_size') : $param['limit'];
-        $limit_start = ($param['page'] - 1) * $rows;
-        $limit_end = $param['page'] * $rows;
-        $list = Db::name('readhistory')->distinct(true)->field('book_id')->where(['user_id' => $uid])->select();
+
+        // 3. 批量获取关联数据
+        $bookIds = array_column($readHistoryList, 'book_id');
+        $chapterIds = array_column($readHistoryList, 'chapter_id');
+
+        // 获取书籍信息
+        $books = Db::name('book')
+            ->field('id, id as bookid, author, title as booktitle, authorid, filename, cover, chapters')
+            ->whereIn('id', $bookIds)
+            ->select()
+            ->toArray();
+        $bookMap = array_column($books, null, 'id');
+
+        // 验证章节有效性（批量处理）
+        $existChapters = Db::name('chapter')
+            ->field('id')
+            ->whereIn('id', $chapterIds)
+            ->select()
+            ->toArray();
+        $existChapterIds = array_column($existChapters, 'id');
+
+        // 过滤无效章节记录
+        $validRecords = [];
+        foreach ($readHistoryList as $item) {
+            if (!in_array($item['chapter_id'], $existChapterIds)) {
+                Db::name('readhistory')->where('chapter_id', $item['chapter_id'])->delete();
+                continue;
+            }
+            $validRecords[] = $item;
+        }
+
+        // 4. 获取附加数据
+        // 阅读次数统计
+        $readCounts = Db::name('readhistory')
+            ->field('book_id, COUNT(DISTINCT chapter_id) as read_count') // 修改别名
+            ->where('user_id', $uid)
+            ->whereIn('book_id', $bookIds)
+            ->group('book_id')
+            ->select()
+            ->toArray();
+        $readCountMap = array_column($readCounts, 'read_count', 'book_id'); // 同步修改映射
+        // 收藏状态
+        $favBooks = Db::name('favorites')
+            ->field('pid')
+            ->where('user_id', $uid)
+            ->whereIn('pid', $bookIds)
+            ->select()
+            ->toArray();
+        $favBookIds = array_column($favBooks, 'pid');
+
+        // 5. 构建响应数据
         $modelname = \think\facade\App::initialize()->http->getName();
-        $result = $list->toArray();
-        foreach ($result as $k => $v) {
-            $book = Db::name('book')->field('author,title as booktitle,authorid,filename,cover,chapters')->where(['id' => $v['book_id']])->find();
-            if (empty($book)) {
-                unset($result[$k]);
-                continue;
+        $result = [];
+        foreach ($validRecords as $item) {
+            if (!isset($bookMap[$item['book_id']])) continue;
+
+            $book = $bookMap[$item['book_id']];
+            $merged = array_merge($book, $item);
+
+            // 计算总章节数
+            if ($merged['chapters'] <= 0) {
+                $merged['chapters'] = Db::name('chapter')
+                    ->where(['bookid' => $merged['id'], 'status' => 1, ['verify', 'in', '0,1']])
+                    ->count();
             }
-            $v = Db::name('readhistory')->field('user_id,book_id,read_date,chapter_id,title,create_time,update_time,GREATEST(IFNULL(update_time, 0), create_time) AS max_time')->where(['user_id' => $uid, 'book_id' => $v['book_id']])->order('max_time desc')->find();
-            $v = array_merge($book, $v);
-            $result[$k] = $v;
-            $result[$k]['authorurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
-            $result[$k]['bookurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['book_id']]));
-            $result[$k]['chapterurl'] = str_replace($modelname, 'home', (string) Route::buildUrl('chapter_detail', ['id' => $v['chapter_id'], 'bookid' => $v['book_id']]));
-            $chapter = Db::name('chapter')->field('id')->where(['id' => $v['chapter_id']])->find();
-            //如果章节不存在，则删除阅读记录
-            if (empty($chapter)) {
-                Db::name('readhistory')->where(['chapter_id' => $v['chapter_id']])->delete();
-                unset($result[$k]);
-                continue;
-            }
-            if (intval($v['chapters']) <= 0) {
-                $total = Db::name('chapter')->where(['bookid' => $v['book_id'], 'status' => 1, ['verify', 'in', '0,1']])->count();
-            } else {
-                $total = $v['chapters'];
-            }
-            $reads = Db::name('readhistory')->where(['user_id' => $uid, 'book_id' => $v['book_id']])->group('book_id')->count();
-            if (intval($total) <= 0 || intval($reads) <= 0) {
-                $result[$k]['speed'] = 0;
-            } else {
-                $result[$k]['speed'] = round(($reads / $total) * 100, 2);
-            }
-            $result[$k]['isfav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $v['book_id']])->count();
-            $result[$k]['create_time'] = date('Y-m-d H:i:s', $v['create_time']);
+
+            // 计算阅读进度
+            $reads = $readCountMap[$merged['bookid']] ?? 0;
+            $merged['speed'] = ($merged['chapters'] > 0)
+                ? round(($reads / $merged['chapters']) * 100, 2)
+                : 0;
+
+            // 生成URL
+            $merged['authorurl'] = str_replace(
+                $modelname,
+                'home',
+                (string)url('author_detail', ['id' => $merged['authorid']])
+            );
+            $merged['bookurl'] = str_replace(
+                $modelname,
+                'home',
+                (string)url('book_detail', ['id' => $merged['filename'] ?: $merged['id']])
+            );
+            $merged['chapterurl'] = str_replace(
+                $modelname,
+                'home',
+                (string)url('chapter_detail', ['id' => $merged['chapter_id'], 'bookid' => $merged['id']])
+            );
+
+            // 格式化时间戳
+            $merged['create_time'] = date('Y-m-d H:i:s', $merged['create_time']);
+            $merged['isfav'] = in_array($merged['id'], $favBookIds) ? 1 : 0;
+            $merged['cover'] = get_file($merged['cover']);
+            $result[] = $merged;
         }
-        // 先取出要排序的字段的值
-        $sort = array_column($result, 'create_time');
-        // 按照sort字段升序 其中SORT_ASC表示升序 SORT_DESC表示降序
-        array_multisort($sort, SORT_DESC, $result);
+
+        // 6. 返回结果
         $res = [
-            'data' => array_slice($result, $limit_start, $limit_end),
-            'total' => count($result),
+            'data' => $result,
+            'total' => $total
         ];
         $this->apiSuccess('success', $res);
     }
@@ -835,7 +919,7 @@ class User extends BaseController
         }
         $chapter_id = isset($param['chapter_id']) ? intval($param['chapter_id']) : 0;
         $book_id = isset($param['book_id']) ? intval($param['book_id']) : 0;
-        if (empty($chapter_id) || empty($chapter_id)) {
+        if (empty($book_id) || empty($chapter_id)) {
             $this->apiError('empty');
         }
         $conf = get_system_config('reward');

@@ -26,7 +26,7 @@ class Chapter extends BaseController
         if (empty($id)) {
             $this->error(404);
         }
-        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum')->where(array('id' => $id))->find();
+        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->find();
         if (empty($chapter)) {
             $this->error(404);
         }
@@ -37,6 +37,7 @@ class Chapter extends BaseController
                 $list[$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
             }
         }
+        $data = [];
         if (get_system_config('content', 'chapter_pages_content_open')) {
             $content = Content::get($chapter['bookid'], $chapter['id']);
             if ($content && mb_strlen($content) > 0) {
@@ -56,23 +57,26 @@ class Chapter extends BaseController
             if (!empty($front)) {
                 $front_url =  (string) Route::buildUrl('chapter_detail', ['id' => $front['id'], 'bookid' => $front['bookid']]);
             } else {
-                $front_url = 'javascript:;';
+                $front_url = '';
             }
             //后一章
             $after = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
             if (!empty($after)) {
                 $after_url = (string) Route::buildUrl('chapter_detail', ['id' => $after['id'], 'bookid' => $after['bookid']]);
             } else {
-                $after_url = 'javascript:;';
+                $after_url = '';
             }
-            View::assign('content', $content);
-            View::assign('front_url', $front_url);
-            View::assign('after_url', $after_url);
+            $data['content'] = $content;
+            $data['front_url'] = $front_url;
+            $data['after_url'] = $after_url;
         }
-        View::assign('id', $id);
-        View::assign('bookid', $chapter['bookid']);
-        View::assign('chapterlsit', $list);
-        if ($ismakecache) $this->makecache(View::fetch());
-        return view();
+        $data['chapter'] = $chapter;
+        $data['id'] = $id;
+        $data['bookid'] = $chapter['bookid'];
+        $data['chapterlist'] = $list;
+        $data['book'] = Db::name('book')->where('id', $data['bookid'])->find();
+        View::config(['view_path' => $this->view_path()]);
+        if ($ismakecache) $this->makecache(View::fetch('detail', $data));
+        return view('detail', $data);
     }
 }

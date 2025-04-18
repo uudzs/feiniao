@@ -129,180 +129,173 @@ class Common extends BaseController
     }
 
     /**
-     * 获取指定广告位广告内容
-     * Summary of recommend
-     * @return void
+     * 获取指定广告位广告内容（优化版）
+     * @return \think\response\Json
      */
     public function recommend()
     {
-        $param = get_params();
-        $pid = trim($param['pid']); //广告位ID 说明：可以同时取多个广告位内容，以英文逗号区分
-        $page = (isset($param['page']) && intval($param['page']) > 0) ? intval($param['page']) : 1; //页码
-        $pagesize = isset($param['pagesize']) ? intval($param['pagesize']) : 0; //条数
-        if (empty($pid)) {
-            $this->apiError('404');
+        try {
+            $param = get_params();
+            $pid = trim((string)$param['pid'] ?? '');
+            $page = max(1, intval($param['page'] ?? 1));
+            $pagesize = max(0, intval($param['pagesize'] ?? 0));
+
+            // 参数校验
+            if (empty($pid)) {
+                throw new \Exception('404');
+            }
+
+            // 获取广告位配置
+            $adverList = $this->getValidAdverList($pid);
+            if (empty($adverList)) {
+                throw new \Exception('404');
+            }
+
+            // 批量获取广告内容
+            $result = [];
+            foreach ($adverList as $adver) {
+                $paginator = $this->getPaginatedAdvData($adver, $page, $pagesize);
+                $result[$adver['id']] = $this->enrichAdvData($paginator, $adver);
+            }
+            if (strpos($pid, ',') !== false) {
+                return json(['code' => 0, 'data' => $result, 'msg' => lang('success')]);
+            } else {
+                return json(['code' => 0, 'data' => $result[$pid], 'msg' => lang('success')]);
+            }
+            // return $this->apiSuccess('success', $result);
+        } catch (\Exception $e) {
+            return $this->apiError($e->getMessage());
         }
-        $time = time();
-        $table = config('database.connections.mysql.prefix') . 'advsr';
-        $condition = '';
+    }
+
+    /**
+     * 获取有效广告位列表
+     */
+    private function getValidAdverList($pid)
+    {
+        $pids = is_array($pid) ? $pid : explode(',', $pid);
+        return Db::name('adver')
+            ->where('id', 'in', $pids)
+            ->where('status', 1)
+            ->cache(300) // 缓存5分钟
+            ->column('*', 'id');
+    }
+
+    /**
+     * 获取分页广告内容
+     */
+    private function getPaginatedAdvData($adver, $page, $pagesize)
+    {
+        $limit = $this->calculateLimit($pagesize, $adver['viewnum']);
+        $currentTime = time();
+        $query = Db::name('advsr')
+            ->where('adver_id', $adver['id'])
+            ->where('status', 1)
+            ->where('start_time', '<', $currentTime)
+            ->where(function ($query) use ($currentTime) {
+                $query->where('end_time', '<=', 0)
+                    ->whereOr('end_time', '>=', $currentTime); // 修正方法名
+            })
+            ->field('id,title,adver_id,type,link,books,images,introduction,color')
+            ->order('level DESC');
+        return $query->paginate(
+            max(1, $limit),  // 确保最小分页数
+            false,
+            ['page' => $page]
+        );
+    }
+
+    /**
+     * 增强广告数据
+     */
+    private function enrichAdvData($paginator, $adver)
+    {
+        $bookIds = array_filter(array_column($paginator->items(), 'books'));
+        $booksData = $this->getBooksData($bookIds);
+        return array_map(function ($item) use ($adver, $booksData, $paginator) {
+            $item['width'] = $adver['width'];
+            $item['height'] = $adver['height'];
+            $item['isendpage'] = $paginator->currentPage() >= $paginator->lastPage();
+            if ($item['books'] && isset($booksData[$item['books']])) {
+                $item = array_merge($item, $booksData[$item['books']]);
+            }
+            if ($item['books'] && !isset($booksData[$item['books']])) {
+                $modelName = \think\facade\App::initialize()->http->getName();
+                $item = array_merge(
+                    $item,
+                    [
+                        'author' => '',
+                        'authorid' => 0,
+                        'headimg' => get_file(''),
+                        'genre' => '',
+                        'finish' => '',
+                        'chapters' => 0,
+                        'hits' => 0,
+                        'url' => str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $item['books']])),
+                        'cover' => get_file('')
+                    ]
+                );
+            }
+            $item['images'] = get_file($item['images']);
+            return $item;
+        }, $paginator->items());
+    }
+
+    /**
+     * 批量获取书籍数据
+     */
+    private function getBooksData($bookIds)
+    {
+        if (empty($bookIds)) return [];
+
+        // 批量查询书籍信息
+        $books = Db::name('book')
+            ->whereIn('id', $bookIds)
+            ->field('id,authorid,author,genre,subgenre,words,chapters,isfinish,hits,cover,filename')
+            ->cache(600)
+            ->select()
+            ->column(null, 'id');
+
+        // 批量查询分类信息
+        $genreIds = array_unique(array_column($books, 'genre'));
+        $genres = Db::name('category')
+            ->whereIn('id', $genreIds)
+            ->cache(600)
+            ->column('name', 'id');
+
+        // 批量查询作者头像
+        $authorIds = array_unique(array_column($books, 'authorid'));
+        $authors = Db::name('author')
+            ->whereIn('id', $authorIds)
+            ->cache(600)
+            ->column('headimg', 'id');
+
+        // 组合数据
         $result = [];
         $modelName = \think\facade\App::initialize()->http->getName();
-        if (strpos($pid, ',') !== false) {
-            $adver = Db::name('adver')->where('id', 'in', $pid)->select()->toArray();
-            $pids = explode(',', $pid);
-            $adver = array_column($adver, null, 'id');
-            foreach ($pids as $key => $value) {
-                $list = [];
-                if (isset($adver[$value]) && intval($adver[$value]['status']) == 1) {
-                    $limit = $pagesize > 0 ? $pagesize : (intval($adver[$value]['viewnum']) > 0 ? intval($adver[$value]['viewnum']) : 0);
-                    if ($limit <= 0) $limit = get_config('app.page_size');
-                    //取总数
-                    $count = Db::query("SELECT count(id) as cnt FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) LIMIT 1", ['status' => 1, 'adver_id' => $value, 'stime' => $time, 'etime' => $time]);
-                    $total = intval($count[0]['cnt']);
-                    if ($total > 0) {
-                        $isendpage = false;
-                        $maxpage = ceil($total / $limit); //最大页数                        
-                        if ($page >= $maxpage) {
-                            $isendpage = true;
-                        }
-                        $condition = ($limit * ($page - 1)) . ',' . $limit;
-                        $list = Db::query("SELECT `id`,`title`,`adver_id`,`type`,`link`,`start_time`,`end_time`,`color`,`books`,`images`,`introduction`,`create_time` FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) ORDER BY `level` DESC LIMIT {$condition}", ['status' => 1, 'adver_id' => $value, 'stime' => $time, 'etime' => $time]);
-                        foreach ($list as $k => $v) {
-                            if (intval($v['books']) > 0) {
-                                $book = Db::name('book')->where(['id' => $v['books']])->find();
-                                if (!empty($book)) {
-                                    $list[$k]['author'] = $book['author'];
-                                    $list[$k]['authorid'] = $book['authorid'];
-                                    $list[$k]['headimg'] = get_file(Db::name('author')->where(['id' => $book['authorid']])->value('headimg'));
-                                    if (!empty($book['genre'])) {
-                                        $list[$k]['genre'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
-                                    } else {
-                                        $list[$k]['genre'] = '';
-                                    }
-                                    $v['images'] = $v['images'] ? $v['images'] : $book['cover'];
-                                    $list[$k]['chapters'] = $book['chapters'];
-                                    $list[$k]['isfinish'] = $book['isfinish'];
-                                    $list[$k]['hits'] = $book['hits'];
-                                    $list[$k]['bigcate'] = $book['genre'];
-                                    $list[$k]['subgenre'] = $book['subgenre'];
-                                    $list[$k]['words'] = $book['words'];
-                                    $list[$k]['finish'] = intval($book['isfinish']) == 2 ? lang('finish') : lang('serialize');
-                                    $list[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
-                                } else {
-                                    $list[$k]['isfinish'] = 1;
-                                    $list[$k]['finish'] = '';
-                                    $list[$k]['author'] = '';
-                                    $list[$k]['headimg'] = '';
-                                    $list[$k]['genre'] = '';
-                                    $list[$k]['bigcate'] = 0;
-                                    $list[$k]['authorid'] = 0;
-                                    $list[$k]['subgenre'] = 0;
-                                    $list[$k]['words'] = 0;
-                                    $list[$k]['hits'] = 0;
-                                    $list[$k]['chapters'] = 0;
-                                    $list[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
-                                }
-                            } else {
-                                $list[$k]['finish'] = '';
-                                $list[$k]['author'] = '';
-                                $list[$k]['headimg'] = '';
-                                $list[$k]['genre'] = '';
-                                $list[$k]['url'] = '';
-                                $list[$k]['bigcate'] = 0;
-                                $list[$k]['authorid'] = 0;
-                                $list[$k]['subgenre'] = 0;
-                                $list[$k]['words'] = 0;
-                                $list[$k]['chapters'] = 0;
-                                $list[$k]['hits'] = 0;
-                                $list[$k]['isfinish'] = 1;
-                            }
-                            $list[$k]['images'] = get_file($v['images']);
-                            $list[$k]['width'] = $adver[$value]['width'];
-                            $list[$k]['height'] = $adver[$value]['height'];
-                            $list[$k]['isendpage'] = $isendpage;
-                        }
-                    }
-                }
-                $result[$value] = $list;
-            }
-        } else {
-            $adver = Db::name('adver')->where(['id' => intval($pid)])->find();
-            if (empty($adver)) {
-                $this->apiError('404');
-            }
-            if (intval($adver['status']) != 1) {
-                $this->apiError('407');
-            }
-            $limit = $pagesize > 0 ? $pagesize : (intval($adver['viewnum']) > 0 ? intval($adver['viewnum']) : 0);
-            if ($limit <= 0) $limit = get_config('app.page_size');
-            //取总数
-            $count = Db::query("SELECT count(id) as cnt FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime)", ['status' => 1, 'adver_id' => $pid, 'stime' => $time, 'etime' => $time]);
-            $total = intval($count[0]['cnt']);
-            if ($total > 0) {
-                $isendpage = false;
-                $maxpage = ceil($total / $limit); //最大页数
-                if ($page >= $maxpage) {
-                    $isendpage = true;
-                }
-                $condition = ($limit * ($page - 1)) . ',' . $limit;
-                $result = Db::query("SELECT `id`,`title`,`adver_id`,`type`,`link`,`start_time`,`end_time`,`color`,`books`,`images`,`introduction`,`create_time` FROM `{$table}` WHERE `status`=:status AND `adver_id`=:adver_id AND `start_time`<:stime AND (`end_time`<=0 OR `end_time`>=:etime) ORDER BY `level` DESC LIMIT {$condition}", ['status' => 1, 'adver_id' => $pid, 'stime' => $time, 'etime' => $time]);
-                foreach ($result as $k => $v) {
-                    if (intval($v['books']) > 0) {
-                        $book = Db::name('book')->where(['id' => $v['books']])->find();
-                        if (!empty($book)) {
-                            $result[$k]['author'] = $book['author'];
-                            $result[$k]['authorid'] = $book['authorid'];
-                            $result[$k]['headimg'] = get_file(Db::name('author')->where(['id' => $book['authorid']])->value('headimg'));
-                            if (!empty($book['genre'])) {
-                                $result[$k]['genre'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
-                            } else {
-                                $result[$k]['genre'] = '';
-                            }
-                            $result[$k]['finish'] = intval($book['isfinish']) == 2 ? lang('finish') : lang('serialize');
-                            $result[$k]['chapters'] = $book['chapters'];
-                            $result[$k]['isfinish'] = $book['isfinish'];
-                            $result[$k]['subgenre'] = $book['subgenre'];
-                            $result[$k]['words'] = $book['words'];
-                            $result[$k]['bigcate'] = $book['genre'];
-                            $result[$k]['hits'] = $book['hits'];
-                            $result[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]));
-                            $v['images'] = $v['images'] ? $v['images'] : $book['cover'];
-                        } else {
-                            $result[$k]['finish'] = '';
-                            $result[$k]['author'] = '';
-                            $result[$k]['headimg'] = '';
-                            $result[$k]['genre'] = '';
-                            $result[$k]['chapters'] = 0;
-                            $result[$k]['authorid'] = 0;
-                            $result[$k]['words'] = 0;
-                            $result[$k]['bigcate'] = 0;
-                            $result[$k]['subgenre'] = 0;
-                            $result[$k]['hits'] = 0;
-                            $result[$k]['isfinish'] = 1;
-                            $result[$k]['url'] = str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $v['books']]));
-                        }
-                    } else {
-                        $result[$k]['isfinish'] = 1;
-                        $result[$k]['finish'] = '';
-                        $result[$k]['author'] = '';
-                        $result[$k]['headimg'] = '';
-                        $result[$k]['genre'] = '';
-                        $result[$k]['url'] = '';
-                        $result[$k]['chapters'] = 0;
-                        $result[$k]['authorid'] = 0;
-                        $result[$k]['hits'] = 0;
-                        $result[$k]['words'] = 0;
-                        $result[$k]['bigcate'] = 0;
-                        $result[$k]['subgenre'] = 0;
-                    }
-                    $result[$k]['images'] = get_file($v['images']);
-                    $result[$k]['width'] = $adver['width'];
-                    $result[$k]['height'] = $adver['height'];
-                    $result[$k]['isendpage'] = $isendpage;
-                }
-            }
+        foreach ($books as $id => $book) {
+            $result[$id] = [
+                'author' => trim($book['author']),
+                'authorid' => $book['authorid'],
+                'headimg' => get_file($authors[$book['authorid']] ?? ''),
+                'genre' => $genres[$book['genre']] ?? '',
+                'finish' => $book['isfinish'] == 2 ? lang('finish') : lang('serialize'),
+                'chapters' => $book['chapters'],
+                'hits' => $book['hits'],
+                'url' => str_replace($modelName, 'home', (string) Route::buildUrl('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']])),
+                'cover' => get_file($book['cover'])
+            ];
         }
-        $this->apiSuccess('success', $result);
+        return $result;
+    }
+    /**
+     * 计算实际限制条数
+     */
+    private function calculateLimit($pagesize, $viewnum)
+    {
+        if ($pagesize > 0) return $pagesize;
+        if ($viewnum > 0) return $viewnum;
+        return get_config('app.page_size', 15);
     }
 
     /**
@@ -1179,7 +1172,7 @@ class Common extends BaseController
                     $this->apiError('fail');
                 }
             } else {
-                $this->apiError('fail');
+                $this->apiError('407');
             }
         }
         $this->apiError('407');

@@ -11,7 +11,7 @@ use think\exception\ValidateException;
 use app\admin\validate\CommentValidator;
 use app\admin\validate\CommentReplyValidator;
 use app\admin\validate\CommentLikeValidator;
-use app\admin\model\{Comment as CommentModel, CommentLike, CommentReply};
+use app\admin\model\{Comment as CommentModel, CommentLike, CommentReply, Book};
 
 class Comment extends BaseController
 {
@@ -83,17 +83,27 @@ class Comment extends BaseController
         } catch (ValidateException $e) {
             return to_assign(1, $e->getError());
         }
-        $is_verify = intval(get_system_config('content', 'comment_verify_open'));
-        $comment = CommentModel::create([
-            'user_id' => $data['user_id'],
-            'target_type' => $data['target_type'],
-            'target_id' => $data['target_id'],
-            'content' => $data['content'],
-            'like_count' => 0,
-            'status' => $is_verify ? 0 : 1,
-            'create_time' => date('Y-m-d H:i:s')
-        ]);
-        $this->apiSuccess($is_verify ? 'examineing' : 'success');
+        Db::startTrans();
+        try {
+            $isVerifyEnabled = get_system_config('content', 'comment_verify_open') ?? 0;
+            $comment = CommentModel::create([
+                'user_id' => JWT_UID,
+                'target_type' => $data['target_type'],
+                'target_id' => $data['target_id'],
+                'content' => $data['content'],
+                'status' => $isVerifyEnabled ? 0 : 1,
+                'like_count' => 0
+            ]);
+            if ($data['target_type'] == 1 && !$isVerifyEnabled) Book::where('id', $data['target_id'])->inc('comments')->update();
+            // 提交事务
+            Db::commit();
+            $message = $isVerifyEnabled ? 'examineing' : 'success';
+            return json(['code' => 0, 'msg' => lang($message)]);
+        } catch (\Exception $e) {
+            // 回滚事务
+            Db::rollback();
+            return json(['code' => 1, 'msg' => $e->getMessage()]);
+        }
     }
 
     public function reply()

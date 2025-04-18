@@ -117,11 +117,19 @@ class Book extends BaseController
                 // 验证失败 输出错误信息
                 return to_assign(1, $e->getError());
             }
-            $param['label'] = implode(',', [$param['identity'], $param['image'], $param['schools'], $param['element']]);
+            $param['label'] = implode(',', [trim($param['identity']), trim($param['image']), trim($param['schools']), trim($param['element'])]);
             unset($param['id'], $param['label_custom_ids'], $param['identity'], $param['image'], $param['schools'], $param['element']);
             $label = strtr($param['label'], ',', '');
             if (empty(trim($label))) {
                 $param['label'] = '';
+            }
+            if (!empty($param['label_custom'])) {
+                $pattern = '/[，。、　\s]+/u';
+                $param['label_custom'] = preg_replace($pattern, ',', $param['label_custom']);
+                $param['label_custom'] = preg_replace('/,+/', ',', $param['label_custom']);
+                $param['label_custom'] = trim($param['label_custom'], ',');
+            } else {
+                $param['label_custom'] = "";
             }
             if (isset($param["outlinetime"])) {
                 $param["outlinetime"] = $param["outlinetime"] ? strtotime($param["outlinetime"]) : 0;
@@ -166,7 +174,7 @@ class Book extends BaseController
                     View::assign('tags', []);
                 }
             } else {
-                View::assign('tags', []);
+                return to_assign(1, '请先安装标签插件');
             }
             $genres = Db::name('category')->where(['pid' => 0, 'status' => 1])->order('ordernum asc')->select()->toArray();
             View::assign('genres', $genres);
@@ -187,7 +195,7 @@ class Book extends BaseController
             } catch (ValidateException $e) {
                 // 验证失败 输出错误信息
                 return to_assign(1, $e->getError());
-            }
+            }            
             if (empty($param['id'])) {
                 return to_assign(1, '作品ID为空');
             }
@@ -232,11 +240,19 @@ class Book extends BaseController
             if (!isset($param['element'])) {
                 $param['element'] = '';
             }
-            $param['label'] = implode(',', [$param['identity'], $param['image'], $param['schools'], $param['element']]);
+            $param['label'] = implode(',', [trim($param['identity']), trim($param['image']), trim($param['schools']), trim($param['element'])]);
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);
             $label = strtr($param['label'], ',', '');
             if (empty(trim($label))) {
                 $param['label'] = '';
+            }
+            if (!empty($param['label_custom'])) {
+                $pattern = '/[，。、　\s]+/u';
+                $param['label_custom'] = preg_replace($pattern, ',', $param['label_custom']);
+                $param['label_custom'] = preg_replace('/,+/', ',', $param['label_custom']);
+                $param['label_custom'] = trim($param['label_custom'], ',');
+            } else {
+                $param['label_custom'] = "";
             }
             if ($param['title'] != $book['title']) {
                 $filename = Pinyin::permalink($param['title'], '');
@@ -262,7 +278,7 @@ class Book extends BaseController
                     $result = json_decode($result, true);
                     $tags = $result['data'];
                 } else {
-                    $tags = [];
+                    return to_assign(1, '请先安装标签插件');
                 }
                 if (!empty($detail['label'])) {
                     $labels = explode(',', $detail['label']);

@@ -57,7 +57,7 @@ class Conf extends BaseController
         } else {
             $id = isset($param['id']) ? $param['id'] : 0;
             if ($id > 0) {
-                $config = Db::name('Config')->where(['id' => $id])->find();                
+                $config = Db::name('Config')->where(['id' => $id])->find();
                 View::assign('config', $config);
             }
             View::assign('id', $id);
@@ -106,10 +106,10 @@ class Conf extends BaseController
     {
         $param = get_params();
         if (request()->isAjax()) {
+            unset($param['file'], $param['s']);
             $data['content'] = serialize($param);
             $data['update_time'] = time();
             $data['id'] = $param['id'];
-            unset($param['file']);
             $res = Db::name('Config')->strict(false)->field(true)->update($data);
             $conf = Db::name('Config')->where('id', $param['id'])->find();
             clear_cache('system_config' . $conf['name']);
@@ -127,7 +127,7 @@ class Conf extends BaseController
             $config = [];
             if ($conf['content']) {
                 $config = unserialize($conf['content']);
-            }
+            }            
             View::assign('id', $id);
             View::assign('config', $config);
             if (isTemplate($template)) {

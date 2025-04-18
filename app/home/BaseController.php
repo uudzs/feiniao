@@ -9,6 +9,9 @@ use think\facade\View;
 use think\exception\HttpResponseException;
 use think\facade\Request;
 use think\Response;
+use think\facade\Cookie;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 /**
  * 控制器基础类
@@ -60,15 +63,13 @@ abstract class BaseController
             'module' => \think\facade\App::initialize()->http->getName(),
             'controller' => app('request')->controller(),
             'action' => app('request')->action(),
-            'version' => get_config('upgrade.version')
+            'version' => get_config('upgrade.version'),
+            'girlgenre' => app('app\common\model\Category')::FEMALE_CATEGORY_ID
         ];
         $domain_bind = get_config('app.domain_bind');
         $params['domain_bind'] = $domain_bind ? array_flip($domain_bind) : [];
-        if (Request::isMobile() || isWeChat()) {
-            View::config(['view_path' => CMS_ROOT . 'template/' . get_config('theme.template_mobile') . '/']);
-        } else {
-            View::config(['view_path' => CMS_ROOT . 'template/' . get_config('theme.template_pc') . '/']);
-        }
+        View::config(['view_path' => $this->view_path()]);
+        $this->auth();
         if (isWeChat()) {
             // $config = get_config('wechat');
             // $app = Factory::officialAccount($config);
@@ -76,6 +77,37 @@ abstract class BaseController
             // View::assign('appconfig', $appconfig);
         }
         View::assign('params', $params);
+    }
+
+    protected function view_path()
+    {
+        if (Request::isMobile() || isWeChat()) {
+            return app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . get_config('theme.template_mobile') . DIRECTORY_SEPARATOR;
+        } else {
+            return app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . get_config('theme.template_pc') . DIRECTORY_SEPARATOR;
+        }
+    }
+
+    protected function auth()
+    {
+        try {
+            $secrect = get_system_config('token', 'secrect');
+            $token = Cookie::get(get_config('app.session_user'));
+            if ($token) {
+                $decoded = JWT::decode($token, new Key($secrect, 'HS256'));
+                if ($decoded) {
+                    $decoded_array = json_decode(json_encode($decoded), TRUE);
+                    if ($decoded_array && isset($decoded_array)) {
+                        $jwt_data = $decoded_array['data'];
+                        if (isset($jwt_data['userid']) && !defined('JWT_UID')) {
+                            define('JWT_UID', $jwt_data['userid']);
+                            View::assign('JWT_UID', JWT_UID);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+        }
     }
 
     public function usecache()

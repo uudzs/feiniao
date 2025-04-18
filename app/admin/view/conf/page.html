@@ -8,6 +8,7 @@
 </style>
 {php}$adver = model('adver')->where(['status' => 1])->order('id asc')->select()->toArray();{/php}
 {php}$navs = model('nav')->where(['status' => 1])->order('id asc')->select()->toArray();{/php}
+{php}$slide = model('slide')->where(['status' => 1])->order('id asc')->select()->toArray();{/php}
 <form class="layui-form p-4">
     <h3 class="pb-3">页面设置</h3>
     <table class="layui-table layui-table-form layui-form-pane">        
@@ -15,16 +16,40 @@
             <td class="layui-td-gray">PC端</td>
             <td>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">首页轮播</label>
+                    <div class="layui-input-inline layui-input-wrap">                        
+                        <select name="home_slide">
+                            <option value="">请选择</option>
+                            {volist name="$slide" id="v"}
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_slide|default='0'"}selected{/eq}>{$v.title}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('slide/index')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">女频轮播</label>
+                    <div class="layui-input-inline layui-input-wrap">                        
+                        <select name="girl_home_slide">
+                            <option value="">请选择</option>
+                            {volist name="$slide" id="v"}
+                            <option value="{$v.id}" {eq name="v.id" value="$config.girl_home_slide|default='0'"}selected{/eq}>{$v.title}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('slide/index')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">主导航</label>
                     <div class="layui-input-inline layui-input-wrap">                        
                         <select name="home_nav">
                             <option value="">请选择</option>
                             {volist name="$navs" id="v"}
-                            <option value="{$v.name}" {eq name="v.name" value="$config.home_nav"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.name}" {eq name="v.name" value="$config.home_nav|default=''"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择要显示的导航菜单</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('nav/index')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页公告</label>
@@ -32,11 +57,11 @@
                         <select name="home_notice">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.home_notice"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_notice|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页主编力荐-主推</label>
@@ -44,11 +69,47 @@
                         <select name="home_editor_main">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.home_editor_main"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_editor_main|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页精品推荐</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        <select name="home_premium">
+                            <option value="">请选择</option>
+                            {volist name="$adver" id="v"}
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_premium|default='0'"}selected{/eq}>{$v.title}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页完本精选</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        <select name="home_complete">
+                            <option value="">请选择</option>
+                            {volist name="$adver" id="v"}
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_complete|default='0'"}selected{/eq}>{$v.title}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页新书优选</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        <select name="home_newbook_selection">
+                            <option value="">请选择</option>
+                            {volist name="$adver" id="v"}
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_newbook_selection|default='0'"}selected{/eq}>{$v.title}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页主编力荐-多图</label>
@@ -56,11 +117,11 @@
                         <select name="home_editor_images">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.home_editor_images"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_editor_images|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页主编力荐-排行</label>
@@ -68,11 +129,11 @@
                         <select name="home_editor_top">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.home_editor_top"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_editor_top|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页中部通栏</label>
@@ -80,11 +141,11 @@
                         <select name="home_banner_1">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.home_banner_1"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_banner_1|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页底部通栏</label>
@@ -92,11 +153,23 @@
                         <select name="home_banner_buttom">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.home_banner_buttom"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_banner_buttom|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">首页右侧小通栏</label>
+                    <div class="layui-input-inline layui-input-wrap">
+                        <select name="home_small_railing">
+                            <option value="">请选择</option>
+                            {volist name="$adver" id="v"}
+                            <option value="{$v.id}" {eq name="v.id" value="$config.home_small_railing|default='0'"}selected{/eq}>{$v.title}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">头部搜索推荐</label>
@@ -104,11 +177,11 @@
                         <select name="header_keywords">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.header_keywords"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.header_keywords|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页链接1号名称</label>
@@ -116,11 +189,11 @@
                         <select name="home_1_link_name">
                             <option value="">请选择</option>
                             {volist name="$navs" id="v"}
-                            <option value="{$v.name}" {eq name="v.name" value="$config.home_1_link_name"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.name}" {eq name="v.name" value="$config.home_1_link_name|default=''"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择要显示的导航菜单</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('nav/index')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页链接2号名称</label>
@@ -128,11 +201,11 @@
                         <select name="home_2_link_name">
                             <option value="">请选择</option>
                             {volist name="$navs" id="v"}
-                            <option value="{$v.name}" {eq name="v.name" value="$config.home_2_link_name"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.name}" {eq name="v.name" value="$config.home_2_link_name|default=''"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择要显示的导航菜单</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('nav/index')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">作品详情页是否显示第一章内容</label>
@@ -161,11 +234,11 @@
                         <select name="mobile_slide">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_slide"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_slide|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页编辑推荐</label>
@@ -173,11 +246,11 @@
                         <select name="mobile_edit">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_edit"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_edit|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页横幅</label>
@@ -185,11 +258,11 @@
                         <select name="mobile_banner">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_banner"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_banner|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">首页新书上架</label>
@@ -197,11 +270,11 @@
                         <select name="mobile_newbook">
                             <option value="">请选择</option>
                             {volist name="$adver" id="v"}
-                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_newbook"}selected{/eq}>{$v.title}</option>
+                            <option value="{$v.id}" {eq name="v.id" value="$config.mobile_newbook|default='0'"}selected{/eq}>{$v.title}</option>
                             {/volist}
                         </select>
                     </div>
-                    <div class="layui-form-mid layui-text-em">请选择对应的广告位</div>
+                    <div class="layui-form-mid layui-text-em"><a href="{:url('adver/datalist')}" class="layui-btn layui-btn-primary layui-btn-xs">前往设置</a></div>
                 </div>
             </td>
         </tr>

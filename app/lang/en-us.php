@@ -35,7 +35,9 @@ return [
         'chapter' => 'chapter',
         'notpicture' => "It's not a picture",
         'nopermission' => 'No operation permission',
-        'alreadyused' => 'Already used'
+        'alreadyused' => 'Already used',
+        'malefrequency' => 'male frequency',
+        'femalefrequency' => 'female frequency',
     ],
     'login' => [
         'prohibitsmslogin' => 'Prohibit SMS login',

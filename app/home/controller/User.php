@@ -142,6 +142,16 @@ class User extends BaseController
     }
 
     /**
+     * 我的评论
+     * Summary of comments
+     * @return void
+     */
+    public function comments()
+    {
+        return view();
+    }
+
+    /**
      * 举报
      * Summary of report
      * @return void

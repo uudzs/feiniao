@@ -35,7 +35,9 @@ return [
         'chapter' => '章',
         'notpicture' => '不是图片',
         'nopermission' => '没有操作权限',
-        'alreadyused' => '已被使用'
+        'alreadyused' => '已被使用',
+        'malefrequency' => '男频',
+        'femalefrequency' => '女频',
     ],
     'login' => [
         'prohibitsmslogin' => '禁止短信方式登录',
