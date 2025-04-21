@@ -68,7 +68,7 @@ class Chapter extends BaseController
         $chapter['book'] = $book;
         $chapter['hide_content'] = $hide_content;
         if (!$hide_content) {
-            if (!get_system_config('content', 'chapter_pages_content_open')) {
+            if (app('request')->isMobile() || isWeChat() || !get_system_config('content', 'chapter_pages_content_open')) {
                 $content = Content::get($book['id'], $chapter['id']);
                 if ($content && mb_strlen($content) > 0) {
                     list($wordnum, $content) = countWordsAndContent($content, true);
