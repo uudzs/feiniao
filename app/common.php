@@ -677,7 +677,7 @@ if (!function_exists('countWordsAndContent')) {
         if (!empty($content)) {
             if ($filter) {
                 $str = htmlspecialchars_decode($content);
-                $str = str_replace(array("\r", "\n", '\r\n', '\r', '\n', '<br>', '<div>'), array("\n", "\n", "\n", "\n", "\n", "\n", "\n"), $str); //换行
+                $str = str_replace(array("\r", "\n", '\r\n', '\r', '\n', '<br>', '<div>', '<br />', '<br/>', '</p>', '<p>'), array("\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n"), $str); //换行
                 $search = array("　", "&nbsp;", "", "	");
                 $replace = array(" ", " ", " ", " ");
                 $str = str_replace($search, $replace, $str);
