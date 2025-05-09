@@ -16,12 +16,10 @@ class BookValidate extends Validate
 
     protected $rule = [
         'title' => 'require|checkOne',
-        'authorid' => 'require',
     ];
 
     protected $message = [
         'title.require' => '作品名称不能为空',
         'title.checkOne' => '作品名称已存在',
-        'authorid.require' => '作者不能为空',
     ];
 }

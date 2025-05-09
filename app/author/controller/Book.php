@@ -91,9 +91,13 @@ class Book extends BaseController
             $param['authorid'] = $uid;
             if (!isset($param['style'])) {
                 $param['style'] = '';
+            } else {
+                $param['style'] = trim($param['style']);
             }
             if (!isset($param['ending'])) {
                 $param['ending'] = '';
+            } else {
+                $param['ending'] = trim($param['ending']);
             }
             if (!isset($param['identity'])) {
                 $param['identity'] = '';
@@ -128,7 +132,7 @@ class Book extends BaseController
             $param['status'] = 1;
             $param['isfinish'] = 1;
             // 标签
-            $param['label'] = $param['style'] . ',' . $param['ending'] . ',' . ($param['identity'] ? $param['identity'] . ',' : '') . ($param['image'] ? $param['image'] . ',' : '') . ($param['schools'] ? $param['schools'] . ',' : '') . ($param['element'] ? $param['element'] : '');
+            $param['label'] = implode(',', array_filter([trim($param['identity'] ?? ''), trim($param['image'] ?? ''), trim($param['schools'] ?? ''), trim($param['element'] ?? '')]));
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);
             $param['create_time'] = time();
             $filename = Pinyin::permalink($param['title'], '');
@@ -159,13 +163,8 @@ class Book extends BaseController
             //     to_assign(1, '添加失败');
             // }
         } else {
-            if (get_addons_is_enable('booktag')) {
-                $result = hook("bookTagHook");
-                $tags = json_decode($result, true);
-                View::assign('tags', $tags['data']);
-            } else {
-                View::assign('tags', []);
-            }
+            $tags = get_system_config('booktag');
+            View::assign('tags', $tags);
             $genre = Db::name('category')->where(['pid' => 0, 'status' => 1])->order('ordernum asc')->select()->toArray();
             View::assign('genre', $genre);
             return view();
@@ -186,63 +185,63 @@ class Book extends BaseController
             to_assign(1, '作品不存在');
         }
         $chapters = Db::name('chapter')->field('id,title,create_time,wordnum,status')->where(array('bookid' => $book['id']))->order('create_time desc')->limit(10)->select()->toArray();
-        if (get_addons_is_enable('booktag')) {
-            $result = hook("bookTagHook");
-            $result = json_decode($result, true);
-            $tags = $result['data'];
-            View::assign('tags', $tags);
-        } else {
-            View::assign('tags', []);
-        }
+        $tags = get_system_config('booktag');
+        View::assign('tags', $tags);
         $genre = Db::name('category')->where(['pid' => 0, 'status' => 1])->order('ordernum asc')->select()->toArray();
         View::assign('genre', $genre);
         $subgenre = Db::name('category')->where(['pid' => $book['genre'], 'status' => 1])->order('ordernum asc')->select()->toArray();
         if (empty($book['editor']) && empty($book['editorid'])) {
             $book['editor'] = Db::name('admin')->where(['id' => $book['editorid']])->value('nickname');
         }
-        $labels = $book['label'] ? explode(',', $book['label']) : [];
+        $labels = $book['label'] ? explode(',', preg_replace('/\s+/', '', $book['label'])) : [];
         $book['label_custom'] = $book['label_custom'] ?: '';
         $book['labe_identity'] = $book['labe_image'] = $book['labe_schools'] = $book['labe_element'] = '';
-        if (empty($book['style'])) {
-            foreach ($tags['style']['data'] as $v) {
-                if (in_array($v, $labels)) {
-                    $book['style'] = $v;
-                    unset($tags['style']);
+        if (!empty($tags)) {
+            if (empty($book['style'])) {
+                foreach (explode(',', $tags['style']) as $v) {
+                    if (in_array(trim($v), $labels)) {
+                        $book['style'] = trim($v);
+                        unset($tags['style']);
+                        break;
+                    }
+                }
+            } else {
+                $book['style'] = trim($book['style']);
+            }
+            if (empty($book['ending'])) {
+                foreach (explode(',', $tags['ending']) as $v) {
+                    if (in_array(trim($v), $labels)) {
+                        $book['ending'] = trim($v);
+                        unset($tags['ending']);
+                        break;
+                    }
+                }
+            } else {
+                $book['ending'] = trim($book['ending']);
+            }
+            foreach (explode(',', $tags['identity']) as $v) {
+                if (in_array(trim($v), $labels)) {
+                    $book['labe_identity'] = trim($v);
                     break;
                 }
             }
-        }
-        if (empty($book['ending'])) {
-            foreach ($tags['ending']['data'] as $v) {
-                if (in_array($v, $labels)) {
-                    $book['ending'] = $v;
-                    unset($tags['ending']);
+            foreach (explode(',', $tags['image']) as $v) {
+                if (in_array(trim($v), $labels)) {
+                    $book['labe_image'] = trim($v);
                     break;
                 }
             }
-        }
-        foreach ($tags['identity']['data'] as $v) {
-            if (in_array($v, $labels)) {
-                $book['labe_identity'] = $v;
-                break;
+            foreach (explode(',', $tags['schools']) as $v) {
+                if (in_array(trim($v), $labels)) {
+                    $book['labe_schools'] = trim($v);
+                    break;
+                }
             }
-        }
-        foreach ($tags['image']['data'] as $v) {
-            if (in_array($v, $labels)) {
-                $book['labe_image'] = $v;
-                break;
-            }
-        }
-        foreach ($tags['schools']['data'] as $v) {
-            if (in_array($v, $labels)) {
-                $book['labe_schools'] = $v;
-                break;
-            }
-        }
-        foreach ($tags['element']['data'] as $v) {
-            if (in_array($v, $labels)) {
-                $book['labe_element'] = $v;
-                break;
+            foreach (explode(',', $tags['element']) as $v) {
+                if (in_array(trim($v), $labels)) {
+                    $book['labe_element'] = trim($v);
+                    break;
+                }
             }
         }
         View::assign('subgenre', $subgenre);

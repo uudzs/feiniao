@@ -2,14 +2,15 @@
 <!-- 主体 -->
 {block name="body"}
 <form class="layui-form p-4">
-	<h3 class="pb-3">新建作品</h3>
+	<h3 class="pb-3">编辑作品</h3>
 	<table class="layui-table layui-table-form">
 		<tr><td class="layui-td-gray-2">作品名称<font>*</font></td>
 			<td><input type="text" name="title"  lay-verify="required" lay-reqText="请完善作品名称" value="{$detail.title}" autocomplete="off" placeholder="请输入作品名称" class="layui-input"></td>
-			<td class="layui-td-gray-2">作品作者<font>*</font></td>
+			<td class="layui-td-gray-2">作品作者</td>
 			<td>
 				<input type="text" name="author" id="author" value="{$detail.author}" autocomplete="off" placeholder="请选择作者" class="layui-input" readonly>
-				<input type="hidden" id="authorid" name="authorid" autocomplete="off" value="{$detail.authorid}">				
+				<input type="hidden" id="authorid" name="authorid" autocomplete="off" value="{$detail.authorid}">
+				<button type="button" class="layui-btn layui-btn-xs authorsName">填写作者</button>
 			</td>			
 			<td class="layui-td-gray-2">编辑人员</td>
 			<td>
@@ -44,20 +45,20 @@
 		</tr>
 		{if $tags.style && $tags.ending}
 		<tr>
-			<td class="layui-td-gray-2">{$tags.style.name}</td>
+			<td class="layui-td-gray-2">作品风格</td>
 			<td>
 				<select name="style">
 					<option value="">请选择</option>
-					{volist name="$tags.style.data" id="v"}
+					{volist name=":explode(',', $tags['style'])" id="v"}
 						<option value="{$v}" {eq name="$detail.style" value="$v"}selected{/eq}>{$v}</option>
 					{/volist}
 				</select>
 			</td>
-			<td class="layui-td-gray-2">{$tags.ending.name}</td>
+			<td class="layui-td-gray-2">作品结局</td>
 			<td>
 				<select name="ending">
 					<option value="">请选择</option>
-					{volist name="$tags.ending.data" id="v"}
+					{volist name=":explode(',', $tags['ending'])" id="v"}
 						<option value="{$v}" {eq name="$detail.ending" value="$v"}selected{/eq}>{$v}</option>
 					{/volist}
 				</select>
@@ -78,33 +79,33 @@
 			<td class="layui-td-gray-2">作品标签</td>
 			<td colspan="5">
 				<div class="layui-card">
-					<div class="layui-card-header">{$tags.identity.name}</div>
+					<div class="layui-card-header">主角身份{$identity}</div>
 					<div class="layui-card-body">
-						{volist name="$tags.identity.data" id="v"}
+						{volist name=":explode(',', $tags['identity'])" id="v"}
 							<input type="radio" name="identity" value="{$v}" title="{$v}" lay-skin="primary" {eq name="$identity" value="$v"} checked{/eq}/>
 						{/volist}
 					</div>
 				</div>
 				<div class="layui-card">
-					<div class="layui-card-header">{$tags.image.name}</div>
+					<div class="layui-card-header">主角形象</div>
 					<div class="layui-card-body">
-						{volist name="$tags.image.data" id="v"}				
+						{volist name=":explode(',', $tags['image'])" id="v"}				
 							<input type="radio" name="image" value="{$v}" title="{$v}" lay-skin="primary" {eq name="$image" value="$v"} checked{/eq}/>
 						{/volist}
 					</div>
 				</div>
 				<div class="layui-card">
-					<div class="layui-card-header">{$tags.schools.name}</div>
+					<div class="layui-card-header">作品流派</div>
 					<div class="layui-card-body">
-						{volist name="$tags.schools.data" id="v"}				
+						{volist name=":explode(',', $tags['schools'])" id="v"}				
 							<input type="radio" name="schools" value="{$v}" title="{$v}" lay-skin="primary" {eq name="$schools" value="$v"} checked{/eq}/>
 						{/volist}
 					</div>
 				</div>
 				<div class="layui-card">
-					<div class="layui-card-header">{$tags.element.name}</div>
+					<div class="layui-card-header">故事元素</div>
 					<div class="layui-card-body">
-						{volist name="$tags.element.data" id="v"}				
+						{volist name=":explode(',', $tags['element'])" id="v"}				
 							<input type="radio" name="element" value="{$v}" title="{$v}" lay-skin="primary" {eq name="$element" value="$v"} checked{/eq}/>
 						{/volist}
 					</div>
@@ -178,6 +179,22 @@
 		$(document).on('click', '#author', function() {
 			tool.side("{:url('author/authorlist')}");
 			return false;
+		});
+
+		$('.authorsName').click(function() {
+			layer.open({
+				area: ['500px', '190px'],
+				type: 1,
+				title: '请输入作者笔名',
+				content: '<div style="padding:20px;"><input type="text" id="tempInput" class="layui-input" value="'+$('#author').val()+'"></div>',
+				btn: ['确定', '取消'],
+				yes: function(index) {
+					var inputVal = $('#tempInput').val();
+					if(!inputVal) return layer.msg('请输入作者笔名');
+					$('#author').val(inputVal);
+					layer.close(index);
+				}
+			});
 		});
 
 		//回调

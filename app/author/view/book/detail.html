@@ -164,51 +164,51 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 m-t-20">
-                                            <h5>{$tags.style.name}</h5>
+                                            <h5>作品风格</h5>
                                             <hr>
-                                            {volist name="$tags.style.data" id="v"}
-                                                <input name="style" type="radio" id="{$v}" value="{$v}" class="with-gap radio-col-blue"{eq name="$book.style" value="$v"} checked{/eq}>
-                                                <label for="{$v}">{$v}</label>
+                                            {volist name=":explode(',', $tags['style'])" id="v"}
+                                                <input name="style" type="radio" id="{:trim($v)}" value="{:trim($v)}" class="with-gap radio-col-blue"{eq name="$book.style" value=":trim($v)"} checked{/eq}>
+                                                <label for="{:trim($v)}">{:trim($v)}</label>
                                             {/volist}
                                         </div>
                                         <div class="col-md-12 m-t-20">
-                                            <h5>{$tags.ending.name}</h5>
+                                            <h5>作品结局</h5>
                                             <hr>
-                                            {volist name="$tags.ending.data" id="v"}
-                                                <input name="ending" type="radio" id="{$v}" value="{$v}" class="with-gap radio-col-blue"{eq name="$book.ending" value="$v"} checked{/eq}>
-                                                <label for="{$v}">{$v}</label>
+                                            {volist name=":explode(',', $tags['ending'])" id="v"}
+                                                <input name="ending" type="radio" id="{:trim($v)}" value="{:trim($v)}" class="with-gap radio-col-blue"{eq name="$book.ending" value=":trim($v)"} checked{/eq}>
+                                                <label for="{:trim($v)}">{:trim($v)}</label>
                                             {/volist}
                                         </div>
                                         <div class="col-md-12 m-t-20">
-                                            <h5>{$tags.identity.name}</h5>
+                                            <h5>主角身份</h5>
                                             <hr>
-                                            {volist name="$tags.identity.data" id="v"}
-                                                <input name="identity" type="radio" id="{$v}" value="{$v}" class="with-gap radio-col-blue"{eq name="$book.labe_identity" value="$v"} checked{/eq}>
-                                                <label for="{$v}">{$v}</label>
+                                            {volist name=":explode(',', $tags['identity'])" id="v"}
+                                                <input name="identity" type="radio" id="{:trim($v)}" value="{:trim($v)}" class="with-gap radio-col-blue"{eq name="$book.labe_identity" value=":trim($v)"} checked{/eq}>
+                                                <label for="{:trim($v)}">{:trim($v)}</label>
                                             {/volist}
                                         </div>
                                         <div class="col-md-12 m-t-20">
-                                            <h5>{$tags.image.name}</h5>
+                                            <h5>主角形象</h5>
                                             <hr>
-                                            {volist name="$tags.image.data" id="v"}
-                                                <input name="image" type="radio" id="{$v}" value="{$v}" class="with-gap radio-col-blue"{eq name="$book.labe_image" value="$v"} checked{/eq}>
-                                                <label for="{$v}">{$v}</label>
+                                            {volist name=":explode(',', $tags['image'])" id="v"}
+                                                <input name="image" type="radio" id="{:trim($v)}" value="{:trim($v)}" class="with-gap radio-col-blue"{eq name="$book.labe_image" value=":trim($v)"} checked{/eq}>
+                                                <label for="{:trim($v)}">{:trim($v)}</label>
                                             {/volist}
                                         </div>
                                         <div class="col-md-12 m-t-20">
-                                            <h5>{$tags.schools.name}</h5>
+                                            <h5>作品流派</h5>
                                             <hr>
-                                            {volist name="$tags.schools.data" id="v"}
-                                                <input name="schools" type="radio" id="{$v}" value="{$v}" class="with-gap radio-col-blue"{eq name="$book.labe_schools" value="$v"} checked{/eq}>
-                                                <label for="{$v}">{$v}</label>
+                                            {volist name=":explode(',', $tags['schools'])" id="v"}
+                                                <input name="schools" type="radio" id="{:trim($v)}" value="{:trim($v)}" class="with-gap radio-col-blue"{eq name="$book.labe_schools" value=":trim($v)"} checked{/eq}>
+                                                <label for="{:trim($v)}">{:trim($v)}</label>
                                             {/volist}
                                         </div>
                                         <div class="col-md-12 m-t-20">
-                                            <h5>{$tags.element.name}</h5>
+                                            <h5>故事元素</h5>
                                             <hr>
-                                            {volist name="$tags.element.data" id="v"}
-                                                <input name="element" type="radio" id="{$v}" value="{$v}" class="with-gap radio-col-blue"{eq name="$book.labe_element" value="$v"} checked{/eq}>
-                                                <label for="{$v}">{$v}</label>
+                                            {volist name=":explode(',', $tags['element'])" id="v"}
+                                                <input name="element" type="radio" id="{:trim($v)}" value="{:trim($v)}" class="with-gap radio-col-blue"{eq name="$book.labe_element" value=":trim($v)"} checked{/eq}>
+                                                <label for="{:trim($v)}">{:trim($v)}</label>
                                             {/volist}
                                         </div>
                                     </div>

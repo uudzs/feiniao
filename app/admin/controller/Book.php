@@ -117,11 +117,45 @@ class Book extends BaseController
                 // 验证失败 输出错误信息
                 return to_assign(1, $e->getError());
             }
-            $param['label'] = implode(',', [trim($param['identity']), trim($param['image']), trim($param['schools']), trim($param['element'])]);
+            $param['label'] = implode(',', array_filter([trim($param['identity'] ?? ''), trim($param['image'] ?? ''), trim($param['schools'] ?? ''), trim($param['element'] ?? '')]));
             unset($param['id'], $param['label_custom_ids'], $param['identity'], $param['image'], $param['schools'], $param['element']);
-            $label = strtr($param['label'], ',', '');
+            $label = str_replace(',', '', $param['label']);
+            $tags = get_system_config('booktag');
             if (empty(trim($label))) {
-                $param['label'] = '';
+                if (!empty($tags)) {
+                    if (!empty($tags['identity'])) {
+                        $array = explode(',', $tags['identity']);
+                        $param['identity'] = $array[array_rand($array)];
+                    }
+                    if (!empty($tags['image'])) {
+                        $array = explode(',', $tags['image']);
+                        $param['image'] = $array[array_rand($array)];
+                    }
+                    if (!empty($tags['schools'])) {
+                        $array = explode(',', $tags['schools']);
+                        $param['schools'] = $array[array_rand($array)];
+                    }
+                    if (!empty($tags['element'])) {
+                        $array = explode(',', $tags['element']);
+                        $param['element'] = $array[array_rand($array)];
+                    }
+                }
+                $param['label'] = implode(',', [trim($param['identity']), trim($param['image']), trim($param['schools']), trim($param['element'])]);
+                unset($param['identity'], $param['image'], $param['schools'], $param['element']);
+            }
+            if (!empty($tags)) {
+                if (!isset($param['style']) || empty($param['style'])) {
+                    if (!empty($tags['style'])) {
+                        $array = explode(',', $tags['style']);
+                        $param['style'] = $array[array_rand($array)];
+                    }
+                }
+                if (!isset($param['ending']) || empty($param['ending'])) {
+                    if (!empty($tags['ending'])) {
+                        $array = explode(',', $tags['ending']);
+                        $param['ending'] = $array[array_rand($array)];
+                    }
+                }
             }
             if (!empty($param['label_custom'])) {
                 $pattern = '/[，。、　\s]+/u';
@@ -139,6 +173,27 @@ class Book extends BaseController
             }
             if (empty($param['title'])) {
                 return to_assign(1, '作品名称不能为空');
+            }
+            if (empty($param['author'])) {
+                return to_assign(1, '作者不能为空');
+            }
+            $author = trim($param['author']);
+            $user = Db::name('author')->field('id,nickname')->where(['nickname' => $author])->find();
+            if (empty($user)) {
+                $time = (string) time();
+                $salt = substr(MD5($time), 0, 6);
+                $password = set_salt(20);
+                $data = array(
+                    'nickname' => $author,
+                    'salt' => $salt,
+                    'password' => sha1(MD5($password) . $salt),
+                    'ip' => request()->ip(),
+                    'create_time' => time(),
+                    'status' => 1,
+                );
+                $param['authorid'] = Db::name('author')->strict(false)->field(true)->insertGetId($data);
+            } else {
+                $param['authorid'] = $user['id'];
             }
             if (empty($param['authorid'])) {
                 return to_assign(1, '作者不能为空');
@@ -164,18 +219,8 @@ class Book extends BaseController
             return to_assign(0, '操作成功', ['aid' => $insertId]);
             //$this->model->addBook($param);
         } else {
-            if (get_addons_is_enable('booktag')) {
-                $result = hook("bookTagHook");
-                if ($result) {
-                    $result = json_decode($result, true);
-                    $tags = $result['data'];
-                    View::assign('tags', $tags);
-                } else {
-                    View::assign('tags', []);
-                }
-            } else {
-                return to_assign(1, '请先安装标签插件');
-            }
+            $tags = get_system_config('booktag');
+            View::assign('tags', $tags);
             $genres = Db::name('category')->where(['pid' => 0, 'status' => 1])->order('ordernum asc')->select()->toArray();
             View::assign('genres', $genres);
             return view();
@@ -195,7 +240,7 @@ class Book extends BaseController
             } catch (ValidateException $e) {
                 // 验证失败 输出错误信息
                 return to_assign(1, $e->getError());
-            }            
+            }
             if (empty($param['id'])) {
                 return to_assign(1, '作品ID为空');
             }
@@ -212,6 +257,27 @@ class Book extends BaseController
             unset($param['file']);
             if (empty($param['title'])) {
                 return to_assign(1, '作品名称不能为空');
+            }
+            if (empty($param['author'])) {
+                return to_assign(1, '作者不能为空');
+            }
+            $author = trim($param['author']);
+            $user = Db::name('author')->field('id,nickname')->where(['nickname' => $author])->find();
+            if (empty($user)) {
+                $time = (string) time();
+                $salt = substr(MD5($time), 0, 6);
+                $password = set_salt(20);
+                $data = array(
+                    'nickname' => $author,
+                    'salt' => $salt,
+                    'password' => sha1(MD5($password) . $salt),
+                    'ip' => request()->ip(),
+                    'create_time' => time(),
+                    'status' => 1,
+                );
+                $param['authorid'] = Db::name('author')->strict(false)->field(true)->insertGetId($data);
+            } else {
+                $param['authorid'] = $user['id'];
             }
             if (empty($param['authorid'])) {
                 return to_assign(1, '作者不能为空');
@@ -240,9 +306,9 @@ class Book extends BaseController
             if (!isset($param['element'])) {
                 $param['element'] = '';
             }
-            $param['label'] = implode(',', [trim($param['identity']), trim($param['image']), trim($param['schools']), trim($param['element'])]);
+            $param['label'] = implode(',', array_filter([trim($param['identity']), trim($param['image']), trim($param['schools']), trim($param['element'])]));
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);
-            $label = strtr($param['label'], ',', '');
+            $label = str_replace(',', '', $param['label']);
             if (empty(trim($label))) {
                 $param['label'] = '';
             }
@@ -273,35 +339,30 @@ class Book extends BaseController
             $detail = $this->model->getBookById($id);
             if (!empty($detail)) {
                 $identity = $image = $schools = $element = '';
-                if (get_addons_is_enable('booktag')) {
-                    $result = hook("bookTagHook");
-                    $result = json_decode($result, true);
-                    $tags = $result['data'];
-                } else {
-                    return to_assign(1, '请先安装标签插件');
-                }
-                if (!empty($detail['label'])) {
+                $tags = get_system_config('booktag');
+                $detail['label'] = preg_replace('/\s+/', '', $detail['label']);
+                if (!empty($detail['label']) && !empty($tags)) {
                     $labels = explode(',', $detail['label']);
-                    foreach ($tags['identity']['data'] as $v) {
-                        if (in_array($v, $labels)) {
+                    foreach (explode(',', $tags['identity']) as $v) {
+                        if (in_array(trim($v), $labels)) {
                             $identity = $v;
                             break;
                         }
                     }
-                    foreach ($tags['image']['data'] as $v) {
-                        if (in_array($v, $labels)) {
+                    foreach (explode(',', $tags['image']) as $v) {
+                        if (in_array(trim($v), $labels)) {
                             $image = $v;
                             break;
                         }
                     }
-                    foreach ($tags['schools']['data'] as $v) {
-                        if (in_array($v, $labels)) {
+                    foreach (explode(',', $tags['schools']) as $v) {
+                        if (in_array(trim($v), $labels)) {
                             $schools = $v;
                             break;
                         }
                     }
-                    foreach ($tags['element']['data'] as $v) {
-                        if (in_array($v, $labels)) {
+                    foreach (explode(',', $tags['element']) as $v) {
+                        if (in_array(trim($v), $labels)) {
                             $element = $v;
                             break;
                         }
