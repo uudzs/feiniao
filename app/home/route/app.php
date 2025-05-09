@@ -14,6 +14,8 @@ try {
     if (isset($data['book_cates']) && $data['book_cates']['rule']) Route::rule($data['book_cates']['rule'], 'book/cate', 'GET')->name('book_cates');
     if (isset($data['book_detail']) && $data['book_detail']['rule']) Route::rule($data['book_detail']['rule'], 'book/detail', 'GET')->name('book_detail');
     if (isset($data['rank']) && $data['rank']['rule']) Route::rule($data['rank']['rule'], 'book/rank', 'GET')->name('rank');
+    Route::rule('app', 'index/app', 'GET')->name('app');
+    //if (isset($data['app']) && $data['app']['rule']) Route::rule($data['app']['rule'], 'index/app', 'GET')->name('app');
     if (isset($data['shuku']) && $data['shuku']['rule']) Route::rule($data['shuku']['rule'], 'book/list', 'GET')->name('shuku');
     if (isset($data['quanben']) && $data['quanben']['rule']) Route::rule($data['quanben']['rule'], 'book/quanben', 'GET')->name('quanben');
     if (isset($data['author_detail']) && $data['author_detail']['rule']) Route::rule($data['author_detail']['rule'], 'author/detail', 'GET')->pattern(['id' => '\d+'])->name('author_detail');

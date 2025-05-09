@@ -1502,49 +1502,38 @@ if (!function_exists('furl')) {
      * @param bool|string $model 模块
      * @return UrlBuild
      */
-    function furl(string $url = '', array $vars = [], $suffix = true, $model = 'home')
+    function furl(string $url = '', array $vars = [], bool $suffix = true, string $model = 'home'): string
     {
+        $domainBind = config('app.domain_bind', []);
 
-        if ($model) {
-            $domain_bind = get_config('app.domain_bind');
-            if ($domain_bind) {
-                $domain_bind = $domain_bind ? array_flip($domain_bind) : [];
-                if (isset($domain_bind[$model]) && $domain_bind[$model]) {
-                    if ($domain_bind[$model] == '*') {
-                        $home_domain = get_config('app.home_domain');
-                        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($home_domain ? $home_domain : true);
-                    } else {
-                        return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain($domain_bind[$model] ? $domain_bind[$model] : true);
-                    }
-                } else {
-                    return (string) Route::buildUrl($url, $vars)->suffix($suffix)->domain(true);
-                }
-            } else {
-                $rurl = url($url, $vars, $suffix, true);
-                $parse = parse_url($rurl);
-                if ($parse) {
-                    if (isset($parse['path']) && $parse['path']) {
-                        if ($parse['path'] == '/' || strpos($parse['path'], $model) !== false) {
-                            return $rurl;
-                        } else {
-                            if ($model == 'api' || $model == 'author') {
-                                $fChar = substr($url, 0, 1);
-                                if ($fChar != '/') {
-                                    $url = '/' . $url;
-                                }
-                                $url = '/' . $model . $url;
-                                return url($url, $vars, $suffix, false);
-                            }
-                            return (isset($parse['scheme']) ? $parse['scheme'] : 'http') . '://' . (isset($parse['host']) ? $parse['host'] : '') . (isset($parse['port']) ? $parse['port'] : '') . '/' . $model . (isset($parse['path']) ? $parse['path'] : '') . (isset($parse['query']) ? ('?' . $parse['query']) : '');
-                        }
-                    }
-                }
-                return $rurl;
+        // 多域名绑定逻辑
+        if (!empty($domainBind)) {
+            $flippedBind = array_flip($domainBind);
+            $domain = $flippedBind[$model] ?? null;
+
+            // 处理通配符域名
+            if ($domain === '*') {
+                $domain = config('app.home_domain', request()->host());
             }
+
+            // 构造带域名的URL
+            return (string) Route::buildUrl($url, $vars)
+                ->suffix($suffix)
+                ->domain($domain ?? true); // true 表示自动当前域名
         }
-        return url($url, $vars, $suffix, false);
+
+        // 非域名绑定逻辑
+        $url = $model !== 'home'
+            ? '/' . ltrim($model . '/' . ltrim($url, '/'), '/')
+            : $url;
+
+        // 生成绝对URL（保持与原函数行为一致）
+        return (string) Route::buildUrl($url, $vars)
+            ->suffix($suffix)
+            ->domain(true); // 强制带域名
     }
 }
+
 if (!function_exists('get_addons_is_enable')) {
     function get_addons_is_enable($name)
     {

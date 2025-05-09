@@ -69,4 +69,10 @@ class Index extends BaseController
         if ($this->usecache()) $this->makecache(View::fetch('index'));
         return View('index');
     }
+
+    public function app()
+    {
+        if ($this->usecache()) $this->makecache(View::fetch('app'));
+        return View('app');
+    }
 }

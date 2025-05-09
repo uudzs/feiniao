@@ -255,6 +255,13 @@ return [
         if (false == file_put_contents(CMS_ROOT . "config/install.lock", '飞鸟阅读安装鉴定文件，请勿删除！！！！！此次安装时间为：' . date('Y-m-d H:i:s', time()))) {
             return to_assign(1, '创建安装鉴定文件失败，请检查目录权限');
         }
+        $env_file = CMS_ROOT . '.env';
+        $o_env_file = CMS_ROOT . '.env.debug';
+        if (!file_exists($env_file) && file_exists($o_env_file)) {
+            if (!rename($o_env_file, $env_file)) {
+                return to_assign(1, '创建env配置文件失败，请手动将根目录下的.env.debug改为.env');
+            }
+        }
         return to_assign();
     }
 }

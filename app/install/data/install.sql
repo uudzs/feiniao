@@ -2201,3 +2201,49 @@ CREATE TABLE `fn_app_version` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='APP版本管理::crud';
+
+DROP TABLE IF EXISTS `fn_comment`;
+CREATE TABLE `fn_comment` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `target_type` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1-小说 2-章节',
+  `target_id` int(11) NOT NULL COMMENT '目标ID',
+  `content` text NOT NULL,
+  `reply_count` int(11) DEFAULT '0' COMMENT '回复数',
+  `like_count` int(11) DEFAULT '0',
+  `status` tinyint(1) DEFAULT '0' COMMENT '0-待审核 1-已通过',
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `target_index` (`target_type`,`target_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Table structure for fn_comment_like
+-- ----------------------------
+DROP TABLE IF EXISTS `fn_comment_like`;
+CREATE TABLE `fn_comment_like` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `target_id` int(11) NOT NULL COMMENT '点赞目标ID',
+  `target_type` tinyint(1) NOT NULL COMMENT '1-主评论 2-回复',
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_like` (`user_id`,`target_id`,`target_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ----------------------------
+-- Table structure for fn_comment_reply
+-- ----------------------------
+DROP TABLE IF EXISTS `fn_comment_reply`;
+CREATE TABLE `fn_comment_reply` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `comment_id` int(11) NOT NULL COMMENT '主评论ID',
+  `parent_id` int(11) DEFAULT '0' COMMENT '父回复ID',
+  `content` text NOT NULL,
+  `like_count` int(11) DEFAULT '0',
+  `status` tinyint(4) DEFAULT '0' COMMENT '状态',
+  `create_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `comment_id` (`comment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
