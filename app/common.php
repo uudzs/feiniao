@@ -677,41 +677,50 @@ if (!function_exists('countWordsAndContent')) {
         if (!empty($content)) {
             if ($filter) {
                 $str = htmlspecialchars_decode($content);
-                $str = str_replace(array("\r", "\n", '\r\n', '\r', '\n', '<br>', '<div>', '<br />', '<br/>', '</p>', '<p>'), array("\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n", "\n"), $str); //换行
-                $search = array("　", "&nbsp;", "", "	");
-                $replace = array(" ", " ", " ", " ");
-                $str = str_replace($search, $replace, $str);
-                $str = strip_tags($str);
-                //去除多余空行
-                $str = explode("\n", $str);
-                $str = array_filter($str, function ($value) {
-                    return (trim($value) !== NULL && trim($value) !== "" && trim($value) !== " " && trim($value) !== " ");
+
+                // 第一步：处理换行相关标签
+                $str = preg_replace([
+                    '/<\/?p\b[^>]*>/i',    // 匹配<p>和</p>
+                    '/<\/?div\b[^>]*>/i',  // 匹配<div>和</div>
+                    '/<br\b[^>]*>/i'       // 匹配所有br变体
+                ], "\n", $str);
+
+                // 第二步：精准移除其他HTML标签
+                $str = preg_replace('/<\/?[a-zA-Z][^>]*>/', '', $str); // 匹配所有有效标签
+
+                // 第三步：处理特殊空白字符
+                $str = str_replace(["　", "&nbsp;", "\t"], [" ", " ", " "], $str);
+
+                // 第四步：清理空行并保留独立<符号
+                $lines = explode("\n", $str);
+                $lines = array_map('trim', $lines);
+                $lines = array_filter($lines, function ($line) {
+                    return $line !== '';
                 });
-                $str = implode("\n", $str);
-                $cnt = str_replace(array("\n", " "), array("", ""), $str);
-            }
-            if (!$filter) {
-                $str = str_replace(array("\r\n", "\r", "\n", '\r\n', '\r', '\n'), '<br>', $content);
+                $str = implode("\n", $lines);
+                $cnt = str_replace(["\n", " "], "", $str);
+                $display_str = $str;
+                // 生成无空白版本用于字数统计
+                $cnt = str_replace(["\n", " "], "", $str);
+            } else {
+                // 非过滤模式逻辑（保持原样）
+                $str = str_replace(["\r\n", "\r", "\n"], '<br>', $content);
                 $str = preg_replace('/\s+/', '&nbsp;', $str);
                 $str = htmlspecialchars_decode($str);
                 $str = preg_replace("/\"/is", "", $str);
                 $str = str_replace('&emsp;', "", $str);
-                //$cnt = strip_tags(str_replace(array('&nbsp;'), "", $str));
-                $cnt = str_replace(array('&nbsp;', '<br>'), "", $str);
+                $cnt = str_replace(['&nbsp;', '<br>'], "", $str);
+                $display_str = $str;
             }
-            //新算法
+
+            // 多字节字符统计
             $arr = mb_str_split($cnt);
             $cn = 0;
             $en = 0;
-            foreach ($arr as $k => $v) {
-                if (strlen($v) == 3) {
-                    $cn++;
-                } else {
-                    $en++;
-                }
+            foreach ($arr as $char) {
+                strlen($char) == 3 ? $cn++ : $en++;
             }
-            $len = $cn + $en;
-            return [$len, $str];
+            return [$cn + $en, $display_str];
         }
         return [0, ''];
     }
