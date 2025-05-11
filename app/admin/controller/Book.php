@@ -340,7 +340,7 @@ class Book extends BaseController
             if (!empty($detail)) {
                 $identity = $image = $schools = $element = '';
                 $tags = get_system_config('booktag');
-                $detail['label'] = preg_replace('/\s+/', '', $detail['label']);
+                $detail['label'] = preg_replace('/\s+/', '', $detail['label'] ?? '');
                 if (!empty($detail['label']) && !empty($tags)) {
                     $labels = explode(',', $detail['label']);
                     foreach (explode(',', $tags['identity']) as $v) {

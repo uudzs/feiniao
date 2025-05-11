@@ -193,7 +193,7 @@ class Book extends BaseController
         if (empty($book['editor']) && empty($book['editorid'])) {
             $book['editor'] = Db::name('admin')->where(['id' => $book['editorid']])->value('nickname');
         }
-        $labels = $book['label'] ? explode(',', preg_replace('/\s+/', '', $book['label'])) : [];
+        $labels = $book['label'] ? explode(',', preg_replace('/\s+/', '', $book['label'] ?? '')) : [];
         $book['label_custom'] = $book['label_custom'] ?: '';
         $book['labe_identity'] = $book['labe_image'] = $book['labe_schools'] = $book['labe_element'] = '';
         if (!empty($tags)) {
