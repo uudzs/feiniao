@@ -67,7 +67,12 @@ class Index
         }
         $storageDir = app()->getRootPath() . 'public/storage/';
         if (!is_dir($storageDir)) {
-            mkdir($storageDir, 0777, true);
+            if (is_writable(app()->getRootPath() . 'public/')) {
+                mkdir($storageDir, 0777, true);
+            } else {
+                echo app()->getRootPath() . 'public/' . "目录不可写！";
+                exit;
+            }
         }
         return view('', ['data' => $data]);
     }

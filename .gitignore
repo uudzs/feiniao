@@ -8,6 +8,7 @@
 /public/storage/*
 /public/backup/*
 /public/static/home/feiniao/*
+/public/static/quyuedu/*
 /addons/*
 /template/*
 /config/theme.php

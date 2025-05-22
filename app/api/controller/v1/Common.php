@@ -539,6 +539,9 @@ class Common extends BaseController
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->apiError('login.emailerr');
             }
+            if (!isset($param['code']) || empty($param['code'])) {
+                $this->apiError('login.captchaempty');
+            }
             $code = intval($param['code']);
             if (empty($code)) {
                 $this->apiError('login.captchaempty');
