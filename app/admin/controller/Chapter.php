@@ -9,6 +9,7 @@ use app\admin\model\Chapter as ChapterModel;
 use app\admin\validate\ChapterValidate;
 use think\exception\ValidateException;
 use think\facade\Db;
+use think\db\exception\DbException;
 use think\facade\View;
 use content\Content;
 
@@ -61,6 +62,52 @@ class Chapter extends BaseController
         } else {
             View::assign('bid', $param['bid']);
             return view();
+        }
+    }
+
+    public function caiji()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            if (!isset($param['bid']) || empty($param['bid'])) {
+                return to_assign(1, '作品ID不能为空');
+            }
+            try {
+                if (!get_addons_is_enable('caijipro')) {
+                    return json([
+                        'code' => 1,
+                        'msg'  => '采集插件未安装或未开启'
+                    ])->header(['Content-Type' => 'application/json']);
+                }
+                $bookid = intval($param['bid']);
+                $list = Db::name('chapter')
+                    ->field('id')
+                    ->where('bookid', $bookid)
+                    ->where('wordnum', '<=', 0)
+                    ->select()
+                    ->toArray();
+                if (empty($list)) {
+                    return json([
+                        'code' => 1,
+                        'msg'  => '未找到可更新章节记录'
+                    ])->header(['Content-Type' => 'application/json']);
+                }
+                $success = 0;
+                foreach ($list as $key => $value) {
+                    $content = hook('caijiproChapterHook', ['chapterid' => $value['id']]);
+                    if (!$content || empty($content)) continue;
+                    if (mb_strlen($content) > 0) $success++;
+                }
+                return json([
+                    'code' => 0,
+                    'msg'  => '采集成功：' . $success . ' 条记录！'
+                ])->header(['Content-Type' => 'application/json']);
+            } catch (\Exception | \RuntimeException | DbException $e) {
+                return json([
+                    'code' => 1,
+                    'msg'  => $e->getMessage()
+                ])->header(['Content-Type' => 'application/json']);
+            }
         }
     }
 

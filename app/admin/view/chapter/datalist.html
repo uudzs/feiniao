@@ -16,7 +16,8 @@
 
 <script type="text/html" id="toolbarDemo">
 	<div class="layui-btn-container">
-		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加章节">+ 添加章节</span>《{$title}》		
+		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加章节">+ 添加章节</span>	
+		<span class="layui-btn layui-btn-sm layui-bg-blue" lay-event="caiji" data-title="采集章节">采集章节</span>《{$title}》		
 	</div>
 </script>
 
@@ -142,11 +143,61 @@
 				]
 			]
 		});
-		
+		function retryAjax(options) {
+			const config = {
+				maxRetries: 10,
+				retryDelay: 1000,
+				...options
+			};
+			const deferred = $.Deferred();
+			function attemptRequest() {
+				$.ajax(config)
+					.done((res) => {
+						deferred.resolve(res); // 请求成功，解析结果
+					})
+					.fail((xhr, status, error) => {
+						config.maxRetries--; // 剩余重试次数减 1
+						if (config.maxRetries > 0 && (status === 'timeout' || status === 'error')) {
+							console.log(`请求失败（${status}），剩余重试次数：${config.maxRetries}，${config.retryDelay/1000}秒后重试...`);
+							setTimeout(() => attemptRequest(), config.retryDelay); // 递归重试
+						} else {
+							if (options.error) {
+								options.error(xhr, status, error); // 无重试次数时触发原始错误回调
+							}
+							deferred.reject({ xhr, status, error }); // 最终拒绝 Promise
+						}
+					});
+			}
+			attemptRequest(); // 启动首次请求
+			return deferred.promise(); // 返回 Promise 对象
+		}
 		//监听表头工具栏事件
 		table.on('toolbar(chapter)', function(obj){
 			if (obj.event === 'add') {
 				tool.side("{:url('chapter/add',['bid'=>$bid])}");
+				return false;
+			} else if(obj.event === 'caiji') {
+				var loadIndex = layer.load(2);	
+				retryAjax({
+					url: "{:url('chapter/caiji')}",
+					method: 'POST',
+					data: {bid: parseInt('{$bid}')},
+					timeout: 0,
+					success: function(res) {
+						layer.close(loadIndex);
+						layer.msg(res.msg);
+						if (res.code == 0) {
+							layui.pageTable.reload({
+								page: {
+									curr: 1
+								}
+							});
+						}
+					},
+					error: function(xhr, status, error) {
+						console.error('最终请求失败（无重试次数）:', status, error);
+					}
+				});		
 				return false;
 			}
 		});

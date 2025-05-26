@@ -41,6 +41,10 @@ class Content
                     'quick_check' => 'size',          // 快速检测方式 (size/mtime)
                 ],
             ];
+            $validAlgos = hash_algos();
+            if (!in_array($config['update_check']['hash_algo'], $validAlgos)) {
+                $config['update_check']['hash_algo'] = 'sha256'; // 默认回退
+            }
             $conf = get_system_config('content');
             if (isset($conf['chapter_save_type'])) {
                 $config['chapter_save_type'] = intval($conf['chapter_save_type']);
@@ -289,9 +293,12 @@ class Content
 
     private static function getFileHash($path)
     {
-        $content = self::uncompress(file_get_contents($path));
-        $hash = self::calcHash($content);
-        return $hash;
+        try {
+            $content = self::uncompress(file_get_contents($path));
+            return self::calcHash($content);
+        } catch (\RuntimeException $e) {
+            return '';
+        }
     }
 
     private static function calcHash($content)
