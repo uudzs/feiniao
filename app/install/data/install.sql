@@ -1008,7 +1008,8 @@ CREATE TABLE `fn_chapter` (
   KEY `idx_a_s_d_v_v` (`bookid`,`status`,`draft`,`verify`,`verifytime`) USING BTREE,
   KEY `idx_a_s_d_v_f` (`bookid`,`status`,`draft`,`verify`,`firstpasstime`) USING BTREE,
   KEY `title` (`bookid`,`title`(191)) USING BTREE,
-  KEY `ip` (`ip`)
+  KEY `ip` (`ip`),
+  KEY `wordnum` (`wordnum`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='章节::crud';
 
 -- ----------------------------
