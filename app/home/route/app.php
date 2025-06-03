@@ -64,6 +64,7 @@ try {
     if (isset($data['wechat_pay_callback']) && $data['wechat_pay_callback']['rule']) Route::rule($data['wechat_pay_callback']['rule'], 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
     if (isset($data['alipay_h5_pay_callback']) && $data['alipay_h5_pay_callback']['rule']) Route::rule($data['alipay_h5_pay_callback']['rule'], 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');
     if (isset($data['comments']) && $data['comments']['rule']) Route::rule($data['comments']['rule'], 'user/comments', 'GET')->name('comments');
+    Route::rule('follow', 'user/follow', 'GET')->name('follow');
     if (isset($data['novelfilter']) && $data['novelfilter']['rule']) Route::rule($data['novelfilter']['rule'], 'novel/index', 'GET')
         ->pattern([
             'channel' => '\d+',

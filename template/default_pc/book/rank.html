@@ -123,11 +123,12 @@
                 <div class="zh-modules-rank-box">
                     {php}
                         $followers = model('follow')
-                        ->field('from_id, ANY_VALUE(type) AS type, COUNT(*) as followers')
+                        ->field('from_id, MAX(type) AS type, COUNT(*) as followers')
                         ->group('from_id')
                         ->order('followers', 'DESC')
                         ->limit(10)
-                        ->select()->toArray();
+                        ->select()
+                        ->toArray();                       
                     {/php}
                     {notempty name="followers"}
                         {volist name="$followers" id="vo"}

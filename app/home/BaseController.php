@@ -81,6 +81,12 @@ abstract class BaseController
 
     protected function view_path()
     {
+        $h5domain = get_system_config('web', 'h5domain');
+        if (!empty($h5domain)) {
+            if (request()->host() === trim($h5domain)) {
+                return app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . get_config('theme.template_mobile') . DIRECTORY_SEPARATOR;
+            }
+        }
         if (Request::isMobile() || isWeChat()) {
             return app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . get_config('theme.template_mobile') . DIRECTORY_SEPARATOR;
         } else {

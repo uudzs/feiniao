@@ -152,6 +152,16 @@ class User extends BaseController
     }
 
     /**
+     * 我的关注
+     * Summary of follow
+     * @return void
+     */
+    public function follow()
+    {
+        return view();
+    }
+
+    /**
      * 举报
      * Summary of report
      * @return void
