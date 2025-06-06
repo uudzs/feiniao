@@ -8,6 +8,7 @@
 	<div class="layui-btn-group">
 		<span class="layui-btn layui-btn-sm layui-bg-blue" lay-event="addons" data-title="插件市场"><i class="layui-icon layui-icon-app"></i> 插件市场</span>
 		<span class="layui-btn layui-btn-sm" lay-event="loginunion" data-title="登录联盟"><i class="layui-icon layui-icon-user"></i> 登录联盟</span>
+		<span class="layui-btn layui-btn-sm layui-bg-orange" lay-event="income" data-title="查看收益"><i class="layui-icon layui-icon-rmb"></i> 查看收益</span>
   	</div>
 </script>
 <script type="text/html" id="plugin-status-switch">
@@ -92,6 +93,9 @@
 				return false;
 			} else if(obj.event === 'loginunion') {
 				tool.side("{:url('upgrade/union_login')}");
+				return false;
+			} else if(obj.event === 'income') {
+				tool.side("{:url('upgrade/union_income')}");
 				return false;
 			}
 		});

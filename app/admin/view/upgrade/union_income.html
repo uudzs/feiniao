@@ -1,0 +1,76 @@
+{extend name="common/base" /}
+{block name="style"}
+<style type="text/css">
+.layui-card-body .layui-timeline-title {
+    padding-bottom: 0;
+    font-size: 14px;
+}
+.layui-card-body {
+    overflow: hidden;
+}
+.layui-bg-gray {
+    padding: 20px;
+}
+.plugin_image {
+    width: 100%;
+    border-radius: 5px;
+}
+.plugin_intro {
+    padding-left: 20px;
+}
+.plugin_intro p {
+    height: 96px;
+    overflow: hidden;
+}
+.layui-card-header button {
+    float: right;
+    margin-top: 10px;
+}
+.layui-card-header h3 span {
+    float: right;
+    margin-top: 10px;
+}
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<div class="p-3">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <h3>我的收益</h3>            
+        </div>
+        <div class="layui-card-body">
+            {notempty name="list"}
+                {volist name="list" id="v"}
+                    <div class="layui-collapse">        
+                        <div class="layui-colla-item">
+                        <div class="layui-colla-title">{$v.title}</div>
+                        <div class="layui-colla-content layui-show">
+                            <ul>
+                                {volist name="$v.orderlist" id="vo"}
+                                    <li>价格：{$vo.price} 版本：{$vo.version} 状态：{$vo.status == 1 ? '<button type="button" class="layui-btn layui-btn-xs">成功</button>' : '<button type="button" class="layui-btn layui-btn-primary layui-btn-xs">失败</button>'}</li>
+                                {/volist}
+                            </ul>
+                        </div>
+                        </div>
+                    </div>
+                {/volist}
+            {else/}
+                <h5>无插收益！</h5>
+            {/notempty}
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    var moduleInit = ['tool'];
+    function feiniaoInit() {
+        var form = layui.form, tool = layui.tool;    
+    }
+</script>
+{/block}
+<!-- /脚本 -->

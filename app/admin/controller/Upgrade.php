@@ -345,6 +345,21 @@ class Upgrade extends BaseController
         }
     }
 
+    public function union_income()
+    {
+        $token = get_cache(self::$tokenKey);
+        if (empty($token)) {
+            return to_assign(1, '请先登录联盟账号');
+        }
+        $url = get_config('upgrade.official_api_url') . 'income';
+        $content = Http::doGet($url);
+        if (empty($content)) return to_assign(1, '获取信息失败');
+        $result = json_decode($content, true);
+        if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+        if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+        return view('union_income', ['list' => $result['data']]);
+    }
+
     public function union_plugin()
     {
         $url = get_config('upgrade.official_api_url') . 'plugin';

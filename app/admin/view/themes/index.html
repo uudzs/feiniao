@@ -33,6 +33,7 @@
                 <div class="layui-card-body">
                     <button class="layui-btn layui-btn-sm" type="button" lay-filter="market"><i class="layui-icon layui-icon-theme"></i> 主题市场</button>
                     <span class="layui-btn layui-btn-sm layui-bg-blue" lay-filter="loginunion" data-title="登录联盟"><i class="layui-icon layui-icon-user"></i> 登录联盟</span>
+                    <span class="layui-btn layui-btn-sm layui-bg-orange" lay-filter="income" data-title="查看收益"><i class="layui-icon layui-icon-rmb"></i> 查看收益</span>
                 </div>
             </div>                     
         </div>
@@ -140,6 +141,10 @@
         });
         $('[lay-filter="loginunion"]').on('click', function() {
             tool.side("{:url('upgrade/union_login')}");
+			return false;
+        });
+        $('[lay-filter="income"]').on('click', function() {
+            tool.side("{:url('upgrade/union_income')}");
 			return false;
         });
         $('[lay-filter="files"]').on('click', function() {
