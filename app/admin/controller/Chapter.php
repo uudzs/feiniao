@@ -12,6 +12,7 @@ use think\facade\Db;
 use think\db\exception\DbException;
 use think\facade\View;
 use content\Content;
+use app\admin\model\Volume;
 
 class Chapter extends BaseController
 {
@@ -136,6 +137,259 @@ class Chapter extends BaseController
             return table_assign(0, '', $list);
         } else {
             return view();
+        }
+    }
+
+    public function chaptersort()
+    {
+        $param = get_params();
+        if (request()->isAjax()) {
+            if (empty($param['bid'])) {
+                to_assign(1, '作品ID为空');
+            }
+            $book = Db::name('book')->where(array('id' => $param['bid']))->find();
+            if (empty($book)) {
+                to_assign(1, '作品不存在');
+            }
+            if (!isset($param['volumes']) || empty($param['volumes'])) {
+                to_assign(1, '核心数据为空');
+            }
+            $chapters = $param['chapters'];
+            $volumes = $param['volumes'];
+            $bookId = $book['id'];
+            if (empty($chapters)) {
+                to_assign(1, '请先添加章节');
+            }
+            try {
+                Db::startTrans();
+
+                // 1. 处理分卷数据
+                $this->processVolumes($bookId, $volumes);
+
+                // 2. 处理章节数据
+                $this->processChapters($bookId, $volumes, $chapters);
+
+                // 3. 同步删除前端不存在的章节
+                $this->syncDeletedChapters($bookId, $chapters);
+
+                Db::commit();
+                return json([
+                    'code' => 0,
+                    'msg' => '更新成功'
+                ])->header(['Content-Type' => 'application/json']);
+            } catch (\Exception $e) {
+                Db::rollback();
+                return json([
+                    'code' => 1,
+                    'msg' => $e->getMessage()
+                ])->header(['Content-Type' => 'application/json']);
+            }
+        } else {
+            $book = Db::name('book')->where(array('id' => $param['bid']))->find();
+            if (empty($book)) {
+                to_assign(1, '作品不存在');
+            }
+            $volumes = (new Volume())::field('id,title as name,sort')->where('bookid', $param['bid'])->order('sort asc')->select()->toArray();
+            $chapters = $this->model::field('id,title,chaps as sort,volumeid')->where('bookid', $param['bid'])->order('chaps asc')->select()->toArray();
+            if (empty($volumes) && $chapters) {
+                $volumes[] = ['id' => 1, 'name' => 'default', 'sort' => 1, 'chapters' => array_column($chapters, 'id')];
+            }
+            if (!empty($volumes) && $chapters) {
+                foreach ($volumes as $key => $value) {
+                    foreach ($chapters as $k => &$v) {
+                        if (intval($value['id']) == 1 && intval($v['volumeid']) <= 0) {
+                            $v['volumeid'] = 1;
+                        }
+                        if (intval($v['volumeid']) > 0 && $value['id'] == $v['volumeid']) {
+                            $volumes[$key]['chapters'][] = $v['id'];
+                        }
+                    }
+                    if (!isset($volumes[$key]['chapters'])) {
+                        $volumes[$key]['chapters'] = [];
+                    }
+                }
+            }
+            View::assign('bid', $param['bid']);
+            View::assign('volumes', $volumes);
+            View::assign('chapters', $chapters);
+            return view();
+        }
+    }
+
+    /**
+     * 处理分卷数据
+     */
+    protected function processVolumes($bookId, $volumes)
+    {
+        // 获取数据库中现有的分卷
+        $dbVolumes = Db::name('volume')
+            ->where('bookid', $bookId)
+            ->column('*', 'id');
+
+        $frontVolumeIds = array_column($volumes, 'id');
+
+        // 1. 处理需要删除的分卷
+        $toDelete = array_diff(array_keys($dbVolumes), $frontVolumeIds);
+        if (!empty($toDelete)) {
+            // 将这些分卷下的章节的volumeid置为0
+            Db::name('chapter')
+                ->where('bookid', $bookId)
+                ->whereIn('volumeid', $toDelete)
+                ->update(['volumeid' => 0]);
+
+            // 删除分卷
+            Db::name('volume')
+                ->where('bookid', $bookId)
+                ->whereIn('id', $toDelete)
+                ->delete();
+        }
+        // 2. 处理新增或更新的分卷
+        foreach ($volumes as $volume) {
+            $volumeData = [
+                'bookid' => $bookId,
+                'title' => $volume['name'],
+                'sort' => $volume['sort'],
+                'update_time' => time()
+            ];
+
+            if (isset($dbVolumes[$volume['id']])) {
+                // 更新现有分卷
+                Db::name('volume')
+                    ->where('id', $volume['id'])
+                    ->update($volumeData);
+            } else {
+                // 新增分卷
+                $volumeData['create_time'] = time();
+                Db::name('volume')->insert($volumeData);
+            }
+        }
+    }
+
+    /**
+     * 处理章节数据
+     */
+    protected function processChapters($bookId, $volumes, $chapters)
+    {
+        // 构建前端章节ID到排序号的映射
+        $chapterSortMap = [];
+        foreach ($chapters as $chapter) {
+            $chapterSortMap[$chapter['id']] = $chapter['sort'];
+        }
+
+        // 先重置所有章节为无分卷状态
+        Db::name('chapter')
+            ->where('bookid', $bookId)
+            ->update(['volumeid' => 0, 'update_time' => time()]);
+
+        // 处理每个分卷的章节
+        foreach ($volumes as $volume) {
+            if (!empty($volume['chapters'])) {
+                // 构建章节ID到排序号的映射
+                $sortValues = [];
+                foreach ($volume['chapters'] as $chapterId) {
+                    if (isset($chapterSortMap[$chapterId])) {
+                        $sortValues[$chapterId] = $chapterSortMap[$chapterId];
+                    }
+                }
+
+                // 批量更新这些章节的volumeid和chaps
+                Db::name('chapter')
+                    ->where('bookid', $bookId)
+                    ->whereIn('id', array_keys($sortValues))
+                    ->update([
+                        'volumeid' => $volume['id'],
+                        'chaps' => Db::raw("CASE id " .
+                            implode(' ', array_map(function ($id, $sort) {
+                                return "WHEN {$id} THEN {$sort} ";
+                            }, array_keys($sortValues), $sortValues)) .
+                            "END"),
+                        'update_time' => time()
+                    ]);
+            }
+        }
+
+        // 确保同一个作品下chaps不重复（按卷分组）
+        $this->ensureUniqueChapterSort($bookId);
+    }
+
+    /**
+     * 同步删除前端不存在的章节
+     */
+    protected function syncDeletedChapters($bookId, $frontChapters)
+    {
+        // 获取前端章节ID列表
+        $frontChapterIds = array_column($frontChapters, 'id');
+
+        // 获取数据库中该作品的所有章节ID
+        $dbChapterIds = Db::name('chapter')
+            ->where('bookid', $bookId)
+            ->column('id');
+
+        // 找出需要删除的章节ID（存在于数据库但不存在于前端数据）
+        $toDelete = array_diff($dbChapterIds, $frontChapterIds);
+
+        if (!empty($toDelete)) {
+            // 执行删除操作
+            Db::name('chapter')
+                ->where('bookid', $bookId)
+                ->whereIn('id', $toDelete)
+                ->delete();
+            if (!is_array($toDelete)) {
+                $toDelete = explode(',', $toDelete);
+            }
+            if (is_array($toDelete)) {
+                foreach ($toDelete as $key => $id) {
+                    Content::delete($bookId, $id);
+                }
+            }
+        }
+    }
+
+    /**
+     * 确保同一个作品下章节排序不重复（按卷分组）
+     */
+    protected function ensureUniqueChapterSort($bookId)
+    {
+        // 获取所有需要处理的章节
+        $chapters = Db::name('chapter')
+            ->where('bookid', $bookId)
+            ->field('id, volumeid, chaps')
+            ->order('volumeid, chaps, id')
+            ->select();
+
+        $volumeSortMap = [];
+        $toUpdate = [];
+
+        foreach ($chapters as $chapter) {
+            $volumeId = $chapter['volumeid'];
+            $currentSort = $chapter['chaps'];
+
+            if (!isset($volumeSortMap[$volumeId])) {
+                $volumeSortMap[$volumeId] = [];
+            }
+
+            // 如果排序号已经存在，需要重新分配
+            if (in_array($currentSort, $volumeSortMap[$volumeId])) {
+                $newSort = max($volumeSortMap[$volumeId]) + 1;
+                $toUpdate[$chapter['id']] = $newSort;
+                $volumeSortMap[$volumeId][] = $newSort;
+            } else {
+                $volumeSortMap[$volumeId][] = $currentSort;
+            }
+        }
+
+        // 批量更新有冲突的章节排序
+        if (!empty($toUpdate)) {
+            Db::name('chapter')
+                ->whereIn('id', array_keys($toUpdate))
+                ->update([
+                    'chaps' => Db::raw("CASE id " .
+                        implode(' ', array_map(function ($id, $sort) {
+                            return "WHEN {$id} THEN {$sort} ";
+                        }, array_keys($toUpdate), $toUpdate)) .
+                        "END"),
+                    'update_time' => time()
+                ]);
         }
     }
 

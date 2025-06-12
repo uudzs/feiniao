@@ -70,23 +70,12 @@ class Report extends Model
    */
   public function delReportById($id, $type = 0)
   {
-    if ($type == 0) {
-      //逻辑删除
-      try {
-        $param['delete_time'] = time();
-        self::where('id', $id)->update(['delete_time' => time()]);
-        add_log('delete', $id);
-      } catch (\Exception $e) {
-        return to_assign(1, '操作失败，原因：' . $e->getMessage());
-      }
-    } else {
-      //物理删除
-      try {
-        self::where('id', $id)->delete();
-        add_log('delete', $id);
-      } catch (\Exception $e) {
-        return to_assign(1, '操作失败，原因：' . $e->getMessage());
-      }
+    //物理删除
+    try {
+      self::where('id', $id)->delete();
+      add_log('delete', $id);
+    } catch (\Exception $e) {
+      return to_assign(1, '操作失败，原因：' . $e->getMessage());
     }
     return to_assign();
   }

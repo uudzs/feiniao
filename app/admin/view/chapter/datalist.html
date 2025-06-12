@@ -17,7 +17,9 @@
 <script type="text/html" id="toolbarDemo">
 	<div class="layui-btn-container">
 		<span class="layui-btn layui-btn-sm" lay-event="add" data-title="添加章节">+ 添加章节</span>	
-		<span class="layui-btn layui-btn-sm layui-bg-blue" lay-event="caiji" data-title="采集章节">采集章节</span>《{$title}》		
+		<span class="layui-btn layui-btn-sm layui-bg-blue" lay-event="caiji" data-title="采集章节">采集章节</span>
+		<span class="layui-btn layui-btn-sm layui-bg-purple" lay-event="chapterSort" data-title="章节管理">章节管理</span>
+		《{$title}》		
 	</div>
 </script>
 
@@ -198,6 +200,9 @@
 						console.error('最终请求失败（无重试次数）:', status, error);
 					}
 				});		
+				return false;
+			} else if(obj.event === 'chapterSort') {
+				tool.side("{:url('chapter/chaptersort',['bid'=>$bid])}");
 				return false;
 			}
 		});

@@ -1,0 +1,599 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        user-select: none;
+    }
+    
+    .container {
+        display: flex;
+        gap: 20px;
+    }
+    
+    .volume-container, .chapter-container {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 15px;
+        background-color: #f9f9f9;
+    }
+    
+    .volume-list, .chapter-list {
+        min-height: 300px;
+        margin-top: 10px;
+    }
+    
+    .volume-item, .chapter-item {
+        padding: 10px;
+        margin-bottom: 8px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+    }
+    
+    .volume-item {
+        background-color: #f0f7ff;
+        font-weight: bold;
+    }
+    
+    .volume-item.selected, .chapter-item.selected {
+        background-color: #d4e6ff;
+        border-color: #a8c6ff;
+    }
+    
+    .volume-item .checkbox, .chapter-item .checkbox {
+        margin-right: 8px;
+    }
+
+    .volume-item .actions {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        display: flex;
+        gap: 5px;
+    }
+    
+    .volume-item .actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: opacity 0.2s;
+        padding: 0;
+        font-size: 12px;
+    }
+    
+    .volume-item .actions button:hover {
+        opacity: 1;
+    }
+
+    .edit-btn {
+        color: #0d6efd;
+    }
+    
+    .volume-item.editing {
+        background-color: #fff8e1;
+    }
+    
+    .volume-item.editing .volume-name {
+        display: none;
+    }
+    
+    .volume-item .edit-input {
+        display: none;
+        width: calc(100% - 60px);
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+    }
+    
+    .volume-item.editing .edit-input {
+        display: inline-block;
+    }
+    
+    .chapter-item .actions {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+    
+    .chapter-item .actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #dc3545;
+        opacity: 0.5;
+        transition: opacity 0.2s;
+    }
+    
+    .chapter-item .actions button:hover {
+        opacity: 1;
+    }
+    
+    .toolbar {
+        margin: 20px 0;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .toolbar button {
+        padding: 5px 10px;
+        background-color: #0d6efd;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .toolbar button:hover {
+        background-color: #0b5ed7;
+    }
+    
+    .toolbar button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+    
+    .sortable-ghost {
+        opacity: 0.5;
+        background: #c8ebfb;
+    }
+    
+    .sortable-chosen {
+        background: #f0f0f0;
+    }
+    
+    .sortable-drag {
+        opacity: 0.8;
+        background: #f0f0f0;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<h2>分卷与章节管理系统</h2>    
+<div class="toolbar">
+    <button id="add-volume">添加分卷</button>
+    <button id="delete-selected" disabled>删除选中</button>
+    <button id="move-to-volume" disabled>移动到分卷</button>
+    <button id="save-btn">保存</button>
+</div>    
+<div class="container">
+    <div class="volume-container">
+        <h3>分卷列表</h3>
+        <div class="volume-list" id="volume-list">
+            <!-- 分卷将通过JavaScript动态生成 -->
+        </div>
+    </div>
+    
+    <div class="chapter-container">
+        <h3>章节列表</h3>
+        <div class="chapter-list" id="chapter-list">
+            <!-- 章节将通过JavaScript动态生成 -->
+        </div>
+    </div>
+</div>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+<script>
+	var moduleInit = ['tool'];
+	function feiniaoInit() {
+		var form = layui.form, tool = layui.tool;
+
+    
+		// 数据模型
+        let dataModel = {
+            volumes: {:json_encode($volumes, JSON_UNESCAPED_UNICODE)},
+            chapters: {:json_encode($chapters, JSON_UNESCAPED_UNICODE)}
+        };
+
+        // 初始化UI
+        function initUI() {
+            renderVolumes();
+            renderChapters();
+            initSortable();
+            updateToolbar();
+        }
+
+        // 渲染分卷列表
+        function renderVolumes() {
+            const $volumeList = $('#volume-list');
+            $volumeList.empty();
+            // 按sort排序
+            const sortedVolumes = [...dataModel.volumes].sort((a, b) => a.sort - b.sort);
+            
+            $.each(sortedVolumes, function(index, volume) {
+
+                const $volumeItem = $(
+                    `<div class="volume-item" data-id="${volume.id}">
+                        <input type="checkbox" class="checkbox" id="volume-${volume.id}">
+                        <span class="volume-name">${volume.name}</span>
+                        <input type="text" class="edit-input" value="${volume.name}">
+                        <div class="actions">
+                            <button class="edit-btn" title="编辑分卷名"><i class="layui-icon layui-icon-edit"></i></button>
+                        </div>
+                    </div>`
+                );
+                
+                $volumeList.append($volumeItem);
+                
+                // 添加点击事件
+                $volumeItem.on('click', function(e) {
+                    if ($(e.target).is('input') || $(e.target).closest('button').length) return;
+                    
+                    $('.volume-item').removeClass('selected');
+                    $volumeItem.addClass('selected');
+                    renderChapters();
+                    updateToolbar();
+                });
+                
+                // 添加复选框事件
+                $volumeItem.find('.checkbox').on('change', function() {
+                    updateToolbar();
+                });
+                
+                // 添加编辑按钮事件
+                $volumeItem.find('.edit-btn').on('click', function(e) {
+                    e.stopPropagation();
+                    startEditingVolume($volumeItem, volume);
+                });
+
+                // 添加编辑输入框事件
+                const $editInput = $volumeItem.find('.edit-input');
+                $editInput.on('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        saveVolumeName($volumeItem, volume);
+                    } else if (e.key === 'Escape') {
+                        cancelEditingVolume($volumeItem);
+                    }
+                });
+                
+                $editInput.on('blur', function() {
+                    saveVolumeName($volumeItem, volume);
+                });
+                
+            });
+            
+            // 默认选中第一个分卷
+            if (sortedVolumes.length > 0) {
+                $volumeList.find('.volume-item:first').addClass('selected');
+            }
+        }
+
+        // 开始编辑分卷名
+        function startEditingVolume($volumeItem, volume) {
+            $('.volume-item').removeClass('editing');
+            $volumeItem.addClass('editing');
+            $volumeItem.find('.edit-input').focus().select();
+        }
+        
+        // 保存分卷名
+        function saveVolumeName($volumeItem, volume) {
+            const newName = $volumeItem.find('.edit-input').val().trim();
+            if (newName && newName !== volume.name) {
+                volume.name = newName;
+                $volumeItem.find('.volume-name').text(newName);
+            }
+            $volumeItem.removeClass('editing');
+        }
+        
+        // 取消编辑
+        function cancelEditingVolume($volumeItem) {
+            const originalName = $volumeItem.find('.volume-name').text();
+            $volumeItem.find('.edit-input').val(originalName);
+            $volumeItem.removeClass('editing');
+        }        
+
+        // 渲染章节列表
+        function renderChapters() {
+            const $chapterList = $('#chapter-list');
+            $chapterList.empty();
+            
+            const selectedVolumeId = $('.volume-item.selected').data('id');
+            if (!selectedVolumeId) return;
+            
+            const volume = dataModel.volumes.find(v => v.id === selectedVolumeId);
+            if (!volume) return;
+            
+            // 获取当前分卷的章节并按排序显示
+            const chaptersToRender = dataModel.chapters
+                .filter(ch => volume.chapters.includes(ch.id))
+                .sort((a, b) => a.sort - b.sort);
+            
+            $.each(chaptersToRender, function(index, chapter) {
+                const $chapterItem = $(
+                    `<div class="chapter-item" data-id="${chapter.id}">
+                        <input type="checkbox" class="checkbox" id="chapter-${chapter.id}">
+                        <label for="chapter-${chapter.id}">${chapter.title}</label>
+                        <div class="item-sort" style="display:none">${chapter.sort}</div>
+                        <div class="actions">
+                            <button class="delete-btn" title="删除章节"><i class="layui-icon layui-icon-close"></i></button>
+                        </div>
+                    </div>`
+                );
+                
+                $chapterList.append($chapterItem);
+                
+                // 点击章节项切换选中状态
+                $chapterItem.on('click', function(e) {
+                    if ($(e.target).closest('.delete-btn').length || $(e.target).is('.delete-btn')) {
+                        return;
+                    }
+                    
+                    e.stopPropagation();
+                    const $checkbox = $(this).find('.checkbox');
+                    $checkbox.prop('checked', !$checkbox.prop('checked'));
+                    $(this).toggleClass('selected', $checkbox.prop('checked'));
+                    updateToolbar();
+                });
+                
+                // 保留复选框change事件
+                $chapterItem.find('.checkbox').on('change', function(e) {
+                    e.stopPropagation();
+                    $chapterItem.toggleClass('selected', this.checked);
+                    updateToolbar();
+                });
+                
+                // 删除按钮事件
+                $chapterItem.find('.delete-btn').on('click', function(e) {
+                    e.stopPropagation();
+                    deleteChapter(chapter.id);
+                });
+            });
+        }
+
+        // 初始化拖拽功能
+        function initSortable() {
+            // 分卷拖拽
+            new Sortable(document.getElementById('volume-list'), {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                onEnd: function(evt) {
+                    updateVolumeSort();
+                }
+            });
+            
+            // 章节拖拽
+            new Sortable(document.getElementById('chapter-list'), {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                chosenClass: 'sortable-chosen',
+                dragClass: 'sortable-drag',
+                onEnd: function(evt) {
+                    updateChapterSort();
+                    
+                    // 更新分卷中的章节顺序
+                    const selectedVolumeId = $('.volume-item.selected').data('id');
+                    if (selectedVolumeId) {
+                        const volume = dataModel.volumes.find(v => v.id === selectedVolumeId);
+                        if (volume) {
+                            volume.chapters = [];
+                            $('#chapter-list .chapter-item').each(function() {
+                                volume.chapters.push($(this).data('id'));
+                            });
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新分卷排序
+        function updateVolumeSort() {
+            $('#volume-list .volume-item').each(function(index) {
+                const volumeId = $(this).data('id');
+                const volume = dataModel.volumes.find(v => v.id === volumeId);
+                if (volume) {
+                    volume.sort = index + 1;
+                }
+            });
+        }
+
+        // 更新章节排序
+        function updateChapterSort() {
+            $('#chapter-list .chapter-item').each(function(index) {
+                const chapterId = $(this).data('id');
+                const chapter = dataModel.chapters.find(c => c.id === chapterId);
+                if (chapter) {
+                    chapter.sort = index + 1;
+                }
+            });
+        }
+
+        // 添加分卷
+        function addVolume() {
+            const name = prompt('请输入分卷名称:', '新分卷' + (dataModel.volumes.length + 1));
+            if (name) {
+                const newVolume = {
+                    id: dataModel.volumes.length + 1,
+                    name: name,
+                    sort: dataModel.volumes.length + 1,
+                    chapters: []
+                };                
+                dataModel.volumes.push(newVolume);
+                renderVolumes();
+            }
+        }
+
+        // 删除章节
+        function deleteChapter(id) {
+            if (confirm('确定要删除这个章节吗？')) {
+                // 从章节列表中删除
+                dataModel.chapters = dataModel.chapters.filter(ch => ch.id !== id);
+                
+                // 从所有分卷中删除
+                dataModel.volumes.forEach(volume => {
+                    volume.chapters = volume.chapters.filter(chId => chId !== id);
+                });
+                
+                renderChapters();
+            }
+        }
+
+        // 删除选中项
+        function deleteSelected() {
+            const selectedChapters = $('.chapter-item.selected').map(function() {
+                return $(this).data('id');
+            }).get();
+            
+            const selectedVolumes = $('.volume-item.selected').map(function() {
+                return $(this).data('id');
+            }).get();
+            
+            if (selectedChapters.length > 0) {
+                if (confirm(`确定要删除选中的 ${selectedChapters.length} 个章节吗？`)) {
+                    // 删除章节
+                    dataModel.chapters = dataModel.chapters.filter(ch => 
+                        !selectedChapters.includes(ch.id)
+                    );
+                    
+                    // 从分卷中移除这些章节
+                    dataModel.volumes.forEach(volume => {
+                        volume.chapters = volume.chapters.filter(chId => 
+                            !selectedChapters.includes(chId)
+                        );
+                    });
+                    
+                    renderChapters();
+                }
+            } else if (selectedVolumes.length > 0) {
+                if (confirm(`确定要删除选中的 ${selectedVolumes.length} 个分卷吗？分卷中的章节也将被删除。`)) {
+                    // 收集要删除的章节ID
+                    const chaptersToDelete = [];
+                    dataModel.volumes
+                        .filter(v => selectedVolumes.includes(v.id))
+                        .forEach(volume => {
+                            chaptersToDelete.push(...volume.chapters);
+                        });
+                    
+                    // 删除章节
+                    dataModel.chapters = dataModel.chapters.filter(ch => 
+                        !chaptersToDelete.includes(ch.id)
+                    );
+                    
+                    // 删除分卷
+                    dataModel.volumes = dataModel.volumes.filter(v => 
+                        !selectedVolumes.includes(v.id)
+                    );
+                    
+                    renderVolumes();
+                    renderChapters();
+                }
+            }
+        }
+
+        // 移动章节到分卷
+        function moveToVolume() {
+            const selectedChapters = $('.chapter-item.selected').map(function() {
+                return $(this).data('id');
+            }).get();
+            
+            if (selectedChapters.length === 0) return;
+            
+            const currentVolumeId = $('.volume-item.selected').data('id');
+            
+            // 获取可选分卷（排除当前选中的分卷）
+            const availableVolumes = dataModel.volumes.filter(v => v.id !== currentVolumeId);
+            
+            if (availableVolumes.length === 0) {
+                alert('没有其他分卷可供移动');
+                return;
+            }
+            
+            const volumeId = prompt(
+                `请选择目标分卷ID:\n${availableVolumes.map(v => `${v.id}: ${v.name}`).join('\n')}`,
+                availableVolumes[0].id
+            );
+            
+            if (volumeId) {
+                const targetVolume = dataModel.volumes.find(v => v.id === parseInt(volumeId));
+                if (targetVolume) {
+                    // 从原分卷中移除
+                    if (currentVolumeId) {
+                        const sourceVolume = dataModel.volumes.find(v => v.id === currentVolumeId);
+                        if (sourceVolume) {
+                            sourceVolume.chapters = sourceVolume.chapters.filter(
+                                chId => !selectedChapters.includes(chId)
+                            );
+                        }
+                    }
+                    
+                    // 添加到目标分卷
+                    selectedChapters.forEach(chId => {
+                        if (!targetVolume.chapters.includes(chId)) {
+                            targetVolume.chapters.push(chId);
+                        }
+                    });
+                    
+                    renderChapters();
+                }
+            }
+        }
+
+        // 更新工具栏状态
+        function updateToolbar() {
+            const hasSelectedChapters = $('.chapter-item.selected').length > 0;
+            const hasSelectedVolumes = $('.volume-item.selected').length > 0;
+            
+            $('#delete-selected').prop('disabled', !hasSelectedChapters && !hasSelectedVolumes);
+            $('#move-to-volume').prop('disabled', 
+                !hasSelectedChapters || 
+                dataModel.volumes.length < 2
+            );
+        }
+
+        // 保存数据
+        async function saveData() {
+            try {
+                $('#save-btn').prop('disabled', true);
+                    var loadIndex = layer.load(1);
+                    $.ajax({
+                        url: "{:url('chapter/chaptersort',['bid'=>$bid])}",
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(dataModel),
+                        success: function(res) {
+                            layer.close(loadIndex);
+                            if (res.code === 0) {
+                                layer.msg('保存成功');
+                                window.parent.location.reload();
+                                location.reload();
+                            } else {
+                                layer.msg(res.msg || '保存失败');
+                            }
+                        },
+                        error: function() {
+                            layer.close(loadIndex);
+                            layer.msg('请求失败，请重试');
+                        }
+                });
+            } catch (error) {
+                alert('保存失败: ' + error.message);
+            } finally {
+                $('#save-btn').prop('disabled', false);
+            }
+        }
+
+        // 绑定事件
+        $('#add-volume').on('click', addVolume);
+        $('#delete-selected').on('click', deleteSelected);
+        $('#move-to-volume').on('click', moveToVolume);
+        $('#save-btn').on('click', saveData);
+        
+        // 初始化UI
+        initUI();
+	}
+</script>
+{/block}
+<!-- /脚本 -->

@@ -418,7 +418,8 @@ INSERT INTO `fn_admin_rule` VALUES ('292', '288', 'themes/edit', '主题文件�
 INSERT INTO `fn_admin_rule` VALUES ('293', '1', 'route/index', '路由管理', '路由管理', '', '1', '0', '1', '', '', '1743497620', '0');
 INSERT INTO `fn_admin_rule` VALUES ('294', '293', 'route/edit', '路由编辑', '路由编辑', '', '2', '0', '1', '', '', '1743497650', '0');
 INSERT INTO `fn_admin_rule` VALUES ('295', '293', 'route/status', '路由状态', '路由状态', '', '2', '0', '1', '', '', '1743497684', '0');
-
+INSERT INTO `fn_admin_rule` VALUES ('296', '150', 'chapter/caiji', '章节采集', '章节采集', '', '2', '0', '1', '', '', '1747919964', '0');
+INSERT INTO `fn_admin_rule` VALUES ('297', '150', 'chapter/chaptersort', '章节管理', '章节管理', '', '2', '0', '1', '', '', '1749465503', '0');
 -- ----------------------------
 -- Table structure for fn_adver
 -- ----------------------------
