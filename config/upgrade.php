@@ -1,5 +1,5 @@
 <?php
 return [
     'official_api_url' => 'https://feiniao.paheng.net/api/',
-    'version'    => '4.09.06',
+    'version'    => '4.09.07',
 ];

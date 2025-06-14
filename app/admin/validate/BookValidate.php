@@ -10,7 +10,7 @@ class BookValidate extends Validate
     // 自定义验证规则
     protected function checkOne($value, $rule, $data = [])
     {
-        $count = Db::name('book')->where([['title', '=', $data['title']], ['author' => $data['author']], ['id', '<>', $data['id']]])->count();
+        $count = Db::name('book')->where([['title', '=', $data['title']], ['author', '=', $data['author']], ['id', '<>', $data['id']]])->count();
         return $count == 0 ? true : false;
     }
 
