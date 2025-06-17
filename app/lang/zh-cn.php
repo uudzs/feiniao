@@ -16,6 +16,7 @@ return [
     'other' => '其他',
     'repeat' => '重复操作',
     'examineing' => '审核中',
+    'author' => '作者',
     'common' => [
         'jumptitle' => '信息提示',
         'jumplink' => '点击前往',

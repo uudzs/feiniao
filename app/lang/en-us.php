@@ -16,6 +16,7 @@ return [
     'other' => 'other',
     'repeat' => 'Repeat operation',
     'examineing' => 'in review',
+    'author' => 'author',
     'common' => [
         'jumptitle' => 'Message',
         'jumplink' => 'Click to go',

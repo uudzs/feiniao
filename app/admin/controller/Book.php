@@ -12,6 +12,7 @@ use think\facade\Db;
 use think\facade\View;
 use Overtrue\Pinyin\Pinyin;
 use content\Content;
+use cover\Cover;
 
 class Book extends BaseController
 {
@@ -210,6 +211,21 @@ class Book extends BaseController
             $param['filename'] = $filename;
             $insertId = Db::name('book')->strict(false)->field(true)->insertGetId($param);
             if ($insertId !== false) {
+                if (empty($param['cover'])) {
+                    $coverPath = get_config('filesystem.disks.public.root') . '/cover/' . $param['authorid'] . '/' . $insertId . '.png';
+                    $coverUrl = get_config('filesystem.disks.public.url') . '/cover/' . $param['authorid'] . '/' . $insertId . '.png';
+                    if (file_exists($coverPath)) {
+                        $param['cover'] = $coverUrl;
+                    } else {
+                        $res = Cover::generate($param['title'], $param['author'], $coverPath);
+                        if ($res && file_exists($coverPath)) {
+                            $param['cover'] = $coverUrl;
+                        }
+                    }
+                }
+                if (isset($param['cover']) && $param['cover']) {
+                    Db::name('book')->where('id', $insertId)->strict(false)->field(true)->update(['cover' => $param['cover']]);
+                }
                 if (!empty($book)) {
                     $filename = $filename . $insertId;
                     Db::name('book')->where('id', $insertId)->strict(false)->field(true)->update(['filename' => $filename]);
@@ -305,6 +321,14 @@ class Book extends BaseController
             }
             if (!isset($param['element'])) {
                 $param['element'] = '';
+            }
+            $coverPath = get_config('filesystem.disks.public.root') . '/cover/' . $param['authorid'] . '/' . $book['id'] . '.png';
+            if ((empty($book['cover']) && empty($param['cover'])) || !file_exists($coverPath)) {
+                $coverUrl = get_config('filesystem.disks.public.url') . '/cover/' . $param['authorid'] . '/' . $book['id'] . '.png';
+                $res = Cover::generate($param['title'], $param['author'], $coverPath);
+                if ($res && file_exists($coverPath)) {
+                    $param['cover'] = $coverUrl;
+                }
             }
             $param['label'] = implode(',', array_filter([trim($param['identity']), trim($param['image']), trim($param['schools']), trim($param['element'])]));
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);

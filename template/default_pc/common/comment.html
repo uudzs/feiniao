@@ -117,7 +117,7 @@ $(window).on('load', function () {
             if(res.code == 0) {
                 renderComments(res.data.data);
                 renderPagination(res.data.total);
-                if(targetType ==1) $('.book-detail-tab ul li:nth-child(3)').text('作品评论('+res.data.total+')');
+                if(targetType ==1) $('.layui-tab-title li:nth-child(3)').text('作品评论('+res.data.total+')');
             } else {
                 layer.msg(res.msg);
             }

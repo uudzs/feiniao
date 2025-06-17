@@ -833,8 +833,8 @@ if (!function_exists('makecover')) {
         $bgPath = CMS_ROOT . 'public/static/home/images/default_cover_bg.png';
         $cateiconpath = CMS_ROOT . 'public/static/home/images/cateicon/';
         $catefile = $cateiconpath . $category['id'] . '.png';
-        if (!is_file($catefile)) {
-            $catefile = $cateiconpath . 'default.png';
+        if (!file_exists($catefile)) {
+            $catefile = CMS_ROOT . 'public/static/home/images/logo-invite.png';
         }
         try {
             //保存目录
@@ -881,12 +881,13 @@ if (!function_exists('makecover')) {
                 // 添加水印
                 $image->text($author_name, $authorfontPath, 30, $color, 5, [0, 220])->save($filePath); //添加作者
             }
-            if (is_file($filePath)) {
+            if (file_exists($filePath)) {
                 return $coverPath;
             } else {
                 return false;
             }
         } catch (\Exception $e) {
+            return $e->getMessage();
             return false;
         }
     }
