@@ -323,7 +323,7 @@
 	{/notempty}
 	
 	{php}
-		$update_list = model('book')->field('id,genre,title as booktitle,filename,create_time,words,author')->where(['status' => 1])->orderRaw('CASE WHEN update_time > 0 THEN update_time ELSE create_time END DESC')->limit(20)->select()->toArray();
+		$update_list = model('book')->field('id,genre,title as booktitle,filename,update_time,create_time,words,author')->where(['status' => 1])->orderRaw('CASE WHEN update_time > 0 THEN update_time ELSE create_time END DESC')->limit(20)->select()->toArray();
 		if(!empty($update_list)) {
 			foreach ($update_list as $k => $vo) {
 				$update_list[$k]['link'] = (string) url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);
@@ -372,7 +372,7 @@
 						</li>
 						<li>{:wordCount($vo.words)}</li>
 						<li>{$vo['author']}</li>
-						<li>{:time_format($vo.create_time)}</li>
+						<li>{:time_format(max($vo['create_time'], $vo['update_time']))}</li>
 					</ul>
 					{/volist}
 				</div>

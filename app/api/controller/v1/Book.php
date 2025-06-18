@@ -9,6 +9,7 @@ use content\Content;
 use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
+use cover\Cover;
 
 set_time_limit(0);
 ini_set('memory_limit', '-1');
@@ -42,6 +43,15 @@ class Book extends BaseController
         if ($detail) {
             if (intval($detail['status']) != 1) {
                 $this->apiError('407');
+            }
+            $coverPath = get_config('filesystem.disks.public.root') . '/cover/' . $detail['authorid'] . '/' . $detail['id'] . '.png';
+            if (empty($detail['cover']) || !file_exists($coverPath)) {
+                $coverUrl = get_config('filesystem.disks.public.url') . '/cover/' . $detail['authorid'] . '/' . $detail['id'] . '.png';
+                $res = Cover::generate($detail['title'], $detail['author'], $coverPath);
+                if ($res && file_exists($coverPath)) {
+                    Db::name('book')->where('id', $detail['id'])->strict(false)->field(true)->update(['cover' => $coverUrl]);
+                    $detail['cover'] = $coverUrl;
+                }
             }
             $detail['bigclassname'] = Db::name('category')->where(['id' => $detail['genre']])->value('name');
             $detail['smallclassname'] = Db::name('category')->where(['id' => $detail['subgenre']])->value('name');
