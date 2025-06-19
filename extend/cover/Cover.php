@@ -58,7 +58,7 @@ class Cover
         $titleY = 350;
 
         // 计算实际行高（取字体大小×行距倍数和最小行距中的较大值）
-        $lineHeight = max(
+        $lineHeight = (int) max(
             $titleFontSize * self::$config['title_line_height'],
             self::$config['min_line_height']
         );
@@ -68,10 +68,10 @@ class Cover
         foreach ($lines as $i => $line) {
             $titleBox = imagettfbbox($titleFontSize, 0, app()->getRootPath() . self::$config['font'], $line);
             $titleWidth = $titleBox[2] - $titleBox[0];
-            $titleX = (self::$config['width'] - $titleWidth) / 2;
+            $titleX = (int) ((self::$config['width'] - $titleWidth) / 2);
 
             // 使用计算出的行高控制垂直间距
-            $currentY = $titleY + ($i * $lineHeight);
+            $currentY = (int) ($titleY + ($i * $lineHeight));
 
             // 文字阴影
             imagettftext($image, $titleFontSize, 0, $titleX + 2, $currentY + 2, $shadowColor, app()->getRootPath() . self::$config['font'], $line);
@@ -81,7 +81,7 @@ class Cover
 
         // 添加作者名称（自适应字号）
         $authorText = lang('author') . ": " . $author;
-        $authorY = $titleY + count($lines) * $lineHeight + 150;
+        $authorY = (int) ($titleY + count($lines) * $lineHeight + 150);
 
         // 计算作者名称所需字号
         $authorFontSize = self::calculateFontSize(
@@ -94,7 +94,7 @@ class Cover
         // 渲染作者名称
         $authorBox = imagettfbbox($authorFontSize, 0, app()->getRootPath() . self::$config['authorfont'], $authorText);
         $authorWidth = $authorBox[2] - $authorBox[0];
-        $authorX = (self::$config['width'] - $authorWidth) / 2;
+        $authorX = (int) ((self::$config['width'] - $authorWidth) / 2);
 
         // 主体文字
         imagettftext($image, $authorFontSize, 0, $authorX, $authorY, $textColor, app()->getRootPath() . self::$config['authorfont'], $authorText);
@@ -103,8 +103,8 @@ class Cover
         $siteFontSize = 16;
         $siteBox = imagettfbbox($siteFontSize, 0, app()->getRootPath() . self::$config['authorfont'], self::$config['site_name']);
         $siteWidth = $siteBox[2] - $siteBox[0];
-        $siteX = (self::$config['width'] - $siteWidth) / 2;
-        $siteY = self::$config['height'] - 50;
+        $siteX = (int) ((self::$config['width'] - $siteWidth) / 2);
+        $siteY = (int) (self::$config['height'] - 50);
 
         imagettftext($image, $siteFontSize, 0, $siteX, $siteY, $textColor, app()->getRootPath() . self::$config['authorfont'], self::$config['site_name']);
 
