@@ -45,7 +45,7 @@ class Book extends BaseController
                 $this->apiError('407');
             }
             $coverPath = get_config('filesystem.disks.public.root') . '/cover/' . $detail['authorid'] . '/' . $detail['id'] . '.png';
-            if (empty($detail['cover']) || !file_exists($coverPath)) {
+            if (empty($detail['cover'])) {
                 $coverUrl = get_config('filesystem.disks.public.url') . '/cover/' . $detail['authorid'] . '/' . $detail['id'] . '.png';
                 $res = Cover::generate($detail['title'], $detail['author'], $coverPath);
                 if ($res && file_exists($coverPath)) {

@@ -323,7 +323,7 @@ class Book extends BaseController
                 $param['element'] = '';
             }
             $coverPath = get_config('filesystem.disks.public.root') . '/cover/' . $param['authorid'] . '/' . $book['id'] . '.png';
-            if ((empty($book['cover']) && empty($param['cover'])) || !file_exists($coverPath)) {
+            if ((empty($book['cover']) && empty($param['cover']))) {
                 $coverUrl = get_config('filesystem.disks.public.url') . '/cover/' . $param['authorid'] . '/' . $book['id'] . '.png';
                 $res = Cover::generate($param['title'], $param['author'], $coverPath);
                 if ($res && file_exists($coverPath)) {
