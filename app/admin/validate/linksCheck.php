@@ -9,14 +9,13 @@ use think\Validate;
 class linksCheck extends Validate
 {
     protected $rule = [
-        'name' => 'require|unique:links',
+        'name' => 'require',
         'src' => 'require|url|unique:links',
         'id' => 'require',
     ];
 
     protected $message = [
         'name.require' => '网站名称不能为空',
-        'name.unique' => '同样的网站名称已经存在',
         'src' => '网站链接不能为空',
         'src.url' => '网站链接不是有效的URL地址',
         'src.unique' => '同样的网站链接已经存在',
