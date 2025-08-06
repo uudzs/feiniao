@@ -44,7 +44,7 @@ class Chapter extends BaseController
             if ($content && mb_strlen($content) > 0) {
                 $content = htmlspecialchars_decode($content);
                 $content = preg_replace('/<br\s?\/?>\r?\n?/i', "\n", $content);
-                if ($config['chapter_refuse_collection_open']) {
+                if (isset($config['chapter_refuse_collection_open']) && $config['chapter_refuse_collection_open']) {
                     $paragraphs = $this->splitContent($content);
                     $content = $this->shuffleParagraphs($paragraphs);
                 } else {

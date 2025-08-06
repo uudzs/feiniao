@@ -78,7 +78,7 @@ $book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();
     .reader .reader-wrap .reader-r.fixed .forum-wrap {
         height: calc(100vh - 191px)
     }
-    {if $conConfig['chapter_refuse_collection_open']}
+    {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open']}
     #chapter_content.unselectable {
         -webkit-touch-callout: none; /* iOS Safari */
         -webkit-user-select: none;   /* Safari */
@@ -117,7 +117,7 @@ $book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();
                     <div class="reader-line"></div>
                     <div class="content" id="chapter_content">
                         {if $conConfig['chapter_pages_content_open']}
-                            {if $conConfig['chapter_refuse_collection_open']}
+                            {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open']}
                                 {foreach $content as $index => $text}
                                     <p data-id="{$index|raw}">{$text|raw}</p>
                                 {/foreach}
@@ -432,7 +432,7 @@ $(window).on('load', function () {
                 if(info && info.hide_content) $('.content').html(info.content);                
             }
         });
-        {if $conConfig['chapter_refuse_collection_open']}
+        {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open']}
             $.when(
                 $.getScript("{__STATIC__}/home/js/protectionSystem.js?v={$version}"),
                 $.Deferred(function(deferred) {
