@@ -11,7 +11,7 @@ return [
     // 日志类型记录的通道 ['error'=>'email',...]
     'type_channel' => [],
     // 关闭全局日志写入
-    'close'        => false,
+    'close'        => true,
     // 全局日志处理 支持闭包
     'processor'    => null,
 
@@ -33,7 +33,7 @@ return [
             // 日志处理
             'processor'      => null,
             // 关闭通道日志写入
-            'close'          => false,
+            'close'          => true,
             // 日志输出格式化
             'format'         => '[%s][%s] %s',
             // 是否实时写入

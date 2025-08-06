@@ -147,7 +147,7 @@ class Index
             for ($i = 0; $i < $chapter_Tables; $i++) {
                 $sql = "CREATE TABLE `" . $data['DB_PREFIX'] . "chapter_content_" . $i . "` (
                 `sid` bigint(20) DEFAULT '0' COMMENT '章节ID',
-                `info` longtext COMMENT '章节内容',
+                `info` longblob COMMENT '章节内容',
                 KEY `sid` (`sid`)
             ) ENGINE=InnoDB DEFAULT CHARACTER SET = utf8mb4 COMMENT='章节内容表'";
                 $link->query($sql);

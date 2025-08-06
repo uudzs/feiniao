@@ -26,11 +26,11 @@ class Chapter extends BaseController
         if (empty($id)) {
             $this->error(404);
         }
-        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->find();
+        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->cache('chapter_id_' . $id, 86400)->find();
         if (empty($chapter)) {
             $this->error(404);
         }
-        $list = Db::name('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
+        $list = Db::name('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1']])->cache('chapter_bookid_chapterlist_' . $chapter['bookid'], 86400)->order('chaps asc')->select()->toArray(); //所有章节
         if (!empty($list)) {
             foreach ($list as $k => $v) {
                 $list[$k]['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $v['id'], 'bookid' => $v['bookid']]);
@@ -38,17 +38,23 @@ class Chapter extends BaseController
             }
         }
         $data = [];
-        if (get_system_config('content', 'chapter_pages_content_open')) {
+        $config = get_system_config('content');
+        if ($config['chapter_pages_content_open']) {
             $content = Content::get($chapter['bookid'], $chapter['id']);
             if ($content && mb_strlen($content) > 0) {
                 $content = htmlspecialchars_decode($content);
                 $content = preg_replace('/<br\s?\/?>\r?\n?/i', "\n", $content);
-                $paragraphs = explode("\n", $content);
-                $paragraphs = array_map('trim', $paragraphs);
-                $paragraphs = array_filter($paragraphs);
-                $content = implode("\n", array_map(function ($p) {
-                    return "<p>" . $p . "</p>";
-                }, $paragraphs));
+                if ($config['chapter_refuse_collection_open']) {
+                    $paragraphs = $this->splitContent($content);
+                    $content = $this->shuffleParagraphs($paragraphs);
+                } else {
+                    $paragraphs = explode("\n", $content);
+                    $paragraphs = array_map('trim', $paragraphs);
+                    $paragraphs = array_filter($paragraphs);
+                    $content = implode("\n", array_map(function ($p) {
+                        return "<p>" . $p . "</p>";
+                    }, $paragraphs));
+                }
             } else {
                 $content = '';
             }
@@ -74,9 +80,36 @@ class Chapter extends BaseController
         $data['id'] = $id;
         $data['bookid'] = $chapter['bookid'];
         $data['chapterlist'] = $list;
-        $data['book'] = Db::name('book')->where('id', $data['bookid'])->find();
+        $data['book'] = Db::name('book')->where('id', $data['bookid'])->cache('book_' . $data['bookid'], 86400)->find();
         View::config(['view_path' => $this->view_path()]);
         if ($ismakecache) $this->makecache(View::fetch('detail', $data));
         return view('detail', $data);
+    }
+
+    private function splitContent($content)
+    {
+        return array_filter(
+            preg_split('/\r\n|\n|\r/', $content),
+            function ($line) {
+                return trim($line) !== '';
+            }
+        );
+    }
+
+    private function shuffleParagraphs($paragraphs)
+    {
+        $indexed = [];
+        foreach ($paragraphs as $index => $text) {
+            $indexed[$index] = $text;
+        }
+        $keys = array_keys($indexed);
+        shuffle($keys);
+
+        $shuffled = [];
+        foreach ($keys as $key) {
+            $shuffled[$key] = $indexed[$key];
+        }
+
+        return $shuffled;
     }
 }

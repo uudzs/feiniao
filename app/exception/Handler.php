@@ -5,22 +5,30 @@ namespace app\exception;
 use think\exception\Handle;
 use think\exception\HttpException;
 use think\exception\ValidateException;
-use think\exception\HttpResponseException;
+use InvalidArgumentException;
 use think\template\exception\TemplateNotFoundException;
 use think\Response;
 use Throwable;
+use RuntimeException;
 use app\common\model\Category;
 
 class Handler extends Handle
 {
     public function render($request, Throwable $e): Response
     {
-        // 1. 处理模板不存在异常
+        // 处理模板不存在异常
         if ($e instanceof TemplateNotFoundException) {
             return $this->handleTemplateNotFound($request);
         }
 
-        // 2. 处理验证异常
+        if ($e instanceof InvalidArgumentException) {
+            return Response::create([
+                'code' => 1,
+                'msg' => $e->getMessage()
+            ], 'json');
+        }
+
+        // 处理验证异常
         if ($e instanceof ValidateException) {
             return Response::create([
                 'code' => 422,
@@ -28,7 +36,7 @@ class Handler extends Handle
             ], 'json');
         }
 
-        // 3. 处理HTTP异常
+        // 处理HTTP异常
         if ($e instanceof HttpException) {
             return $this->handleHttpException($request, $e);
         }

@@ -34,7 +34,7 @@ class Chapter extends BaseController
         if (empty($id)) {
             $this->apiError('empty');
         }
-        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->find();
+        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->cache('chapter_id_' . $id, 86400)->find();
         if (empty($chapter)) {
             $this->apiError('404');
         }
@@ -44,7 +44,7 @@ class Chapter extends BaseController
         if (intval($chapter['verify']) == 2) {
             $this->apiError('407');
         }
-        $book = Db::name('book')->field('id,title,cover,status')->where(array('id' => $chapter['bookid']))->find();
+        $book = Db::name('book')->field('id,title,cover,status')->where(array('id' => $chapter['bookid']))->cache('book_' . $chapter['bookid'], 86400)->find();
         if (empty($book)) {
             $this->apiError('404');
         }

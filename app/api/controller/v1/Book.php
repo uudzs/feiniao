@@ -38,7 +38,7 @@ class Book extends BaseController
             $this->apiError('empty');
         }
         $uid = JWT_UID;
-        $detail = Db::name('book')->where(['id' => $id])->find();
+        $detail = Db::name('book')->where(['id' => $id])->cache('book_' . $id)->find();
         $model_name = \think\facade\App::initialize()->http->getName();
         if ($detail) {
             if (intval($detail['status']) != 1) {
@@ -61,7 +61,7 @@ class Book extends BaseController
             $detail['issign'] = Db::name('author')->where(['id' => $detail['authorid']])->value('issign');
             $detail['words'] = wordCount($detail['words']);
             $detail['uptime'] = $detail['update_time'] ? date('Y-m-d H:i:s', $detail['update_time']) : date('Y-m-d H:i:s', $detail['create_time']);
-            $detail['chapter'] = Db::name('chapter')->field('id,title,chaps,bookid,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray(); //所有章节
+            $detail['chapter'] = Db::name('chapter')->field('id,title,chaps,bookid,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->cache('chapter_bookid_chapterlist_' . $id, 86400)->order('chaps asc')->select()->toArray(); //所有章节
             $first_chapter = $last_chapter = [];
             if (!empty($detail['chapter'])) {
                 $first_chapter = $detail['chapter'][0]; //第一章
@@ -245,6 +245,7 @@ class Book extends BaseController
         $order = empty($param['order']) ? 'id desc' : $param['order'];
         $list =  Db::name('book')->where($where)
             ->field('id,title,author,authorid,cover,style,ending,genre,subgenre,isfinish,finishtime,chapters,label,label_custom,hits,words,status,editor,editorid,issign,create_time,update_time,remark,filename')
+            ->cache('booklist', 86400)
             ->order($order)
             ->paginate(['list_rows' => $rows, 'var_page' => 'page', 'page' => $page, 'query' => $param]);
         $result = $list->toArray();

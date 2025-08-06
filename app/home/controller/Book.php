@@ -78,12 +78,12 @@ class Book extends BaseController
         $id = isset($param['id']) ? $param['id'] : 0;
         $book = [];
         if (intval($id) ==  $id) {
-            $book = Db::name('book')->where('id', $id)->find();
+            $book = Db::name('book')->where('id', $id)->cache('book_' . $id, 86400)->find();
             if (!empty($book)) {
                 Db::name('book')->where('id', $id)->inc('hits')->update();
             }
         } else {
-            $book = Db::name('book')->where('filename', $id)->find();
+            $book = Db::name('book')->where('filename', $id)->cache('book_' . $id, 86400)->find();
             if (!empty($book)) {
                 $id = $book['id'];
                 Db::name('book')->where('id', $id)->inc('hits')->update();
@@ -92,12 +92,12 @@ class Book extends BaseController
         if (empty($book)) {
             $this->error(404);
         }
-        $book['bigclassname'] = Db::name('category')->where(['id' => $book['genre']])->value('name');
+        $book['bigclassname'] = Db::name('category')->where(['id' => $book['genre']])->cache('category_' . $book['genre'], 86400)->value('name');
         $book['cover'] = get_file($book['cover']);
         $book['words'] = wordCount($book['words']);
         $book['author'] = trim($book['author']);
         $book['remark'] = $book['remark'] ? strip_tags($book['remark']) : '';
-        $first_chapter = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->find();
+        $first_chapter = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->cache('chapter_bookid_chapsasc_' . $id, 86400)->order('chaps asc')->find();
         if (!empty($first_chapter)) {
             $book['first_chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id'], 'bookid' => $first_chapter['bookid']])->domain(true);
             $book['first_chapter_title'] = $first_chapter['title'];
@@ -105,7 +105,7 @@ class Book extends BaseController
             $book['first_chapter_url'] = '';
             $book['first_chapter_title'] = '';
         }
-        $chapter = Db::name('chapter')->field('id,bookid,title,create_time,update_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps desc')->find();
+        $chapter = Db::name('chapter')->field('id,bookid,title,create_time,update_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->cache('chapter_bookid_chapsdesc_' . $id, 86400)->order('chaps desc')->find();
         if (!empty($chapter)) {
             $book['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $chapter['id'], 'bookid' => $chapter['bookid']])->domain(true);
             $book['chapter_title'] = $chapter['title'];

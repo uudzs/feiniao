@@ -5,6 +5,7 @@ namespace content;
 use think\facade\Db;
 use think\Exception;
 use RuntimeException;
+use util\DatabaseUtil;
 
 class Content
 {
@@ -23,6 +24,8 @@ class Content
             $config = [
                 //章节保存类型
                 'chapter_save_type' => 1, // 1数据库，2txt
+                //是否开启压缩
+                'chapter_compress_open' => 0, // 1开启，0关闭
                 // 基础配置
                 'base_path'       => app()->getRootPath() . 'runtime' . DIRECTORY_SEPARATOR . 'chapters', // 存储根目录
                 'dir_depth'       => 3,               // 目录分片层级
@@ -48,7 +51,10 @@ class Content
             $conf = get_system_config('content');
             if (isset($conf['chapter_save_type'])) {
                 $config['chapter_save_type'] = intval($conf['chapter_save_type']);
-                if ($config['chapter_save_type'] == 2) {
+            }
+            if (isset($conf['chapter_compress_open'])) {
+                $config['chapter_compress_open'] = intval($conf['chapter_compress_open']);
+                if ($config['chapter_compress_open']) {
                     if (isset($conf['compress_algorithm']) && $conf['compress_algorithm']) {
                         $config['compress']['algorithm'] = $conf['compress_algorithm'];
                     }
@@ -58,6 +64,8 @@ class Content
                 } else {
                     $config['compress']['enabled'] = false;
                 }
+            } else {
+                $config['compress']['enabled'] = false;
             }
             self::$config = $config;
             self::$initialized = true;
@@ -69,6 +77,15 @@ class Content
         self::initialize();
         if (self::$config['chapter_save_type'] == 1) {
             $chaptertable = calc_hash_db($bookId);
+            try {
+                DatabaseUtil::ensureLongBlobColumn($chaptertable, 'info');
+            } catch (RuntimeException $e) {
+                throw new RuntimeException();
+            } catch (Exception $e) {
+                throw new Exception();
+            }
+            $compressed = self::compress($content);
+            $content = $compressed ?: $content;
             return Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $chapterId, 'info' => $content]);
         } else {
             return self::writeSafe($chapterId, $content);
@@ -86,13 +103,22 @@ class Content
                 if (!empty($content)) {
                     $chaptertable = calc_hash_db($bookId);
                     list($wordnum, $content) = countWordsAndContent($content, true);
+                    $compressed = self::compress($content);
+                    $content = $compressed ?: $content;
+                    try {
+                        DatabaseUtil::ensureLongBlobColumn($chaptertable, 'info');
+                    } catch (RuntimeException $e) {
+                        throw new RuntimeException();
+                    } catch (Exception $e) {
+                        throw new Exception();
+                    }
                     if (Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $chapterId, 'info' => $content])) {
                         $path = self::getPath($chapterId);
                         @unlink($path);
                     }
                 }
             }
-            return $content;
+            return self::uncompress($content);
         } else {
             $content = self::file($chapterId);
             if (empty($content)) {
@@ -115,6 +141,15 @@ class Content
         self::initialize();
         if (self::$config['chapter_save_type'] == 1) {
             $chaptertable = calc_hash_db($bookId);
+            try {
+                DatabaseUtil::ensureLongBlobColumn($chaptertable, 'info');
+            } catch (RuntimeException $e) {
+                throw new RuntimeException();
+            } catch (Exception $e) {
+                throw new Exception();
+            }
+            $compressed = self::compress($content);
+            $content  = $compressed ?: $content;
             return Db::name($chaptertable)->where(['sid' => $chapterId])->strict(false)->field(true)->update(['info' => $content]);
         } else {
             return self::writeSafe($chapterId, $content);
@@ -150,7 +185,9 @@ class Content
             try {
                 $content = self::read($chapterId);
             } catch (RuntimeException $e) {
+                throw new RuntimeException();
             } catch (Exception $e) {
+                throw new Exception();
             }
             if (empty($content)) {
                 if (get_addons_is_enable('caijipro')) {
@@ -263,9 +300,9 @@ class Content
                 $newSize = strlen(self::compress($newContent));
                 if (filesize($path) != $newSize) return true;
             } catch (RuntimeException $e) {
-                return false;
+                throw new RuntimeException();
             } catch (Exception $e) {
-                return false;
+                throw new Exception();
             }
         } elseif ($conf['quick_check'] === 'mtime') {
             if (filemtime($path) < time() - 5) return true;
@@ -296,8 +333,10 @@ class Content
         try {
             $content = self::uncompress(file_get_contents($path));
             return self::calcHash($content);
-        } catch (\RuntimeException $e) {
-            return '';
+        } catch (RuntimeException $e) {
+            throw new RuntimeException();
+        } catch (Exception $e) {
+            throw new Exception();
         }
     }
 

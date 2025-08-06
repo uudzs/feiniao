@@ -14,7 +14,10 @@
 {include file="common/header" nav='index' /}
 <style>
 </style>
-{php}$book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();{/php}
+{php}
+$conConfig = get_system_config('content');
+$book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();
+{/php}
 {notempty name="book"}
     {php}
         if($book['genre']) {
@@ -75,10 +78,19 @@
     .reader .reader-wrap .reader-r.fixed .forum-wrap {
         height: calc(100vh - 191px)
     }
+    {if $conConfig['chapter_refuse_collection_open']}
+    #chapter_content.unselectable {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none;   /* Safari */
+        -moz-user-select: none;      /* Firefox */
+        -ms-user-select: none;       /* IE/Edge */
+        user-select: none;           /* Standard syntax */
+    }
+    {/if}
     </style>
     <div class="reader-wrap">
         <div class="reader-main">
-            {if !get_system_config('content', 'chapter_pages_content_open')}            
+            {if !$conConfig['chapter_pages_content_open']}            
             <div class="reader-top">
                 <div class="bookimg"><a href="{:url('book_detail', ['id' => $book['id']])}"><img src="{:get_file($book.cover)}" alt="{$book.title}" onerror="this.src='{__STATIC__}/home/images/logo-ico.png'"><em></em></a></div>
                 <div class="name">{$book.title}</div>
@@ -103,9 +115,15 @@
                         <span>更新时间：<i>{:time_format($chapter.create_time)}</i></span>
                     </div>
                     <div class="reader-line"></div>
-                    <div class="content">
-                        {if get_system_config('content', 'chapter_pages_content_open')}
-                        {$content|raw}
+                    <div class="content" id="chapter_content">
+                        {if $conConfig['chapter_pages_content_open']}
+                            {if $conConfig['chapter_refuse_collection_open']}
+                                {foreach $content as $index => $text}
+                                    <p data-id="{$index|raw}">{$text|raw}</p>
+                                {/foreach}
+                            {else/}
+                                {$content|raw}
+                            {/if}
                         {/if}
                     </div>
                     <div class="btn-w">
@@ -122,7 +140,7 @@
             <div class="reader-forum">
                 <div class="close"><i class="bi bi-x-lg"></i></div>
                 <div class="forum-wrap JforumWrap">
-                    {if get_system_config('content', 'comment_open')}
+                    {if $conConfig['comment_open']}
                         {php} $targetType = 2; $target_id = $chapter['id']; {/php}
                         {include file="common/comment" /}
                     {/if}
@@ -381,167 +399,187 @@ $(window).on('load', function () {
         $('#adom_reader_font_size').text(fontsizes[config.fontsize]);
     })
     //初始化
-    {if !get_system_config('content', 'chapter_pages_content_open')}
-    $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
-        if(result.code == 0) {
-            chapter_info = result.data.data[0];
-            chapter_id = chapter_info.front_chapter;
-            $('.read-speed').find('i').css('width', chapter_info.speed + '%');
-            $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
-            $('.title_txtbox').html(chapter_info.title);
-            $('.content').html(format_chapter(chapter_info.content));
-            if(parseInt(chapter_info.like) > 0) {
-                $('.like').find('i').attr('class','bi bi-heart-fill');
+    {if !$conConfig['chapter_pages_content_open']}
+        $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
+            if(result.code == 0) {
+                chapter_info = result.data.data[0];
+                chapter_id = chapter_info.front_chapter;
+                $('.read-speed').find('i').css('width', chapter_info.speed + '%');
+                $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
+                $('.title_txtbox').html(chapter_info.title);
+                $('.content').html(format_chapter(chapter_info.content));
+                if(parseInt(chapter_info.like) > 0) {
+                    $('.like').find('i').attr('class','bi bi-heart-fill');
+                } else {
+                    $('.like').find('i').attr('class','bi bi-heart');
+                }
+                if(parseInt(chapter_info.fav) > 0) {
+                    $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus-fill');
+                } else {
+                    $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus');
+                }            
             } else {
-                $('.like').find('i').attr('class','bi bi-heart');
+                layer.msg(result.msg);
             }
-            if(parseInt(chapter_info.fav) > 0) {
-                $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus-fill');
-            } else {
-                $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus');
-            }            
-        } else {
-            layer.msg(result.msg);
-        }
-    });
-    {else}
+        });
+    {else/}
         $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
             if(result.code == 0) {
                 const info = result.data.data[0];
                 chapter_info = info;
                 $('.read-speed').find('i').css('width', info.speed + '%');
                 $('.read-speed').find('font').text('阅读进度：' + info.speed + '%');
-                if(info && info.hide_content) $('.content').html(info.content);
+                if(info && info.hide_content) $('.content').html(info.content);                
             }
         });
+        {if $conConfig['chapter_refuse_collection_open']}
+            $.when(
+                $.getScript("{__STATIC__}/home/js/protectionSystem.js?v={$version}"),
+                $.Deferred(function(deferred) {
+                    $(deferred.resolve);
+                })
+            ).done(function() {
+                const protectionSystem = new ProtectionSystem();
+                protectionSystem.init();
+            }).fail(function(error) {
+                console.error('脚本加载失败:', error);
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i'))) {
+                    e.preventDefault();
+                }
+            });
+            document.onselectstart = function() { return false; };
+            document.ondragstart = function() { return false; };
+        {/if}
     {/if}
     {eq name=":get_addons_is_enable('changyan')" value="1"}
-    if($('#SOHUCS').length > 0) SOHUCS = true;
+        if($('#SOHUCS').length > 0) SOHUCS = true;
     {/eq}
     //滚动
-    {if !get_system_config('content', 'chapter_pages_content_open')}
-    var isLoading = false;
-    $(window).scroll(function() {
-        if($(window).scrollTop() > 69) {
-            $(".reader-r").addClass("fixed");
-        } else {
-            $(".reader-r").removeClass("fixed");
-        }
-        if($(window).scrollTop() <= 0 && !isLoading) {
-            isLoading = true;
-            isupperpage = true;
-            upper_chapter();            
-        } 
-        var scrollTop = Math.ceil($(window).scrollTop());
-        var height = Math.ceil($(window).height());
-        var documentheight = parseInt($(document).height());
-        if((scrollTop + height >= documentheight) && !isLoading) {
-            isLoading = true;
-            isupperpage = false;
-            next_chapter();            
-        }
-    });
-
-    //上一页    
-    window.upper_chapter = function() {
-        if(!chapter_id) {
-            isLoading = false;
-            return false;            
-        }
-        $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
-            isLoading = false;
-            if(result.code == 0) {
-                {eq name=":get_addons_is_enable('changyan')" value="1"}
-                get_sohucs(chapter_id);
-                {/eq}
-                info = result.data.data[0];
-                chapter_id = info.front_chapter;
-                $('#JcatalogListWrap ul li').removeClass('active');
-                $('#JcatalogListWrap ul').find('[data-chapterid="' + info.id + '"]').addClass('active');
-                var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]}px;">
-                                <div class="title">
-                                    <div class="title_txtbox">${info.title}</div>
-                                </div>
-                                <div class="bookinfo">
-                                    <span>本章字数：<i>${info.wordnum}</i></span>
-                                    <span>更新时间：<i>${info.create_time}</i></span>
-                                </div>
-                                <div class="reader-line"></div>
-                                <div class="content">${format_chapter(info.content)}</div>
-                                <div class="btn-w">
-                                    <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
-                                </div>
-                            </div>`;
-                $('#Jcontent').prepend(html);
-                if(parseInt(info.like) > 0) {
-                    $('.like').find('i').attr('class','bi bi-heart-fill');
-                } else {
-                    $('.like').find('i').attr('class','bi bi-heart');
-                }                
+    {if !$conConfig['chapter_pages_content_open']}
+        var isLoading = false;
+        $(window).scroll(function() {
+            if($(window).scrollTop() > 69) {
+                $(".reader-r").addClass("fixed");
             } else {
-                layer.msg(result.msg);
+                $(".reader-r").removeClass("fixed");
+            }
+            if($(window).scrollTop() <= 0 && !isLoading) {
+                isLoading = true;
+                isupperpage = true;
+                upper_chapter();            
+            } 
+            var scrollTop = Math.ceil($(window).scrollTop());
+            var height = Math.ceil($(window).height());
+            var documentheight = parseInt($(document).height());
+            if((scrollTop + height >= documentheight) && !isLoading) {
+                isLoading = true;
+                isupperpage = false;
+                next_chapter();            
             }
         });
-    }
-    //下一页
-    window.next_chapter = function() {
-        if(chapter_info && !chapter_info.after_chapter) {
-            isLoading = false;
-            return false;
-        }
-        if(chapter_info.after_chapter > 0) {
-            $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_info.after_chapter}, function(result) {
+
+        //上一页    
+        window.upper_chapter = function() {
+            if(!chapter_id) {
+                isLoading = false;
+                return false;            
+            }
+            $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
                 isLoading = false;
                 if(result.code == 0) {
                     {eq name=":get_addons_is_enable('changyan')" value="1"}
-                    get_sohucs(chapter_info.after_chapter);
+                    get_sohucs(chapter_id);
                     {/eq}
-                    chapter_info = result.data.data[0];
-                    $('.read-speed').find('i').css('width', chapter_info.speed + '%');
-                    $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
+                    info = result.data.data[0];
+                    chapter_id = info.front_chapter;
                     $('#JcatalogListWrap ul li').removeClass('active');
-                    $('#JcatalogListWrap ul').find('[data-chapterid="' + chapter_info.id + '"]').addClass('active');
+                    $('#JcatalogListWrap ul').find('[data-chapterid="' + info.id + '"]').addClass('active');
                     var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]}px;">
                                     <div class="title">
-                                        <div class="title_txtbox">${chapter_info.title}</div>
+                                        <div class="title_txtbox">${info.title}</div>
                                     </div>
                                     <div class="bookinfo">
-                                        <span>本章字数：<i>${chapter_info.wordnum}</i></span>
-                                        <span>更新时间：<i>${chapter_info.create_time}</i></span>
+                                        <span>本章字数：<i>${info.wordnum}</i></span>
+                                        <span>更新时间：<i>${info.create_time}</i></span>
                                     </div>
                                     <div class="reader-line"></div>
-                                    <div class="content">${format_chapter(chapter_info.content)}</div>
+                                    <div class="content">${format_chapter(info.content)}</div>
                                     <div class="btn-w">
                                         <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                                     </div>
                                 </div>`;
-                    $('#Jcontent').append(html);
-                    if(parseInt(chapter_info.like) > 0) {
+                    $('#Jcontent').prepend(html);
+                    if(parseInt(info.like) > 0) {
                         $('.like').find('i').attr('class','bi bi-heart-fill');
                     } else {
                         $('.like').find('i').attr('class','bi bi-heart');
-                    }                    
+                    }                
                 } else {
                     layer.msg(result.msg);
                 }
-            });            
-        } else {
-            isLoading = false;
+            });
         }
-    }
+        //下一页
+        window.next_chapter = function() {
+            if(chapter_info && !chapter_info.after_chapter) {
+                isLoading = false;
+                return false;
+            }
+            if(chapter_info.after_chapter > 0) {
+                $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_info.after_chapter}, function(result) {
+                    isLoading = false;
+                    if(result.code == 0) {
+                        {eq name=":get_addons_is_enable('changyan')" value="1"}
+                        get_sohucs(chapter_info.after_chapter);
+                        {/eq}
+                        chapter_info = result.data.data[0];
+                        $('.read-speed').find('i').css('width', chapter_info.speed + '%');
+                        $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
+                        $('#JcatalogListWrap ul li').removeClass('active');
+                        $('#JcatalogListWrap ul').find('[data-chapterid="' + chapter_info.id + '"]').addClass('active');
+                        var html = `<div class="reader-box ${config.fontfamily}" style="font-size: ${fontsizes[config.fontsize]}px;">
+                                        <div class="title">
+                                            <div class="title_txtbox">${chapter_info.title}</div>
+                                        </div>
+                                        <div class="bookinfo">
+                                            <span>本章字数：<i>${chapter_info.wordnum}</i></span>
+                                            <span>更新时间：<i>${chapter_info.create_time}</i></span>
+                                        </div>
+                                        <div class="reader-line"></div>
+                                        <div class="content">${format_chapter(chapter_info.content)}</div>
+                                        <div class="btn-w">
+                                            <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
+                                        </div>
+                                    </div>`;
+                        $('#Jcontent').append(html);
+                        if(parseInt(chapter_info.like) > 0) {
+                            $('.like').find('i').attr('class','bi bi-heart-fill');
+                        } else {
+                            $('.like').find('i').attr('class','bi bi-heart');
+                        }                    
+                    } else {
+                        layer.msg(result.msg);
+                    }
+                });            
+            } else {
+                isLoading = false;
+            }
+        }
 
-    var format_chapter = function(chapter) {
-        return '<p>' + chapter.split("<br>").join("</p><p>") + "</p>";
-    };
+        var format_chapter = function(chapter) {
+            return '<p>' + chapter.split("<br>").join("</p><p>") + "</p>";
+        };
     {/if}
     {eq name=":get_addons_is_enable('changyan')" value="1"}
-    function get_sohucs(id) {
-        $.postApi("{:addons_url('changyan://index/sohucs')}", {id: id}, function(result) {
-            if(result.code == 0) {
-                if(result.data.sid) $('#SOHUCS').attr('sid', result.data.sid);
-            }
-        });       
-    }
+        function get_sohucs(id) {
+            $.postApi("{:addons_url('changyan://index/sohucs')}", {id: id}, function(result) {
+                if(result.code == 0) {
+                    if(result.data.sid) $('#SOHUCS').attr('sid', result.data.sid);
+                }
+            });       
+        }
     {/eq}
 });
 </script>
