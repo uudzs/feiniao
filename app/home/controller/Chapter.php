@@ -40,23 +40,30 @@ class Chapter extends BaseController
         $data = [];
         $config = get_system_config('content');
         if ($config['chapter_pages_content_open']) {
-            $content = Content::get($chapter['bookid'], $chapter['id']);
-            if ($content && mb_strlen($content) > 0) {
-                $content = htmlspecialchars_decode($content);
-                $content = preg_replace('/<br\s?\/?>\r?\n?/i', "\n", $content);
-                if (isset($config['chapter_refuse_collection_open']) && $config['chapter_refuse_collection_open']) {
-                    $paragraphs = $this->splitContent($content);
-                    $content = $this->shuffleParagraphs($paragraphs);
+            $chapter['chapteraccess'] = chapterCheckAccess($id);
+            $hide_content = $chapter['chapteraccess'] !== 1;
+            $chapter['hide_content'] = $hide_content;
+            if (!$hide_content) {
+                $content = Content::get($chapter['bookid'], $chapter['id']);
+                if ($content && mb_strlen($content) > 0) {
+                    $content = htmlspecialchars_decode($content);
+                    $content = preg_replace('/<br\s?\/?>\r?\n?/i', "\n", $content);
+                    if (isset($config['chapter_refuse_collection_open']) && $config['chapter_refuse_collection_open']) {
+                        $paragraphs = $this->splitContent($content);
+                        $content = $this->shuffleParagraphs($paragraphs);
+                    } else {
+                        $paragraphs = explode("\n", $content);
+                        $paragraphs = array_map('trim', $paragraphs);
+                        $paragraphs = array_filter($paragraphs);
+                        $content = implode("\n", array_map(function ($p) {
+                            return "<p>" . $p . "</p>";
+                        }, $paragraphs));
+                    }
                 } else {
-                    $paragraphs = explode("\n", $content);
-                    $paragraphs = array_map('trim', $paragraphs);
-                    $paragraphs = array_filter($paragraphs);
-                    $content = implode("\n", array_map(function ($p) {
-                        return "<p>" . $p . "</p>";
-                    }, $paragraphs));
+                    $content = '';
                 }
             } else {
-                $content = '';
+                $content = lang('common.nopermission');
             }
             //前一章
             $front = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '<', $chapter['chaps']]])->order('chaps DESC')->find();

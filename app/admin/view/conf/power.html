@@ -6,9 +6,10 @@
         width: 200px !important;
     }
     .layui-input-block {
-        margin-left: 220px !important;
+        margin-left: 200px !important;
     }
 </style>
+{php}$level = model('user_level')->where('status',1)->order('id asc')->select();{/php}
 <form class="layui-form p-4">
 	<h3 class="pb-3">权限设置</h3>
     <div class="py-3">
@@ -76,30 +77,54 @@
                         <label class="layui-form-label">阅读收费模式</label>
                         <div class="layui-input-inline" style="min-width: 300px;">
                             {if(!isset($config['charge_read_type']))}
-                                <input type="checkbox" name="charge_read_type[]" value="free" title="免费" checked>
-                                <input type="checkbox" name="charge_read_type[]" value="vip" title="会员">
-                                <input type="checkbox" name="charge_read_type[]" value="coin" title="金币">
+                                <input type="checkbox" name="charge_read_type[]" value="free" title="免费" checked lay-filter="free">
+                                <input type="checkbox" name="charge_read_type[]" value="vip" title="会员" lay-filter="userlevel">
+                                <input type="checkbox" name="charge_read_type[]" value="coin" title="金币" lay-filter="coin">
                             {else/}
-                                <input type="checkbox" name="charge_read_type[]" value="free" title="免费" {if(in_array('free', $config['charge_read_type']))}checked{/if}>
-                                <input type="checkbox" name="charge_read_type[]" value="vip" title="会员" {if(in_array('vip', $config['charge_read_type']))}checked{/if}>
-                                <input type="checkbox" name="charge_read_type[]" value="coin" title="金币" {if(in_array('coin', $config['charge_read_type']))}checked{/if}>
+                                <input type="checkbox" name="charge_read_type[]" value="free" title="免费" {if(in_array('free', $config['charge_read_type']))}checked{/if} lay-filter="free">
+                                <input type="checkbox" name="charge_read_type[]" value="vip" title="会员" {if(in_array('vip', $config['charge_read_type']))}checked{/if} lay-filter="userlevel">
+                                <input type="checkbox" name="charge_read_type[]" value="coin" title="金币" {if(in_array('coin', $config['charge_read_type']))}checked{/if} lay-filter="coin">
                             {/if}
                         </div>
-                        <div class="layui-form-mid layui-word-aux">免费模式为全站免费，会员模式需购买VIP会员，金币模式用于消耗金币阅读，<br>会员模式与金币模式同时开启时，优先使用会员模式，免费模式不可与其他模式共存，<br>免费模式优先于其他模式，非免费模式时登录免费章节则无效。</div>
+                        <div class="layui-form-mid layui-word-aux">免费模式为全站免费，会员模式需购买VIP会员，金币模式用于消耗金币阅读，<br>会员模式与金币模式同时开启时，优先使用会员模式，不是会员则使用金币模式，免费模式不可与其他模式共存，<br>免费模式优先于其他模式，非免费模式时登录免费阅读则无效。</div>
                     </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">千字金币</label>
-                        <div class="layui-input-inline layui-input-wrap">
-                          <input type="text" name="read_thousand_price" value="{$config.read_thousand_price|default='0'}" placeholder="请填写章节数" autocomplete="off" class="layui-input">
-                        </div>
-                        <div class="layui-form-mid layui-text-em">此此设仅对金币模式有效，选择金币模式后此价格不能为0，最好为整数。</div>
+                    <div class="layui-form-item userlevel" {if(!isset($config.charge_read_type) || !in_array('vip', $config['charge_read_type']) || in_array('free', $config['charge_read_type']))}style="display: none;"{/if}>
+                         <label class="layui-form-label">选择会员级别</label>
+                         <div class="layui-input-block">
+                            {empty name="$config.userlevel"}
+                                {volist name="$level" id="v"}
+                                    <input type="checkbox" name="userlevel[]" value="{$v.id}" title="{$v.title}">
+                                {/volist}
+                            {else/}
+                                {volist name="$level" id="v"}
+                                    <input type="checkbox" name="userlevel[]" value="{$v.id}" title="{$v.title}" {if(in_array($v['id'], $config['userlevel']))}checked{/if}>
+                                {/volist}
+                            {/empty}
+                         </div>
                     </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">前多少章免费</label>
+                    <div class="coin" {if(!isset($config.charge_read_type) || !in_array('coin', $config['charge_read_type']) || in_array('free', $config['charge_read_type']))}style="display: none;"{/if}>        
                         <div class="layui-input-inline layui-input-wrap">
-                          <input type="text" name="front_free_chapter_num" value="{$config.front_free_chapter_num|default='0'}" placeholder="请填写章节数" autocomplete="off" class="layui-input">
+                            {if $level}
+                                {volist name="$level" id="v"}
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">{$v.title}千字金币</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" name="read_thousand_price[{$v.id}]" autocomplete="off" value="{$config['read_thousand_price'][$v['id']]|default='0'}" placeholder="请填写{$v.title}千字金币" class="layui-input read_thousand_price">
+                                        </div>
+                                    </div>
+                                {/volist}
+                            {else/}
+                                <input type="text" name="read_thousand_price" value="{$config.read_thousand_price|default='0'}" placeholder="请填写千字金币" autocomplete="off" class="layui-input">
+                            {/if}
                         </div>
-                        <div class="layui-form-mid layui-text-em">此章节数仅对金币模式有效，为0则表示所有章节不免费。</div>
+                        <div class="layui-form-item">此处设置仅对金币模式有效，如果价格为0，则等于会员模式。</div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">前多少章免费</label>
+                            <div class="layui-input-inline layui-input-wrap">
+                            <input type="text" name="front_free_chapter_num" value="{$config.front_free_chapter_num|default='0'}" placeholder="请填写章节数" autocomplete="off" class="layui-input">
+                            </div>
+                            <div class="layui-form-mid layui-text-em">此章节数仅对金币模式有效，为0则表示所有章节不免费。</div>
+                        </div>
                     </div>
                 </div>                
             </div>
@@ -178,7 +203,44 @@
 <script>
 	const moduleInit = ['tool'];
 	function feiniaoInit() {
-		var form = layui.form, tool = layui.tool;      
+		var form = layui.form, tool = layui.tool;
+        form.on('checkbox(free)', function(data) {
+            if(data.elem.checked) {
+				$('.userlevel, .coin').hide();
+                $("input[lay-filter='userlevel'], input[lay-filter='coin']").each(function(){
+                    this.checked = false;
+                });
+                $("input[name='userlevel[]']").prop('checked', false);
+                $('.read_thousand_price').val(0);
+                form.render();
+			}
+		});
+        form.on('checkbox(userlevel)', function(data) {
+            if(data.elem.checked) {
+                $("input[lay-filter='free']").prop('checked', false);
+                $('input[name=login_read_open][value=0]').prop('checked', true);
+                form.render('radio');
+                form.render('checkbox');
+				$('.userlevel').show();
+			} else {                
+                $("input[name='userlevel[]']").prop('checked', false);
+                form.render('checkbox');
+				$('.userlevel').hide();
+			}
+		});
+        form.on('checkbox(coin)', function(data) {
+            if(data.elem.checked) {
+                $("input[lay-filter='free']").prop('checked', false);
+                $('input[name=login_read_open][value=0]').prop('checked', true);
+                form.render('radio');
+                form.render('checkbox');
+				$('.coin').show();
+			} else {
+                $('.read_thousand_price').val(0);
+                form.render();
+				$('.coin').hide();
+			}
+		});
 		//监听提交
 		form.on('submit(webform)', function (data) {
 			let callback = function (e) {

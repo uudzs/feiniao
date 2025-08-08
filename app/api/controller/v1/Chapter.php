@@ -51,19 +51,8 @@ class Chapter extends BaseController
         if (intval($book['status']) != 1) {
             $this->apiError('407');
         }
-        $hide_content = false;
-        $power_config = get_system_config('power');
-        if (isset($power_config['login_read_open']) && intval($power_config['login_read_open']) == 1) {
-            $login_read_num = isset($power_config['login_read_num']) ? intval($power_config['login_read_num']) : 0;
-            if (!$uid && $login_read_num > 0) {
-                $chaps = intval($chapter['chaps']);
-                if ($chaps > $login_read_num) {
-                    $hide_content = true;
-                }
-            } else if (!$uid && $login_read_num <= 0) {
-                $hide_content = true;
-            }
-        }
+        $chapter['chapteraccess'] = chapterCheckAccess($id);
+        $hide_content = $chapter['chapteraccess'] !== 1;
         $book['cover'] = get_file($book['cover']);
         $chapter['book'] = $book;
         $chapter['hide_content'] = $hide_content;
@@ -84,7 +73,7 @@ class Chapter extends BaseController
                 $chapter['content'] = '';
             }
         } else {
-            $chapter['content'] = lang('common.isnotlogin');
+            $chapter['content'] = lang('common.nopermission');
         }
         $bookid = $book['id'];
         $chapter_id = $id;

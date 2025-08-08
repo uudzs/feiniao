@@ -16,7 +16,6 @@
 </style>
 {php}
 $conConfig = get_system_config('content');
-$book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();
 {/php}
 {notempty name="book"}
     {php}
@@ -28,10 +27,9 @@ $book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();
             $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
             $subgenrelink = url('book_cates', ['id' => $book['genre']]);
         }
-        $chapterlist = model('chapter')->field('id,title,chaps,create_time')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
-        $author = model('author')->where(['id'=>$book['authorid'], 'status' => 1])->find();            
-        $chapter = model('chapter')->where(['id'=>$id, 'status' => 1, ['verify', 'in', '0,1']])->find();            
-        $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
+        if (!$conConfig['chapter_pages_content_open']) {
+            $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
+        }
     {/php}
 {/notempty}
 <div class="reader" id="page_reader">
@@ -117,13 +115,52 @@ $book = model('book')->where(['id'=>$bookid, 'status' => 1])->find();
                     <div class="reader-line"></div>
                     <div class="content" id="chapter_content">
                         {if $conConfig['chapter_pages_content_open']}
-                            {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open']}
-                                {foreach $content as $index => $text}
-                                    <p data-id="{$index|raw}">{$text|raw}</p>
-                                {/foreach}
+                            {if isset($chapter['chapteraccess']) && $chapter['chapteraccess'] !== 1}
+                                {if $chapter['chapteraccess'] == -1}
+                                    <p data-id="0">章节内容为空！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -2}
+                                    <p data-id="0">未设置阅价格！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -8}
+                                    <p data-id="0">参数错误！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -9}
+                                    <p data-id="0">请登录后再阅读！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -10}
+                                    <p data-id="0">用户不存在！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -11}
+                                    <p data-id="0">没有阅读权限，请升级会员身份！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -12}
+                                    <p data-id="0">非法用户身份！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -13}
+                                    <p data-id="0">章节不存在！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -14}
+                                    <p data-id="0">章节被禁止！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -15}
+                                    <p data-id="0">章节内容为空！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -16}
+                                    <p data-id="0">没有金币！</p>
+                                {/if}
+                                {if $chapter['chapteraccess'] == -17}
+                                    <p data-id="0">不够本章节所需的金币数，请充值！</p>
+                                {/if}                                
                             {else/}
-                                {$content|raw}
-                            {/if}
+                                {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open'] && is_array($content)}
+                                    {foreach $content as $index => $text}
+                                        <p data-id="{$index|raw}">{$text|raw}</p>
+                                    {/foreach}
+                                {else/}
+                                    {$content|raw}
+                                {/if}
+                            {/if}                            
                         {/if}
                     </div>
                     <div class="btn-w">
@@ -428,8 +465,7 @@ $(window).on('load', function () {
                 const info = result.data.data[0];
                 chapter_info = info;
                 $('.read-speed').find('i').css('width', info.speed + '%');
-                $('.read-speed').find('font').text('阅读进度：' + info.speed + '%');
-                if(info && info.hide_content) $('.content').html(info.content);                
+                $('.read-speed').find('font').text('阅读进度：' + info.speed + '%');            
             }
         });
         {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open']}

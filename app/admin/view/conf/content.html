@@ -39,15 +39,15 @@
 				</div>
 				<div class="layui-form-mid layui-word-aux">是否启用章节压缩，启用后会降低空间占用大小，也会增加一些计算性能。</div>
 			</div>
-			<div class="chapter_compress_seting">
-				<div class="layui-form-item" {if !isset($config.chapter_compress_open) || $config.chapter_compress_open == 0}style="display: none;"{/if}>
+			<div class="chapter_compress_seting" {if !isset($config.chapter_compress_open) || $config.chapter_compress_open == 0}style="display: none;"{/if}>
+				<div class="layui-form-item">
 					<label class="layui-form-label">数据压缩等级</label>
 					<div class="layui-input-inline">
 						<select name="compress_level">
 							<option value="0"{empty name="$config.compress_level"} selected{/empty}>不压缩</option>
 							<option value="1"{if isset($config.compress_level) && $config.compress_level == 1} selected{/if}>普通</option>
 							<option value="6"{if isset($config.compress_level) && $config.compress_level == 6} selected{/if}>一般</option>
-							<option value="9"{if isset($config.compress_level) && $config.compress_level == 3} selected{/if}>最高</option>
+							<option value="9"{if isset($config.compress_level) && $config.compress_level == 9} selected{/if}>最高</option>
 						</select>					
 					</div>
 					<div class="layui-form-mid layui-word-aux">开启章节压缩后有效，压缩等级越高，性能消耗越大，请合理选择。</div>

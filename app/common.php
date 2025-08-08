@@ -8,7 +8,6 @@ use think\facade\Request;
 use avatars\MDAvatars;
 use think\Image;
 use think\facade\Route;
-use think\facade\Lang;
 
 //设置缓存
 function set_cache($key, $value, $date = 86400)
@@ -1621,5 +1620,118 @@ if (!function_exists('isJson')) {
     {
         $json = json_decode($string);
         return (json_last_error() == JSON_ERROR_NONE) && (!is_null($json));
+    }
+}
+if (!function_exists('chapterCheckAccess')) {
+    function chapterCheckAccess($chapterId = 0)
+    {
+        $uid = defined('JWT_UID') && JWT_UID ? JWT_UID : 0;
+        if (empty($chapterId)) return -8;
+        $power_config = get_system_config('power');
+        $front_free_chapter_num = $power_config['front_free_chapter_num'] ?? 0;
+        $read_thousand_price = $power_config['read_thousand_price'] ?? 0;
+        $charge_read_type = $power_config['charge_read_type'] ?? [];
+        $userlevel = $power_config['userlevel'] ?? [];
+        $needles = ['coin', 'vip'];
+        $anyExist = (bool)array_intersect($needles, $charge_read_type);
+        if ($anyExist) {
+            if (empty($uid)) return -9;
+            $userinfo = Db::name('user')->field('id,level,status,coin')->where('id', $uid)->find();
+            if (empty($userinfo)) return -10;
+            if (in_array('vip', $charge_read_type)) {
+                if (empty($userinfo['level'])) return -11;
+                $level = Db::name('user_level')->field('id,title')->where('status', 1)->select()->column(null, 'id');
+                if (in_array($userinfo['level'], $userlevel)) {
+                    if (!isset($level[$userinfo['level']])) return -12;
+                    return 1;
+                }
+            }
+            if (in_array('coin', $charge_read_type)) {
+                $chapter = Db::name('chapter')->field('id,bookid,wordnum,status,chaps,verify')->where('id', $chapterId)->find();
+                if (empty($chapter)) return -13;
+                if (intval($chapter['status']) <= 0 || intval($chapter['verify']) >= 2) return -14;
+                if (empty($chapter['wordnum'])) return -15;
+                $front_free_chapter_num = intval($front_free_chapter_num);
+                $chaps = intval($chapter['chaps']);
+                if ($front_free_chapter_num > 0 && $front_free_chapter_num >= $chaps) {
+                    return 1;
+                }
+                $order = Db::name('order')->where(['user_id' => $uid, 'pid' => $chapterId, 'product_type' => 'chapter', 'virtual_type' => 2, 'paid' => 1, 'status' => 2])->count() ?? 0;
+                if ($order) return 1;
+                $price = 0;
+                $wordnum = intval($chapter['wordnum']);
+                if (empty($userinfo['coin'])) return -16;
+                if (is_array($read_thousand_price) && isset($read_thousand_price[$userinfo['level']]) && $read_thousand_price[$userinfo['level']]) {
+                    $price = getChapterPrice($wordnum, $read_thousand_price[$userinfo['level']]);
+                } else {
+                    $price = getChapterPrice($wordnum, $read_thousand_price);
+                }
+                $coin = intval($userinfo['coin']);
+                if ($price < 0) return $price;
+                if ($coin < $price) return -17;
+                Db::startTrans();
+                try {
+                    $data = [
+                        'user_id' => $uid,
+                        'pid' => $chapterId,
+                        'pay_type' => 'balance',
+                        'product_type' => 'chapter',
+                        'status' => 2,
+                        'paid' => 1,
+                        'order_id' => 'c_' . (new idwork\Idwork())->generateId(),
+                        'total_num' => 1,
+                        'total_price' => $price,
+                        'total_postage' => 0,
+                        'pay_price' => $price,
+                        'add_time' => time(),
+                        'pay_time' => time(),
+                        'use_integral' => 0,
+                        'is_del' => 0,
+                        'is_system_del' => 0,
+                        'virtual_type' => 2,
+                        'virtual_info' => '章节消费',
+                        'channel_type' => 'balance'
+                    ];
+                    Db::name('order')->strict(false)->field(true)->insertGetId($data);
+                    Db::name('user')->where('id', $uid)->dec('coin', $price)->update();
+                    add_coin_log($uid, $price, 0, '章节消费');
+                    // 提交事务
+                    Db::commit();
+                    return 1;
+                } catch (\Exception $e) {
+                    // 回滚事务
+                    Db::rollback();
+                    return 0;
+                }
+            }
+        }
+        $login_read_open = $power_config['login_read_open'] ?? 0;
+        $login_read_num = $power_config['login_read_num'] ?? 0;
+        if ($login_read_open) {
+            if (empty($login_read_num)) {
+                if (empty($uid)) return -9;
+            } else {
+                $chapter = Db::name('chapter')->field('id,bookid,wordnum,status,chaps,verify')->where('id', $chapterId)->find();
+                if (empty($chapter)) return -13;
+                if (intval($chapter['status']) <= 0 || intval($chapter['verify']) >= 2) return -14;
+                $login_read_num = intval($login_read_num);
+                $chaps = intval($chapter['chaps']);
+                if ($login_read_num >= $chaps) {
+                    return 1;
+                } else {
+                    return -19;
+                }
+            }
+        }
+        return 1;
+    }
+    if (!function_exists('getChapterPrice')) {
+        function getChapterPrice($wordnum, $read_thousand_price)
+        {
+            if (empty($wordnum)) return -1;
+            if (empty($read_thousand_price)) return -2;
+            $thousands = $wordnum / 1000;
+            return ceil($thousands * intval($read_thousand_price));
+        }
     }
 }

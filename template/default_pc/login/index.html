@@ -137,6 +137,7 @@
                             key: 'token',
                             value: result.data.token
                         });
+                        $.setCookie(sessionname, result.data.token, 365);
                         window.location.href = refererUrl;
                     } else {
                         $('#refreshCaptcha').attr("src", "{:furl('v1/captcha', [], true, 'api')}" + "?" + Math.random());
@@ -168,6 +169,7 @@
                             key: 'token',
                             value: result.data.token
                         });
+                        $.setCookie(sessionname, result.data.token, 365);
                         window.location.href = refererUrl;
                     }
                 });
