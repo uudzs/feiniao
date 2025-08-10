@@ -81,9 +81,6 @@
                   {php} $targetType = 1; $target_id = $bid; {/php}
                   {include file="common/comment" /}
               {/if}
-              {eq name=":get_addons_is_enable('changyan')" value="1"}
-              {:hook('commentsHook', ['terminal' => 'wap_script', 'bookid' => $bid])}
-              {/eq}
             </li>
         </ul>
     </div>

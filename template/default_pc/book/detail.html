@@ -30,13 +30,8 @@
 
 </style>
 <div class="container book-detail">
-    {php}$book = model('book')->where(['id'=>$bid, 'status' => 1])->find();{/php}
     {notempty name="book"}
         {php}
-        if($book['genre']) {
-            $genrename = model('category')->where(['status' => 1, 'id' => $book['genre']])->value('name');
-            $genrelink = url('book_cates', ['id' => $book['genre']]);
-        }
         if($book['subgenre']) {
             $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
             $subgenrelink = url('book_cates', ['id' => $book['subgenre']]);
@@ -74,9 +69,7 @@
         if(isset($pageconf['book_detail_first_chapter_isshow']) && $pageconf['book_detail_first_chapter_isshow']) {
             $content = $title = '';
             if($chapterlist && $chapterlist[0]) {
-                $chaptertable = calc_hash_db($book['id']); //章节内容表名
-                $title = $chapterlist[0]['title'];
-                $content = model($chaptertable)->where(['sid' => $chapterlist[0]['id']])->value('info');
+                $content = content\Content::get($book['id'], $chapterlist[0]['id']);
                 list($cnt, $content) = countWordsAndContent($content);
             }
         }
@@ -94,8 +87,8 @@
                     {/eq}
                 </div>
                 <p class="book-info__categories">
-                    {notempty name="$genrename"}
-                    <a class="category" href="{$genrelink}">{$genrename}</a>
+                    {notempty name="$bigclassname"}
+                    <a class="category" href="{:url('book_cates', ['id' => $book['genre']])}">{$bigclassname}</a>
                     {/notempty}
                     {notempty name="$subgenrename"}
                     <a class="category" href="{$subgenrelink}">{$subgenrename}</a>
@@ -119,16 +112,16 @@
             </section>
             <section class="author-info"  >
                 <a href="{:url('author_detail',['id'=>$book['authorid']])}" class="author-info--img">
-                    <img class="author-info-via" src="{:get_file($author.headimg)}" lazy="loaded">
+                    <img class="author-info-via" src="{:get_file($author.headimg??'')}" lazy="loaded">
                 </a>
-                <a href="{:url('author_detail',['id'=>$book['authorid']])}" class="author-info--name">{$book.author}</a>
-                {eq name="$author.issign" value="1"}
+                <a href="{$book.authorurl}" class="author-info--name">{$book.author}</a>
+                {if $author && $author['issign']}
                     <div class="author-info--badges">
                         <span class="author-info--badges-sign"><img src="{__ASSETS__}/init/images/sign_ico.png" alt="签约作家"></span>
                     </div>
                 {else/}
                     <div class="author-info--badges" style="margin-bottom: 20px;"></div>
-                {/eq}
+                {/if}
                 <div class="author-info--outputs" >
                     <div>
                         <span><b>{$book_count}</b></span>
@@ -152,7 +145,7 @@
             <ul class="layui-tab-title">
               <li class="layui-this">作品信息</li>
               <li>章节目录({:count($chapterlist)})</li>
-              <li>作品评论{eq name=":get_addons_is_enable('changyan')" value="1"}({:hook('commentsNum', ['bookid' => $book['id']])}){/eq}</li>
+              <li>作品评论</li>
             </ul>
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show remark">
@@ -203,9 +196,6 @@
                         {php} $targetType = 1; $target_id = $book['id']; {/php}
                         {include file="common/comment" /}
                     {/if}
-                    {eq name=":get_addons_is_enable('changyan')" value="1"}
-                    {:hook('commentsHook', ['terminal' => 'pc_script', 'bookid' => $book['id']])}
-                    {/eq}
                 </div>
             </div>
         </div>       
@@ -280,45 +270,6 @@
         </div>        
     {/notempty}
 </div>
-<style>
-#SOHUCS #SOHU_MAIN .module-cmt-footer .section-service-w .service-wrap-w a {
-    display: none!important
-}
-#SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw, #SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw:hover {
-    background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
-    color: #fff !important;
-    padding: 6px 13px!important;
-    border-radius: 50px!important;
-    font-weight: 400!important;
-    line-height: normal!important;
-    letter-spacing: 0.5px!important;
-    position: relative!important;
-    z-index: 1!important;
-    width: auto !important;
-    height: auto !important;
-    font-size: 15px!important;
-    overflow: hidden !important;
-}
-#SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .cy-logo {
-    background-size: contain!important;
-    background-repeat: no-repeat!important;
-    background-position: center center!important;
-}
-#SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .list-comment-empty-w .empty-prompt-w {
-    background: none!important;
-}
-#SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .platform-login .split-hr {
-    display: none!important;
-}
-#SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .block-head-w .head-img-w img {
-    border-radius: 50%!important;
-    clip-path: inset(0 round 20px);
-}
-#SOHUCS #SOHU_MAIN .module-cmt-list .block-cont-gw .cont-head-gw .head-img-gw img {
-    border-radius: 50%!important;
-    clip-path: inset(0 round 20px);
-}
-</style>
 {/block}
 <!-- 脚本 -->
 {block name="script"}
@@ -373,10 +324,6 @@
             });
         })
         {/eq}
-        $('.header-login').on('click', function () {
-            layer.msg('ddd');
-            $('.changyan-overlay-outer .phone-login .login-btn').html('登录');
-        })
         $('.author-info--btn').on('click', function () {
             var text = $(this).text().split(' ').join('');
             $.postApi("{:furl('v1/follow', [], true, 'api')}", {"from_id": bookinfo.authorid, "type": 1}, function(result) {

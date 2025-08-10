@@ -106,7 +106,7 @@ $conConfig = get_system_config('content');
             <div class="reader-content" id="Jcontent">
                 <div class="reader-box">
                     <div class="title">
-                        <div class="title_txtbox">{$chapter.title}</div>
+                        <div class="title_txtbox">{:get_full_chapter($chapter['title'], $chapter['chaps'])}</div>
                     </div>
                     <div class="bookinfo">
                         <span>本章字数：<i>{$chapter.wordnum}</i></span>
@@ -163,13 +163,15 @@ $conConfig = get_system_config('content');
                             {/if}                            
                         {/if}
                     </div>
-                    <div class="btn-w">
-                        <div class="btn-pagination">
-                            <a href="{$front_url|default='javascript:void(0);'}">← 上一章</a>
-                            <a href="{$after_url|default='javascript:void(0);'}">下一章 →</a>
+                    {if $conConfig['chapter_pages_content_open']}
+                        <div class="btn-w">
+                            <div class="btn-pagination">
+                                <a href="{$front_url|default='javascript:void(0);'}">← 上一章</a>
+                                <a href="{$after_url|default='javascript:void(0);'}">下一章 →</a>
+                            </div>
+                            <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
                         </div>
-                        <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
-                    </div>
+                    {/if}
                 </div>
             </div>
         </div>
@@ -181,9 +183,6 @@ $conConfig = get_system_config('content');
                         {php} $targetType = 2; $target_id = $chapter['id']; {/php}
                         {include file="common/comment" /}
                     {/if}
-                    {eq name=":get_addons_is_enable('changyan')" value="1"}
-                    {:hook('commentsHook', ['terminal' => 'pc_script', 'chapterid' => $chapter['id']])}
-                    {/eq}
                 </div>
             </div>
         </div>
@@ -193,7 +192,9 @@ $conConfig = get_system_config('content');
         <div class="gpd-guidebar">
             <div class="tooltip-wrapper"><button class="list"><i class="bi bi-justify"></i><span class="text">目录</span></button></div>
             <div class="tooltip-wrapper"><button class="setting"><i class="bi bi-nut"></i><span class="text">设置</span></button></div>
+            {if isset($conConfig['listen_book_open']) && $conConfig['listen_book_open']}
             <div class="tooltip-wrapper"><button class="listen"><i class="bi bi-music-note-list"></i><span class="text">听书</span></button></div>
+            {/if}
             <div class="tooltip-wrapper"><button class="comment"><i class="bi bi-chat-dots"></i><span class="text">评论</span></button></div>
             <div class="tooltip-wrapper"><button class="like"><i class="bi bi-heart"></i><span class="text">点赞</span></button></div>
             <div class="tooltip-wrapper"><button class="bookshelf"><i class="bi bi-bag-plus"></i><span class="text">书架</span></button></div>
@@ -247,65 +248,250 @@ $conConfig = get_system_config('content');
                     </div>
                 </div>
             </div>
+            {if isset($conConfig['listen_book_open']) && $conConfig['listen_book_open']}
+            <style>
+            :root {
+                --primary: #3498db;
+                --dark: #2c3e50;
+                --light: #ecf0f1;
+                --danger: #e74c3c;
+                --border-radius: 12px;
+                --transition: all 0.3s ease;
+            }
+            .tts-container {
+                width: 100%;
+            }
+
+            .tts-container .tts-controls {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .tts-container .control-group {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .tts-container .control-group label {
+                display: flex;
+                align-items: center;
+                font-size: 18px;
+                font-weight: 600;
+                color: var(--dark);
+                margin-bottom: 10px;
+            }
+
+            .tts-container .control-group label i {
+                margin-right: 12px;
+                color: var(--primary);
+                font-size: 20px;
+                width: 24px;
+                text-align: center;
+            }
+
+            .tts-container select {
+                padding: 15px;
+                border: none;
+                background-color: #f5f7fa;
+                border-radius: 10px;
+                font-size: 16px;
+                color: var(--dark);
+                border: 2px solid transparent;
+                transition: var(--transition);
+                appearance: none;
+                background-image: url('data:image/svg+xml;utf8,<svg fill="%233498db" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+                background-repeat: no-repeat;
+                background-position: right 15px center;
+                background-size: 16px;
+            }
+
+            .tts-container select:focus {
+                outline: none;
+                border-color: var(--primary);
+                background-color: white;
+                box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+            }
+
+            .tts-container .control-group.button-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-top: 10px;
+            }
+
+            .tts-container input[type="checkbox"] {
+                appearance: none;
+                -webkit-appearance: none;
+                width: 18px;
+                height: 18px;
+                border: 2px solid #bbb;
+                border-radius: 4px;
+                outline: none;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.2s ease;
+            }
+
+            .tts-container input[type="checkbox"]:checked {
+                background-color: #4285f4;
+                border-color: #4285f4;
+            }
+
+            .tts-container input[type="checkbox"]:checked::after {
+                content: '✓';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                color: white;
+                font-size: 14px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .tts-container input[type="checkbox"]:hover {
+                border-color: #aaa;
+            }
+
+            .tts-container input[type="checkbox"]:focus {
+                box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+            }
+
+            .tts-container .btn {                
+                flex: 1;
+                padding: 8px 10px;
+                border: none;
+                border-radius: 5px;
+                font-size: 17px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: var(--transition);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+
+            .tts-container .btn i {
+                margin-right: 8px;
+                font-size: 17px;
+            }
+
+            .tts-container .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            }
+
+            .tts-container .btn:active {
+                transform: translateY(1px);
+            }
+
+            .tts-container .btn-play {
+                background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
+                color: white;
+            }
+
+            .tts-container .btn-play:hover {
+                background: linear-gradient(to right, #148AFF, #12C6FB);
+            }
+
+            .tts-container .btn-stop {
+                background: linear-gradient(to right, var(--danger), #c0392b);
+                color: white;
+            }
+
+            .tts-container .btn-stop:hover {
+                background: linear-gradient(to right, #c0392b, #a93226);
+            }
+
+            .tts-container .btn.disabled {
+                background: #7a7a7a;
+                cursor: not-allowed;
+                transform: none;
+                box-shadow: none;
+                opacity: 0.7;
+            }
+
+            .tts-container .btn.disabled:hover {
+                transform: none;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            }
+
+            .tts-highlight {
+                background: rgba(72, 149, 239, 0.3) !important;
+                box-shadow: 0 0 15px rgba(72, 149, 239, 0.5);
+                animation: highlight-pulse 2s infinite;
+            }
+            
+            @keyframes highlight-pulse {
+                0% { box-shadow: 0 0 10px rgba(72, 149, 239, 0.5); }
+                50% { box-shadow: 0 0 20px rgba(72, 149, 239, 0.8); }
+                100% { box-shadow: 0 0 10px rgba(72, 149, 239, 0.5); }
+            }
+            </style>
             <div class="gpd-wrap gpd-listen-wrap" style="display:none">
                 <h3>听书阅读</h3>
-                <div class="tit">{eq name=":get_addons_is_enable('baiduspeech')" value="1"}{:hook('baiduspeechHook', ['terminal' => 'web', 'bookid' => $bookid, 'chapterid' => $chapter['id']])}{/eq}</div>
-            </div>            
+                <div class="tit">
+                    <div class="tts-container">
+                        <div class="tts-controls">
+                            <div class="control-group">
+                                <label for="tts-voices"><i class="bi bi-soundwave"></i> 语音</label>
+                                <select id="tts-voices">
+                                    <option value="0">Microsoft Xiaoxiao (中文)</option>
+                                    <option value="1">Google US English</option>
+                                    <option value="2">Amazon Amy (British)</option>
+                                    <option value="3">Apple Samantha</option>
+                                </select>
+                            </div>
+                            
+                            <div class="control-group">
+                                <label for="tts-rate"><i class="bi bi-sliders"></i> 语速</label>
+                                <select id="tts-rate">
+                                    <option value="0.5">慢速</option>
+                                    <option value="0.8">稍慢</option>
+                                    <option value="1.0" selected="">正常</option>
+                                    <option value="1.3">稍快</option>
+                                    <option value="1.6">快速</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group button-group">
+                                <label><i class="bi bi-repeat"></i> 自动朗读</label>
+                                <input type="checkbox" name="tts-read" id="tts-read" value="1">
+                            </div>
+                            
+                            <div class="control-group button-group">
+                                <button class="btn btn-play" id="ttsstart"><i class="bi bi-play"></i> 开始听书</button>
+                                <button class="btn btn-stop" id="ttsstop"><i class="bi bi-stop"></i> 停止</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                window.TTSChapterContainer = '#Jcontent .content';
+                window.TTSChapterContentOpen = parseInt("{$conConfig['chapter_pages_content_open']|default='0'}");
+                window.TTSChapterNextPageObj = $('.btn-pagination a').eq(1);
+                function feiniaoGetCookie() {
+                    return $.getCookie("feiniaoTTS");
+                }
+                function feiniaoSetCookie(value) {
+                    return $.setCookie("feiniaoTTS", value, 365);
+                }
+            </script>
+            <script src="{__STATIC__}/home/js/tts.js?v={$version}"></script>
+            {/if}
         </div>
     </div>
 </div>
-{eq name=":get_addons_is_enable('changyan')" value="1"}
-<style>
-    #SOHUCS #SOHU_MAIN .module-cmt-footer .section-service-w .service-wrap-w a {
-        display: none!important
-    }
-    #SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw, #SOHUCS #SOHU_MAIN .module-cmt-box .post-wrap-w .wrap-action-w .action-issue-w .issue-btn-w a .btn-fw:hover {
-        background: var(--Linear, linear-gradient(159deg, #12C6FB 31.17%, #148AFF 72.66%));
-        color: #fff !important;
-        padding: 6px 13px!important;
-        border-radius: 50px!important;
-        font-weight: 400!important;
-        line-height: normal!important;
-        letter-spacing: 0.5px!important;
-        position: relative!important;
-        z-index: 1!important;
-        width: auto !important;
-        height: auto !important;
-        font-size: 15px!important;
-        overflow: hidden !important;
-    }
-    #SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .cy-logo {
-        background-size: contain!important;
-        background-repeat: no-repeat!important;
-        background-position: center center!important;
-    }
-    #SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .list-comment-empty-w .empty-prompt-w {
-        background: none!important;
-    }
-    #SOHUCS #SOHU_MAIN .changyan-login-dialog-wrapper .platform-login .split-hr {
-        display: none!important;
-    }
-    #SOHUCS #SOHU_MAIN .module-cmt-header .section-cbox-w .block-head-w .head-img-w img {
-        border-radius: 50%!important;
-        clip-path: inset(0 round 20px);
-    }
-    #SOHUCS #SOHU_MAIN .module-cmt-list .block-cont-gw .cont-head-gw .head-img-gw img {
-        border-radius: 50%!important;
-        clip-path: inset(0 round 20px);
-    }
-</style>
-{/eq}
 {/block}
 <!-- 脚本 -->
 {block name="script"}
 <script>
-{eq name=":get_addons_is_enable('changyan')" value="1"}
-var SOHUCS = false;
-{/eq}
 $(window).on('load', function () {
-    {eq name=":get_addons_is_enable('changyan')" value="1"}
-    $(".btn-fw").text('评论一下');
-    {/eq}
     var chapter_id = '{$id}';
     var bookid = '{$bookid}';
     window.chapter_info = {};
@@ -489,9 +675,6 @@ $(window).on('load', function () {
             document.ondragstart = function() { return false; };
         {/if}
     {/if}
-    {eq name=":get_addons_is_enable('changyan')" value="1"}
-        if($('#SOHUCS').length > 0) SOHUCS = true;
-    {/eq}
     //滚动
     {if !$conConfig['chapter_pages_content_open']}
         var isLoading = false;
@@ -524,10 +707,7 @@ $(window).on('load', function () {
             }
             $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_id}, function(result) {
                 isLoading = false;
-                if(result.code == 0) {
-                    {eq name=":get_addons_is_enable('changyan')" value="1"}
-                    get_sohucs(chapter_id);
-                    {/eq}
+                if(result.code == 0) {          
                     info = result.data.data[0];
                     chapter_id = info.front_chapter;
                     $('#JcatalogListWrap ul li').removeClass('active');
@@ -567,9 +747,6 @@ $(window).on('load', function () {
                 $.postApi("{:furl('v1/chapter', [], true, 'api')}", {limit: 1, id: chapter_info.after_chapter}, function(result) {
                     isLoading = false;
                     if(result.code == 0) {
-                        {eq name=":get_addons_is_enable('changyan')" value="1"}
-                        get_sohucs(chapter_info.after_chapter);
-                        {/eq}
                         chapter_info = result.data.data[0];
                         $('.read-speed').find('i').css('width', chapter_info.speed + '%');
                         $('.read-speed').find('font').text('阅读进度：' + chapter_info.speed + '%');
@@ -608,15 +785,6 @@ $(window).on('load', function () {
             return '<p>' + chapter.split("<br>").join("</p><p>") + "</p>";
         };
     {/if}
-    {eq name=":get_addons_is_enable('changyan')" value="1"}
-        function get_sohucs(id) {
-            $.postApi("{:addons_url('changyan://index/sohucs')}", {id: id}, function(result) {
-                if(result.code == 0) {
-                    if(result.data.sid) $('#SOHUCS').attr('sid', result.data.sid);
-                }
-            });       
-        }
-    {/eq}
 });
 </script>
 {/block}

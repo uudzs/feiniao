@@ -54,6 +54,7 @@ class Chapter extends BaseController
         $chapter['chapteraccess'] = chapterCheckAccess($id);
         $hide_content = $chapter['chapteraccess'] !== 1;
         $book['cover'] = get_file($book['cover']);
+        $chapter['title'] = get_full_chapter($chapter['title'], $chapter['chaps']);
         $chapter['book'] = $book;
         $chapter['hide_content'] = $hide_content;
         if (!$hide_content) {
