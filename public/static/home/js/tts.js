@@ -139,14 +139,34 @@
         if (paragraphs[currentParagraphIndex] && paragraphs[currentParagraphIndex].element) {
             const $currentPara = paragraphs[currentParagraphIndex].element;
             $currentPara.addClass('tts-highlight');            
-            // 滚动到可见位置
-            const offset = $currentPara.offset();
-            if (offset) {
-                $('html, body').animate({
-                    scrollTop: offset.top - 100
+            // 滚动到可见位置            
+            if(typeof TTSChapterScrollContainer !== "undefined") {
+                const container = TTSChapterScrollContainer[0];
+                const paragraph = $currentPara[0];           
+                const paragraphOffsetTop = getContainerRelativeOffset(paragraph, container);
+                const targetScrollTop = paragraphOffsetTop - 100;
+                TTSChapterScrollContainer.animate({
+                    scrollTop: targetScrollTop
                 }, 300);
+            } else {
+                const offset = $currentPara.offset();
+                if (offset) {
+                    $('html, body').animate({
+                        scrollTop: offset.top - 100
+                    }, 300);
+                }
             }
         }
+    }
+
+    // 辅助函数：计算元素相对于目标容器的内容顶部偏移量
+    function getContainerRelativeOffset(element, container) {
+        let offset = 0;
+        while (element && element !== container && element !== document.body) {
+            offset += element.offsetTop;
+            element = element.offsetParent;
+        }
+        return offset;
     }
 
     // 开始听书
