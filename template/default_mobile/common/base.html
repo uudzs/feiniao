@@ -2,7 +2,11 @@
 <html>
 <head>
     {php}
-	$systemconf = get_system_config('web');
+    if (get_addons_is_enable('sitegroup')) {
+        $systemconf = app('feiniaowebconfig');
+    } else {
+	    $systemconf = get_system_config('web');
+    }
     $version = get_config('upgrade.version');
 	{/php}
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />

@@ -420,7 +420,18 @@
 			</section>
 		</div>
 	{/notempty}
-	{php}$links = model('links')->where(['status' => 1])->order('sort desc')->select()->toArray();{/php}
+	{php}
+	$links = [];
+	if (get_addons_is_enable('sitegroup')) {
+		$feiniaoLinks = hook('siteGroupLinksHook');
+        if ($feiniaoLinks && isJson($feiniaoLinks)) {
+            $links = json_decode($feiniaoLinks, true);
+        }
+    }
+	if(empty($links)) {
+		$links = model('links')->where(['status' => 1])->order('sort desc')->select()->toArray();
+	}
+	{/php}
 	{notempty name="links"}
 	<div class="container comm_friendLnk">
 		<div class="comm_footer_partner">

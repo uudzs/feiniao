@@ -9,7 +9,18 @@
 		<link rel="mobile-prefetch" href=""/>
 	{/block}
 	{php}
-	$conf = get_system_config('web');
+	if (get_addons_is_enable('sitegroup')) {
+        $conf = app('feiniaowebconfig');
+		if(empty($conf)) {
+			$conf = get_system_config('web');
+		}
+		$feiniaoNavs = hook('siteGroupNavHook');
+        if ($feiniaoNavs && isJson($feiniaoNavs)) {
+            $feiniaoNavs = json_decode($feiniaoNavs, true);
+        }
+    } else {
+	    $conf = get_system_config('web');
+    }
 	$version = get_config('upgrade.version');
 	$pageconf = get_system_config('page');
 	{/php}

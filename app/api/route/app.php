@@ -74,10 +74,19 @@ Route::group('v1', function () {
     Route::rule('commentreply', 'api/v1.comment/reply', 'POST');
 })->prefix('v1.');
 try {
-    $rule = get_cache('routeRule');
-    if (!$rule) {
+    if (get_addons_is_enable('sitegroup')) {
+        $result = hook('siteGroupRouteHook');
+        if ($result && isJson($result)) {
+            $result = json_decode($result, true);
+            if ($result && is_array($result)) {
+                $rule = $result;
+            }
+        }
+        if (empty($rule)) {
+            $rule = Db::name('route')->field('id,rule,name,group')->where(['status' => 1])->order('id asc')->select()->toArray();
+        }
+    } else {
         $rule = Db::name('route')->field('id,rule,name,group')->where(['status' => 1])->order('id asc')->select()->toArray();
-        set_cache('routeRule', $rule);
     }
     $data = array_column($rule, null, 'name');
     if (isset($data['book_detail']) && $data['book_detail']['rule']) Route::rule($data['book_detail']['rule'], 'book/detail', 'GET')->name('book_detail');

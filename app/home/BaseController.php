@@ -12,6 +12,7 @@ use think\Response;
 use think\facade\Cookie;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+use think\facade\Event;
 
 /**
  * 控制器基础类
@@ -68,14 +69,49 @@ abstract class BaseController
         ];
         $domain_bind = get_config('app.domain_bind');
         $params['domain_bind'] = $domain_bind ? array_flip($domain_bind) : [];
-        View::config(['view_path' => $this->view_path()]);
-        $this->auth();
-        if (isWeChat()) {
-            // $config = get_config('wechat');
-            // $app = Factory::officialAccount($config);
-            // $appconfig = $app->jssdk->buildConfig(array('updateAppMessageShareData', 'updateTimelineShareData'), false, false, false);
-            // View::assign('appconfig', $appconfig);
+        if (get_addons_is_enable('sitegroup')) {
+            $result = hook('siteGroupHook');
+            if ($result && isJson($result)) {
+                $result = json_decode($result, true);
+                if ($result && is_array($result)) {
+                    if (isset($result['seo']) && $result['seo']) {
+                        app()->instance('feiniaoseo', $result['seo']);
+                        unset($result['seo']);
+                    }
+                    app()->instance('feiniaowebconfig', $result);
+                    if (Request::isMobile() || isWeChat()) {
+                        if (isset($result['template_mobile']) && $result['template_mobile']) {
+                            $dir = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $result['template_mobile'] . DIRECTORY_SEPARATOR;
+                            if (is_dir($dir)) {
+                                View::config(['view_path' => $dir]);
+                            } else {
+                                View::config(['view_path' => $this->view_path()]);
+                            }
+                        }
+                    } else {
+                        if (isset($result['template_pc']) && $result['template_pc']) {
+                            $dir = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $result['template_pc'] . DIRECTORY_SEPARATOR;
+                            if (is_dir($dir)) {
+                                View::config(['view_path' => $dir]);
+                            } else {
+                                View::config(['view_path' => $this->view_path()]);
+                            }
+                        }
+                    }
+                } else {
+                    app()->instance('feiniaoseo', []);
+                    app()->instance('feiniaowebconfig', []);
+                    View::config(['view_path' => $this->view_path()]);
+                }
+            } else {
+                app()->instance('feiniaoseo', []);
+                app()->instance('feiniaowebconfig', []);
+                View::config(['view_path' => $this->view_path()]);
+            }
+        } else {
+            View::config(['view_path' => $this->view_path()]);
         }
+        $this->auth();
         View::assign('params', $params);
     }
 

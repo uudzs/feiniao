@@ -1140,7 +1140,15 @@ if (!function_exists('get_invite_code')) {
 if (!function_exists('randNickname')) {
     function randNickname()
     {
-        $nickname = get_system_config('web', 'title') . '_' . set_salt(10);
+        if (get_addons_is_enable('sitegroup')) {
+            $system_config = app('feiniaowebconfig');
+            if (empty($system_config)) {
+                $system_config = get_system_config('web');
+            }
+        } else {
+            $system_config = get_system_config('web');
+        }
+        $nickname = $system_config['title'] . '_' . set_salt(10);
         $data = Db::name('user')->where(array('nickname' => $nickname))->find();
         if (empty($data)) {
             return $nickname;
@@ -1154,7 +1162,15 @@ if (!function_exists('randNickname')) {
 if (!function_exists('randNicknameAuthor')) {
     function randNicknameAuthor()
     {
-        $nickname = get_system_config('web', 'title') . '_' . set_salt(10);
+        if (get_addons_is_enable('sitegroup')) {
+            $system_config = app('feiniaowebconfig');
+            if (empty($system_config)) {
+                $system_config = get_system_config('web');
+            }
+        } else {
+            $system_config = get_system_config('web');
+        }
+        $nickname = $system_config['title'] . '_' . set_salt(10);
         $data = Db::name('author')->where(array('nickname' => $nickname))->find();
         if (empty($data)) {
             return $nickname;
@@ -1221,8 +1237,19 @@ if (!function_exists('get_seo_str')) {
     {
         $tags = ['{网站名}', '{大类名}', '{小类名}', '{书名}', '{作品标签}', '{作品简介}', '{作品签约状态}', '{作者}', '{作者所有作品名}', '{作者注册时间}', '{作者签约状态}', '{点击量}', '{年份}', '{连载状态}', '{作品字数}', '{章节数}', '{章节名}', '{域名}', '{邀请金币}'];
         if ($type == 'key') return $tags;
-        $system_config = get_system_config('web');
-        $seo_config = get_system_config('seo');
+        if (get_addons_is_enable('sitegroup')) {
+            $seo_config = app('feiniaoseo');
+            if (empty($seo_config)) {
+                $seo_config = get_system_config('seo');
+            }
+            $system_config = app('feiniaowebconfig');
+            if (empty($system_config)) {
+                $system_config = get_system_config('web');
+            }
+        } else {
+            $system_config = get_system_config('web');
+            $seo_config = get_system_config('seo');
+        }
         $site_title = (isset($seo_config['site_title']) && $seo_config['site_title']) ? $seo_config['site_title'] : $system_config['title'];
         $domain = (isset($seo_config['domain']) && $seo_config['domain']) ? $seo_config['domain'] : '';
         if (empty($content)) {

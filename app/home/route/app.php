@@ -4,10 +4,19 @@ use think\facade\Route;
 use think\facade\Db;
 
 try {
-    $rule = get_cache('routeRule');
-    if (!$rule) {
+    if (get_addons_is_enable('sitegroup')) {
+        $result = hook('siteGroupRouteHook');
+        if ($result && isJson($result)) {
+            $result = json_decode($result, true);
+            if ($result && is_array($result)) {
+                $rule = $result;
+            }
+        }
+        if (empty($rule)) {
+            $rule = Db::name('route')->field('id,rule,name,group')->where(['status' => 1])->order('id asc')->select()->toArray();
+        }
+    } else {
         $rule = Db::name('route')->field('id,rule,name,group')->where(['status' => 1])->order('id asc')->select()->toArray();
-        set_cache('routeRule', $rule);
     }
     $data = array_column($rule, null, 'name');
     if (isset($data['/']) && $data['/']['rule']) Route::rule($data['/']['rule'], 'index/index', 'GET')->name('/');

@@ -69,8 +69,8 @@ $conf = get_system_config('other');
 }
 </style>
 <div class="about">
-    {notempty name=":get_system_config('web','logo')"}    
-        <img src="{:get_system_config('web','logo')}" class="logo">
+    {notempty name="$systemconf.logo"}    
+        <img src="{$systemconf.logo}" class="logo">
     {/notempty}
     <div class="tips">
         <div class="span1">

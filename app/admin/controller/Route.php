@@ -44,8 +44,6 @@ class Route extends BaseController
             }
             $route = RouteModel::findOrFail($id);
             if ($route->save($param)) {
-                $list = RouteModel::field('id,rule,name,group')->where(['status' => 1])->order('id asc')->select()->toArray();
-                set_cache('routeRule', $list);
                 return to_assign(0);
             } else {
                 return to_assign(1, '更新失败');

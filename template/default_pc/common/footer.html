@@ -13,9 +13,15 @@
 				<div class="company-part">
 					<h6>{$conf.title}</h6>
 					<ul>
-						{foreach name=":get_navs('footer_nav')" item="a"}
-							<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
-						{/foreach}
+						{if get_addons_is_enable('sitegroup') && isset($feiniaoNavs) && $feiniaoNavs && isset($feiniaoNavs['footer_nav']) && $feiniaoNavs['footer_nav'] && isset($feiniaoNavs['footer_nav']['items']) && $feiniaoNavs['footer_nav']['items']}
+							{foreach name="$feiniaoNavs['footer_nav']['items']" item="a"}
+								<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+							{/foreach}
+						{else/}
+							{foreach name=":get_navs('footer_nav')" item="a"}
+								<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+							{/foreach}
+						{/if}
 					</ul>
 				</div>
 			</div>
@@ -23,9 +29,15 @@
 				<div class="help-part">
 					<h6>帮助中心</h6>
 					<ul>
-						{foreach name=":get_navs('footer_help')" item="a"}
-							<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
-						{/foreach}
+						{if get_addons_is_enable('sitegroup') && isset($feiniaoNavs) && $feiniaoNavs && isset($feiniaoNavs['footer_help']) && $feiniaoNavs['footer_help'] && isset($feiniaoNavs['footer_help']['items']) && $feiniaoNavs['footer_help']['items']}
+							{foreach name="$feiniaoNavs['footer_help']['items']" item="a"}
+								<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+							{/foreach}
+						{else/}
+							{foreach name=":get_navs('footer_help')" item="a"}
+								<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'javascript:;':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+							{/foreach}
+						{/if}
 					</ul>
 				</div>
 			</div>
@@ -44,12 +56,12 @@
 		<div class="row">
 			<div class="copy-right">
 				<p>
-					{:get_system_config('web','copyright')}
-					{notempty name=":get_system_config('web','beian')"}
-						<a target="_blank" rel="nofollow" href="http://www.beian.gov.cn/portal/registerSystemInfo">{:get_system_config('web','beian')}</a>
+					{$conf.copyright}
+					{notempty name="$conf.beian"}
+						<a target="_blank" rel="nofollow" href="http://www.beian.gov.cn/portal/registerSystemInfo">{$conf.beian}</a>
 					{/notempty}
-					{notempty name=":get_system_config('web','icp')"}
-						<a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{:get_system_config('web','icp')}</a>
+					{notempty name="$conf.icp"}
+						<a href="https://beian.miit.gov.cn/" target="_blank" rel="nofollow">{$conf.icp}</a>
 					{/notempty}
 				</p>
 			</div>

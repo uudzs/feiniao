@@ -1,22 +1,28 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+{php}
+if (get_addons_is_enable('sitegroup')) {
+  $conf = app('feiniaowebconfig');
+} else {
+  $conf = get_system_config('web');
+}
+$version = get_config('upgrade.version');
+{/php}
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <title>{:get_system_config('web','title')}</title>		
-    <meta name="keywords" content="{:get_system_config('web','keywords')}"/>
-    <meta name="description" content="{:get_system_config('web','desc')}"/>
+    <title>{$conf.title}</title>		
     <meta name="format-detection" content="telephone=no" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    <link rel="stylesheet" href="{__STATIC__}/font-awesome/css/font-awesome.min.css?v={:get_system_config('web','version')}" />
-    <link rel="stylesheet" href="{__STATIC__}/bui/css/bui.css?v={:get_system_config('web','version')}" />
-    <link rel="stylesheet" href="{__MOBILE__}/default/css/style.css?v={:get_system_config('web','version')}" />
+    <link rel="stylesheet" href="{__STATIC__}/font-awesome/css/font-awesome.min.css?v={$version}" />
+    <link rel="stylesheet" href="{__STATIC__}/bui/css/bui.css?v={$version}" />
+    <link rel="stylesheet" href="{__MOBILE__}/default/css/style.css?v={$version}" />
     <script>
         var tokenurl = "{:furl('v1/gettoken', [], true, 'api')}";
         var loginurl = "{:furl('login', [], true, 'home')}";
         var sessionname = "{:get_config('app.session_user')}";
     </script>
-    <script src="{__STATIC__}/bui/js/zepto.js?v={:get_system_config('web','version')}"></script>
-    <script src="{__STATIC__}/bui/js/bui.js?v={:get_system_config('web','version')}"></script>
+    <script src="{__STATIC__}/bui/js/zepto.js?v={$version}"></script>
+    <script src="{__STATIC__}/bui/js/bui.js?v={$version}"></script>
 </head>
 <body>
 <style>

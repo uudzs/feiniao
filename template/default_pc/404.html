@@ -1,13 +1,20 @@
 
 <!DOCTYPE html>
 <html lang="zxx">
-
+{php}
+if (get_addons_is_enable('sitegroup')) {
+  $conf = app('feiniaowebconfig');
+  if(empty($conf)) {
+    $conf = get_system_config('web');
+  }
+} else {
+  $conf = get_system_config('web');
+}
+{/php}
 <head>
-  <title>访问的页面不存在-{:get_system_config('web','title')}</title>
+  <title>访问的页面不存在-{$conf.title}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8" />
-  <meta name="keywords" content="{:get_system_config('web','title')}" />
-  <meta name="description" content="{:get_system_config('web','title')}" />
   <style>
 :root {
   --heading-color: #293462;
@@ -365,7 +372,7 @@ img.shape-w3-twelve {
 
 <body>
   <div class="error-block">
-    <h1><a href="#logo" class="brand-logo"><img src="{:get_system_config('web','logo')}" alt="{:get_system_config('web','title')}"></a></h1>
+    <h1><a href="#logo" class="brand-logo"><img src="{$conf.logo}" alt="{$conf.title}"></a></h1>
     <div class="grids-2">
       <div class="right-grid">
         <h2>404</h2>
@@ -375,7 +382,7 @@ img.shape-w3-twelve {
     </div>
     <!-- copyright -->
     <div class="copyright text-center">
-      <p>{:get_system_config('web','copyright')}</p>
+      <p>{$conf.copyright}</p>
     </div>
     <!-- //copyright -->
   </div>

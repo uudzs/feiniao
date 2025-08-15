@@ -27,20 +27,26 @@
 				</form>
 				<div class="top-manu">
 					<ul>
-						{foreach name=":get_navs($pageconf['home_nav'])" item="a"}
-							{empty name="$a.list"}
+						{if get_addons_is_enable('sitegroup') && isset($feiniaoNavs) && $feiniaoNavs && isset($feiniaoNavs[$pageconf['home_nav']]) && $feiniaoNavs[$pageconf['home_nav']] && isset($feiniaoNavs[$pageconf['home_nav']]['items']) && $feiniaoNavs[$pageconf['home_nav']]['items']}
+							{foreach name="$feiniaoNavs[$pageconf['home_nav']]['items']" item="a"}
 								<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'/':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
-							{else/}
-								<li>
-									<a href="{$a.src==''?'/':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a>
-									<ul class="sub-manu">
-										{foreach name="$a.list" item="b"}
-										<li><a href="{$b.src==''?'/':$b.src}" {eq name="b.target" value="1" } target="_blank"{/eq}>{$b.title}</a></li>
-										{/foreach}
-									</ul>
-								</li>
-							{/empty}
-						{/foreach}
+							{/foreach}
+						{else/}
+							{foreach name=":get_navs($pageconf['home_nav'])" item="a"}
+								{empty name="$a.list"}
+									<li {if condition="$a.src == $params.current_url"}class="active"{/if}><a href="{$a.src==''?'/':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a></li>
+								{else/}
+									<li>
+										<a href="{$a.src==''?'/':$a.src}" {eq name="a.target" value="1" } target="_blank"{/eq}>{$a.title}</a>
+										<ul class="sub-manu">
+											{foreach name="$a.list" item="b"}
+											<li><a href="{$b.src==''?'/':$b.src}" {eq name="b.target" value="1" } target="_blank"{/eq}>{$b.title}</a></li>
+											{/foreach}
+										</ul>
+									</li>
+								{/empty}
+							{/foreach}
+						{/if}
 						</style>
 						<li class="loginstatus">
 							<a href="{:furl('login', [], true, 'home')}" class="login-btn">登录</a>							
