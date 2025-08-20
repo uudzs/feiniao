@@ -169,7 +169,9 @@ $conConfig = get_system_config('content');
                                 <a href="{$front_url|default='javascript:void(0);'}">← 上一章</a>
                                 <a href="{$after_url|default='javascript:void(0);'}">下一章 →</a>
                             </div>
+                            {if get_system_config('power','report_open')}
                             <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
+                            {/if}
                         </div>
                     {/if}
                 </div>
@@ -494,6 +496,7 @@ $conConfig = get_system_config('content');
 $(window).on('load', function () {
     var chapter_id = '{$id}';
     var bookid = '{$bookid}';
+    var report_open = parseInt("{:get_system_config('power','report_open')}");
     window.chapter_info = {};
     var info = {};
     var config = layui.data('feiniao').readconfig;
@@ -723,7 +726,7 @@ $(window).on('load', function () {
                                     <div class="reader-line"></div>
                                     <div class="content">${format_chapter(info.content)}</div>
                                     <div class="btn-w">
-                                        <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
+                                    ${report_open > 0 ? '<div class="btn-report"><a href="{:url("report")}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>' : ''}
                                     </div>
                                 </div>`;
                     $('#Jcontent').prepend(html);
@@ -763,7 +766,7 @@ $(window).on('load', function () {
                                         <div class="reader-line"></div>
                                         <div class="content">${format_chapter(chapter_info.content)}</div>
                                         <div class="btn-w">
-                                            <div class="btn-report"><a href="{:url('report')}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>
+                                            ${report_open > 0 ? '<div class="btn-report"><a href="{:url("report")}" target="_blank"><i class="bi bi-shield-exclamation"></i>举报</a></div>' : ''}
                                         </div>
                                     </div>`;
                         $('#Jcontent').append(html);

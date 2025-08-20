@@ -23,6 +23,7 @@ $version = get_config('upgrade.version');
     </script>
     <script src="{__STATIC__}/bui/js/zepto.js?v={$version}"></script>
     <script src="{__STATIC__}/bui/js/bui.js?v={$version}"></script>
+    <script src="{__MOBILE__}/default/js/init.js?v={$version}"></script>
 </head>
 <body>
 <style>
@@ -67,6 +68,7 @@ $version = get_config('upgrade.version');
         var token = '{$token}';
         if(token) {           
             var storage = bui.storage();
+            setCookie("{:get_config('app.session_user')}", '{$token}', 1, { path: "/" });
             storage.set("token", '{$token}');
             var url = '{$url}';
             window.location.href = url;                  

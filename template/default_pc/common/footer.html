@@ -48,7 +48,9 @@
 						{php}$other = get_system_config('other');{/php}
 						<li>{$other.srevicetel|default='无'}</li>
 						<li>{$other.sreviceemail|default='无'}</li>
+						{if get_system_config('power','report_open')}
 						<li><a href="{:url('report')}" class="main-btn">在线举报</a></li>
+						{/if}
 					</ul>
 				</div>
 			</div>

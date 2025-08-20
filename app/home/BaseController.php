@@ -69,6 +69,13 @@ abstract class BaseController
         ];
         $domain_bind = get_config('app.domain_bind');
         $params['domain_bind'] = $domain_bind ? array_flip($domain_bind) : [];
+        View::config(['view_path' => $this->view_path()]);
+        $this->auth();
+        View::assign('params', $params);
+    }
+
+    protected function view_path()
+    {
         if (get_addons_is_enable('sitegroup')) {
             $result = hook('siteGroupHook');
             if ($result && isJson($result)) {
@@ -83,40 +90,26 @@ abstract class BaseController
                         if (isset($result['template_mobile']) && $result['template_mobile']) {
                             $dir = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $result['template_mobile'] . DIRECTORY_SEPARATOR;
                             if (is_dir($dir)) {
-                                View::config(['view_path' => $dir]);
-                            } else {
-                                View::config(['view_path' => $this->view_path()]);
+                                return $dir;
                             }
                         }
                     } else {
                         if (isset($result['template_pc']) && $result['template_pc']) {
                             $dir = app()->getRootPath() . 'template' . DIRECTORY_SEPARATOR . $result['template_pc'] . DIRECTORY_SEPARATOR;
                             if (is_dir($dir)) {
-                                View::config(['view_path' => $dir]);
-                            } else {
-                                View::config(['view_path' => $this->view_path()]);
+                                return $dir;
                             }
                         }
                     }
                 } else {
                     app()->instance('feiniaoseo', []);
                     app()->instance('feiniaowebconfig', []);
-                    View::config(['view_path' => $this->view_path()]);
                 }
             } else {
                 app()->instance('feiniaoseo', []);
                 app()->instance('feiniaowebconfig', []);
-                View::config(['view_path' => $this->view_path()]);
             }
-        } else {
-            View::config(['view_path' => $this->view_path()]);
         }
-        $this->auth();
-        View::assign('params', $params);
-    }
-
-    protected function view_path()
-    {
         $h5domain = get_system_config('web', 'h5domain');
         if (!empty($h5domain)) {
             if (request()->host() === trim($h5domain)) {

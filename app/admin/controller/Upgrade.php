@@ -190,6 +190,18 @@ class Upgrade extends BaseController
                     if (basename($value) == 'config.php' && is_file($config_file)) {
                         $new_config = include_once $value;
                         $old_config = include_once $config_file;
+                        $convertUrls = function (&$config) {
+                            foreach ($config as &$item) {
+                                if (isset($item['value']) && is_object($item['value'])) {
+                                    $item['value'] = (string)$item['value'];
+                                }
+                                if (isset($item['tips']) && is_object($item['tips'])) {
+                                    $item['tips'] = (string)$item['tips'];
+                                }
+                            }
+                        };
+                        $convertUrls($new_config);
+                        $convertUrls($old_config);
                         $config = array_replace_recursive($old_config, $new_config);
                         if ($config) {
                             file_put_contents($config_file, '<?php' . "\n" . 'return ' . var_export($config, true) . ';');

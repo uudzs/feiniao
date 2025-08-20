@@ -15,6 +15,9 @@ class Login
     //登录
     public function index()
     {
+        if (!get_system_config('power', 'author_open')) {
+            throw new \think\exception\HttpException(404, '作者功能未开启！');
+        }
         if (!empty(get_login_author('id'))) {
             $url = (string) Route::buildUrl('user/index');
             redirect($url)->send();
@@ -25,6 +28,9 @@ class Login
     //提交登录
     public function login_submit()
     {
+        if (!get_system_config('power', 'author_open')) {
+            return to_assign(1, '作者功能未开启！');
+        }
         $param = get_params();
         try {
             validate(AuthorCheck::class)->scene('login')->check($param);
@@ -67,6 +73,9 @@ class Login
     //重置密码
     public function resetpass()
     {
+        if (!get_system_config('power', 'author_open')) {
+            return to_assign(1, '作者功能未开启！');
+        }
         if (request()->isAjax()) {
             $param = get_params();
             try {
@@ -100,6 +109,9 @@ class Login
 
     public function resetpasssms()
     {
+        if (!get_system_config('power', 'author_open')) {
+            return to_assign(1, '作者功能未开启！');
+        }
         $param = get_params();
         try {
             validate(AuthorCheck::class)->scene('regsendsms')->check($param);
@@ -182,6 +194,9 @@ class Login
     //注册
     public function register()
     {
+        if (!get_system_config('power', 'author_open')) {
+            throw new \think\exception\HttpException(404, '作者功能未开启！');
+        }
         if (!empty(get_login_author('id'))) {
             $url = (string) Route::buildUrl('user/index');
             redirect($url)->send();
@@ -192,6 +207,9 @@ class Login
     //发送验证码
     public function regsms()
     {
+        if (!get_system_config('power', 'author_open')) {
+            return to_assign(1, '作者功能未开启！');
+        }
         $param = get_params();
         try {
             validate(AuthorCheck::class)->scene('regsendsms')->check($param);
@@ -280,6 +298,9 @@ class Login
     //提交注册
     public function reg_submit()
     {
+        if (!get_system_config('power', 'author_open')) {
+            return to_assign(1, '作者功能未开启！');
+        }
         $param = get_params();
         try {
             validate(AuthorCheck::class)->scene('reg')->check($param);

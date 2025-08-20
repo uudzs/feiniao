@@ -3,15 +3,19 @@
 {block name="body"}
 
 <div class="p-3">
-	<form class="layui-form gg-form-bar border-t border-x">
-		<div class="layui-input-inline" style="width:300px;">
-			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
-		</div>
-		<div class="layui-input-inline">
-		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
-		</div>
-	</form>
-	<table class="layui-hide" id="route" lay-filter="route"></table>
+	{if !get_addons_is_enable('sitegroup')}
+		<form class="layui-form gg-form-bar border-t border-x">
+			<div class="layui-input-inline" style="width:300px;">
+				<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
+			</div>
+			<div class="layui-input-inline">
+			<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
+			</div>
+		</form>
+		<table class="layui-hide" id="route" lay-filter="route"></table>
+	{else/}
+		<blockquote class="layui-elem-quote">由于已开启站群插件，请到站群插件进行相关设置。</blockquote>
+	{/if}
 </div>
 
 <script type="text/html" id="toolbarDemo"></script>

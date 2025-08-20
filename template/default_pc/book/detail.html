@@ -32,6 +32,7 @@
 <div class="container book-detail">
     {notempty name="book"}
         {php}
+        $conConfig = get_system_config('content');
         if($book['subgenre']) {
             $subgenrename = model('category')->where(['status' => 1, 'id' => $book['subgenre']])->value('name');
             $subgenrelink = url('book_cates', ['id' => $book['subgenre']]);
@@ -66,7 +67,7 @@
         }        
         $book_words_count = model('chapter')->where(['bookid' => $book['id'], 'status' => 1, ['verify', 'in', '0,1']])->sum('wordnum');
         $follow_count = model('follow')->where(['from_id' => $book['authorid']])->count();
-        if(isset($pageconf['book_detail_first_chapter_isshow']) && $pageconf['book_detail_first_chapter_isshow']) {
+        if(isset($conConfig['book_detail_first_chapter_isshow']) && $conConfig['book_detail_first_chapter_isshow']) {
             $content = $title = '';
             if($chapterlist && $chapterlist[0]) {
                 $content = content\Content::get($book['id'], $chapterlist[0]['id']);
@@ -151,7 +152,7 @@
                 <div class="layui-tab-item layui-show remark">
                     <h2 class="ypc-column-name">书籍简介</h2>
                     {$book.remark|raw|default='无简介'}
-                    {if isset($pageconf['book_detail_first_chapter_isshow']) && $pageconf['book_detail_first_chapter_isshow']}
+                    {if isset($conConfig['book_detail_first_chapter_isshow']) && $conConfig['book_detail_first_chapter_isshow']}
                         <h2 class="ypc-column-name">{$title}</h2>
                         {$content|raw}      
                     {/if}

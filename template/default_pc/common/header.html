@@ -51,7 +51,9 @@
 						<li class="loginstatus">
 							<a href="{:furl('login', [], true, 'home')}" class="login-btn">登录</a>							
 						</li>
+						{if get_system_config('power','author_open')}
 						<li><a href="{:furl('/', [], true, 'author')}" class="creat-accout-btn" target="_blank">作家中心</a></li>
+						{/if}
 					</ul>
 					<ul>
 						<div class="comm_header_user_logined_avatar">

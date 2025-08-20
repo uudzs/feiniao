@@ -1,78 +1,120 @@
 {extend name="common/base"/}
 <!-- 主体 -->
 {block name="body"}
+<style>
+.layui-upload img {
+	max-width: 100%;
+	max-height: 100%;
+	display: block;
+}
+.layui-upload .placeholder {
+	color: #999;
+	font-size: 14px;
+	text-align: center;
+	padding: 0 10px;
+}
+.layui-upload .delete-btn {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+.layui-upload:hover .delete-btn {
+	opacity: 1;
+}
+.layui-upload .delete-btn:hover {
+	background: rgba(231, 76, 60, 0.8);
+}
+</style>
 <form class="layui-form p-4">
 	<h3 class="pb-3">系统配置</h3>
-	<table class="layui-table layui-table-form">
-		<tr>
-			<td class="layui-td-gray-2">系统名称<font>*</font></td>
-			<td>
-				<input type="hidden" name="id" value="{$id}">
-				<input type="text" name="admin_title" lay-verify="required" autocomplete="off" placeholder="请输入系统名称" lay-reqText="请输入系统名称" class="layui-input" {notempty name="$config.admin_title"} value="{$config.admin_title}"{/notempty}>
-			</td>
-			<td class="layui-td-gray">网站名称<font>*</font></td>
-			<td>
-				<input type="text" name="title" lay-verify="required" autocomplete="off" placeholder="请输入网站平台名称" lay-reqText="请输入网站名称" class="layui-input" {notempty name="$config.title" } value="{$config.title}"{/notempty}>
-			</td>
-			<td rowspan="2" class="layui-td-gray">系统LOGO</td>
-			<td rowspan="2" style="width: 150px;">
-				<div class="layui-upload" style="width: 150px;">
-					<div class="layui-upload-list" id="demo1" style="overflow: hidden;">
-						<img src='{notempty name="$config.logo"}{$config.logo}{/notempty}'/>
-						<input type="hidden" name="logo" {notempty name="$config.logo"} value="{$config.logo}" {/notempty}>
+	{if !get_addons_is_enable('sitegroup')}
+		<table class="layui-table layui-table-form">
+			<tr>
+				<td class="layui-td-gray-2">系统名称<font>*</font></td>
+				<td>
+					<input type="hidden" name="id" value="{$id}">
+					<input type="text" name="admin_title" lay-verify="required" autocomplete="off" placeholder="请输入系统名称" lay-reqText="请输入系统名称" class="layui-input" {notempty name="$config.admin_title"} value="{$config.admin_title}"{/notempty}>
+				</td>
+				<td class="layui-td-gray">网站名称<font>*</font></td>
+				<td>
+					<input type="text" name="title" lay-verify="required" autocomplete="off" placeholder="请输入网站平台名称" lay-reqText="请输入网站名称" class="layui-input" {notempty name="$config.title" } value="{$config.title}"{/notempty}>
+				</td>
+				<td rowspan="2" class="layui-td-gray">系统LOGO</td>
+				<td rowspan="2" style="width: 150px;">
+					<div class="layui-upload" style="width: 150px;">
+						<div class="layui-upload-list" id="demo1" style="overflow: hidden;">
+							<img src='{notempty name="$config.logo"}{$config.logo}{/notempty}'/>
+							<input type="hidden" name="logo" {notempty name="$config.logo"} value="{$config.logo}"{/notempty}>
+						</div>
+						<button type="button" class="layui-btn layui-btn-normal layui-btn-xs" id="uploadBtn">上传LOGO</button>
 					</div>
-					<button type="button" class="layui-btn layui-btn-normal layui-btn-xs" id="uploadBtn">上传LOGO</button>
-				</div>
-			</td>
-			<td rowspan="2" class="layui-td-gray">App二维码</td>
-			<td rowspan="2" style="width: 150px;">
-				<div class="layui-upload" style="width: 150px;">
-					<div class="layui-upload-list" id="appqr" style="overflow: hidden;">
-						<img src='{notempty name="$config.appqr"}{$config.appqr}{/notempty}'/>
-						<input type="hidden" name="appqr" {notempty name="$config.appqr"} value="{$config.appqr}" {/notempty}>
+				</td>
+				<td rowspan="2" class="layui-td-gray">App二维码</td>
+				<td rowspan="2" style="width: 150px;">
+					<div class="layui-upload" style="width: 150px;">
+						<div class="layui-upload-list" id="appqr" style="overflow: hidden;">
+							<img src='{notempty name="$config.appqr"}{$config.appqr}{/notempty}'/>
+							<input type="hidden" name="appqr" {notempty name="$config.appqr"} value="{$config.appqr}"{/notempty}>
+							<div class="delete-btn" id="deleteQrBtn">
+								<i class="layui-icon layui-icon-delete"></i>
+							</div>
+						</div>
+						<button type="button" class="layui-btn layui-btn-normal layui-btn-xs" id="appqrUploadBtn">上传二维码</button>
 					</div>
-					<button type="button" class="layui-btn layui-btn-normal layui-btn-xs" id="appqrUploadBtn">上传二维码</button>
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td class="layui-td-gray">ICP备案号</td>
-			<td>
-				<input type="text" name="icp" autocomplete="off" placeholder="请输入ICP备案号" class="layui-input" {notempty name="$config.icp"} value="{$config.icp}" {/notempty}>
-			</td>
-			<td class="layui-td-gray-2">公安备案号</td>
-			<td>
-				<input type="text" name="beian" autocomplete="off" placeholder="请输入公安备案号" class="layui-input" {notempty name="$config.beian"} value="{$config.beian}" {/notempty}>
-			</td>
-		</tr>	
-		<tr>
-			<td class="layui-td-gray">移动端域名</td>
-			<td colspan="7">
-				<input type="text" name="h5domain" autocomplete="off" placeholder="请输入独立移动端域名" class="layui-input" {notempty name="$config.h5domain"} value="{$config.h5domain}" {/notempty}>
-				<span style="color:#999; font-size:12px;">如：h5.youdomain.com，只填写域名即可，不要有https或结尾的斜杠，为空则表示不绑定域名，使用默认模式。</span>
-			</td>
-		</tr>
-		<tr>
-			<td class="layui-td-gray">统计代码</td>
-			<td colspan="7">
-				<textarea name="code" placeholder="请输入完整的统计代码" class="layui-textarea">{notempty name="$config.code"}{$config.code}{/notempty}</textarea>
-				<p>
-					推荐使用悟空网站统计，免实名，无跳转，注册就送蜘蛛池。<a href="https://www.wukongtongji.com/login?from=5jInfmvCYkx&tab=register" target="_blank" style="color: #1e9fff;">点击注册</a> 
-				</p>
-			</td>
-		</tr>		
-		<tr>
-			<td class="layui-td-gray">版权信息</td>
-			<td colspan="7">
-				<textarea name="copyright" placeholder="请输入版权信息" class="layui-textarea">{notempty name="$config.copyright"}{$config.copyright}{/notempty}</textarea>
-			</td>
-		</tr>
-	</table>
+				</td>
+			</tr>
+			<tr>
+				<td class="layui-td-gray">ICP备案号</td>
+				<td>
+					<input type="text" name="icp" autocomplete="off" placeholder="请输入ICP备案号" class="layui-input" {notempty name="$config.icp"} value="{$config.icp}" {/notempty}>
+				</td>
+				<td class="layui-td-gray-2">公安备案号</td>
+				<td>
+					<input type="text" name="beian" autocomplete="off" placeholder="请输入公安备案号" class="layui-input" {notempty name="$config.beian"} value="{$config.beian}" {/notempty}>
+				</td>
+			</tr>	
+			<tr>
+				<td class="layui-td-gray">移动端域名</td>
+				<td colspan="7">
+					<input type="text" name="h5domain" autocomplete="off" placeholder="请输入独立移动端域名" class="layui-input" {notempty name="$config.h5domain"} value="{$config.h5domain}" {/notempty}>
+					<span style="color:#999; font-size:12px;">如：h5.youdomain.com，只填写域名即可，不要有https或结尾的斜杠，为空则表示不绑定域名，使用默认模式。</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="layui-td-gray">统计代码</td>
+				<td colspan="7">
+					<textarea name="code" placeholder="请输入完整的统计代码" class="layui-textarea">{notempty name="$config.code"}{$config.code}{/notempty}</textarea>
+					<p>
+						推荐使用悟空网站统计，免实名，无跳转，注册就送蜘蛛池。<a href="https://www.wukongtongji.com/login?from=5jInfmvCYkx&tab=register" target="_blank" style="color: #1e9fff;">点击注册</a> 
+					</p>
+				</td>
+			</tr>		
+			<tr>
+				<td class="layui-td-gray">版权信息</td>
+				<td colspan="7">
+					<textarea name="copyright" placeholder="请输入版权信息" class="layui-textarea">{notempty name="$config.copyright"}{$config.copyright}{/notempty}</textarea>
+				</td>
+			</tr>
+		</table>
 
-	<div class="py-3">
-		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
-		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
-	</div>
+		<div class="py-3">
+			<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+			<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+		</div>
+	{else/}
+		<blockquote class="layui-elem-quote">由于已开启站群插件，请到站群插件进行相关设置。</blockquote>
+	{/if}
 </form>
 {/block}
 <!-- /主体 -->
@@ -83,6 +125,7 @@
 	const moduleInit = ['tool'];
 	function feiniaoInit() {
 		var form = layui.form, tool = layui.tool, upload = layui.upload;
+		{if !get_addons_is_enable('sitegroup')}
 		//监听提交
 		form.on('submit(webform)', function (data) {
 			let callback = function (e) {
@@ -124,6 +167,13 @@
 				}
 			}
 		});
+
+		// 删除二维码
+		$('#deleteQrBtn').click(function() {
+			$(this).siblings('img').attr('src', '');
+			$(this).siblings('input[type="hidden"]').val('');
+		});
+		{/if}
 	}
 </script>
 {/block}

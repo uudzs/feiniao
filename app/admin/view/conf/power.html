@@ -189,6 +189,42 @@
                     </div>
                 </div>                
             </div>
+            <hr>
+            <div class="layui-card-header">作家设置</div>
+            <div class="layui-card-body">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否开启作家功能</label>
+                        <div class="layui-input-block">
+                            {if(!isset($config['author_open']))}
+                                <input type="radio" name="author_open" value="1" title="开启">
+                                <input type="radio" name="author_open" value="0" title="关闭" checked>
+                            {else/}
+                                <input type="radio" name="author_open" value="1" title="开启"{eq name="$config.author_open" value="1"} checked{/eq}>
+                                <input type="radio" name="author_open" value="0" title="关闭"{eq name="$config.author_open" value="0"} checked{/eq}>
+                            {/if}
+                        </div>
+                    </div>
+                </div>                
+            </div>
+            <hr>
+            <div class="layui-card-header">其他设置</div>
+            <div class="layui-card-body">
+                <div class="layui-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">是否开启举报功能</label>
+                        <div class="layui-input-block">
+                            {if(!isset($config['report_open']))}
+                                <input type="radio" name="report_open" value="1" title="开启">
+                                <input type="radio" name="report_open" value="0" title="关闭" checked>
+                            {else/}
+                                <input type="radio" name="report_open" value="1" title="开启"{eq name="$config.report_open" value="1"} checked{/eq}>
+                                <input type="radio" name="report_open" value="0" title="关闭"{eq name="$config.report_open" value="0"} checked{/eq}>
+                            {/if}
+                        </div>
+                    </div>
+                </div>                
+            </div>
         </div>
         <input type="hidden" name="id" value="{$id}">
 		<button class="layui-btn layui-btn-normal" type="button" lay-submit="" lay-filter="webform">立即提交</button>

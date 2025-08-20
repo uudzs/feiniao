@@ -2,15 +2,19 @@
 <!-- 主体 -->
 {block name="body"}
 <div class="p-3">
-	<form class="layui-form gg-form-bar border-t border-x">
-		<div class="layui-input-inline" style="width:300px;">
-			<input type="text" name="keywords" placeholder="ID/名称" class="layui-input" />
-		</div>
-		<div class="layui-input-inline">
-		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
-		</div>
-	</form>
-	<table class="layui-hide" id="link" lay-filter="link"></table>
+	{if !get_addons_is_enable('sitegroup')}
+		<form class="layui-form gg-form-bar border-t border-x">
+			<div class="layui-input-inline" style="width:300px;">
+				<input type="text" name="keywords" placeholder="ID/名称" class="layui-input" />
+			</div>
+			<div class="layui-input-inline">
+			<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">提交搜索</button>
+			</div>
+		</form>
+		<table class="layui-hide" id="link" lay-filter="link"></table>
+	{else/}
+		<blockquote class="layui-elem-quote">由于已开启站群插件，请到站群插件进行相关设置。</blockquote>
+	{/if}
 </div>
 
 <script type="text/html" id="status">
@@ -34,6 +38,7 @@
 	const moduleInit = ['tool'];
 	function feiniaoInit() {
 		var table = layui.table, tool = layui.tool, form = layui.form;
+		{if !get_addons_is_enable('sitegroup')}
 		layui.pageTable = table.render({
 			elem: '#link',
 			title: '友情链接列表',
@@ -114,6 +119,7 @@
 			});
 			return false;
 		});
+		{/if}
 	}
 </script>
 {/block}

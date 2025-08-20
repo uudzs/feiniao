@@ -2,13 +2,17 @@
 <!-- 主体 -->
 {block name="body"}
 <div class="p-3">
-	<div class="gg-form-bar border-t border-x" style="padding-bottom:10px">
-		<button class="layui-btn layui-btn-sm add-menu">+ 添加导航</button>
-		<button class="layui-btn layui-btn-primary layui-btn-sm add-back">返回</button>
-	</div>
-	<div>
-		<table class="layui-hide" id="treeTable" lay-filter="treeTable"></table>
-	</div>
+	{if !get_addons_is_enable('sitegroup')}
+		<div class="gg-form-bar border-t border-x" style="padding-bottom:10px">
+			<button class="layui-btn layui-btn-sm add-menu">+ 添加导航</button>
+			<button class="layui-btn layui-btn-primary layui-btn-sm add-back">返回</button>
+		</div>
+		<div>
+			<table class="layui-hide" id="treeTable" lay-filter="treeTable"></table>
+		</div>
+	{else/}
+		<blockquote class="layui-elem-quote">由于已开启站群插件，请到站群插件进行相关设置。</blockquote>
+	{/if}
 </div>
 <script type="text/html" id="target">
 	<i class="layui-icon {{#  if(d.target == 1){ }}layui-icon-ok{{#  } else { }}layui-icon-close{{#  } }}"></i>
@@ -26,6 +30,7 @@
 	const moduleInit = ['tool', 'treeGrid'];
 	function feiniaoInit() {
 		var treeGrid = layui.treeGrid,table = layui.table, tool = layui.tool;
+		{if !get_addons_is_enable('sitegroup')}
 		var pageTable = treeGrid.render({
 			id: 'treeTable',
 			elem: '#treeTable',
@@ -126,6 +131,7 @@
 				});
 			}
 		});
+		{/if}
 	}
 </script>
 {/block}

@@ -55,6 +55,9 @@ abstract class BaseController
     // 初始化
     protected function initialize()
     {
+        if (!get_system_config('power', 'author_open')) {
+            throw new \think\exception\HttpException(404, '作者功能未开启！');
+        }
         $params = [
             'module' => \think\facade\App::initialize()->http->getName(),
             'controller' => app('request')->controller(),
