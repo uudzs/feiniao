@@ -357,6 +357,31 @@ class Upgrade extends BaseController
         }
     }
 
+    public function plugin_pay()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $ordersn = isset($param['ordersn']) ? trim($param['ordersn']) : '';
+            if (empty($ordersn)) {
+                return to_assign(1, '订单号不存在！');
+            }
+            $paynumber = isset($param['paynumber']) ? trim($param['paynumber']) : '';
+            if (empty($paynumber)) {
+                return to_assign(1, '订单号不存在！');
+            }
+            $token = get_cache(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $url = get_config('upgrade.official_api_url') . 'pluginpay' . '/' . $ordersn . '/' . $paynumber;
+            $content = Http::doGet($url);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            return to_assign(0, '购买成功，审核中。');
+        }
+    }
+
     public function union_income()
     {
         $token = get_cache(self::$tokenKey);
