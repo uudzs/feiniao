@@ -8,7 +8,7 @@
 		<div class="row">
 			<div class="col-lg-3 col-md-3">
 				<div class="logo">
-					<a href="{:url('/')}"><img src="{$conf.logo}" alt="{$conf.title}"></a>
+					<a href="{:url('/')}"><img src="{$conf.logo|default=''}" alt="{$conf.title|default=''}"></a>
 				</div>
 			</div>
 			<div class="col-lg-9 col-md-9 header-right">

@@ -70,7 +70,7 @@ $conf = get_system_config('other');
 </style>
 <div class="about">
     {notempty name="$systemconf.logo"}    
-        <img src="{$systemconf.logo}" class="logo">
+        <img src="{$systemconf.logo|default=''}" class="logo">
     {/notempty}
     <div class="tips">
         <div class="span1">

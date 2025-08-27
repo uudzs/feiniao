@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{__STATIC__}/home/style/login.css?v={$version}">
 {/block}
 {block name="title"}
-<title>登录-{$conf.title}</title>	
+<title>登录-{$conf.title|default=''}</title>	
 {/block}
 {block name="body"}
 {include file="common/header" nav='index' /}

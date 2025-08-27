@@ -25,11 +25,11 @@
 	$pageconf = get_system_config('page');
 	{/php}
 	{block name="title"}
-		<title>{$conf.title}</title>		
+		<title>{$conf.title|default=''}</title>		
 	{/block}
 	{block name="keywords"}
-		<meta name="keywords" content="{$conf.title}"/>
-		<meta name="description" content="{$conf.title}"/>
+		<meta name="keywords" content="{$conf.title|default=''}"/>
+		<meta name="description" content="{$conf.title|default=''}"/>
 	{/block}
 	{block name="css"}
 		<link rel="stylesheet" href="{__STATIC__}/home/style/swap.css?v={$version}" rel="stylesheet">
@@ -107,7 +107,7 @@
 		
 		<!-- 统计代码 -->
 		{block name="code"}
-		<div style="display: none;">{$conf.code|raw}</div>
+		<div style="display: none;">{$conf.code|raw|default=''}</div>
 		{/block}
 		<!-- /统计代码 -->
 	</div>

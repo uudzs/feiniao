@@ -34,7 +34,7 @@ $site_title = '登录';
 </style>
 <div class="container">
     <div class="subtitle logo">
-        <h1>{$systemconf.title}</h1>
+        <h1>{$systemconf.title|default=''}</h1>
     </div>
     <div class="login-form">
         <div class="subtitle">快捷登录</div>

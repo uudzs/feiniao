@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{__STATIC__}/home/style/login.css?v={$version}">
 {/block}
 {block name="title"}
-<title>注册-{$conf.title}</title>	
+<title>注册-{$conf.title|default=''}</title>	
 {/block}
 {block name="body"}
 {include file="common/header" nav='index' /}
@@ -11,7 +11,7 @@
 <div class="main-body">
     <div class="login-main">
         <div class="login-top">
-            <span>{$conf.title}注册</span>
+            <span>{$conf.title|default=''}注册</span>
             <span class="bg1"></span>
             <span class="bg2"></span>
         </div>

@@ -56,7 +56,7 @@ $conf = get_system_config('other');
 </style>
 <div class="service">
     {notempty name="$conf.sreviceqr"}    
-        <img src="{$conf.sreviceqr}" class="sreviceqr">
+        <img src="{$conf.sreviceqr|default=''}" class="sreviceqr">
     {/notempty}
     <div class="tips">
         <div class="span1">

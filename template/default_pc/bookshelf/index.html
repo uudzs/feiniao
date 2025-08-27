@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{__STATIC__}/home/style/my.css?v={$version}" />
 {/block}
 {block name="title"}
-<title>我的书架-{$conf.title}</title>
+<title>我的书架-{$conf.title|default=''}</title>
 {/block}
 {block name="keywords"}
 <meta name="keywords" content="我的书架" />

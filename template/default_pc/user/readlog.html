@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{__STATIC__}/home/style/my.css?v={$version}" />
 {/block}
 {block name="title"}
-<title>阅读记录-{$conf.title}</title>
+<title>阅读记录-{$conf.title|default=''}</title>
 {/block}
 {block name="keywords"}
 <meta name="keywords" content="阅读记录" />

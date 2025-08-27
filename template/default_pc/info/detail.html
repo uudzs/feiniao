@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="{__STATIC__}/home/style/info.css?v={$version}"/>
 {/block}
 {block name="title"}
-<title>{$detail.title}-{$conf.title}</title>
+<title>{$detail.title}-{$conf.title|default=''}</title>
 {/block}
 {block name="keywords"}
 <meta name="keywords" content="{$detail.title}" />

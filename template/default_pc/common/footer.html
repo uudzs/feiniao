@@ -4,14 +4,14 @@
 			<div class="col-lg-4 col-md-4">
 				<div class="logo-part">
 					<div class="footer-logo">
-						<a href="{:url('/')}"><img src="{$conf.logo}" alt="{$conf.title}"></a>
+						<a href="{:url('/')}"><img src="{$conf.logo|default=''}" alt="{$conf.title|default=''}"></a>
 					</div>
 					<p>{:nl2br(get_system_config('other','servicedescription'))}</p>					
 				</div>
 			</div>
 			<div class="col-lg-2 col-md-2">
 				<div class="company-part">
-					<h6>{$conf.title}</h6>
+					<h6>{$conf.title|default=''}</h6>
 					<ul>
 						{if get_addons_is_enable('sitegroup') && isset($feiniaoNavs) && $feiniaoNavs && isset($feiniaoNavs['footer_nav']) && $feiniaoNavs['footer_nav'] && isset($feiniaoNavs['footer_nav']['items']) && $feiniaoNavs['footer_nav']['items']}
 							{foreach name="$feiniaoNavs['footer_nav']['items']" item="a"}
