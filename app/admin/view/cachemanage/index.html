@@ -1,0 +1,300 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layuimini-container layui-form p-4">
+    <div class="layuimini-main">
+        <div class="layui-card">
+            <div class="layui-card-header">
+                <h3>缓存说明</h3>
+            </div>
+            <div class="layui-card-body">
+                <div class="layui-row">默认支持的缓存类型：File、Redis、Memcache、Memcached、WinCache。当前使用：<span class="layui-badge layui-bg-green">{$current_config.current_type|default='未知'}</span> 推荐使用：<span class="layui-badge layui-bg-orange">{$recommended_type|default='file'}</span></div>
+            </div>
+        </div>
+
+        <!-- 缓存类型检测 -->
+        <div class="layui-card">
+            <div class="layui-card-body">
+                <div class="layui-row">
+                    <div class="layui-col-md12">
+                        <div class="layui-btn-group">
+                            <button class="layui-btn layui-btn-sm" onclick="detectAllCache()">
+                                <i class="layui-icon layui-icon-refresh-1"></i> 重新检测所有类型
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-bg-gray" style="padding: 16px;">
+                    <div class="layui-row layui-col-space15 cache-engine-list" style="display: flex; flex-wrap: wrap;">
+                        {volist name="cache_types" id="type"}
+                        <div class="layui-col-md6" style="display: flex;">
+                            <div class="layui-card" data-type="{$key}" style="flex: 1; display: flex; flex-direction: column;">
+                                <div class="layui-card-header">
+                                    <span style="font-weight: bold; font-size: 14px;">{$type.name}</span>
+                                    <div style="float: right;">
+                                        {if $type.recommended}
+                                        <span class="layui-badge layui-bg-orange">推荐</span>
+                                        {/if}
+                                        <span class="layui-badge {$type.available ? 'layui-bg-green' : 'layui-bg-red'}">
+                                            {$type.available ? '可用' : '不可用'}
+                                        </span>
+                                    </div>
+                                    <div style="clear: both;"></div>
+                                </div>
+                                <div class="layui-card-body" style="flex: 1; display: flex; flex-direction: column;">
+                                    <blockquote class="layui-elem-quote" style="margin-bottom: 15px; border-left: 5px solid #009688;">
+                                        {$type.description}
+                                    </blockquote>
+                                    
+                                    <div style="flex: 1;">
+                                        {if $type.available}
+                                            {if isset($type.version)}
+                                            <div class="layui-text"><strong>版本:</strong> {$type.version}</div>
+                                            {/if}
+                                            {if isset($type.server_version)}
+                                            <div class="layui-text"><strong>服务版本:</strong> {$type.server_version}</div>
+                                            {/if}
+                                            {if isset($type.performance)}
+                                            <div class="layui-text"><strong>性能:</strong> 
+                                                {switch name="$type.performance"}
+                                                    {case value="high"}<span class="layui-badge layui-bg-green">高</span>{/case}
+                                                    {case value="medium"}<span class="layui-badge layui-bg-orange">中</span>{/case}
+                                                    {case value="low"}<span class="layui-badge layui-bg-red">低</span>{/case}
+                                                {/switch}
+                                            </div>
+                                            {/if}
+                                        {else}
+                                            <div class="layui-text">
+                                                <i class="layui-icon layui-icon-close layui-text-danger"></i>
+                                                <span class="layui-text-danger"><strong>错误:</strong> {$type.error}</span>
+                                            </div>
+                                            {if isset($type.extensions_check.missing) && $type.extensions_check.missing}
+                                            <div class="layui-text layui-text-danger">
+                                                <i class="layui-icon layui-icon-tips"></i> 缺少PHP扩展: {:implode(', ', $type.extensions_check.missing)}
+                                            </div>
+                                            {/if}
+                                        {/if}
+                                    </div>
+                                    
+                                    <div class="layui-btn-group" style="margin-top: auto; width: 100%;">
+                                        {if $type.available}
+                                            <button class="layui-btn layui-btn-sm layui-btn-normal" onclick="configureCache('{$key}')">
+                                                <i class="layui-icon layui-icon-set"></i> 配置
+                                            </button>
+                                            {if $key != $current_config.current_type}
+                                                <button class="layui-btn layui-btn-sm" onclick="switchCache('{$key}')">
+                                                    <i class="layui-icon layui-icon-ok"></i> 启用
+                                                </button>
+                                            {else}
+                                                <button class="layui-btn layui-btn-sm layui-btn-disabled" disabled>
+                                                    <i class="layui-icon layui-icon-ok"></i> 当前
+                                                </button>
+                                            {/if}                                    
+                                        {/if}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {/volist}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 缓存配置弹窗 -->
+<div id="cache-config-modal" style="display: none; padding: 20px;">
+    <form class="layui-form" id="cache-config-form">
+        <input type="hidden" name="cache_type" id="config_cache_type">
+        
+        <!-- 动态配置字段将在这里生成 -->
+        <div id="dynamic-config-fields"></div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" onclick="testCacheConfig()">测试配置</button>
+                <button type="submit" class="layui-btn layui-btn-normal">保存配置</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table, tool = layui.tool, form = layui.form, element = layui.element;
+
+        // 表单提交
+        form.on('submit(cache-config)', function(data){
+            saveCacheConfig(data.field);
+            return false;
+        });
+        
+        // 监听表单提交
+        $('#cache-config-form').on('submit', function(e) {
+            e.preventDefault();
+            saveCacheConfig($(this).serialize());
+        });    
+
+        // 检测所有缓存类型
+       window.detectAllCache = function() {
+            var loading = layer.load(2, {content: '正在检测...'});            
+            $.post('{:url("cachemanage/detect")}', {type: 'all'}, function(res) {                
+                if (res.code === 0) {
+                    layer.close(loading);
+                    layer.msg('检测完成', {icon: 1});
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.close(loading);
+                    layer.msg('检测失败：' + res.msg, {icon: 2});
+                }
+            });
+        }
+
+        // 配置缓存
+        window.configureCache = function(cacheType) {
+            // 获取配置字段
+            $.post('{:url("cachemanage/getconfigfields")}', {cache_type: cacheType}, function(res) {
+                if (res.code === 0) {
+                    generateConfigForm(cacheType, res.data.config_fields, res.data.current_config);
+                } else {
+                    layer.msg('获取配置失败：' + res.msg, {icon: 2});
+                }
+            });
+        }
+
+        // 生成配置表单
+        window.generateConfigForm = function(cacheType, configFields, currentConfig) {
+            var html = '';
+            
+            // 生成配置字段
+            for (var field in configFields) {
+                var fieldConfig = configFields[field];
+                var value = fieldConfig.current_value || '';
+                
+                html += '<div class="layui-form-item">';
+                html += '<label class="layui-form-label">' + fieldConfig.label;
+                if (fieldConfig.required) html += '<span style="color: red;">*</span>';
+                html += '</label>';
+                html += '<div class="layui-input-block">';
+                
+                switch (fieldConfig.type) {
+                    case 'text':
+                    case 'password':
+                        html += '<input type="' + fieldConfig.type + '" name="' + field + '" value="' + value + '" ';
+                        html += 'placeholder="' + (fieldConfig.placeholder || '') + '" ';
+                        if (fieldConfig.required) html += 'lay-verify="required" ';
+                        html += 'class="layui-input">';
+                        break;
+                    case 'number':
+                        html += '<input type="number" name="' + field + '" value="' + value + '" ';
+                        if (fieldConfig.min !== undefined) html += 'min="' + fieldConfig.min + '" ';
+                        if (fieldConfig.max !== undefined) html += 'max="' + fieldConfig.max + '" ';
+                        if (fieldConfig.required) html += 'lay-verify="required|number" ';
+                        html += 'class="layui-input">';
+                        break;
+                    case 'checkbox':
+                        html += '<input type="checkbox" name="' + field + '" title="' + fieldConfig.label + '" ';
+                        if (value) html += 'checked ';
+                        html += 'lay-skin="switch">';
+                        break;
+                }
+                
+                html += '</div>';
+                html += '</div>';
+            }
+            
+            $('#dynamic-config-fields').html(html);
+            $('#config_cache_type').val(cacheType);
+            
+            // 重新渲染表单
+            layui.form.render();
+            
+            // 打开配置弹窗
+            layer.open({
+                type: 1,
+                title: '配置 ' + cacheType.toUpperCase() + ' 缓存',
+                content: $('#cache-config-modal'),
+                area: ['600px', 'auto'],
+                maxHeight: '80%',
+                btn: false
+            });
+        }
+
+        // 测试缓存配置
+        window.testCacheConfig = function() {
+            var formData = $('#cache-config-form').serializeArray();
+            var data = {};            
+            $.each(formData, function(i, field) {
+                data[field.name] = field.value;
+            });            
+            var loading = layer.load(2, {content: '正在测试...'});            
+            $.post('{:url("cachemanage/testconfig")}', data, function(res) {
+                layer.close(loading);
+                if (res.code === 0) {
+                    layer.msg('配置测试通过！', {icon: 1});
+                } else {
+                    layer.msg('配置测试失败：' + res.msg, {icon: 2, time: 3000});
+                }
+            });
+        }
+
+        // 保存缓存配置
+        window.saveCacheConfig = function(data) {
+            var loading = layer.load(2, {content: '正在保存...'});            
+            $.post('{:url("cachemanage/saveconfig")}', data, function(res) {                
+                if (res.code === 0) {
+                    layer.close(loading);
+                    layer.msg(res.msg, {icon: 1});
+                    layer.closeAll('page');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    layer.close(loading);
+                    layer.msg('保存失败：' + res.msg, {icon: 2, time: 3000});
+                    if (res.data) {
+                        console.error('验证错误:', res.data);
+                    }
+                }
+            });
+        }
+
+        // 切换缓存类型
+        window.switchCache = function(cacheType) {
+            layer.confirm('确定要启用 ' + cacheType.toUpperCase() + ' 缓存吗？<br><small>切换后将立即生效，建议先进行配置测试。</small>', {
+                btn: ['确定', '取消']
+            }, function(index) {
+                var loading = layer.load(2, {content: '正在切换缓存类型...'});                
+                $.post('{:url("cachemanage/switchcache")}', {cache_type: cacheType}, function(res) {                    
+                    layer.close(index);                    
+                    if (res.code === 0) {
+                        layer.close(loading);
+                        layer.msg(res.msg, {icon: 1});
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        layer.close(loading);
+                        layer.msg('切换失败：' + res.msg, {icon: 2});
+                    }
+                });
+            });
+        }
+    }
+</script>
+{/block}
+{block name="style"}
+<style>
+.layuimini-main .cache-engine-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+</style>
+{/block}

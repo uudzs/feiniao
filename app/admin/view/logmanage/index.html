@@ -1,0 +1,196 @@
+{extend name="common/base"/}
+<!-- 主体 -->
+{block name="body"}
+<div class="layui-form p-4">
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <h3>日志管理</h3>
+        </div>
+        <div class="layui-card-body">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">日志开启</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="enabled" lay-skin="switch" lay-filter="logSwitch" lay-text="开启|关闭" {if $is_enabled}checked{/if}>
+                    </div>
+                    <div class="layui-input-inline">
+                        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm layui-btn-radius" id="cleanLogs">清空日志</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <h3>日志统计</h3>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            总文件数
+                            <span class="layui-badge layui-bg-black">个</span>
+                        </div>
+                        <div class="layui-card-body layuiadmin-card-list">
+                            <p>&nbsp;</p>
+                            <p class="layuiadmin-big-font">{$log_stats.file_count}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            总大小
+                            <span class="layui-badge layui-bg-black">字节</span>
+                        </div>
+                        <div class="layui-card-body layuiadmin-card-list">
+                            <p>&nbsp;</p>
+                            <p class="layuiadmin-big-font">{$log_stats.total_size_formatted}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            主日志
+                            <span class="layui-badge layui-bg-black">个</span>
+                        </div>
+                        <div class="layui-card-body layuiadmin-card-list">
+                            <p class="layuiadmin-big-font">{$log_stats.module_stats.main.count|default=0}</p>
+                            <p>大小: {$log_stats.module_stats.main.size_formatted|default='0B'}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            后台日志
+                            <span class="layui-badge layui-bg-black">个</span>
+                        </div>
+                        <div class="layui-card-body layuiadmin-card-list">
+                            <p class="layuiadmin-big-font">{$log_stats.module_stats.admin.count|default=0}</p>
+                            <p>大小: {$log_stats.module_stats.admin.size_formatted|default='0B'}</p>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            API日志
+                            <span class="layui-badge layui-bg-black">个</span>
+                        </div>
+                        <div class="layui-card-body layuiadmin-card-list">
+                            <p class="layuiadmin-big-font">{$log_stats.module_stats.api.count|default=0}</p>
+                            <p>大小: {$log_stats.module_stats.api.size_formatted|default='0B'}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-md4">
+                    <div class="layui-card">
+                        <div class="layui-card-header">
+                            前台日志
+                            <span class="layui-badge layui-bg-black">个</span>
+                        </div>
+                        <div class="layui-card-body layuiadmin-card-list">
+                            <p class="layuiadmin-big-font">{$log_stats.module_stats.home.count|default=0}</p>
+                            <p>大小: {$log_stats.module_stats.home.size_formatted|default='0B'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <h3>日志文件列表</h3>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" lay-even lay-skin="line">
+                <thead>
+                    <tr>
+                        <th>文件名</th>
+                        <th>模块</th>
+                        <th>大小</th>
+                        <th>修改时间</th>
+                    </tr>
+                </thead>
+                <tbody id="logList">
+                    <!-- 日志文件列表将通过AJAX加载 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+	function feiniaoInit() {
+		var table = layui.table, tool = layui.tool, form = layui.form, element = layui.element;
+        
+        // 监听日志开关
+        form.on('switch(logSwitch)', function(data){
+            var enabled = this.checked ? 1 : 0;            
+            $.post('{:url("logmanage/saveconfig")}', {enabled: enabled}, function(res){
+                if(res.code === 0) {
+                    layer.msg(res.msg, {icon: 1});
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                    // 恢复开关状态
+                    data.elem.checked = !data.elem.checked;
+                    form.render('checkbox');
+                }
+            });
+        });
+        
+        // 清理日志文件
+        $('#cleanLogs').click(function(){
+            layer.confirm('确定要清理所有日志文件吗？', function(index){
+                $.post('{:url("logmanage/cleanlogs")}', function(res){
+                    if(res.code === 0) {
+                        layer.msg(res.msg, {icon: 1});
+                        // 重新加载页面以更新统计信息
+                        setTimeout(function() {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        layer.msg(res.msg, {icon: 2});
+                    }
+                });
+                layer.close(index);
+            });
+        });
+        
+        // 加载日志文件列表
+        window.loadLogList = function() {
+            $.get('{:url("logmanage/loglist")}', function(res){
+                if(res.code === 0) {
+                    var html = '';
+                    // 按大小降序排序
+                    res.data.sort(function(a, b) {
+                        return b.size_raw - a.size_raw;
+                    });
+                    
+                    $.each(res.data, function(index, item){
+                        html += '<tr>';
+                        html += '<td>' + item.name + '</td>';
+                        html += '<td>' + item.module + '</td>';
+                        html += '<td>' + item.size + '</td>';
+                        html += '<td>' + item.modified + '</td>';
+                        html += '</tr>';
+                    });
+                    $('#logList').html(html);
+                }
+            });
+        }
+        
+        // 初始化加载日志列表
+        loadLogList();
+    }
+</script>
+{/block}

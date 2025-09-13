@@ -3,7 +3,7 @@
 namespace app\common\model;
 
 use think\Model;
-use think\facade\Cache;
+use app\service\CacheService;
 
 class Category extends Model
 {
@@ -18,16 +18,13 @@ class Category extends Model
     public static function getMaleCategories()
     {
         $cacheKey = "male_categories";
-        $data = Cache::get($cacheKey);
-        if (!$data) {
-            $data = self::where('pid', 0)
+        return CacheService::remember($cacheKey, function () {
+            return self::where('pid', 0)
                 ->where('id', '<>', self::FEMALE_CATEGORY_ID)
                 ->where('status', 1)
                 ->order('ordernum ASC')
                 ->column('id,name,key', 'id');
-            Cache::set($cacheKey, $data, 86400);
-        }
-        return $data;
+        }, 0);
     }
 
     /**
@@ -37,15 +34,12 @@ class Category extends Model
     public static function getCategorySubclass($pid = 0)
     {
         $cacheKey = "categories_subclass_" . $pid;
-        $data = Cache::get($cacheKey);
-        if (!$data) {
-            $data = self::where('pid', $pid)
+        return CacheService::remember($cacheKey, function () use ($pid) {
+            return self::where('pid', $pid)
                 ->where('status', 1)
                 ->order('ordernum ASC')
                 ->column('id,name,key', 'id');
-            Cache::set($cacheKey, $data, 86400);
-        }
-        return $data;
+        }, 0);
     }
 
     /**
@@ -55,15 +49,12 @@ class Category extends Model
     public static function getFemaleSubCategories()
     {
         $cacheKey = "female_subclass";
-        $data = Cache::get($cacheKey);
-        if (!$data) {
-            $data = self::where('pid', self::FEMALE_CATEGORY_ID)
+        return CacheService::remember($cacheKey, function () {
+            return self::where('pid', self::FEMALE_CATEGORY_ID)
                 ->where('status', 1)
                 ->order('ordernum ASC')
                 ->column('id,name,key', 'id');
-            Cache::set($cacheKey, $data, 86400);
-        }
-        return $data;
+        }, 0);
     }
 
     /**

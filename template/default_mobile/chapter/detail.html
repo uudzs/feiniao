@@ -66,7 +66,7 @@
             </a>
         </div>
         <div class="chapter-top-menu__content-item">
-            <a href="{:furl('book_detail',['id'=>$bookid], true, 'home')}">
+            <a href="{:furl('book_detail',['id'=>$book['filename'] ? $book['filename'] : $book['id']], true, 'home')}">
                 <i class="fa fa-file-text" aria-hidden="true"></i>
                 <p>书籍详情</p>
             </a>

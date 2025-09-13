@@ -5,6 +5,7 @@ namespace app\common\model;
 use think\Model;
 use app\common\model\Category;
 use app\common\model\SearchLog;
+use app\service\CacheService;
 
 class Novel extends Model
 {
@@ -34,6 +35,34 @@ class Novel extends Model
             'w' => ['field' => 'words', 'name' => '字数最多', 'type' => 'desc']
         ]
     ];
+
+    /**
+     * 获取小说详情（带缓存）
+     * @param int $id
+     * @return array|null
+     */
+    public static function getBookDetail($id)
+    {
+        $cacheKey = 'book_' . $id;
+        if (intval($id) == $id) {
+            $result = CacheService::remember($cacheKey, function () use ($id) {
+                return self::where('id', $id)->find();
+            });
+            if ($result instanceof \think\Model) {
+                return $result->toArray();
+            }
+            return $result;
+        } else {
+            $result = CacheService::remember($cacheKey, function () use ($id) {
+                return self::where('filename', $id)->find();
+            });
+            if ($result instanceof \think\Model) {
+                return $result->toArray();
+            }
+            return $result;
+        }
+        return [];
+    }
 
     public static function getList($channelType, $filter)
     {

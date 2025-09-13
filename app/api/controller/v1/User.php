@@ -810,7 +810,7 @@ class User extends BaseController
             $merged['chapterurl'] = str_replace(
                 $modelname,
                 'home',
-                (string)url('chapter_detail', ['id' => $merged['chapter_id'], 'bookid' => $merged['id']])
+                (string)furl('chapter_detail', ['id' => $merged['chapter_id'], 'bookid' => $merged['filename'] ? $merged['filename'] : $merged['id']])
             );
 
             // 格式化时间戳

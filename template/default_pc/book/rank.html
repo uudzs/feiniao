@@ -20,7 +20,7 @@
                     {php}$chapter_top = model('book')->where(['status' => 1])->order('chapters desc')->limit(10)->select()->toArray();{/php}
                     {notempty name="chapter_top"}
                     {volist name="$chapter_top" id="vo"}
-                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    {php}$link = url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);{/php}
                     <div class="zh-modules-rank-book">
                         {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
                         {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
@@ -43,7 +43,7 @@
                     {php}$words_top = model('book')->where(['status' => 1])->order('words desc')->limit(10)->select()->toArray();{/php}
                     {notempty name="words_top"}
                     {volist name="$words_top" id="vo"}
-                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    {php}$link = url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);{/php}
                     <div class="zh-modules-rank-book">
                         {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
                         {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
@@ -66,7 +66,7 @@
                     {php}$hits_top = model('book')->where(['status' => 1])->order('hits desc')->limit(10)->select()->toArray();{/php}
                     {notempty name="hits_top"}
                     {volist name="$hits_top" id="vo"}
-                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    {php}$link = url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);{/php}
                     <div class="zh-modules-rank-book">
                         {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
                         {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
@@ -97,7 +97,7 @@
                     {/php}
                     {notempty name="rand_top"}
                     {volist name="$rand_top" id="vo"}
-                    {php}$link = url('book_detail', ['id' => $vo['id']]);{/php}
+                    {php}$link = url('book_detail', ['id' => $vo['filename'] ? $vo['filename'] : $vo['id']]);{/php}
                     <div class="zh-modules-rank-book">
                         {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$vo.title}"></div>{/eq}
                         {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$vo.title}"></div>{/eq}
@@ -172,7 +172,7 @@
                         {volist name="$favorites" id="vo"}
                             {php}
                                 $book = model('book')->field('id,title')->where('id', $vo['pid'])->find();
-                                $link = url('book_detail', ['id' => $book['id']]);
+                                $link = url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]);
                             {/php}
                             <div class="zh-modules-rank-book">
                                 {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$book.title}"></div>{/eq}

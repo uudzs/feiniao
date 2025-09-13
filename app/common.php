@@ -1542,6 +1542,11 @@ if (!function_exists('furl')) {
     {
         $domainBind = config('app.domain_bind', []);
 
+        if ($url === 'chapter_detail' && isset($vars['id']) && is_numeric($vars['id'])) {
+            // 自动加密章节ID
+            $vars['id'] = encrypt_chapter_id((int)$vars['id']);
+        }
+
         // 多域名绑定逻辑
         if (!empty($domainBind)) {
             $flippedBind = array_flip($domainBind);
@@ -1761,4 +1766,34 @@ if (!function_exists('chapterCheckAccess')) {
             return ceil($thousands * intval($read_thousand_price));
         }
     }
+}
+
+/**
+ * 加密章节ID
+ * @param int $chapterId 章节ID
+ * @return string 加密后的字符串
+ */
+function encrypt_chapter_id($chapterId)
+{
+    return \app\service\ChapterIdService::encrypt((int)$chapterId);
+}
+
+/**
+ * 解密章节ID
+ * @param string $encryptedId 加密的章节ID
+ * @return int 原始章节ID
+ */
+function decrypt_chapter_id($encryptedId)
+{
+    return \app\service\ChapterIdService::decrypt((string)$encryptedId);
+}
+
+/**
+ * 验证加密的章节ID是否有效
+ * @param string $encryptedId 加密的章节ID
+ * @return bool
+ */
+function is_valid_chapter_id($encryptedId)
+{
+    return \app\service\ChapterIdService::isValid((string)$encryptedId);
 }

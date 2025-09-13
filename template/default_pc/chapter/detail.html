@@ -90,7 +90,7 @@ $conConfig = get_system_config('content');
         <div class="reader-main">
             {if !$conConfig['chapter_pages_content_open']}            
             <div class="reader-top">
-                <div class="bookimg"><a href="{:url('book_detail', ['id' => $book['id']])}"><img src="{:get_file($book.cover)}" alt="{$book.title}" onerror="this.src='{__STATIC__}/home/images/logo-ico.png'"><em></em></a></div>
+                <div class="bookimg"><a href="{:url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']])}"><img src="{:get_file($book.cover)}" alt="{$book.title}" onerror="this.src='{__STATIC__}/home/images/logo-ico.png'"><em></em></a></div>
                 <div class="name">{$book.title}</div>
                 <div class="au">{$book.author}</div>
                 <div class="tags">
@@ -200,7 +200,7 @@ $conConfig = get_system_config('content');
             <div class="tooltip-wrapper"><button class="comment"><i class="bi bi-chat-dots"></i><span class="text">评论</span></button></div>
             <div class="tooltip-wrapper"><button class="like"><i class="bi bi-heart"></i><span class="text">点赞</span></button></div>
             <div class="tooltip-wrapper"><button class="bookshelf"><i class="bi bi-bag-plus"></i><span class="text">书架</span></button></div>
-            <div class="tooltip-wrapper"><button class="addshelf btn_addshelf"><a href="{:url('book_detail', ['id' => $book['id']])}"><i class="bi bi-book"></i><span class="text">书详情</span></a></button></div>            
+            <div class="tooltip-wrapper"><button class="addshelf btn_addshelf"><a href="{:url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']])}"><i class="bi bi-book"></i><span class="text">书详情</span></a></button></div>            
         </div>
         <div class="gpd-toast-mask" style="display: none;"></div>
         <div class="gpd-reader-toast">
@@ -210,7 +210,7 @@ $conConfig = get_system_config('content');
                     <ul>
                         {notempty name="$chapterlist"}
                             {volist name="$chapterlist" id="v"}
-                            <li data-chapterid="{$v.id}" {eq name="$v['id']" value="$id"} class="active"{/eq}><a href="{:url('chapter_detail',['id'=>$v['id'],'bookid'=>$bookid])}"><span>{$v.title}</span></a></li>
+                            <li data-chapterid="{$v.id}" {eq name="$v['id']" value="$id"} class="active"{/eq}><a href="{:furl('chapter_detail',['id'=>$v['id'],'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}"><span>{$v.title}</span></a></li>
                             {/volist}
                         {/notempty}
                     </ul>

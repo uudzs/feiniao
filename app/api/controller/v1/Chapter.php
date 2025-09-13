@@ -34,7 +34,7 @@ class Chapter extends BaseController
         if (empty($id)) {
             $this->apiError('empty');
         }
-        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->cache('chapter_id_' . $id, 86400)->find();
+        $chapter = \app\common\model\Chapter::getChapterDetail($id);
         if (empty($chapter)) {
             $this->apiError('404');
         }
@@ -44,7 +44,7 @@ class Chapter extends BaseController
         if (intval($chapter['verify']) == 2) {
             $this->apiError('407');
         }
-        $book = Db::name('book')->field('id,title,cover,status')->where(array('id' => $chapter['bookid']))->cache('book_' . $chapter['bookid'], 86400)->find();
+        $book = \app\common\model\Novel::getBookDetail($chapter['bookid']);
         if (empty($book)) {
             $this->apiError('404');
         }
@@ -79,6 +79,7 @@ class Chapter extends BaseController
         $bookid = $book['id'];
         $chapter_id = $id;
         $ip = request()->ip();
+        $model_name = \think\facade\App::initialize()->http->getName();
         if (!empty($uid)) {
             $member = Db::name('user')->where(array('id' => $uid))->find();
             if (!empty($member)) {
@@ -264,7 +265,7 @@ class Chapter extends BaseController
         $front = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '<', $chapter['chaps']]])->order('chaps DESC')->find();
         if (!empty($front)) {
             $chapter['front_chapter'] = $front['id'];
-            $chapter['front_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $front['id'], 'bookid' => $front['bookid']]));
+            $chapter['front_url'] = str_replace($model_name, 'home', (string)furl('chapter_detail', ['id' => $front['id'], 'bookid' => $book['filename'] ? $book['filename'] : $front['bookid']]));
         } else {
             $chapter['front_chapter'] = 0;
             $chapter['front_url'] = '';
@@ -273,7 +274,7 @@ class Chapter extends BaseController
         $after = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
         if (!empty($after)) {
             $chapter['after_chapter'] = $after['id'];
-            $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id'], 'bookid' => $after['bookid']]));
+            $chapter['after_url'] = str_replace($model_name, 'home', (string)furl('chapter_detail', ['id' => $after['id'], 'bookid' => $book['filename'] ? $book['filename'] : $after['bookid']]));
         } else {
             if (get_addons_is_enable('caijipro')) {
                 $isNewChapter = hook('caijiproUpgradeHook', ['bookid' => $bookid]);
@@ -281,7 +282,7 @@ class Chapter extends BaseController
                     $after = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
                     if (!empty($after)) {
                         $chapter['after_chapter'] = $after['id'];
-                        $chapter['after_url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('chapter_detail', ['id' => $after['id'], 'bookid' => $after['bookid']]));
+                        $chapter['after_url'] = str_replace($model_name, 'home', (string)furl('chapter_detail', ['id' => $after['id'], 'bookid' => $book['filename'] ? $book['filename'] : $after['bookid']]));
                     } else {
                         $chapter['after_chapter'] = 0;
                         $chapter['after_url'] = '';

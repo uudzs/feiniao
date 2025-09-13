@@ -99,7 +99,7 @@
                 {notempty name="$last_chapter"}
                 <p class="book-info__time">
                     <span>更新时间：{:time_format($last_chapter.create_time,'Y-m-d')}</span>
-                    <a class="book-info__lastChapter ypc-link" href="{:url('chapter_detail',['id'=>$last_chapter['id'], 'bookid'=>$last_chapter['bookid']])}" target="_blank"> 最新章节：{$last_chapter.title}</a>
+                    <a class="book-info__lastChapter ypc-link" href="{:furl('chapter_detail',['id'=>$last_chapter['id'], 'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}" target="_blank"> 最新章节：{$last_chapter.title}</a>
                 </p>
                 {/notempty}
                 <div class="btn-box">
@@ -167,7 +167,7 @@
                             <ul class="catalogue">
                                 {volist name="$new_chapter" id="v"}
                                     <li class="catalogue-list">
-                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id'], 'bookid'=>$v['bookid']])}" target="_blank" class="ypc-link catalogue-list__link">
+                                        <a title="{$v.title}" href="{:furl('chapter_detail',['id'=>$v['id'], 'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}" target="_blank" class="ypc-link catalogue-list__link">
                                             <span class="catalogue-list__title">{$v.title}</span>
                                             <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
                                         </a>
@@ -182,7 +182,7 @@
                             <ul class="catalogue">
                                 {volist name="$chapterlist" id="v"}
                                     <li class="catalogue-list">
-                                        <a title="{$v.title}" href="{:url('chapter_detail',['id'=>$v['id'], 'bookid'=>$v['bookid']])}" target="_blank" class="ypc-link catalogue-list__link">
+                                        <a title="{$v.title}" href="{:furl('chapter_detail',['id'=>$v['id'], 'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}" target="_blank" class="ypc-link catalogue-list__link">
                                             <span class="catalogue-list__title">{$v.title}</span>
                                             <span class="catalogue-list__time">{:time_format($v.create_time,'Y-m-d')}</span>
                                         </a>
@@ -202,7 +202,7 @@
         </div>       
         {php}
         if($book['genre']) {
-            $similar = model('book')->field('id,cover,title')->where(['status' => 1, 'genre' => $book['genre']])->order('hits desc')->limit(8)->select()->toArray();
+            $similar = model('book')->field('id,cover,filename,title')->where(['status' => 1, 'genre' => $book['genre']])->order('hits desc')->limit(8)->select()->toArray();
         } else {
             $similar = '';
         }
@@ -214,10 +214,10 @@
                     {volist name="$similar" id="v"}
                         <li class="hot-list">
                             <div class="book-vertical">
-                                <a href="{:url('book_detail',['id'=>$v['id']])}" title="{$v.title}">
+                                <a href="{:url('book_detail',['id'=>$v['filename'] ? $v['filename'] : $v['id']])}" title="{$v.title}">
                                     <div class="cover w130" lazy="loading" style="background-image: url('{:get_file($v.cover)}');"></div>
                                 </a>
-                                <a title="{$v.title}" href="{:url('book_detail',['id'=>$v['id']])}">
+                                <a title="{$v.title}" href="{:url('book_detail',['id'=>$v['filename'] ? $v['filename'] : $v['id']])}">
                                     <h4 class="book-title">{$v.title}</h4>
                                 </a>
                             </div>
@@ -228,7 +228,7 @@
         {/notempty}          
         {php}
         if($book['genre']) {
-            $new_book = model('book')->field('id,cover,title,author,authorid,words,remark,isfinish')->where(['status' => 1, 'genre' => $book['genre']])->order('create_time desc')->limit(9)->select()->toArray();
+            $new_book = model('book')->field('id,cover,title,filename,author,authorid,words,remark,isfinish')->where(['status' => 1, 'genre' => $book['genre']])->order('create_time desc')->limit(9)->select()->toArray();
         } else {
             $new_book = '';
         }
@@ -240,12 +240,12 @@
                 {volist name="$new_book" id="v"}
                     <li class="recently-list">
                         <div class="book-simple">
-                            <a href="{:url('book_detail',['id'=>$v['id']])}" title="{$v.title}">
+                            <a href="{:url('book_detail',['id'=>$v['filename'] ? $v['filename'] : $v['id']])}" title="{$v.title}">
                                 <div class="cover w90" lazy="loading" style="background-image: url('{:get_file($v.cover)}');"></div>
                             </a>
                             <div class="book-info">
                                 <div class="book-head">
-                                    <a href="{:url('book_detail',['id'=>$v['id']])}" title="{$v.title}">
+                                    <a href="{:url('book_detail',['id'=>$v['filename'] ? $v['filename'] : $v['id']])}" title="{$v.title}">
                                         <h4 class="book-title">{$v.title}</h4>
                                     </a>
                                 </div>
@@ -301,7 +301,7 @@
             width: 100,// 宽度，单位 px
             height: 100,// 高度，单位 px            
             correctLevel: 0,// 纠错等级 0 1 2 3
-            text: "{:url('book_detail',['id'=>$bid],true,true)}"
+            text: "{:url('book_detail',['id'=>$book['filename'] ? $book['filename'] : $bid],true,true)}"
         });
         $('.favorites').on('click', function () {
             var text = $(this).text().split(' ').join('');

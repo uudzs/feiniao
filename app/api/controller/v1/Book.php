@@ -38,7 +38,7 @@ class Book extends BaseController
             $this->apiError('empty');
         }
         $uid = JWT_UID;
-        $detail = Db::name('book')->where(['id' => $id])->cache('book_' . $id)->find();
+        $detail = \app\common\model\Novel::getBookDetail($id);
         $model_name = \think\facade\App::initialize()->http->getName();
         if ($detail) {
             if (intval($detail['status']) != 1) {
@@ -60,14 +60,16 @@ class Book extends BaseController
             $detail['cover'] = get_file($detail['cover']);
             $detail['issign'] = Db::name('author')->where(['id' => $detail['authorid']])->value('issign');
             $detail['words'] = wordCount($detail['words']);
-            $detail['uptime'] = $detail['update_time'] ? date('Y-m-d H:i:s', $detail['update_time']) : date('Y-m-d H:i:s', $detail['create_time']);
-            $detail['chapter'] = Db::name('chapter')->field('id,title,chaps,bookid,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->cache('chapter_bookid_chapterlist_' . $id, 86400)->order('chaps asc')->select()->toArray(); //所有章节
+            $cacheKey = 'chapter_list_' . $id;
+            $detail['chapter'] = \app\service\CacheService::remember($cacheKey, function () use ($id) {
+                return \app\common\model\Chapter::field('id,bookid,title,chaps,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
+            });
             $first_chapter = $last_chapter = [];
             if (!empty($detail['chapter'])) {
                 $first_chapter = $detail['chapter'][0]; //第一章
                 $last_chapter = end($detail['chapter']); //最后一章
                 foreach ($detail['chapter'] as $k => $v) {
-                    $url = (string) Route::buildUrl('chapter_detail', ['id' => $v['id'], 'bookid' => $v['bookid']]);
+                    $url = (string)furl('chapter_detail', ['id' => $v['id'], 'bookid' => $detail['filename'] ? $detail['filename'] : $v['bookid']]);
                     $detail['chapter'][$k]['chapter_url'] = str_replace($model_name, 'home', $url);
                     $detail['chapter'][$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
                 }
@@ -94,10 +96,10 @@ class Book extends BaseController
             //查询是否有该章节记录
             if (!empty($reads)) {
                 $detail['continueread'] = 1;
-                $detail['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $reads['chapter_id'], 'bookid' => $reads['book_id']]);
+                $detail['chapter_url'] = furl('chapter_detail', ['id' => $reads['chapter_id'], 'bookid' => $detail['filename'] ? $detail['filename'] : $v['bookid']]);
             } else {
                 if ($first_chapter) {
-                    $detail['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $first_chapter['id'], 'bookid' => $first_chapter['bookid']]);
+                    $detail['chapter_url'] = furl('chapter_detail', ['id' => $first_chapter['id'], 'bookid' => $detail['filename'] ? $detail['filename'] : $v['bookid']]);
                 } else {
                     $detail['chapter_url'] = 'javascript:;';
                 }

@@ -15,7 +15,7 @@
 {php}$author = model('author')->where(['id'=>$id, 'status' => 1])->find();{/php}
 {notempty name="$author"}
 {php}
-$book_list = model('book')->field('id,title,genre,subgenre,words,remark,isfinish,cover')->where(['status' => 1, 'authorid' => $author['id']])->select()->toArray();
+$book_list = model('book')->field('id,title,filename,genre,subgenre,words,remark,isfinish,cover')->where(['status' => 1, 'authorid' => $author['id']])->select()->toArray();
 if(!empty($book_list)) {
     foreach($book_list as $k => $v) {
         if($v['genre']) {
@@ -73,9 +73,9 @@ $follow_count = model('follow')->where(['from_id' => $author['id']])->count();
                             {volist name="$book_list" id="v"}
                             <li class="vcm_book_box flex">
                                 <div class="book_l flex">
-                                    <div class="cover"><a href="{:url('book_detail',['id'=>$v['id']])}" target="_blank"><img src="{:get_file($v.cover)}" alt="{$v.title}"></a></div>
+                                    <div class="cover"><a href="{:url('book_detail',['id'=>$v['filename'] ? $v['filename'] : $v['id']])}" target="_blank"><img src="{:get_file($v.cover)}" alt="{$v.title}"></a></div>
                                     <div class="info">
-                                        <h4 class="name"><a href="{:url('book_detail',['id'=>$v['id']])}" target="_blank">{$v.title}</a></h4>
+                                        <h4 class="name"><a href="{:url('book_detail',['id'=>$v['filename'] ? $v['filename'] : $v['id']])}" target="_blank">{$v.title}</a></h4>
                                         <div class="status">
                                             <div class="over">{eq name="$v.isfinish" value="2"}完结{else/}连载{/eq}</div><em class="sp"></em>
                                             {notempty name="$v.genre"}<div class="cat">{$v.genre}</div><em class="dot"></em>{/notempty}
@@ -86,13 +86,13 @@ $follow_count = model('follow')->where(['from_id' => $author['id']])->count();
                                         {notempty name="$v.chapter"}
                                         <div class="update">
                                             <span class="ttit">最新章节：</span>
-                                            <a href="{:url('chapter_detail',['id'=>$v['chapter']['id'], 'bookid'=>$v['chapter']['bookid']])}" class="gonew" target="_blank">{$v.chapter.title}</a>
+                                            <a href="{:furl('chapter_detail',['id'=>$v['chapter']['id'], 'bookid'=>$v['filename'] ? $v['filename'] : $v['id']])}" class="gonew" target="_blank">{$v.chapter.title}</a>
                                             <div class="uptime">{:time_format($v.chapter.create_time,'Y-m-d')}</div>
                                         </div>
                                         {/notempty}
                                     </div>
                                 </div>
-                                <div class="action"><a href="{:url('book_detail',['id'=>$v['id']])}" target="_blank" class="goread">立即阅读</a></div>
+                                <div class="action"><a href="{:url('book_detail',['id'=>$v['filename'] ? $v['filename'] : $v['id']])}" target="_blank" class="goread">立即阅读</a></div>
                             </li>
                             {/volist}
                         </ul>

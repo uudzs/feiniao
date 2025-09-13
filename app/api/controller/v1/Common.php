@@ -14,6 +14,7 @@ use think\Image;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use think\captcha\facade\Captcha;
+use think\facade\Validate;
 
 class Common extends BaseController
 {
@@ -465,6 +466,9 @@ class Common extends BaseController
         $mobile = isset($param['mobile']) ? trim($param['mobile']) : '';
         $password = isset($param['password']) ? trim($param['password']) : '';
         $invite_code = isset($param['invite_code']) ? trim($param['invite_code']) : '';
+        $username = preg_replace('/\s+/', '', $username);
+        $mobile = preg_replace('/\s+/', '', $mobile);
+        $email = preg_replace('/\s+/', '', $email);
         if (empty($mobile) && empty($username) && empty($email)) {
             $this->apiError('empty');
         }
@@ -517,6 +521,19 @@ class Common extends BaseController
                 if (!in_array('account', $power['login_type'])) {
                     $this->apiError('login.prohibitaccountlogin');
                 }
+            }
+            $validate = Validate::rule([
+                'username' => 'require|regex:^[a-zA-Z0-9_]+$',
+            ]);
+            $validate->message([
+                'username.require' => lang('empty'),
+                'username.regex' => lang('paramerror'),
+            ]);
+            if (!$validate->check($param)) {
+                return json([
+                    'code' => 1,
+                    'msg' => $validate->getError()
+                ])->header(['Content-Type' => 'application/json']);
             }
             if (empty($password)) {
                 $this->apiError('empty');

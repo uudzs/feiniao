@@ -286,7 +286,7 @@ function add_log($type, $param_id = '', $param = [], $subject = '')
 {
     $action = '未知操作';
     $type_action = get_config('log.admin_action');
-    if ($type_action[$type]) {
+    if ($type_action && isset($type_action[$type])) {
         $action = $type_action[$type];
     }
     if ($type == 'login') {
@@ -294,6 +294,14 @@ function add_log($type, $param_id = '', $param = [], $subject = '')
     } else {
         $session_admin = get_config('app.session_admin');
         $login_admin = \think\facade\Session::get($session_admin);
+    }
+    // 检查管理员信息是否存在
+    if (empty($login_admin) || !isset($login_admin['id']) || !isset($login_admin['nickname'])) {
+        // 如果管理员信息不存在，使用默认值
+        $login_admin = [
+            'id' => 0,
+            'nickname' => '系统'
+        ];
     }
     $data = [];
     $data['title'] = '';

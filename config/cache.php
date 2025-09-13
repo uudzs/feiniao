@@ -3,50 +3,74 @@
 // +----------------------------------------------------------------------
 // | 缓存设置
 // +----------------------------------------------------------------------
+// | 缓存配置文件 - 支持动态配置管理
+// | 支持的缓存类型：file、redis、memcache、memcached、sqlite、wincache
+// +----------------------------------------------------------------------
+// | 最后更新时间：2025-09-11 13:29:54
+// +----------------------------------------------------------------------
 
 return [
     // 默认缓存驱动
-    'default' => env('cache.driver', 'file'),
+    'default' => 'file',
 
     // 缓存连接方式配置
     'stores'  => [
+        // 文件缓存
         'file' => [
-            // 驱动方式
-            'type'       => 'File',
-            // 缓存保存目录
-            'path'       => '',
-            // 缓存前缀
-            'prefix'     => '',
-            // 缓存有效期 0表示永久缓存
-            'expire'     => 0,
-            // 缓存标签前缀
-            'tag_prefix' => 'tag:',
-            // 序列化机制 例如 ['serialize', 'unserialize']
-            'serialize'  => [],
+            'type'        => 'File',
+            'path'        => '',
+            'prefix'      => '',
+            'expire'      => 0,
+            'tag_prefix'  => 'tag:',
+            'serialize'   => [],
         ],
-        // 更多的缓存连接    
-        // redis缓存
-        'redis' =>  [
-            // 驱动方式
-            'type'          => 'redis',
-            // 服务器地址
-            'host'          => env('redis.redis_hostname', '127.0.0.1'),
-            // 端口
-            'port'          => env('redis.port', '6379'),
-            // 密码
-            'password'      => env('redis.redis_password', ''),
-            // 缓存有效期 0表示永久缓存
-            'expire'        => 0,
-            // 缓存前缀
-            'prefix'     => env('cache.cache_prefix', ''),
-            // 缓存标签前缀
-            'tag_prefix'    => env('cache.cache_tag_prefix', ''),
-            // 数据库 0号数据库
-            'select'        => intval(env('redis.select', 0)),
-            // 序列化机制 例如 ['serialize', 'unserialize']
-            'serialize'     => [],
-            // 服务端主动关闭
-            'timeout'       => 0
+
+        // Redis缓存
+        'redis' => [
+            'type'        => 'redis',
+            'host'        => '127.0.0.1',
+            'port'        => 6379,
+            'password'    => '',
+            'select'      => 0,
+            'timeout'     => 0,
+            'expire'      => 0,
+            'persistent'  => false,
+            'prefix'      => '',
+            'tag_prefix'  => 'tag:',
+            'serialize'   => [],
+        ],
+
+        // Memcache缓存
+        'memcache' => [
+            'type'        => 'memcache',
+            'host'        => '127.0.0.1',
+            'port'        => 11211,
+            'timeout'     => 1,
+            'expire'      => 0,
+            'prefix'      => '',
+            'tag_prefix'  => 'tag:',
+            'serialize'   => [],
+        ],
+
+        // Memcached缓存
+        'memcached' => [
+            'type'        => 'memcached',
+            'host'        => '127.0.0.1',
+            'port'        => 11211,
+            'username'    => '',
+            'password'    => '',
+            'expire'      => 0,
+            'timeout'     => 1,
+            'prefix'      => '',
+            'tag_prefix'  => 'tag:',
+        ],
+
+        // WinCache（Windows系统专用）缓存
+        'wincache' => [
+            'type'        => 'wincache',
+            'prefix'      => '',
+            'expire'      => 0,
+            'tag_prefix'  => 'tag:',
         ],
     ],
 ];

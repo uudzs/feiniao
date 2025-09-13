@@ -26,14 +26,27 @@ class Chapter extends BaseController
         if (empty($id)) {
             $this->error(404);
         }
-        $chapter = Db::name('chapter')->field('id,title,bookid,verify,status,chaps,wordnum,create_time')->where(array('id' => $id))->cache('chapter_id_' . $id, 86400)->find();
+        if (intval($id) != $id) {
+            $id = decrypt_chapter_id($id);
+        }
+        if ($id <= 0) {
+            $this->error(404);
+        }
+        $chapter = \app\common\model\Chapter::getChapterDetail($id);
         if (empty($chapter)) {
             $this->error(404);
         }
-        $list = Db::name('chapter')->field('id,bookid,title,chaps,create_time')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1']])->cache('chapter_bookid_chapterlist_' . $chapter['bookid'], 86400)->order('chaps asc')->select()->toArray(); //所有章节
+        $book = \app\common\model\Novel::getBookDetail($chapter['bookid']);
+        if (empty($book)) {
+            $this->error(404);
+        }
+        $cacheKey = 'chapter_list_' . $chapter['bookid'];
+        $list = \app\service\CacheService::remember($cacheKey, function () use ($chapter) {
+            return \app\common\model\Chapter::field('id,bookid,title,chaps,create_time')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
+        });
         if (!empty($list)) {
             foreach ($list as $k => $v) {
-                $list[$k]['chapter_url'] = (string) Route::buildUrl('chapter_detail', ['id' => $v['id'], 'bookid' => $v['bookid']]);
+                $list[$k]['chapter_url'] = (string) furl('chapter_detail', ['id' => $v['id'], 'bookid' => $book['filename'] ? $book['filename'] : $v['bookid']]);
                 $list[$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
             }
         }
@@ -68,14 +81,14 @@ class Chapter extends BaseController
             //前一章
             $front = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '<', $chapter['chaps']]])->order('chaps DESC')->find();
             if (!empty($front)) {
-                $front_url =  (string) Route::buildUrl('chapter_detail', ['id' => $front['id'], 'bookid' => $front['bookid']]);
+                $front_url =  (string)furl('chapter_detail', ['id' => $front['id'], 'bookid' => $book['filename'] ? $book['filename'] : $front['bookid']]);
             } else {
                 $front_url = '';
             }
             //后一章
             $after = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1'], ['chaps', '>', $chapter['chaps']]])->order('chaps ASC')->find();
             if (!empty($after)) {
-                $after_url = (string) Route::buildUrl('chapter_detail', ['id' => $after['id'], 'bookid' => $after['bookid']]);
+                $after_url = (string)furl('chapter_detail', ['id' => $after['id'], 'bookid' => $book['filename'] ? $book['filename'] : $after['bookid']]);
             } else {
                 $after_url = '';
             }
@@ -87,7 +100,7 @@ class Chapter extends BaseController
         $data['id'] = $id;
         $data['bookid'] = $chapter['bookid'];
         $data['chapterlist'] = $list;
-        $data['book'] = Db::name('book')->where('id', $data['bookid'])->cache('book_' . $data['bookid'], 86400)->find();
+        $data['book'] = $book;
         View::config(['view_path' => $this->view_path()]);
         if ($ismakecache) $this->makecache(View::fetch('detail', $data));
         return view('detail', $data);
