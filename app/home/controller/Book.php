@@ -87,7 +87,7 @@ class Book extends BaseController
         }
         $book['bigclassname'] = Db::name('category')->where(['id' => $book['genre']])->cache('category_' . $book['genre'], 86400)->value('name');
         $book['cover'] = get_file($book['cover']);
-        $book['words'] = wordCount($book['words']);
+        $book['words_str'] = wordCount($book['words']);
         $book['author'] = trim($book['author']);
         $book['remark'] = $book['remark'] ? strip_tags($book['remark']) : '';
         $first_chapter = Db::name('chapter')->field('id,bookid,title')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->cache('chapter_bookid_chapsasc_' . $id, 86400)->order('chaps asc')->find();
