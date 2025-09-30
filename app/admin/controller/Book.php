@@ -97,6 +97,7 @@ class Book extends BaseController
             }
             unset($param['id']);
             $this->model->where('id', $id)->strict(false)->field(true)->update($param);
+            clear_cache('book_' . $id);
             return to_assign();
         } else {
             return to_assign(1, '请求失败');
@@ -354,6 +355,7 @@ class Book extends BaseController
                 $param['update_time'] = time();
                 Db::name('book')->where('id', $book['id'])->strict(false)->field(true)->update($param);
                 add_log('edit', $param['id'], $param);
+                clear_cache('book_' . $book['id']);
                 return to_assign();
             } else {
                 $this->model->editBook($param);

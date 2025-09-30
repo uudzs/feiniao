@@ -519,6 +519,7 @@ class Chapter extends BaseController
             $param['verifyresult'] = '编辑修改章节内容';
             Db::name('chapter')->where(['id' => $id])->strict(false)->field(true)->update($param);
             Content::update($chapter['bookid'], $id, $content);
+            clear_cache('chapter_' . $id);
             $res = Db::name('book')->where(['id' => $chapter['bookid']])->strict(false)->field(true)->update(['update_time' => time()]);
             return to_assign();
         } else {
@@ -576,6 +577,7 @@ class Chapter extends BaseController
             if ($param['verify'] == 1) {
                 $res = Db::name('book')->where(['id' => $chapter['bookid']])->strict(false)->field(true)->update(['update_time' => time()]);
             }
+            clear_cache('chapter_' . $id);
             return to_assign();
         } else {
             $id = isset($param['id']) ? $param['id'] : 0;
