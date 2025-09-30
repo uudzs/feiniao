@@ -136,6 +136,6 @@ composer install （依赖包默认已集成，可以忽略。）
 - 非常感谢您一直以来对我们的关注和支持，我们将不断努力，为您带来更好的体验和回报。
 - 感谢您给予我们的信任、鼓励和支持。我们会加倍努力，为您带来更好的服务！
 
-|支付宝      |    微信|
+|微信1      |    微信2|
 | :--------: | :--------:|
 | <img src="https://www.paheng.com/static/image/zfb.png" width="300"  align=center />|<img src="https://www.paheng.com/static/image/wx.png" width="300"  align=center />|

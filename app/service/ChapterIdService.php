@@ -6,7 +6,7 @@ namespace app\service;
 
 /**
  * 章节ID加密/解密服务
- * 用于隐藏真实的章节ID，提高安全性
+ * 使用更稳健的XOR和Base64编码方案
  */
 class ChapterIdService
 {
@@ -14,38 +14,6 @@ class ChapterIdService
      * 加密密钥 - 可在配置文件中设置
      */
     private static $secretKey = 'feiniao_chapter_key';
-
-    /**
-     * 字符映射表 - 用于混淆
-     */
-    private static $charMap = [
-        '0' => 'q',
-        '1' => 'w',
-        '2' => 'e',
-        '3' => 'r',
-        '4' => 't',
-        '5' => 'y',
-        '6' => 'u',
-        '7' => 'i',
-        '8' => 'o',
-        '9' => 'p'
-    ];
-
-    /**
-     * 反向字符映射表
-     */
-    private static $reverseCharMap = [
-        'q' => '0',
-        'w' => '1',
-        'e' => '2',
-        'r' => '3',
-        't' => '4',
-        'y' => '5',
-        'u' => '6',
-        'i' => '7',
-        'o' => '8',
-        'p' => '9'
-    ];
 
     /**
      * 获取加密密钥
@@ -73,29 +41,24 @@ class ChapterIdService
             return '';
         }
 
-        // 第一步：使用固定的盐值（基于章节ID本身生成，确保结果一致）
-        $salt = ($chapterId * 7 + 13) % 100; // 使用数学运算生成固定盐值
-        $salted = $chapterId + $salt * 10000000; // 使用更大的乘数避免冲突
+        // 使用更简单的XOR加密
+        $key = crc32(self::getSecretKey());
+        $encrypted = $chapterId ^ $key;
 
-        // 第二步：简单的位运算加密
-        $key = crc32(self::getSecretKey()) & 0xFFFF; // 取16位
-        $encrypted = $salted ^ $key;
+        // 转换为十六进制字符串
+        $hex = dechex($encrypted);
 
-        // 第三步：转为字符串并进行字符映射
-        $str = (string)$encrypted;
-        $mapped = '';
-        for ($i = 0; $i < strlen($str); $i++) {
-            $char = $str[$i];
-            $mapped .= isset(self::$charMap[$char]) ? self::$charMap[$char] : $char;
-        }
-
-        // 第四步：添加校验位（取原ID的最后一位）
+        // 添加简单校验和（ID的最后一位数字）
         $checksum = $chapterId % 10;
-        $mapped .= chr(97 + $checksum); // a-j 对应 0-9
+        $hex .= dechex($checksum);
 
-        // 第五步：Base64编码并移除填充符
-        $encoded = base64_encode($mapped);
-        return rtrim($encoded, '=');
+        // Base64编码并替换可能产生问题字符
+        $encoded = base64_encode($hex);
+
+        // 替换可能产生的问题字符
+        $encoded = str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
+
+        return $encoded;
     }
 
     /**
@@ -110,55 +73,39 @@ class ChapterIdService
         }
 
         try {
-            // 第一步：Base64解码
-            $padding = 4 - (strlen($encryptedId) % 4);
-            if ($padding !== 4) {
-                $encryptedId .= str_repeat('=', $padding);
+            // 恢复Base64替换的字符
+            $encoded = str_replace(['-', '_'], ['+', '/'], $encryptedId);
+
+            // 添加填充字符
+            $padding = strlen($encoded) % 4;
+            if ($padding !== 0) {
+                $encoded .= str_repeat('=', 4 - $padding);
             }
-            $decoded = base64_decode($encryptedId);
-            if ($decoded === false) {
+
+            // Base64解码
+            $hex = base64_decode($encoded);
+            if ($hex === false) {
                 return 0;
             }
 
-            // 第二步：提取校验位
-            if (strlen($decoded) < 2) {
-                return 0;
-            }
-            $checksumChar = substr($decoded, -1);
-            $expectedChecksum = ord($checksumChar) - 97;
-            $mapped = substr($decoded, 0, -1);
+            // 分离加密数据和校验和
+            $data = substr($hex, 0, -1);
+            $checksum = substr($hex, -1);
 
-            // 第三步：反向字符映射
-            $str = '';
-            for ($i = 0; $i < strlen($mapped); $i++) {
-                $char = $mapped[$i];
-                $str .= isset(self::$reverseCharMap[$char]) ? self::$reverseCharMap[$char] : $char;
-            }
+            // 转换回数字
+            $encrypted = hexdec($data);
+            $key = crc32(self::getSecretKey());
 
-            // 第四步：解密位运算
-            $encrypted = (int)$str;
-            $key = crc32(self::getSecretKey()) & 0xFFFF;
-            $salted = $encrypted ^ $key;
+            // XOR解密
+            $chapterId = $encrypted ^ $key;
 
-            // 第五步：移除固定的盐值（需要先计算原始章节ID）
-            $originalChapterId = $salted % 10000000;
-
-            // 验证盐值是否正确
-            $expectedSalt = ($originalChapterId * 7 + 13) % 100;
-            $actualSalt = intval(($salted - $originalChapterId) / 10000000);
-
-            if ($actualSalt !== $expectedSalt) {
-                return 0; // 盐值不匹配，可能是无效的加密ID
-            }
-
-            // 第六步：验证校验位
-            if ($originalChapterId % 10 !== $expectedChecksum) {
+            // 验证校验和
+            if ($chapterId % 10 !== hexdec($checksum)) {
                 return 0;
             }
 
-            return $originalChapterId > 0 ? $originalChapterId : 0;
+            return $chapterId > 0 ? $chapterId : 0;
         } catch (\Exception $e) {
-            // 解密失败返回0
             return 0;
         }
     }
