@@ -116,6 +116,9 @@ $conConfig = get_system_config('content');
                     <div class="content" id="chapter_content">
                         {if $conConfig['chapter_pages_content_open']}
                             {if isset($chapter['chapteraccess']) && $chapter['chapteraccess'] !== 1}
+                                {if $chapter['chapteraccess'] == 0}
+                                    <p data-id="0">未知错误</p>
+                                {/if} 
                                 {if $chapter['chapteraccess'] == -1}
                                     <p data-id="0">章节内容为空！</p>
                                 {/if}
@@ -151,7 +154,10 @@ $conConfig = get_system_config('content');
                                 {/if}
                                 {if $chapter['chapteraccess'] == -17}
                                     <p data-id="0">不够本章节所需的金币数，请充值！</p>
-                                {/if}                                
+                                {/if}
+                                {if $chapter['chapteraccess'] == -19}
+                                    <p data-id="0">请登录后再阅读！</p>
+                                {/if}    
                             {else/}
                                 {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open'] && is_array($content)}
                                     {foreach $content as $index => $text}
