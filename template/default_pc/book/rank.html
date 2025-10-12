@@ -171,19 +171,19 @@
                     {notempty name="favorites"}
                         {volist name="$favorites" id="vo"}
                             {php}
-                                $book = model('book')->field('id,title')->where('id', $vo['pid'])->find();
-                                $link = url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]);
+                                $book = model('book')->field('id,title,filename')->where('id', $vo['pid'])->find();
+                                $link = $book ? url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']]) : '';
                             {/php}
                             <div class="zh-modules-rank-book">
-                                {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$book.title}"></div>{/eq}
-                                {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$book.title}"></div>{/eq}
-                                {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$book.title}"></div>{/eq}
+                                {eq name="$key" value="0"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/1940777.png" alt="{$book.title|default=''}"></div>{/eq}
+                                {eq name="$key" value="1"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/e452c9d.png" alt="{$book.title|default=''}"></div>{/eq}
+                                {eq name="$key" value="2"}<div class="book-rank--num"><img src="{__STATIC__}/home/image/65b1446.png" alt="{$book.title|default=''}"></div>{/eq}
                                 {if condition="$key > 2 && $key < 9"}
                                     <div class="book-rank--num"><span>0{$key+1}</span></div>
                                 {/if}
                                 {eq name="$key" value="9"}<div class="book-rank--num"><span>10</span></div>{/eq}
                                 <div class="book-rank--title">
-                                    <p class="book-rank--title-text ellipsis"><a title="{$book['title']}" target="_blank" href="{$link}" class="global-hover">{$book['title']}</a></p>
+                                    <p class="book-rank--title-text ellipsis"><a title="{$book['title']|default=''}" target="_blank" href="{$link}" class="global-hover">{$book['title']|default=''}</a></p>
                                     <div class="website-rank__rank-text">{$vo.favs}</div>
                                 </div>
                             </div>

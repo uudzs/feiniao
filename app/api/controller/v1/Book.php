@@ -247,7 +247,6 @@ class Book extends BaseController
         $order = empty($param['order']) ? 'id desc' : $param['order'];
         $list =  Db::name('book')->where($where)
             ->field('id,title,author,authorid,cover,style,ending,genre,subgenre,isfinish,finishtime,chapters,label,label_custom,hits,words,status,editor,editorid,issign,create_time,update_time,remark,filename')
-            ->cache('booklist', 86400)
             ->order($order)
             ->paginate(['list_rows' => $rows, 'var_page' => 'page', 'page' => $page, 'query' => $param]);
         $result = $list->toArray();
