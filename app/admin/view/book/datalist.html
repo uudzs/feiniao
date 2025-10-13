@@ -267,7 +267,7 @@
 
 		//监听性别操作
 		form.on('switch(status)', function(obj) {
-			var id = obj.othis.parents('tr').find("td:first").text();
+			var id = obj.othis.parents('tr').find("td:eq(1)").text()
 			let callback = function (e) {
 				layer.msg(e.msg);
 				if (e.code == 0) {

@@ -22,11 +22,11 @@ class Login extends BaseController
         // 获取来路URL
         $cookieKey = 'refererKey';
         $refererUrl = Request::instance()->server('HTTP_REFERER', '');
-        if (!empty($refererUrl) && strpos($refererUrl, 'register') === false) {
+         if (!empty($refererUrl) && strpos($refererUrl, 'register') === false && strpos($refererUrl, 'login') === false) {
             Cookie::set($cookieKey, $refererUrl);
         }
         if (Cookie::has($cookieKey)) $refererUrl = Cookie::get($cookieKey);
-        if (!empty($refererUrl) && strpos($refererUrl, 'register') !== false) {
+        if (!empty($refererUrl) && (strpos($refererUrl, 'register') !== false || strpos($refererUrl, 'login') !== false)) {
             $refererUrl = furl('/', [], true, 'home');
         }
         $refererUrl = $refererUrl ? $refererUrl : furl('/', [], true, 'home');

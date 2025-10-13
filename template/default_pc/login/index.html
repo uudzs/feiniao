@@ -28,7 +28,7 @@
                     </ul>
                     <div class="layui-tab-content">
                         {if(in_array('account', $power['login_type']))}
-                            <form class="layui-form" lay-filter="login">
+                            <form class="layui-form" lay-filter="login" onsubmit="return false;">
                                 <div class="layui-tab-item layui-show">
                                     <div class="center">                
                                         <div class="item">
@@ -53,7 +53,7 @@
                             </form>
                         {/if}
                         {if(in_array('sms', $power['login_type']))}
-                            <form class="layui-form" lay-filter="mobile_login">
+                            <form class="layui-form" lay-filter="mobile_login" onsubmit="return false;">
                                 <div class="layui-tab-item {if(!in_array('account', $power['login_type']))}layui-show{/if}">
                                     <div class="center">
                                         <div class="layui-form-item">
@@ -111,6 +111,11 @@
             var $ = layui.jquery,
             form = layui.form,
             layer = layui.layer;
+            // 阻止表单默认提交
+            $('form.layui-form').on('submit', function(e) {
+                e.preventDefault();
+                return false;
+            });
             {if(in_array('account', $power['login_type']))}
             form.on('submit(login)', function (data) {
                 data = data.field;               
