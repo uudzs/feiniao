@@ -255,7 +255,7 @@ class Upgrade extends BaseController
                 $templine = str_ireplace('INSERT INTO ', 'INSERT IGNORE INTO ', $templine);
                 try {
                     Db::execute($templine);
-                } catch (\PDOException $e) {
+                } catch (\Throwable $e) {
                     //$e->getMessage();
                 }
                 $templine = '';
