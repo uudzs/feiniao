@@ -626,7 +626,7 @@ class User extends BaseController
                         continue;
                     }
                     $result['data'][$k]['link'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $author['id']]));
-                    $result['data'][$k]['headimg'] = get_file($author['headimg']);
+                    $result['data'][$k]['headimg'] = get_file($author['headimg'], 1);
                     $result['data'][$k]['nickname'] = $author['nickname'];
                     $result['data'][$k]['book_count'] = Db::name('book')->where(['status' => 1, 'authorid' => $v['from_id']])->count();;
                 } else {
@@ -636,7 +636,7 @@ class User extends BaseController
                         continue;
                     }
                     $result['data'][$k]['link'] = 'javascript:;';
-                    $result['data'][$k]['headimg'] = get_file($user['headimgurl']);
+                    $result['data'][$k]['headimg'] = get_file($user['headimgurl'], 1);
                     $result['data'][$k]['nickname'] = $user['nickname'];
                     $result['data'][$k]['book_count'] = 0;
                 }

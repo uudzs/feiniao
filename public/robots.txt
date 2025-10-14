@@ -1,3 +1,45 @@
 User-agent: *
 Disallow:
 Sitemap: /sitemap.xml
+Allow: /
+User-agent: Baiduspider
+Allow: /
+User-agent: Baiduspider-mobile
+Allow: /
+User-agent: 360Spider
+Allow: /
+User-agent: sogou spider
+Allow: /
+User-agent: Sosospider
+Allow: /
+User-agent: YodaoBot
+Allow: /
+User-agent: Yahoo!Slurp China
+Allow: /
+User-agent: Googlebot
+Allow: /
+User-agent: Bingbot
+Allow: /
+User-agent: Slurp
+Allow: /
+User-agent: msnbot
+Allow: /
+User-agent: YisouSpider
+Allow: /
+User-agent: ia_archiver
+Allow: /
+User-agent: EasouSpider 
+Allow: /
+User-agent: JikeSpider
+Allow: /
+User-agent: EtaoSpider
+Allow: /
+User-agent: YandexBot
+Allow: /
+User-agent: AhrefsBot
+Allow: /
+User-agent: ezooms.bot
+Allow: /
+User-agent: Bytespider
+Allow: /
+User-agent: AspiegelBot

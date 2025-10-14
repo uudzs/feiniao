@@ -42,7 +42,7 @@ class Author extends BaseController
             } else {
                 $detail['isfollow'] = 0;
             }
-            $detail['headimg'] = get_file($detail['headimg']);
+            $detail['headimg'] = get_file($detail['headimg'], 1);
             $detail['books'] = Db::name('book')->field('id,title,author,authorid,cover,style,ending,genre,subgenre,isfinish,finishtime,chapters,label,label_custom,hits,words,status,editor,editorid,issign,create_time,update_time,remark,filename')->where(['authorid' => $id, 'status' => 1])->order('create_time desc')->select()->toArray(); //所有作品
             $detail['follow_count'] = Db::name('follow')->where(['from_id' => $detail['id']])->count();
             $detail['words_count'] = Db::name('book')->where(['status' => 1, 'authorid' => $detail['id']])->sum('words');

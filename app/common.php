@@ -219,7 +219,7 @@ function time_format($time = NULL, $format = 'Y-m-d H:i:s')
  * 根据附件表的id返回url地址
  * @param  [type] $id [description]
  */
-function get_file($id)
+function get_file($id, $type = 0)
 {
     $host = Request::host();
     $port = Request::port();
@@ -230,34 +230,41 @@ function get_file($id)
             $geturl = Db::name("file")->where(['id' => $id])->find();
             if (!empty($geturl)) {
                 if ($geturl['status'] == 1) {
-                    //审核通过
                     $url = $geturl['filepath'];
                     return $url;
-                } else {
-                    //待审核
-                    return $sitepath . 'static/assets/init/images/data-none.png';
                 }
-            } else {
-                //不通过
-                return $sitepath . 'static/assets/init/images/data-none.png';
             }
         } else {
-            if ($id == 'undefined') {
-                return $sitepath . 'static/assets/init/images/data-none.png';
-            }
-            if ($id && strpos(trim($id), 'nocover') !== false) {
-                return $sitepath . 'static/assets/init/images/data-none.png';
-            }
-            if ($id && strpos(trim($id), 'Public/author/image/cover/') !== false) {
-                return $sitepath . str_replace("Public/author/image/cover/", "static/author/cover/", $id);
-            }
             if (strpos($id, 'http') !== false) {
                 return $id;
             }
-            return \think\facade\App::initialize()->http->getName() == 'api' ? $sitepath . $id : $id;
+            if ($id && $id != 'undefined') {
+                if (strpos(trim($id), 'Public/author/image/cover/') !== false) {
+                    return $sitepath . str_replace("Public/author/image/cover/", "static/author/cover/", $id);
+                }
+                return $sitepath . $id;
+            }
         }
     }
-    return $sitepath . 'static/assets/init/images/data-none.png';
+    return get_default_img($sitepath . 'static/assets/init/images/data-none.png', $type);
+}
+
+if (!function_exists('get_default_img')) {
+    function get_default_img($default_url = '', $type = 0)
+    {
+        if (get_addons_is_enable('sitegroup')) {
+            $system_config = app('feiniaowebconfig');
+            if (!empty($system_config)) {
+                if ($type == 1 && isset($system_config['avatar']) && $system_config['avatar']) {
+                    return $system_config['avatar'];
+                }
+                if ($type == 0 && isset($system_config['cover']) && $system_config['cover']) {
+                    return $system_config['cover'];
+                }
+            }
+        }
+        return $default_url;
+    }
 }
 
 function get_file_list($dir)

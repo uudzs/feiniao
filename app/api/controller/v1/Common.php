@@ -227,7 +227,7 @@ class Common extends BaseController
                     [
                         'author' => '',
                         'authorid' => 0,
-                        'headimg' => get_file(''),
+                        'headimg' => get_file('', 1),
                         'genre' => '',
                         'finish' => '',
                         'chapters' => 0,
@@ -278,7 +278,7 @@ class Common extends BaseController
             $result[$id] = [
                 'author' => trim($book['author']),
                 'authorid' => $book['authorid'],
-                'headimg' => get_file($authors[$book['authorid']] ?? ''),
+                'headimg' => get_file($authors[$book['authorid']] ?? '', 1),
                 'genre' => $genres[$book['genre']] ?? '',
                 'finish' => $book['isfinish'] == 2 ? lang('finish') : lang('serialize'),
                 'chapters' => $book['chapters'],
@@ -405,7 +405,7 @@ class Common extends BaseController
         }
         $user['mobile'] = $user['mobile'] ? substr_replace($user['mobile'], '****', 3, 4) : '';
         $user['id_card'] = $user['id_card'] ? substr_replace($user['id_card'], '****', 3, 4) : '';
-        $user['headimgurl'] = get_file($user['headimgurl']);
+        $user['headimgurl'] = get_file($user['headimgurl'], 1);
         if (!empty($user['email'])) {
             $parts = explode('@', $user['email']);
             $replaceLength = strlen($parts[0]) - 2;

@@ -77,7 +77,7 @@
         <div class="crumbs"><a href="{:url('/')}">首页</a>{notempty name="$genrename"}<a href="{$genrelink}">{$genrename}</a>{/notempty}{notempty name="$subgenrename"}<a href="{$subgenrelink}">{$subgenrename}</a>{/notempty}<h2>{$book.title}</h2></div>
         <section class="header">
             <div class="book-cover">
-                <img src="{:get_file($book.cover)}" class="book-cover__img" alt="{$book.title}">
+                <img src="{$book.cover|default=''}" class="book-cover__img" alt="{$book.title}">
             </div>
             <section class="book-info">
                 <h1 class="book-info__title">{$book.title}</h1>
@@ -116,7 +116,7 @@
             </section>
             <section class="author-info"  >
                 <a href="{:url('author_detail',['id'=>$book['authorid']])}" class="author-info--img">
-                    <img class="author-info-via" src="{:get_file($author.headimg??'')}" lazy="loaded">
+                    <img class="author-info-via" src="{:get_file($author.headimg??'',1)}" lazy="loaded">
                 </a>
                 <a href="{$book.authorurl}" class="author-info--name">{$book.author}</a>
                 {if $author && $author['issign']}

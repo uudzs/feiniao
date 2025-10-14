@@ -40,6 +40,7 @@ class Chapter extends BaseController
         if (empty($book)) {
             $this->error(404);
         }
+        $book['cover'] = get_file($book['cover']);
         $cacheKey = 'chapter_list_' . $chapter['bookid'];
         $list = \app\service\CacheService::remember($cacheKey, function () use ($chapter) {
             return \app\common\model\Chapter::field('id,bookid,title,chaps,create_time')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();

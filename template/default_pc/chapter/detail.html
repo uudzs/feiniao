@@ -8,6 +8,17 @@
 {block name="keywords"}
 <meta name="keywords" content="{:get_seo_str('chapter','chapter_keywords','',['chapterid'=>$id])}"/>
 <meta name="description" content="{:get_seo_str('chapter','chapter_description','',['chapterid'=>$id])}"/>
+<meta property="og:type" content="novel"/>
+<meta property="og:title" content="{$book.title|default=''}"/>
+<meta property="og:description" content="{$book.remark|default=''}"/>
+<meta property="og:image" content="{$book.cover|default=''}"/>
+<meta property="og:novel:category" content="{:model('category')->where(['status' => 1, 'id' => $book['genre']])->value('name')}"/>
+<meta property="og:novel:author" content="{$book.author|default=''}"/>
+<meta property="og:novel:book_name" content="{$book.title|default=''}"/>
+<meta property="og:novel:chapter_url" content="{:furl('chapter_detail',['id'=>$id,'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}"/>
+<meta property="og:novel:chapter_title" content="{$chapter.title|default=''}"/>
+<meta property="og:novel:author_link" content="{:url('author_detail',['id'=>$book['authorid']])}"/>
+<meta property="og:novel:status" content="{$book.isfinish == 2 ? lang('finish') : lang('serialize')}"/>
 {/block}
 <!-- 主体 -->
 {block name="body"}
@@ -90,7 +101,7 @@ $conConfig = get_system_config('content');
         <div class="reader-main">
             {if !$conConfig['chapter_pages_content_open']}            
             <div class="reader-top">
-                <div class="bookimg"><a href="{:url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']])}"><img src="{:get_file($book.cover)}" alt="{$book.title}" onerror="this.src='{__STATIC__}/home/images/logo-ico.png'"><em></em></a></div>
+                <div class="bookimg"><a href="{:url('book_detail', ['id' => $book['filename'] ? $book['filename'] : $book['id']])}"><img src="{$book.cover|default=''}" alt="{$book.title}" onerror="this.src='{:get_file('')}'"><em></em></a></div>
                 <div class="name">{$book.title}</div>
                 <div class="au">{$book.author}</div>
                 <div class="tags">

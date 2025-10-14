@@ -260,7 +260,7 @@ class Book extends BaseController
                 $result['data'][$k]['cover']  = get_file($v['cover']);
                 $result['data'][$k]['bigcatetitle'] = Db::name('category')->where(['id' => $v['genre']])->value('name');
                 $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $v['subgenre']])->value('name');
-                $result['data'][$k]['headpic'] = get_file($author['headimg']);
+                $result['data'][$k]['headpic'] = get_file($author['headimg'], 1);
                 $result['data'][$k]['cover_str'] = get_file($v['cover']);
                 $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? lang('finish') : lang('serialize');
                 $result['data'][$k]['words_str'] = intval($v['words']) > 0 ? wordCount($v['words']) : 0;

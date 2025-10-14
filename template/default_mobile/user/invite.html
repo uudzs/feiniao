@@ -125,7 +125,7 @@
                             var html = "";
                             data.forEach(function(el, index) {
                                 html +=`<li class="bui-btn bui-box">                        
-                                            <div class="bui-thumbnail"><img src="${el.headimgurl}" onerror="javascript:this.src='{__ASSETS__}/init/images/data-none.png';this.onerror=null;"></div>
+                                            <div class="bui-thumbnail"><img src="${el.headimgurl}" onerror="javascript:this.src='{:get_file('')}';this.onerror=null;"></div>
                                             <div class="span1">
                                                 <h3 class="item-title">${el.nickname}</h3>
                                                 <p class="item-text reg_time">注册时间：${el.register_time}</p>

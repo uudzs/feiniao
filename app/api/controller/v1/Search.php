@@ -75,7 +75,7 @@ class Search extends BaseController
                     unset($result['data'][$k]);
                     continue;
                 }
-                $result['data'][$k]['headpic'] = get_file($author['headimg']);
+                $result['data'][$k]['headpic'] = get_file($author['headimg'], 1);
                 $result['data'][$k]['regdate'] = date('Y-m-d', $author['create_time']);
                 $result['data'][$k]['bookcount'] = Db::name('book')->where(['authorid' => $v['authorid']])->count();
                 $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));

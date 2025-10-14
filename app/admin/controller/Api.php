@@ -158,8 +158,18 @@ class Api extends BaseController
     //清空缓存
     public function cache_clear()
     {
-        \think\facade\Cache::clear();
-        return to_assign(0, '系统缓存已清空');
+        try {
+            \think\facade\Cache::clear();
+            return json([
+                'code' => 0,
+                'msg'  => '系统缓存已清空'
+            ])->header(['Content-Type' => 'application/json']);
+        } catch (\Exception $e) {
+            return json([
+                'code' => 0,
+                'msg'  => '清空缓存失败：' . $e->getMessage()
+            ])->header(['Content-Type' => 'application/json']);
+        }
     }
 
     //发送测试邮件

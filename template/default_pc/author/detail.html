@@ -46,7 +46,7 @@ $follow_count = model('follow')->where(['from_id' => $author['id']])->count();
     <div class="container">
         <div class="flex vem_people justify-between items-center">
             <div class="avatar">
-                <div class="el-image"><img src="{:get_file($author.headimg)}" class="el-image__inner"></div>
+                <div class="el-image"><img src="{:get_file($author.headimg,1)}" class="el-image__inner"></div>
             </div>
             <div class="people_info flex-grow">
                 <div class="umain flex justify-between items-center">
@@ -103,7 +103,7 @@ $follow_count = model('follow')->where(['from_id' => $author['id']])->count();
     </div>
 {else/}
     <div style="display: flex;justify-content: center;align-items: center;margin: 20rem auto;">
-        <img src="{__STATIC__}/home/images/logo-invite.png" alt="">
+        <img src="{:get_file('')}" alt="">
         作者不存在！
     </div>        
 {/notempty}
