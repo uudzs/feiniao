@@ -253,13 +253,16 @@ if (!function_exists('get_default_img')) {
     function get_default_img($default_url = '', $type = 0)
     {
         if (get_addons_is_enable('sitegroup')) {
-            $system_config = app('feiniaowebconfig');
-            if (!empty($system_config)) {
-                if ($type == 1 && isset($system_config['avatar']) && $system_config['avatar']) {
-                    return $system_config['avatar'];
-                }
-                if ($type == 0 && isset($system_config['cover']) && $system_config['cover']) {
-                    return $system_config['cover'];
+            $class_name = 'feiniaowebconfig';
+            if (class_exists($class_name) && app()->exists($class_name)) {
+                $system_config = app($class_name);
+                if (!empty($system_config)) {
+                    if ($type == 1 && isset($system_config['avatar']) && $system_config['avatar']) {
+                        return $system_config['avatar'];
+                    }
+                    if ($type == 0 && isset($system_config['cover']) && $system_config['cover']) {
+                        return $system_config['cover'];
+                    }
                 }
             }
         }
