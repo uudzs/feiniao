@@ -51,6 +51,25 @@ abstract class BaseController
         $domain_bind = get_config('app.domain_bind');
         $domain_bind = $domain_bind ? array_flip($domain_bind) : [];
         View::assign('domain_bind', $domain_bind);
+        if (get_addons_is_enable('sitegroup')) {
+            $result = hook('siteGroupHook');
+            if ($result && isJson($result)) {
+                $result = json_decode($result, true);
+                if ($result && is_array($result)) {
+                    if (isset($result['seo']) && $result['seo']) {
+                        app()->instance('feiniaoseo', $result['seo']);
+                        unset($result['seo']);
+                    }
+                    app()->instance('feiniaowebconfig', $result);                    
+                } else {
+                    app()->instance('feiniaoseo', []);
+                    app()->instance('feiniaowebconfig', []);
+                }
+            } else {
+                app()->instance('feiniaoseo', []);
+                app()->instance('feiniaowebconfig', []);
+            }
+        }
         // 控制器初始化
         $this->initialize();
     }
