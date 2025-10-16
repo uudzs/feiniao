@@ -106,7 +106,7 @@ $conConfig = get_system_config('content');
                 <div class="au">{$book.author}</div>
                 <div class="tags">
                     <span>{$genrename ? $genrename : '--'} <i>类型</i></span><i class="line"></i>
-                    <span>{:time_format($book.create_time,'Y-m-d')} <i>发布时间</i></span><i class="line"></i>
+                    <span>{$book.create_time|default=''} <i>发布时间</i></span><i class="line"></i>
                     <span>{:wordCount($book_words_count)} <i>字数</i></span>
                 </div>
                 <div class="other">
@@ -121,7 +121,7 @@ $conConfig = get_system_config('content');
                     </div>
                     <div class="bookinfo">
                         <span>本章字数：<i>{$chapter.wordnum}</i></span>
-                        <span>更新时间：<i>{:time_format($chapter.create_time)}</i></span>
+                        <span>更新时间：<i>{$chapter.update_time ? $chapter.update_time : $chapter.create_time|default=''}</i></span>
                     </div>
                     <div class="reader-line"></div>
                     <div class="content" id="chapter_content">
