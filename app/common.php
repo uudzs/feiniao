@@ -1248,22 +1248,13 @@ if (!function_exists('get_seo_str')) {
         $tags = ['{网站名}', '{大类名}', '{小类名}', '{书名}', '{作品标签}', '{作品简介}', '{作品签约状态}', '{作者}', '{作者所有作品名}', '{作者注册时间}', '{作者签约状态}', '{点击量}', '{年份}', '{连载状态}', '{作品字数}', '{章节数}', '{章节名}', '{域名}', '{邀请金币}'];
         if ($type == 'key') return $tags;
         if (get_addons_is_enable('sitegroup')) {
-            if (class_exists('feiniaoseo') && app()->exists('feiniaoseo')) {
+            try {
                 $seo_config = app('feiniaoseo');
-                if (empty($seo_config)) {
-                    $seo_config = get_system_config('seo');
-                }
-            } else {
-                $seo_config = get_system_config('seo');
-            }
-            if (class_exists('feiniaowebconfig') && app()->exists('feiniaowebconfig')) {
                 $system_config = app('feiniaowebconfig');
-                if (empty($system_config)) {
-                    $system_config = get_system_config('web');
-                }
-            } else {
+            } catch (\Exception $e) {
+                $seo_config = get_system_config('seo');
                 $system_config = get_system_config('web');
-            }
+            }            
         } else {
             $system_config = get_system_config('web');
             $seo_config = get_system_config('seo');
