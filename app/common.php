@@ -1254,9 +1254,15 @@ if (!function_exists('get_seo_str')) {
             } catch (\Exception $e) {
                 $seo_config = get_system_config('seo');
                 $system_config = get_system_config('web');
-            }            
+            }
         } else {
             $system_config = get_system_config('web');
+            $seo_config = get_system_config('seo');
+        }
+        if (!isset($system_config) || empty($system_config)) {
+            $system_config = get_system_config('web');
+        }
+        if (!isset($seo_config) || empty($seo_config)) {
             $seo_config = get_system_config('seo');
         }
         $site_title = (isset($seo_config['site_title']) && $seo_config['site_title']) ? $seo_config['site_title'] : $system_config['title'];
