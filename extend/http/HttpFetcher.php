@@ -270,7 +270,7 @@ class HttpFetcher
         foreach ($customHeaders as $key => $value) {
             $headers[] = $key . ': ' . $value;
         }
-        
+
         return $headers;
     }
 
@@ -302,11 +302,13 @@ class HttpFetcher
      */
     private function randomDelay()
     {
-        $min = $this->config['random_delay'][0];
-        $max = $this->config['random_delay'][1];
+        $min = $this->config['random_delay'][0] * 1000000; // 转换为微秒
+        $max = $this->config['random_delay'][1] * 1000000;
+
         if ($min >= 0 && $max > $min) {
-            $delay = $min + mt_rand() / mt_getrandmax() * ($max - $min);
-            usleep($delay * 1000000); // 转换为微秒
+            // 使用整数运算生成随机延迟
+            $delay = mt_rand($min, $max);
+            usleep($delay);
         }
     }
 
