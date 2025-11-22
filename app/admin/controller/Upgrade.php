@@ -159,24 +159,24 @@ class Upgrade extends BaseController
 
     private function copy_addone_file($addone, $info)
     {
-        $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $addone['name'] . DIRECTORY_SEPARATOR;
-        $path = app()->getRootPath() . $relativepath;
-        if (!createDirectory($path)) {
-            return to_assign(1, '创建' . $path . '目录失败');
-        }
-        $zipfile = self::httpGet($info['path']);
-        if (!$zipfile || empty($zipfile)) {
-            return to_assign(1, '读取远程升级文件错误，请检测网络！');
-        }
-        $filepath = $path . $addone['name'] . '.zip';
-        if (false === @file_put_contents($filepath, $zipfile)) {
-            return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
-        }
-        if (!is_file($filepath)) return to_assign(1, '升级包保存失败');
-        if (!class_exists('ZipArchive')) {
-            return to_assign(1, '请手动解压' . $filepath . '到根目录。');
-        }
         try {
+            $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'upgrade' . DIRECTORY_SEPARATOR . $addone['name'] . DIRECTORY_SEPARATOR;
+            $path = app()->getRootPath() . $relativepath;
+            if (!createDirectory($path)) {
+                return to_assign(1, '创建' . $path . '目录失败');
+            }
+            $zipfile = self::httpGet($info['path']);
+            if (!$zipfile || empty($zipfile)) {
+                return to_assign(1, '读取远程升级文件错误，请检测网络！');
+            }
+            $filepath = $path . $addone['name'] . '.zip';
+            if (false === @file_put_contents($filepath, $zipfile)) {
+                return to_assign(1, '保存文件错误，请检测文件夹写入权限！');
+            }
+            if (!is_file($filepath)) return to_assign(1, '升级包保存失败');
+            if (!class_exists('ZipArchive')) {
+                return to_assign(1, '请手动解压' . $filepath . '到根目录。');
+            }
             $zip = new ZipArchive;
             $res = $zip->open($filepath);
             if ($res === TRUE) {

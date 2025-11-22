@@ -3,7 +3,7 @@
 
 ### 相关链接
 - 项目会不定时进行更新。
-- 官方地址：https://feiniao.paheng.net
+- 官方地址：[https://feiniao.paheng.net](https://feiniao.paheng.net)
 - 使用手册：[https://feiniao.paheng.net/frontend/list](https://feiniao.paheng.net/frontend/list)
 - 演示地址：[https://demo.feiniao.paheng.net/](https://demo.feiniao.paheng.net/)
 - 开发交流QQ3群：177260545

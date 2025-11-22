@@ -74,7 +74,11 @@ class Chapter extends BaseController
                         }, $paragraphs));
                     }
                 } else {
-                    $content = '';
+                    $obj = auto_run_addons('collect', [
+                        'type' => 'single_chapter',
+                        'chapter_id' => $id
+                    ]);
+                    $content = $obj[0] ?? '';
                 }
             } else {
                 $content = lang('common.nopermission');

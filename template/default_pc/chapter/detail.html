@@ -175,7 +175,7 @@ $conConfig = get_system_config('content');
                                         <p data-id="{$index|raw}">{$text|raw}</p>
                                     {/foreach}
                                 {else/}
-                                    {$content|raw}
+                                    {$content|raw|default='暂无内容'}
                                 {/if}
                             {/if}                            
                         {/if}

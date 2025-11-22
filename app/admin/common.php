@@ -87,12 +87,20 @@ function set_recursion($result, $pid = 0, $level = -1)
 {
     /*记录排序后的类别数组*/
     static $list = array();
-    static $space = ['', '├─', '§§├─', '§§§§├─', '§§§§§§├─'];
+    static $space = ['└', '├─'];
     $level++;
     foreach ($result as $k => $v) {
         if ($v['pid'] == $pid) {
             if ($pid != 0) {
-                $v['title'] = $space[$level] . $v['title'];
+                if ($level < 2) {
+                    $v['title'] = $space[$level] . $v['title'];
+                } else {
+                    $str = '└';
+                    for ($i = 0; $i < $level; $i++) {
+                        $str .= '─';
+                    }
+                    $v['title'] = $str . '├─' . $v['title'];
+                }
             }
             /*将该类别的数据放入list中*/
             $list[] = $v;

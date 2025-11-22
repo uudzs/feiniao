@@ -6,12 +6,12 @@
 // | 缓存配置文件 - 支持动态配置管理
 // | 支持的缓存类型：file、redis、memcache、memcached、sqlite、wincache
 // +----------------------------------------------------------------------
-// | 最后更新时间：2025-09-11 13:29:54
+// | 最后更新时间：2025-11-21 11:21:13
 // +----------------------------------------------------------------------
 
 return [
     // 默认缓存驱动
-    'default' => 'file',
+    'default' => 'File',
 
     // 缓存连接方式配置
     'stores'  => [
@@ -31,11 +31,11 @@ return [
             'host'        => '127.0.0.1',
             'port'        => 6379,
             'password'    => '',
-            'select'      => 0,
+            'select'      => 8,
             'timeout'     => 0,
             'expire'      => 0,
             'persistent'  => false,
-            'prefix'      => '',
+            'prefix'      => 'feiniao_',
             'tag_prefix'  => 'tag:',
             'serialize'   => [],
         ],

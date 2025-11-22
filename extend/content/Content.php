@@ -84,6 +84,10 @@ class Content
             } catch (Exception $e) {
                 throw new Exception();
             }
+            $data = Db::name($chaptertable)->where(['sid' => $chapterId])->find();
+            if (!empty($data)) {
+                return self::update($bookId, $chapterId, $content);
+            }
             $compressed = self::compress($content);
             $content = $compressed ?: $content;
             return Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $chapterId, 'info' => $content]);

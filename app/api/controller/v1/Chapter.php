@@ -68,7 +68,11 @@ class Chapter extends BaseController
                     $search = array(" ", "\n", '\n');
                     $chapter['content'] = str_replace($search, $replace, $chapter['content']);
                 } else {
-                    $chapter['content'] = '';
+                    $obj = auto_run_addons('collect', [
+                        'type' => 'single_chapter',
+                        'chapter_id' => $id
+                    ]);
+                    $chapter['content'] = $obj[0] ?? '';
                 }
             } else {
                 $chapter['content'] = '';
