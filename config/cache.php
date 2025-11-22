@@ -11,7 +11,7 @@
 
 return [
     // 默认缓存驱动
-    'default' => 'File',
+    'default' => 'redis',
 
     // 缓存连接方式配置
     'stores'  => [
