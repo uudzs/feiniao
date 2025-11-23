@@ -60,6 +60,13 @@ class Chapter extends BaseController
         if (!$hide_content) {
             if (app('request')->isMobile() || isWeChat() || !get_system_config('content', 'chapter_pages_content_open')) {
                 $content = Content::get($book['id'], $chapter['id']);
+                if (empty($content)) {
+                    $obj = auto_run_addons('collect', [
+                        'type' => 'single_chapter',
+                        'chapter_id' => $id
+                    ]);
+                    $content = $obj[0] ?? '';
+                }
                 if ($content && mb_strlen($content) > 0) {
                     list($wordnum, $content) = countWordsAndContent($content, true);
                     $chapter['wordnum'] = $wordnum;
@@ -67,12 +74,6 @@ class Chapter extends BaseController
                     $replace = array("", "<br>", "<br>");
                     $search = array(" ", "\n", '\n');
                     $chapter['content'] = str_replace($search, $replace, $chapter['content']);
-                } else {
-                    $obj = auto_run_addons('collect', [
-                        'type' => 'single_chapter',
-                        'chapter_id' => $id
-                    ]);
-                    $chapter['content'] = $obj[0] ?? '';
                 }
             } else {
                 $chapter['content'] = '';

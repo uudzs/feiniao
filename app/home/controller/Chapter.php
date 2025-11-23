@@ -59,6 +59,13 @@ class Chapter extends BaseController
             $chapter['hide_content'] = $hide_content;
             if (!$hide_content) {
                 $content = Content::get($chapter['bookid'], $chapter['id']);
+                if (empty($content)) {
+                    $obj = auto_run_addons('collect', [
+                        'type' => 'single_chapter',
+                        'chapter_id' => $id
+                    ]);
+                    $content = $obj[0] ?? '';
+                }
                 if ($content && mb_strlen($content) > 0) {
                     $content = htmlspecialchars_decode($content);
                     $content = preg_replace('/<br\s?\/?>\r?\n?/i', "\n", $content);
@@ -73,12 +80,6 @@ class Chapter extends BaseController
                             return "<p>" . $p . "</p>";
                         }, $paragraphs));
                     }
-                } else {
-                    $obj = auto_run_addons('collect', [
-                        'type' => 'single_chapter',
-                        'chapter_id' => $id
-                    ]);
-                    $content = $obj[0] ?? '';
                 }
             } else {
                 $content = lang('common.nopermission');
