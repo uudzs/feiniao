@@ -530,6 +530,13 @@ class Chapter extends BaseController
                 return to_assign(1, '请先审核章节');
             }
             $content = Content::get($chapter['bookid'], $id);
+            if (empty($content)) {
+                $obj = auto_run_addons('collect', [
+                    'type' => 'single_chapter',
+                    'chapter_id' => $id
+                ]);
+                $content = current(array_filter($obj));
+            }
             if (!empty($content)) {
                 $chapter['info'] = htmlspecialchars_decode($content);
                 View::assign('chapter', $chapter);

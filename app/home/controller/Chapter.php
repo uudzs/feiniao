@@ -65,6 +65,7 @@ class Chapter extends BaseController
                         'chapter_id' => $id
                     ]);
                     $content = $obj[0] ?? '';
+                    $content = current(array_filter($obj));
                 }
                 if ($content && mb_strlen($content) > 0) {
                     $content = htmlspecialchars_decode($content);
