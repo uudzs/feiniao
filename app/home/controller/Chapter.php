@@ -64,7 +64,6 @@ class Chapter extends BaseController
                         'type' => 'single_chapter',
                         'chapter_id' => $id
                     ]);
-                    $content = $obj[0] ?? '';
                     $content = current(array_filter($obj));
                 }
                 if ($content && mb_strlen($content) > 0) {

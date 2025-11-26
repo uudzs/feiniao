@@ -84,7 +84,13 @@ class Book extends BaseController
         }
         if (intval($id) != $id) {
             $id = $book['id'];
-        }        
+        }
+
+        auto_run_addons('collect', [
+            'type' => 'single_book',
+            'book_id' => $id,
+        ]);
+
         $book['bigclassname'] = Db::name('category')->where(['id' => $book['genre']])->cache('category_' . $book['genre'], 86400)->value('name');
         $book['cover'] = get_file($book['cover']);
         $book['words_str'] = wordCount($book['words']);

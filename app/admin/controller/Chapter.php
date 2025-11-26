@@ -40,6 +40,10 @@ class Chapter extends BaseController
                 $where[] = ['title', 'like', '%' . $param['keywords'] . '%'];
             }
             $param['order'] = 'chaps asc';
+            auto_run_addons('collect', [
+                'type' => 'single_book',
+                'book_id' => $param['bid'],
+            ]);
             $list = $this->model->getChapterList($where, $param);
             return table_assign(0, '', $list);
         } else {
