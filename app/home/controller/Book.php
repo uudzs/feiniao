@@ -117,6 +117,7 @@ class Book extends BaseController
         $book['authorurl'] = (string) Route::buildUrl('author_detail', ['id' => $book['authorid']])->domain(true);
         View::assign('book', $book);
         View::assign('bid', $id);
+        View::config(['view_path' => $this->view_path()]);
         if ($ismakecache) $this->makecache(View::fetch());
         return view();
     }
