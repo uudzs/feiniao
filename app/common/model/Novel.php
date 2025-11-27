@@ -84,7 +84,9 @@ class Novel extends Model
         self::applyStatusFilter($query, $filter['status']);
 
         // 应用字数筛选
-        $query->whereBetween('words', self::CONDITION_MAP['word_range'][$filter['word']]['value']);
+        if ($filter['word'] > 0) {
+            $query->whereBetween('words', self::CONDITION_MAP['word_range'][$filter['word']]['value']);
+        }
 
         // 应用排序
         $orderConfig = self::CONDITION_MAP['order'][$filter['order']];
