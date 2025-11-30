@@ -11,13 +11,13 @@
 
 return [
     // 默认缓存驱动
-    'default' => 'redis',
+    'default' => 'file',
 
     // 缓存连接方式配置
     'stores'  => [
         // 文件缓存
         'file' => [
-            'type'        => 'File',
+            'type'        => 'file',
             'path'        => '',
             'prefix'      => '',
             'expire'      => 0,
