@@ -7,6 +7,6 @@ class ThinkAddons extends Facade
 {
     protected static function getFacadeClass()
     {
-        return 'app\admin\service\ThinkAddons';
+        return 'app\service\ThinkAddonsService';
     }
 }

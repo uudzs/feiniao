@@ -58,14 +58,11 @@ class Chapter extends BaseController
             $hide_content = $chapter['chapteraccess'] !== 1;
             $chapter['hide_content'] = $hide_content;
             if (!$hide_content) {
+                auto_run_addons('collect', [
+                    'type' => 'single_chapter',
+                    'chapter_id' => $id
+                ]);
                 $content = Content::get($chapter['bookid'], $chapter['id']);
-                if (empty($content)) {
-                    $obj = auto_run_addons('collect', [
-                        'type' => 'single_chapter',
-                        'chapter_id' => $id
-                    ]);
-                    $content = current(array_filter($obj));
-                }
                 if ($content && mb_strlen($content) > 0) {
                     $content = htmlspecialchars_decode($content);
                     $content = preg_replace('/<br\s?\/?>\r?\n?/i', "\n", $content);

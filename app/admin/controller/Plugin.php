@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace app\admin\controller;
 
 use app\admin\BaseController;
-use think\facade\Db;
 use think\facade\View;
 use think\facade\Request;
 // 插件服务
