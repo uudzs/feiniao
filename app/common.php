@@ -1608,7 +1608,7 @@ if (!function_exists('get_addons_list')) {
     function get_addons_list()
     {
         $list = [];
-        $class = 'app\admin\service\ThinkAddons';
+        $class = 'app\service\ThinkAddonsService';
         if (class_exists($class)) {
             $obj = app($class);
             $list = $obj->localAddons();
