@@ -188,7 +188,9 @@ input:focus{
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 15px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 .login-bottom .other-login .layui-icon {
     position: relative;
@@ -196,6 +198,14 @@ input:focus{
     margin: 0 2px;
     top: 2px;
     font-size: 26px;
+}
+.login-bottom .other-login .bi {
+    position: relative;
+    display: inline-block;
+    margin: 0 2px;
+    top: 2px;
+    color: #148AFF ;
+    font-size: 20px;
 }
 .login-bottom .bottom-other {
     text-align:center;

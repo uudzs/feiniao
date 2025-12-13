@@ -153,7 +153,7 @@ abstract class BaseController
         if (is_file($config_file)) {
             $addonscnf = (array) include $config_file;
         }
-        if (!isset($addonscnf['open']['value']) || intval($addonscnf['open']['value']) != 1) return false;
+        if (!isset($addonscnf['open']['value']) || intval($addonscnf['open']['value']) !== 1) return false;
         if (!isset($addonscnf['autouptime']['value']) || intval($addonscnf['autouptime']['value']) <= 0) return false;
         if (Request::isMobile()) {
             $path = $rootPath . 'runtime/html/mobile/';
@@ -199,7 +199,7 @@ abstract class BaseController
         if (is_file($config_file)) {
             $addonscnf = (array) include $config_file;
         }
-        if (!isset($addonscnf['open']['value']) || intval($addonscnf['open']['value']) != 1) return false;
+        if (!isset($addonscnf['open']['value']) || intval($addonscnf['open']['value']) !== 1) return false;
         if (!isset($addonscnf['autouptime']['value']) || intval($addonscnf['autouptime']['value']) <= 0) return false;
         if (Request::isMobile()) {
             $path = $rootPath . 'runtime/html/mobile/';

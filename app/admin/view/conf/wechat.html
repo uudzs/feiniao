@@ -5,43 +5,7 @@
 	<h3 class="pb-3">微信配置</h3>
 	<table class="layui-table layui-table-form">
 		<tr>
-			<td class="layui-td-gray-2">开启状态</td>
-			<td colspan="3">
-                {empty name="$config.official_open"}
-					<input type="radio" name="official_open" value="2" title="禁止">
-					<input type="radio" name="official_open" value="1" title="开启" checked>
-                {else/}
-					<input type="radio" name="official_open" value="2" title="禁止"{eq name="$config.official_open" value="2"} checked{/eq}>
-					<input type="radio" name="official_open" value="1" title="开启"{eq name="$config.official_open" value="1"} checked{/eq}>
-				{/empty}
-            </td>
-		</tr>
-		<tr>
-			<td class="layui-td-gray">公众号appid</td>
-			<td>
-				<input type="text" name="appid" autocomplete="off" placeholder="请输入appID" class="layui-input" {notempty name="$config.appid"} value="{$config.appid}" {/notempty}>
-			</td>
-			<td class="layui-td-gray">公众号appsecret</td>
-			<td>
-				<input type="text" name="appsecret" autocomplete="off" placeholder="请输入secretey" class="layui-input" {notempty name="$config.appsecret"} value="{$config.appsecret}" {/notempty}>
-			</td>
-		</tr>
-		<tr>
-			<td class="layui-td-gray">Token</td>
-			<td>
-				<input type="hidden" value="{$id}" name="id">
-				<input type="text" name="token" autocomplete="off" placeholder="请输入Token" class="layui-input" {notempty name="$config.token"} value="{$config.token}" {/notempty}>
-			</td>
-			<td class="layui-td-gray">EncodingAESKey</td>
-			<td>
-				<input type="text" name="aes_key" autocomplete="off" placeholder="兼容与安全模式下请一定要填写" class="layui-input" {notempty name="$config.aes_key"} value="{$config.aes_key}" {/notempty}>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="4"><hr></td>
-		</tr>
-		<tr>
-			<td class="layui-td-gray-2">开启状态</td>
+			<td class="layui-td-gray-2">支付开启状态</td>
 			<td colspan="3">
                 {empty name="$config.pay_open"}
 					<input type="radio" name="pay_open" value="2" title="禁止">
@@ -109,6 +73,7 @@
 		</tr>
 	</table>
 	<div class="py-3">
+		<input type="hidden" name="id" value="{$id}">
 		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
 		<button type="reset" class="layui-btn layui-btn-primary">重置</button>
 	</div>

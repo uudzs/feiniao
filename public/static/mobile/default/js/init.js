@@ -81,7 +81,7 @@ async function gettoken() {
 
 function isWeChat() {
     var ua = navigator.userAgent.toLowerCase();
-    if (ua.match(/MicroMessenger/i) == 'micromessenger' && parseInt(is_official_open) === 1) {
+    if (ua.match(/MicroMessenger/i) == 'micromessenger') {
         return true;
     } else {
         return false;

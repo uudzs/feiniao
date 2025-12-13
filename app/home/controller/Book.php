@@ -23,7 +23,7 @@ class Book extends BaseController
         $ismakecache = $this->usecache();
         $param = get_params();
         $id = isset($param['id']) ? $param['id'] : 0;
-        if (intval($id) ==  $id) {
+        if (intval($id) === $id) {
             $category = Db::name('category')->where(['id' => $id])->find();
         } else {
             $category = Db::name('category')->where(['key' => $id])->find();
@@ -82,7 +82,7 @@ class Book extends BaseController
         if (empty($book)) {
             $this->error(404);
         }
-        if (intval($id) != $id) {
+        if (intval($id) !== $id) {
             $id = $book['id'];
         }
 

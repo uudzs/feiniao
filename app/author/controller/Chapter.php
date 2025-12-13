@@ -187,7 +187,7 @@ class Chapter extends BaseController
             if (!empty($draftlist)) {
                 foreach ($draftlist as $k => $v) {
                     //当前直接使用
-                    if (intval($info['chaps']) == intval($v['chaps'])) {
+                    if (intval($info['chaps']) === intval($v['chaps'])) {
                         $v['content'] = htmlspecialchars_decode($v['content']);
                         $v['content'] = str_replace($search, $replace, $v['content']);
                         list($info['wordnum'], $info['content']) = countWordsAndContent($v['content'], true);
@@ -319,7 +319,7 @@ class Chapter extends BaseController
                 if (!empty($draftlist)) {
                     foreach ($draftlist as $k => $v) {
                         //当前直接使用
-                        if (intval($info['chaps']) == intval($v['chaps']) && empty($verify)) {
+                        if (intval($info['chaps']) === intval($v['chaps']) && empty($verify)) {
                             $v['content'] = htmlspecialchars_decode($v['content']);
                             $v['content'] = str_replace($search, $replace, $v['content']);
                             list($info['wordnum'], $info['content']) = countWordsAndContent($v['content'], true);
@@ -353,7 +353,7 @@ class Chapter extends BaseController
         if (empty($member)) {
             to_assign(1, '作者不存在！');
         }
-        if (intval($member['status']) != 1) {
+        if (intval($member['status']) !== 1) {
             to_assign(1, '用户被禁止！');
         }
         $book = Db::name('book')->where(['id' => $bid, 'authorid' => $member['id']])->find();
@@ -378,7 +378,7 @@ class Chapter extends BaseController
             if (empty($chapter)) {
                 to_assign(1, '章节不存在');
             }
-            if (intval($chapter['bookid']) != $book['id']) {
+            if (intval($chapter['bookid']) !== $book['id']) {
                 to_assign(1, '章节有误');
             }
             $verify = Db::name('chapter_verify')->where(['cid' => $id])->find();
@@ -450,7 +450,7 @@ class Chapter extends BaseController
         //修改
         if ($id > 0) {
             $sid = $id;
-            if (isset($chapter) && !empty($chapter) && intval($chapter['verify']) == 1) {
+            if (isset($chapter) && !empty($chapter) && intval($chapter['verify']) === 1) {
                 Db::name('chapter')->where(['id' => $id])->strict(false)->field(true)->update(['verify' => 0, 'verifytime' => 0, 'verifypeople' => '']);
                 //入审核库
                 $verify = [
@@ -689,7 +689,7 @@ class Chapter extends BaseController
         if (!empty($draft['cid'])) {
             $chapter = Db::name('chapter')->where(array('id' => $draft['cid']))->find();
             if ($chapter['bookid'] == $book['id']) {
-                if (!empty($chapter) && intval($chapter['draft']) == 1 && intval($chapter['status']) != 1 && intval($chapter['verify']) != 1) {
+                if (!empty($chapter) && intval($chapter['draft']) === 1 && intval($chapter['status']) !== 1 && intval($chapter['verify']) != 1) {
                     if (Db::name('chapter')->delete($chapter['id']) === false) {
                         return to_assign(1, "删除失败");
                     }

@@ -28,7 +28,7 @@ class Pay extends BaseController
         //如果是微信环境
         if (isWeChat()) {
             $wechat = get_system_config('wechat');
-            if (intval($wechat['pay_open']) == 1) {
+            if (intval($wechat['pay_open']) === 1) {
                 $param = get_params();
                 $order_id = isset($param['order_id']) ? intval($param['order_id']) : 0;
                 if (empty($order_id)) {
@@ -123,7 +123,7 @@ class Pay extends BaseController
     public function alipay()
     {
         $conf = get_system_config('alipay');
-        if (intval($conf['open']) == 1) {
+        if (intval($conf['open']) === 1) {
             $param = get_params();
             $order_id = isset($param['order_id']) ? intval($param['order_id']) : 0;
             if (empty($order_id)) {
@@ -171,7 +171,7 @@ class Pay extends BaseController
     public function alipay_h5_pay_callback()
     {
         $conf = get_system_config('alipay');
-        if (intval($conf['open']) == 1) {
+        if (intval($conf['open']) === 1) {
             $config = [
                 'alipay' => [
                     'default' => [
@@ -214,14 +214,14 @@ class Pay extends BaseController
                     if (empty($order)) {
                         return false;
                     }
-                    if (intval($order['paid']) != 0) {
+                    if (intval($order['paid']) !== 0) {
                         return false;
                     }
                     $viptask = [];
                     if ($order['product_type'] == 'vip') {
                         $expire_time = 0;
                         $vipconf = get_system_config('vip');
-                        if (intval($vipconf['open'] != 1)) {
+                        if (intval($vipconf['open'] !== 1)) {
                             return false;
                         }
                         $pid = $order['pid'];
@@ -286,7 +286,7 @@ class Pay extends BaseController
     public function wechat_pay_callback()
     {
         $wechat = get_system_config('wechat');
-        if (intval($wechat['pay_open']) == 1) {
+        if (intval($wechat['pay_open']) === 1) {
             $config = [
                 'sandbox'            => false, // 设置为 false 或注释则关闭沙箱模式
                 'app_id'             => $wechat['appid'],
@@ -307,14 +307,14 @@ class Pay extends BaseController
                     if (empty($order)) {
                         return false;
                     }
-                    if (intval($order['paid']) != 0) {
+                    if (intval($order['paid']) !== 0) {
                         return false;
                     }
                     $viptask = [];
                     if ($order['product_type'] == 'vip') {
                         $expire_time = 0;
                         $conf = get_system_config('vip');
-                        if (intval($conf['open'] != 1)) {
+                        if (intval($conf['open'] !== 1)) {
                             return false;
                         }
                         $pid = $order['pid'];

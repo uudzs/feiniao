@@ -5,12 +5,11 @@ namespace content;
 use think\facade\Db;
 use think\Exception;
 use RuntimeException;
-use util\DatabaseUtil;
 
 class Content
 {
     protected static $config;
-    private static bool $initialized = false;
+    private static $initialized = false;
     protected static $compressors = [
         'gzip'   => ['compress' => 'gzcompress', 'uncompress' => 'gzuncompress'],
         'zlib'   => ['compress' => 'gzdeflate', 'uncompress' => 'gzinflate'],
@@ -76,14 +75,7 @@ class Content
     {
         self::initialize();
         if (self::$config['chapter_save_type'] == 1) {
-            $chaptertable = calc_hash_db($bookId);
-            try {
-                DatabaseUtil::ensureLongBlobColumn($chaptertable, 'info');
-            } catch (RuntimeException $e) {
-                throw new RuntimeException();
-            } catch (Exception $e) {
-                throw new Exception();
-            }
+            $chaptertable = calc_hash_db($bookId);    
             $data = Db::name($chaptertable)->where(['sid' => $chapterId])->find();
             if (!empty($data)) {
                 return self::update($bookId, $chapterId, $content);
@@ -109,13 +101,6 @@ class Content
                     list($wordnum, $content) = countWordsAndContent($content, true);
                     $compressed = self::compress($content);
                     $content = $compressed ?: $content;
-                    try {
-                        DatabaseUtil::ensureLongBlobColumn($chaptertable, 'info');
-                    } catch (RuntimeException $e) {
-                        throw new RuntimeException();
-                    } catch (Exception $e) {
-                        throw new Exception();
-                    }
                     if (Db::name($chaptertable)->strict(false)->field(true)->insertGetId(['sid' => $chapterId, 'info' => $content])) {
                         $path = self::getPath($chapterId);
                         @unlink($path);
@@ -145,13 +130,6 @@ class Content
         self::initialize();
         if (self::$config['chapter_save_type'] == 1) {
             $chaptertable = calc_hash_db($bookId);
-            try {
-                DatabaseUtil::ensureLongBlobColumn($chaptertable, 'info');
-            } catch (RuntimeException $e) {
-                throw new RuntimeException();
-            } catch (Exception $e) {
-                throw new Exception();
-            }
             $compressed = self::compress($content);
             $content  = $compressed ?: $content;
             return Db::name($chaptertable)->where(['sid' => $chapterId])->strict(false)->field(true)->update(['info' => $content]);

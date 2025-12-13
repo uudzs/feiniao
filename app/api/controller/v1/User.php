@@ -11,13 +11,7 @@ use think\facade\Route;
 use app\admin\model\Follow;
 use app\admin\model\User as UserModel;
 use think\Image;
-use Endroid\QrCode\Builder\Builder;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
-use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
-use Endroid\QrCode\Label\Font\NotoSans;
-use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
-use Endroid\QrCode\Writer\PngWriter;
+use PHPQRCode\QRcode;
 
 class User extends BaseController
 {
@@ -382,7 +376,7 @@ class User extends BaseController
         $param = get_params();
         $path = trim($param['path']);
         $inviteurl = trim($param['inviteurl']);
-        if (empty(JWT_UID)) {
+        if (!defined('JWT_UID') || empty(JWT_UID)) {
             $this->apiError('common.isnotlogin', [], 99);
         }
         if (empty($path) || empty($inviteurl)) {
@@ -414,8 +408,9 @@ class User extends BaseController
         $replace = array(get_system_config('web', 'title'), $user['nickname']);
         $search = array('{sitename}', "{nickname}");
         $title = str_replace($search, $replace, $title);
+
         try {
-            //保存目录
+            // 保存目录
             $savePath = get_config('filesystem.disks.public.root') . '/invite/' . $user['id'] . '/';
             if (!is_dir($savePath)) {
                 mkdir($savePath, 0777, true);
@@ -423,43 +418,93 @@ class User extends BaseController
             $filename = set_password($user['id'], $user['salt']);
             $filePath = $savePath . $filename . '.jpg';
             $posterPath = get_config('filesystem.disks.public.url') . '/invite/' . $user['id'] . '/' . $filename . '.jpg';
-            //$url = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('inviteurl', ['name' => $user['qrcode_invite']])->domain(true));
+
             $qrFile = $savePath . 'poster_qrcode.png';
-            $qrwidth = 200;
+
             if (!is_file($qrFile)) {
                 $logoPath = CMS_ROOT . 'public/static/home/images/logo-invite.png';
                 if (!is_file($logoPath)) {
                     $this->apiError('404');
                 }
-                $result = Builder::create()
-                    ->writer(new PngWriter())
-                    ->writerOptions([])
-                    ->data($inviteurl)
-                    ->encoding(new Encoding('UTF-8'))
-                    ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
-                    ->size($qrwidth)
-                    ->margin(0)
-                    ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
-                    ->logoPath($logoPath)
-                    ->logoResizeToWidth(50)
-                    ->logoResizeToHeight(50)
-                    ->labelText(lang('user.longpressqrcode'))
-                    ->labelFont(new NotoSans(15))
-                    ->labelAlignment(new LabelAlignmentCenter())
-                    ->validateResult(false)
-                    ->build();
-                $result->saveToFile($qrFile);
+
+                // 生成基础二维码[1,6](@ref)
+                QRcode::png($inviteurl, $qrFile, 'L', 6, 2);
+
+                // 添加LOGO到二维码中心
+                $QR = imagecreatefromstring(file_get_contents($qrFile));
+                $logo = imagecreatefromstring(file_get_contents($logoPath));
+
+                $QR_width = imagesx($QR);
+                $QR_height = imagesy($QR);
+                $logo_width = imagesx($logo);
+                $logo_height = imagesy($logo);
+
+                // 调整LOGO大小 - 确保所有计算结果为整数
+                $logo_qr_width = intval($QR_width / 5);
+                if ($logo_qr_width < 1) $logo_qr_width = 1;
+
+                $scale = $logo_width / $logo_qr_width;
+                $logo_qr_height = intval($logo_height / $scale);
+                if ($logo_qr_height < 1) $logo_qr_height = 1;
+
+                // 计算LOGO位置（居中）
+                $from_width = intval(($QR_width - $logo_qr_width) / 2);
+                $from_height = intval(($QR_height - $logo_qr_height) / 2);
+
+                // 重新组合图片并调整大小 - 所有尺寸参数确保为整数
+                imagecopyresampled($QR, $logo, $from_width, $from_height, 0, 0, $logo_qr_width, $logo_qr_height, $logo_width, $logo_height);
+
+                // 添加文字 - 长按识别二维码
+                $textColor = imagecolorallocate($QR, 0, 0, 0);
+                $fontSize = 12;
+                $text = lang('user.longpressqrcode');
+
+                // 获取文字尺寸并确保为整数
+                $textBbox = imagettfbbox($fontSize, 0, CMS_ROOT . 'public/static/home/font/hanchengwangtianxigufengti.ttf', $text);
+                $textWidth = intval($textBbox[2] - $textBbox[0]);
+                $textHeight = intval($textBbox[1] - $textBbox[7]);
+
+                // 计算文字位置并确保为整数
+                $textX = intval(($QR_width - $textWidth) / 2);
+                $textY = intval($QR_height - 10);
+
+                // 确保字体大小也是整数
+                $fontSize = intval($fontSize);
+
+                imagettftext(
+                    $QR,
+                    $fontSize,  // 字体大小（整数）
+                    0,          // 角度（整数）
+                    $textX,     // X坐标（整数）
+                    $textY,     // Y坐标（整数）
+                    $textColor,
+                    CMS_ROOT . 'public/static/home/font/hanchengwangtianxigufengti.ttf',
+                    $text
+                );
+
+                // 保存最终二维码
+                imagepng($QR, $qrFile);
+
+                // 释放内存
+                imagedestroy($QR);
+                imagedestroy($logo);
             }
+
             if (!is_file($qrFile)) {
-                $this->apiError('fail');
+                return json(['code' => 1, 'msg' => lang('fail')])->header(['Content-Type' => 'application/json']);
             }
-            //加载图片
+
+            // 加载背景图片
             $image = Image::open($bgPath);
             $width = $image->width();
             $height = $image->height();
-            $textWidth = $width - intval($width * 0.4); //文本宽度
-            $textfontPath = CMS_ROOT . 'public/static/home/font/hanchengwangtianxigufengti.ttf'; // 字体文件路径
+
+            $textWidth = $width - intval($width * 0.4);
+            $textfontPath = CMS_ROOT . 'public/static/home/font/hanchengwangtianxigufengti.ttf';
+
             $image = imagecreatefromjpeg($bgPath);
+
+            // 设置文字颜色
             if ($conf['textColor'] && strpos(trim($conf['textColor']), 'rgb') !== false) {
                 $color = str_replace(['rgb(', ')'], ['', ''], $conf['textColor']);
                 list($r, $g, $b) = explode(',', trim($color));
@@ -472,30 +517,37 @@ class User extends BaseController
                 $b = 210;
             }
             $textColor = imagecolorallocate($image, $r, $g, $b);
-            $fontsize = 25; //文字大小
-            $content = self::autowrap($fontsize, 0, $textfontPath, $title, $textWidth); // 自动换行处理
+
+            $fontsize = 25;
+            $content = self::autowrap($fontsize, 0, $textfontPath, $title, $textWidth);
+
             $x = intval($width * 0.2);
             $y = intval($height * 0.55);
             imagettftext($image, $fontsize, 0, $x, $y, $textColor, $textfontPath, $content);
-            //计算二维码的位置
+
+            // 计算二维码位置
             $qrCodeSize = getimagesize($qrFile);
             $qrCodeWidth = intval($qrCodeSize[0]);
-            $qrCodeHeight =  intval($qrCodeSize[1]);
+            $qrCodeHeight = intval($qrCodeSize[1]);
+
             $x = intval(($width - $qrCodeWidth) / 2);
             $y = intval(($height - $qrCodeHeight - $height * 0.12));
+
             $qrCode = imagecreatefrompng($qrFile);
-            //将二维码合并到图片上
             imagecopy($image, $qrCode, $x, $y, 0, 0, $qrCodeWidth, $qrCodeHeight);
+
             imagejpeg($image, $filePath, 100);
-            // 释放图片资源
             imagedestroy($image);
+
             if (is_file($filePath)) {
-                $this->apiError('success');
+                return json(['code' => 0, 'msg' => lang('success'), 'data' => ['path' => $posterPath]])->header(['Content-Type' => 'application/json']);
             } else {
-                $this->apiError('fail');
+                return json(['code' => 1, 'msg' => lang('fail')])->header(['Content-Type' => 'application/json']);
             }
         } catch (\Exception $e) {
-            return json(['code' => 1, 'msg' => $e->getMessage()]);
+            return json(['code' => 1, 'msg' => $e->getMessage()])->header(['Content-Type' => 'application/json']);
+        } catch (\Throwable $e) {
+            return json(['code' => 1, 'msg' => $e->getMessage()])->header(['Content-Type' => 'application/json']);
         }
     }
 
@@ -840,7 +892,7 @@ class User extends BaseController
             $this->apiError('common.isnotlogin', [], 99);
         }
         $conf = get_system_config('reward');
-        if (empty($conf) || intval($conf['open']) != 1) {
+        if (empty($conf) || intval($conf['open']) !== 1) {
             $this->apiError('407');
         }
         $uid = JWT_UID;
@@ -1132,7 +1184,7 @@ class User extends BaseController
         if (empty($user)) {
             $this->apiError('404');
         }
-        if (intval($user['realname_status']) != 1) {
+        if (intval($user['realname_status']) !== 1) {
             $this->apiError('user.authentication');
         }
         if ($full_name != $user['name']) {

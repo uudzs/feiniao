@@ -21,8 +21,8 @@
                         <label class="layui-form-label">是否开启注册</label>
                         <div class="layui-input-block">
                             {if(!isset($config['register_open']))}
-                                <input type="radio" name="register_open" value="1" title="开启" checked>
-                                <input type="radio" name="register_open" value="0" title="关闭">
+                                <input type="radio" name="register_open" value="1" title="开启">
+                                <input type="radio" name="register_open" value="0" title="关闭" checked>
                             {else/}
                                 <input type="radio" name="register_open" value="1" title="开启"{eq name="$config.register_open" value="1"} checked{/eq}>
                                 <input type="radio" name="register_open" value="0" title="关闭"{eq name="$config.register_open" value="0"} checked{/eq}>
@@ -30,23 +30,16 @@
                         </div>
                     </div>                
                     <div class="layui-form-item">
-                        <label class="layui-form-label">允许登录类型</label>
+                        <label class="layui-form-label">是否开启登录</label>
                         <div class="layui-input-block">
-                            {empty name="$config.login_type"}
-                                <input type="checkbox" name="login_type[]" value="sms" title="短信登录">
-                                <input type="checkbox" name="login_type[]" value="account" title="账号登录">
-                                {volist name=":get_addons_type('login')" id="v"}
-                                    <input type="checkbox" name="login_type[]" value="{$v.name}" title="{$v.title}">
-                                {/volist}
+                            {if(!isset($config['login_open']))}
+                                <input type="radio" name="login_open" value="1" title="开启">
+                                <input type="radio" name="login_open" value="0" title="关闭" checked>
                             {else/}
-                                <input type="checkbox" name="login_type[]" value="sms" title="短信登录" {if(in_array('sms', $config['login_type']))}checked{/if}>
-                                <input type="checkbox" name="login_type[]" value="account" title="账号登录" {if(in_array('account', $config['login_type']))}checked{/if}>
-                                {volist name=":get_addons_type('login')" id="v"}
-                                    <input type="checkbox" name="login_type[]" value="{$v.name}" title="{$v.title}" {if(in_array($v['name'], $config['login_type']))}checked{/if}>
-                                {/volist}
-                            {/empty}
+                                <input type="radio" name="login_open" value="1" title="开启"{eq name="$config.login_open" value="1"} checked{/eq}>
+                                <input type="radio" name="login_open" value="0" title="关闭"{eq name="$config.login_open" value="0"} checked{/eq}>
+                            {/if}
                         </div>
-                        <div class="layui-form-mid layui-text-em">登录插件安装启用后需要在这里设置开启才会有效，如全未勾选则表示禁止登录。</div>
                     </div>
                 </div>                
             </div>
@@ -155,8 +148,8 @@
                         <label class="layui-form-label">下载是否必须登录</label>
                         <div class="layui-input-block">
                             {if(!isset($config['txt_download_islogin']))}
-                                <input type="radio" name="txt_download_islogin" value="1" title="是" checked>
-                                <input type="radio" name="txt_download_islogin" value="0" title="否">
+                                <input type="radio" name="txt_download_islogin" value="1" title="是">
+                                <input type="radio" name="txt_download_islogin" value="0" title="否" checked>
                             {else/}
                                 <input type="radio" name="txt_download_islogin" value="1" title="是"{eq name="$config.txt_download_islogin" value="1"} checked{/eq}>
                                 <input type="radio" name="txt_download_islogin" value="0" title="否"{eq name="$config.txt_download_islogin" value="0"} checked{/eq}>

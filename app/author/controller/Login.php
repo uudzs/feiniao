@@ -142,7 +142,7 @@ class Login
                 $result = isset($obj[0]) ? $obj[0] : $obj;
                 if (!isJson($result)) return to_assign(1, '发送失败');
                 $result = json_decode($result, true);
-                if (isset($result['code']) && intval($result['code']) == 0) {
+                if (isset($result['code']) && intval($result['code']) === 0) {
                     if (!empty($verif)) {
                         $data = array(
                             'account' => $mobile,
@@ -240,7 +240,7 @@ class Login
                 $result = isset($obj[0]) ? $obj[0] : $obj;
                 if (!isJson($result)) return to_assign(1, '发送失败');
                 $result = json_decode($result, true);
-                if (isset($result['code']) && intval($result['code']) == 0) {
+                if (isset($result['code']) && intval($result['code']) === 0) {
                     if (!empty($verif)) {
                         $data = array(
                             'account' => $mobile,

@@ -26,7 +26,7 @@ class Chapter extends BaseController
         if (empty($id)) {
             $this->error(404);
         }
-        if (intval($id) != $id) {
+        if (intval($id) !== $id) {
             $id = decrypt_chapter_id($id);
         }
         if ($id <= 0) {
@@ -36,7 +36,7 @@ class Chapter extends BaseController
         if (empty($chapter)) {
             $this->error(404);
         }
-        $book = \app\common\model\Novel::getBookDetail($chapter['bookid']);
+        $book = \app\common\model\Novel::getBookDetail((int)$chapter['bookid']);
         if (empty($book)) {
             $this->error(404);
         }
@@ -45,12 +45,6 @@ class Chapter extends BaseController
         $list = \app\service\CacheService::remember($cacheKey, function () use ($chapter) {
             return \app\common\model\Chapter::field('id,bookid,title,chaps,create_time')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
         });
-        if (!empty($list)) {
-            foreach ($list as $k => $v) {
-                $list[$k]['chapter_url'] = (string) furl('chapter_detail', ['id' => $v['id'], 'bookid' => $book['filename'] ? $book['filename'] : $v['bookid']]);
-                $list[$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
-            }
-        }
         $data = [];
         $config = get_system_config('content');
         if ($config['chapter_pages_content_open']) {

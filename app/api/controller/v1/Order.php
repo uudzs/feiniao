@@ -90,7 +90,7 @@ class Order extends BaseController
         $price = $day = 0;
         if ($type == 'vip') {
             $conf = get_system_config('vip');
-            if (intval($conf['open'] != 1)) {
+            if (intval($conf['open'] !== 1)) {
                 $this->apiError('vip.unopened');
             }
             $day_key = 'level_' . $pid . '_day';

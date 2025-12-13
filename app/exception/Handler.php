@@ -9,13 +9,18 @@ use InvalidArgumentException;
 use think\template\exception\TemplateNotFoundException;
 use think\Response;
 use Throwable;
-use RuntimeException;
+use think\exception\HttpResponseException;
 use app\common\model\Category;
 
 class Handler extends Handle
 {
     public function render($request, Throwable $e): Response
     {
+        // 处理HttpResponseException
+        if ($e instanceof HttpResponseException) {
+            return $e->getResponse();
+        }
+
         // 处理模板不存在异常
         if ($e instanceof TemplateNotFoundException) {
             return $this->handleTemplateNotFound($request);

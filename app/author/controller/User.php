@@ -64,7 +64,7 @@ class User extends BaseController
                 to_assign(1, '请设置笔名！');
             }
             //如果还未认证过实名
-            if (intval($member['authstate']) != 1) {
+            if (intval($member['authstate']) !== 1) {
                 if (!isset($param['true_name']) || empty($param['true_name'])) {
                     to_assign(1, '真实姓名不能为空！');
                 }
@@ -83,7 +83,7 @@ class User extends BaseController
                 unset($param['authstate']);
             }
             //如果还未认证过银行卡
-            if (intval($member['bankstate']) != 1) {
+            if (intval($member['bankstate']) !== 1) {
                 if (empty($param['bankcard'])) {
                     to_assign(1, '请填写银行卡号！');
                 }
@@ -198,9 +198,9 @@ class User extends BaseController
                 }
             }
             //银行卡更新
-            if (intval($member['bankstate']) != 1) {
+            if (intval($member['bankstate']) !== 1) {
                 //如果更换了银行卡需要重新签署协议|只有已签约的作者有效
-                if ($param['bankcard'] != $member['bankcard'] && intval($member['issign']) == 1) {
+                if ($param['bankcard'] != $member['bankcard'] && intval($member['issign']) === 1) {
                     $banksign = Db::name('author_sign')->where(['genre' => 2, 'uid' => $member['id'], 'rtype' => 2, ['status', '<>', 1]])->select()->toArray(); //查询是否有改银行卡审核中的记录
                     //银行卡更改补充协议
                     if (empty($banksign)) {

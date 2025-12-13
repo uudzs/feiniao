@@ -36,7 +36,7 @@ class Follow extends BaseController
             $list = $this->model->getFollowList($where, $param);
             $list = $list ? $list->toArray() : [];
             foreach ($list['data'] as $k => $v) {
-                if (intval($v['type']) == 1) {
+                if (intval($v['type']) === 1) {
                     $list['data'][$k]['from_name'] = Db::name('author')->where('id', $v['from_id'])->value('nickname');
                 } else {
                     $list['data'][$k]['from_name'] = Db::name('user')->where('id', $v['from_id'])->value('nickname');

@@ -67,7 +67,7 @@ class Advsr extends BaseController
             if (empty($adver)) {
                 return to_assign(1, '广告位不存在');
             }
-            if (intval($adver['status']) != 1) {
+            if (intval($adver['status']) !== 1) {
                 return to_assign(1, '广告位已禁用');
             }
             // $use = 0;
@@ -93,10 +93,10 @@ class Advsr extends BaseController
             if (isset($param["end_time"])) {
                 $param["end_time"] = $param["end_time"] ? strtotime($param["end_time"]) : 0;
             }
-            if (intval($param['type']) == 1 && empty($param['books'])) {
+            if (intval($param['type']) === 1 && empty($param['books'])) {
                 return to_assign(1, '请选择作品');
             }
-            if (intval($param['type']) == 3 && empty($param['link'])) {
+            if (intval($param['type']) === 3 && empty($param['link'])) {
                 return to_assign(1, '请填写链接地址');
             }
             if (intval($param['books']) > 0) {
@@ -109,7 +109,7 @@ class Advsr extends BaseController
                 }
             }
             $param['introduction'] = mb_substr($param['introduction'], 0, 200, "UTF-8");
-            // if (intval($param['type']) == 1) {
+            // if (intval($param['type']) === 1) {
             //     $param['link'] = '/book-' . $param['books'] . '.html';
             // }
             unset($param['file']);
@@ -139,7 +139,7 @@ class Advsr extends BaseController
             if (empty($adver)) {
                 return to_assign(1, '广告位不存在');
             }
-            if (intval($adver['status']) != 1) {
+            if (intval($adver['status']) !== 1) {
                 return to_assign(1, '广告位已禁用');
             }
             // $use = 0;
@@ -164,10 +164,10 @@ class Advsr extends BaseController
             if (isset($param["end_time"])) {
                 $param["end_time"] = $param["end_time"] ? strtotime($param["end_time"]) : 0;
             }
-            if (intval($param['type']) == 1 && empty($param['books'])) {
+            if (intval($param['type']) === 1 && empty($param['books'])) {
                 return to_assign(1, '请选择作品');
             }
-            if (intval($param['type']) == 3 && empty($param['link'])) {
+            if (intval($param['type']) === 3 && empty($param['link'])) {
                 return to_assign(1, '请填写链接地址');
             }
             if (intval($param['books']) > 0) {
@@ -180,7 +180,7 @@ class Advsr extends BaseController
                 }
             }
             $param['introduction'] = mb_substr($param['introduction'], 0, 200, "UTF-8");
-            // if (intval($param['type']) == 1) {
+            // if (intval($param['type']) === 1) {
             //     $param['link'] = '/book-' . $param['books'] . '.html';
             // }
             unset($param['file']);

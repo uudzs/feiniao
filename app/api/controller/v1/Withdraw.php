@@ -60,7 +60,7 @@ class Withdraw extends BaseController
         if (empty($user)) {
             $this->apiError('404');
         }
-        if (intval($user['realname_status']) != 1) {
+        if (intval($user['realname_status']) !== 1) {
             $this->apiError('user.authentication');
         }
         if (!password_verify($securitypass, $user['securitypwd'])) {
@@ -70,17 +70,17 @@ class Withdraw extends BaseController
         if (empty($card)) {
             $this->apiError('404');
         }
-        if (intval($card['user_id'] != JWT_UID)) {
+        if (intval($card['user_id'] !== JWT_UID)) {
             $this->apiError('404');
         }
-        if (intval($card['auth_status'] != 1)) {
+        if (intval($card['auth_status'] !== 1)) {
             $this->apiError('user.receivingaccountauthentication');
         }
         if ($card['full_name'] != $user['name']) {
             $this->apiError('inconsistent');
         }
         $conf = get_system_config('withdraw');
-        if (intval($conf['open'] != 1)) {
+        if (intval($conf['open'] !== 1)) {
             $this->apiError('407');
         }
         $tax = floatval($conf['tax']);

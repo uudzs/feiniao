@@ -86,7 +86,7 @@ class Common extends BaseController
                 $result = isset($obj[0]) ? $obj[0] : $obj;
                 if (!isJson($result)) $this->apiError('fail');
                 $result = json_decode($result, true);
-                if (isset($result['code']) && intval($result['code']) == 0) {
+                if (isset($result['code']) && intval($result['code']) === 0) {
                     $filepath = $result['data'] ?: $filepath;
                 } else {
                     $this->apiError('fail');
@@ -474,15 +474,17 @@ class Common extends BaseController
         }
         $user = [];
         $power = get_system_config('power');
+        if (!isset($power['login_open']) || empty($power['login_open'])) {
+            $this->apiError('407');
+        }
         if ($mobile) {
             if (empty($password) && empty($param['code'])) {
                 $this->apiError('empty');
             }
             if (empty($password)) {
-                if (isset($power['login_type'])) {
-                    if (!in_array('sms', $power['login_type'])) {
-                        $this->apiError('login.prohibitsmslogin');
-                    }
+                $isSmsLogin = get_addons_type('smssend');
+                if (empty($isSmsLogin)) {
+                    $this->apiError('login.prohibitsmslogin');
                 }
                 $code = intval($param['code']);
                 if (empty($code)) {
@@ -501,11 +503,6 @@ class Common extends BaseController
                 }
                 $user = Db::name('user')->where(['mobile' => $mobile])->find();
             } else {
-                if (isset($power['login_type'])) {
-                    if (!in_array('account', $power['login_type'])) {
-                        $this->apiError('login.prohibitaccountlogin');
-                    }
-                }
                 $user = Db::name('user')->where(['mobile' => $mobile])->find();
                 if (empty($user)) {
                     $this->apiError('404');
@@ -517,11 +514,6 @@ class Common extends BaseController
             }
         }
         if ($username) {
-            if (isset($power['login_type'])) {
-                if (!in_array('account', $power['login_type'])) {
-                    $this->apiError('login.prohibitaccountlogin');
-                }
-            }
             $validate = Validate::rule([
                 'username' => 'require|regex:^[a-zA-Z0-9_]+$',
             ]);
@@ -548,10 +540,9 @@ class Common extends BaseController
             }
         }
         if ($email) {
-            if (isset($power['login_type'])) {
-                if (!in_array('sms', $power['login_type'])) {
-                    $this->apiError('login.prohibitsmslogin');
-                }
+            $isSmsLogin = get_addons_type('smssend');
+            if (empty($isSmsLogin)) {
+                $this->apiError('login.prohibitsmslogin');
             }
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->apiError('login.emailerr');
@@ -575,7 +566,7 @@ class Common extends BaseController
         }
         // 校验
         if (empty($user)) {
-            if (isset($power['register_open']) && intval($power['register_open']) != 1) {
+            if (isset($power['register_open']) && intval($power['register_open']) !== 1) {
                 $this->apiError('404');
             }
             $session_invite = get_config('app.session_invite');
@@ -950,7 +941,7 @@ class Common extends BaseController
     public function register()
     {
         $power = get_system_config('power');
-        if (isset($power['register_open']) && intval($power['register_open']) != 1) {
+        if (isset($power['register_open']) && intval($power['register_open']) !== 1) {
             $this->apiError('403');
         }
         $param = get_params();
@@ -1158,7 +1149,7 @@ class Common extends BaseController
                 $result = isset($obj[0]) ? $obj[0] : $obj;
                 if (!isJson($result)) $this->apiError('fail');
                 $result = json_decode($result, true);
-                if (isset($result['code']) && intval($result['code']) == 0) {
+                if (isset($result['code']) && intval($result['code']) === 0) {
                     if (!empty($verif)) {
                         $data = array(
                             'account' => $mobile,

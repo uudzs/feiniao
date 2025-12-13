@@ -580,7 +580,7 @@ if (!function_exists('money_converse')) {
         $dw = array("", "十", "百", "千", "万", "亿", "兆");
         $retval = "";
         $proZero = false;
-        if (intval($num) == $num) {
+        if (intval($num) === $num) {
             $num = intval($num);
         }
         for ($i = 0; $i < strlen($num); $i++) {
@@ -1371,7 +1371,7 @@ if (!function_exists('get_seo_str')) {
                         $books = Db::name('book')->field('title')->where(['authorid' => $author['id']])->select()->toArray();
                         $titles = [];
                         foreach ($books as $k => $v) {
-                            if (intval($seo_config['book_mark']) == 1) {
+                            if (intval($seo_config['book_mark']) === 1) {
                                 $titles[] = '《' . $v['title'] . '》';
                             } else {
                                 $titles[] = $v['title'];
@@ -1446,7 +1446,7 @@ if (!function_exists('seo_book_tag')) {
                 }
                 $content = str_replace('{作品标签}', $label_str, $content);
             }
-            if (intval($seo_config['book_mark']) == 1) {
+            if (intval($seo_config['book_mark']) === 1) {
                 $content = str_replace('{书名}', ('《' . $book['title'] . '》'), $content);
             } else {
                 $content = str_replace('{书名}', $book['title'], $content);
@@ -1500,14 +1500,14 @@ if (!function_exists('seo_book_tag')) {
                 $content = str_replace('{作品字数}', (wordCount($book['words'])), $content);
             }
             if (strpos($content, '{连载状态}') !== false) {
-                $content = str_replace('{连载状态}', (intval($book['isfinish']) == 2 ? '完结' : '连载'), $content);
+                $content = str_replace('{连载状态}', (intval($book['isfinish']) === 2 ? '完结' : '连载'), $content);
             }
             if (strpos($content, '{作品签约状态}') !== false) {
-                $content = str_replace('{作品签约状态}', (intval($book['issign']) == 1 ? '已签约' : '待签约'), $content);
+                $content = str_replace('{作品签约状态}', (intval($book['issign']) === 1 ? '已签约' : '待签约'), $content);
             }
             if (strpos($content, '{作者签约状态}') !== false) {
                 $issign = Db::name('author')->where(['id' => $book['authorid']])->value('issign');
-                $content = str_replace('{作者签约状态}', (intval($issign) == 1 ? '已签约' : '待签约'), $content);
+                $content = str_replace('{作者签约状态}', (intval($issign) === 1 ? '已签约' : '待签约'), $content);
             }
         } else {
             $content = str_replace('{作品标签}', '', $content);
@@ -1686,7 +1686,7 @@ if (!function_exists('chapterCheckAccess')) {
             $userinfo = Db::name('user')->field('id,level,status,coin')->where('id', $uid)->find();
             if (empty($userinfo)) return -10;
             if (in_array('vip', $charge_read_type)) {
-                if (empty($userinfo['level'])) return -11;
+                if (empty($userinfo['level']) || intval($userinfo['level']) <= 1) return -11;
                 $level = Db::name('user_level')->field('id,title')->where('status', 1)->select()->column(null, 'id');
                 if (in_array($userinfo['level'], $userlevel)) {
                     if (!isset($level[$userinfo['level']])) return -12;

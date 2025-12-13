@@ -122,7 +122,7 @@ class Sign extends BaseController
         if (empty($member)) {
             $this->error('作者不存在！');
         }
-        if (intval($member['status']) != 1) {
+        if (intval($member['status']) !== 1) {
             $this->error('用户被禁止！');
         }
         $book = Db::name('book')->where(['id' => $bid, 'authorid' => $member['id']])->find();
@@ -191,7 +191,7 @@ class Sign extends BaseController
             if (empty($member)) {
                 to_assign(1, '作者不存在！');
             }
-            if (intval($member['status']) != 1) {
+            if (intval($member['status']) !== 1) {
                 to_assign(1, '用户被禁止！');
             }
             $book = Db::name('book')->where(['id' => $bid, 'authorid' => $member['id']])->find();
@@ -287,7 +287,7 @@ class Sign extends BaseController
             if (empty($member)) {
                 to_assign(1, '作者不存在！');
             }
-            if (intval($member['status']) != 1) {
+            if (intval($member['status']) !== 1) {
                 to_assign(1, '用户被禁止！');
             }
             $book = Db::name('book')->where(['id' => $bid, 'authorid' => $member['id']])->find();
@@ -347,7 +347,7 @@ class Sign extends BaseController
             if (empty($member)) {
                 to_assign(1, '作者不存在！');
             }
-            if (intval($member['status']) != 1) {
+            if (intval($member['status']) !== 1) {
                 to_assign(1, '用户被禁止！');
             }
             if (empty($member['address']) && empty($address)) {
@@ -355,12 +355,12 @@ class Sign extends BaseController
             }
             $data = [];
             //如果没有认证实名则收集作者信息
-            if (intval($member['authstate']) != 1) {
+            if (intval($member['authstate']) !== 1) {
                 if ($param['idcard'] && $param['true_name']) {
                     $data['true_name'] = $param['true_name']; //真实姓名
                     $data['idcard'] = $param['idcard']; //身份证号
                     $res = peopleAuthState(['idNo' => $param['idcard'], 'name' => $param['true_name']]);
-                    if (intval($res['code']) != 0) {
+                    if (intval($res['code']) !== 0) {
                         to_assign(1, $res['message']);
                     }
                     $data['authstate'] = 1;
@@ -422,7 +422,7 @@ class Sign extends BaseController
             if (empty($member)) {
                 to_assign(1, '作者不存在！');
             }
-            if (intval($member['status']) != 1) {
+            if (intval($member['status']) !== 1) {
                 to_assign(1, '用户被禁止！');
             }
             $accountid = CommonHelper::getPersonAccount($member);
@@ -457,7 +457,7 @@ class Sign extends BaseController
             if (empty($member)) {
                 to_assign(1, '作者不存在！');
             }
-            if (intval($member['status']) != 1) {
+            if (intval($member['status']) !== 1) {
                 to_assign(1, '用户被禁止！');
             }
             $sign = Db::name('author_sign')->where(['id' => $sid])->find();
@@ -504,7 +504,7 @@ class Sign extends BaseController
             $signType = 'Multi'; //签章类型，Single（单页签章）、Multi（多页签章）、Edges（签骑缝章）、Key（关键字签章）
             $signPosList = [$tempData['formal']['signPos'][0], $tempData['formal']['signPos'][1]]; //签署位置信息列表
             $result = SignHelper::mobileUserMultiPositionSign($srcPdfPath, $dstPdfFile, $accountId, $sealData, $signPosList, $code, $mobile, $signType);
-            if (intval($result['errCode']) == 0 && file_exists($dstPdfFile)) {
+            if (intval($result['errCode']) === 0 && file_exists($dstPdfFile)) {
                 $update = [];
                 $update['contract'] = '/sign/' . explode('/sign/', $dstPdfFile)[1]; //主合同待签名地址
                 //授权书
@@ -548,7 +548,7 @@ class Sign extends BaseController
         if (empty($member)) {
             $this->error('作者不存在！');
         }
-        if (intval($member['status']) != 1) {
+        if (intval($member['status']) !== 1) {
             $this->error('用户被禁止！');
         }
         $sign = Db::name('author_sign')->where(['id' => $sid])->find();
@@ -602,7 +602,7 @@ class Sign extends BaseController
         if (empty($member)) {
             $this->error('作者不存在！');
         }
-        if (intval($member['status']) != 1) {
+        if (intval($member['status']) !== 1) {
             $this->error('用户被禁止！');
         }
         $sign = Db::name('author_sign')->where(['id' => $sid])->find();

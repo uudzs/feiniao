@@ -84,7 +84,7 @@ class Api extends BaseController
                 $result = isset($obj[0]) ? $obj[0] : $obj;
                 if (!isJson($result)) return to_assign(1, '上传失败');
                 $result = json_decode($result, true);
-                if (isset($result['code']) && intval($result['code']) == 0) {
+                if (isset($result['code']) && intval($result['code']) === 0) {
                     $filepath = $result['data'] ?: $filepath;
                 } else {
                     return to_assign(1, $result['msg']);

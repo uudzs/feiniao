@@ -38,17 +38,17 @@ class Chapter extends BaseController
         if (empty($chapter)) {
             $this->apiError('404');
         }
-        if (intval($chapter['status']) != 1) {
+        if (intval($chapter['status']) !== 1) {
             $this->apiError('407');
         }
-        if (intval($chapter['verify']) == 2) {
+        if (intval($chapter['verify']) === 2) {
             $this->apiError('407');
         }
         $book = \app\common\model\Novel::getBookDetail($chapter['bookid']);
         if (empty($book)) {
             $this->apiError('404');
         }
-        if (intval($book['status']) != 1) {
+        if (intval($book['status']) !== 1) {
             $this->apiError('407');
         }
         $chapter['chapteraccess'] = chapterCheckAccess($id);

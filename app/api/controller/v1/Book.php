@@ -41,7 +41,7 @@ class Book extends BaseController
         $detail = \app\common\model\Novel::getBookDetail($id);
         $model_name = \think\facade\App::initialize()->http->getName();
         if ($detail) {
-            if (intval($detail['status']) != 1) {
+            if (intval($detail['status']) !== 1) {
                 $this->apiError('407');
             }
             $coverPath = get_config('filesystem.disks.public.root') . '/cover/' . $detail['authorid'] . '/' . $detail['id'] . '.png';
@@ -151,7 +151,7 @@ class Book extends BaseController
             $category = Db::name('category')->field('id,name,pid')->where(['status' => 1])->order('ordernum asc')->select()->toArray();
             if ($areaid == 2) {
                 foreach ($category as $key => $value) {
-                    if (intval($value['pid']) == 0 && strpos($value['name'], lang('common.girl')) !== false) {
+                    if (intval($value['pid']) === 0 && strpos($value['name'], lang('common.girl')) !== false) {
                         $big = $value['id'];
                         break;
                     }
@@ -161,7 +161,7 @@ class Book extends BaseController
                 }
             } else {
                 foreach ($category as $key => $value) {
-                    if (intval($value['pid']) == 0 && strpos($value['name'], lang('common.girl')) === false) {
+                    if (intval($value['pid']) === 0 && strpos($value['name'], lang('common.girl')) === false) {
                         $big[] = $value['id'];
                     }
                 }
@@ -262,7 +262,7 @@ class Book extends BaseController
                 $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $v['subgenre']])->value('name');
                 $result['data'][$k]['headpic'] = get_file($author['headimg'], 1);
                 $result['data'][$k]['cover_str'] = get_file($v['cover']);
-                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) == 2 ? lang('finish') : lang('serialize');
+                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) === 2 ? lang('finish') : lang('serialize');
                 $result['data'][$k]['words_str'] = intval($v['words']) > 0 ? wordCount($v['words']) : 0;
                 $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
                 $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']]));
@@ -294,7 +294,7 @@ class Book extends BaseController
         }
         $uid = JWT_UID;
         $power_config = get_system_config('power');
-        if (isset($power_config['txt_download_open']) && intval($power_config['txt_download_open']) == 1) {
+        if (isset($power_config['txt_download_open']) && intval($power_config['txt_download_open']) === 1) {
             $txt_download_islogin = isset($power_config['txt_download_islogin']) ? intval($power_config['txt_download_islogin']) : 0;
             if ($txt_download_islogin == 1 && empty($uid)) {
                 $this->apiError('common.isnotlogin');
@@ -303,7 +303,7 @@ class Book extends BaseController
             if (empty($book)) {
                 $this->apiError('404');
             }
-            if (intval($book['status']) != 1) {
+            if (intval($book['status']) !== 1) {
                 $this->apiError('407');
             }
             $relativepath = 'runtime' . DIRECTORY_SEPARATOR . 'down' . DIRECTORY_SEPARATOR . $book['id'] . DIRECTORY_SEPARATOR;
@@ -406,7 +406,7 @@ class Book extends BaseController
         if (empty($book)) {
             $this->apiError('404');
         }
-        if (intval($book['status']) != 1) {
+        if (intval($book['status']) !== 1) {
             $this->apiError('407');
         }
         $down_path = get_cache($token);

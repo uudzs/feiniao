@@ -52,9 +52,11 @@
             {else/}
                 <div class="center" style="font-size: 20px; color: #000;text-align: center;"><i class="layui-icon layui-icon-face-surprised" style="font-size: 20px;"></i> 禁止注册</div>
             {/if}
-            <div class="layui-form-item bottom-other">
-                <a href="{:url('login')}">已有账号？<span>前往登录</span></a>
-            </div>
+            {if !empty($power['login_open'])}
+                <div class="layui-form-item bottom-other">
+                    <a href="{:url('login')}">已有账号？<span>前往登录</span></a>
+                </div>
+            {/if}
         </div>
     </div>
 </div>

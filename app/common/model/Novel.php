@@ -43,8 +43,8 @@ class Novel extends Model
      */
     public static function getBookDetail($id)
     {
-        $cacheKey = 'book_' . $id;
-        if (intval($id) == $id) {
+        $cacheKey = 'book_' . $id;        
+        if (intval($id) === $id) {
             $result = CacheService::remember($cacheKey, function () use ($id) {
                 return self::where('id', $id)->find();
             });
@@ -211,12 +211,19 @@ class Novel extends Model
 
         // 中文处理：如果无空格且长度>2，按2字一组拆分（避免单字匹配）
         if (preg_match('/^[\x{4e00}-\x{9fa5}]{2,}$/u', $keyword)) {
-            return [
-                $keyword, // 保留完整词（优先匹配）
-                ...mb_str_split($keyword, 2) // 拆分为双字组（如"修仙传" => ["修仙", "仙传"]）
-            ];
-        }
+            // 初始化结果数组，第一个元素是完整关键词
+            $result = [$keyword];
 
+            // 获取字符串的字符长度
+            $length = mb_strlen($keyword, 'UTF-8');
+
+            // 循环遍历，每次取2个字符
+            for ($i = 0; $i < $length - 1; $i++) {
+                $result[] = mb_substr($keyword, $i, 2, 'UTF-8'); // 注意明确指定编码为UTF-8
+            }
+
+            return $result;
+        }
         // 默认按空格分割（英文或混合词）
         return array_filter(explode(' ', $keyword));
     }

@@ -10,7 +10,7 @@ use think\exception\ValidateException;
 use think\facade\Db;
 use think\facade\View;
 
-class links extends BaseController
+class Links extends BaseController
 {
     public function index()
     {

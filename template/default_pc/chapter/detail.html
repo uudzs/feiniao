@@ -227,7 +227,7 @@ $conConfig = get_system_config('content');
                     <ul>
                         {notempty name="$chapterlist"}
                             {volist name="$chapterlist" id="v"}
-                            <li data-chapterid="{$v.id}" {eq name="$v['id']" value="$id"} class="active"{/eq}><a href="{:furl('chapter_detail',['id'=>$v['id'],'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}"><span>{$v.title}</span></a></li>
+                            <li data-chapterid="{$v.id}" {eq name="$v['id']" value="$id"} class="active"{/eq}><a href="{:furl('chapter_detail',['id'=>$v['id'],'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}"><span>{:get_full_chapter($v['title'], $v['chaps'])}</span></a></li>
                             {/volist}
                         {/notempty}
                     </ul>

@@ -201,7 +201,7 @@ class Chapter extends BaseController
             if (!empty($volumes) && $chapters) {
                 foreach ($volumes as $key => $value) {
                     foreach ($chapters as $k => &$v) {
-                        if (intval($value['id']) == 1 && intval($v['volumeid']) <= 0) {
+                        if (intval($value['id']) === 1 && intval($v['volumeid']) <= 0) {
                             $v['volumeid'] = 1;
                         }
                         if (intval($v['volumeid']) > 0 && $value['id'] == $v['volumeid']) {

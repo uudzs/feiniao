@@ -98,7 +98,7 @@
       <ul>
         {notempty name="$chapterlist"}
           {volist name="chapterlist" id="v"}
-          <li id="chapterDirectory-{$v.id}" {eq name="v.id" value="$id"}class="active"{/eq}><a href="{$v.chapter_url}">{$v.title}</a></li>
+          <li id="chapterDirectory-{$v.id}" {eq name="v.id" value="$id"}class="active"{/eq}><a href="{:furl('chapter_detail',['id'=>$v['id'],'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}">{:get_full_chapter($v['title'], $v['chaps'])}</a></li>
           {/volist}
         {/notempty}
       </ul>

@@ -94,7 +94,7 @@ class Upgrade extends BaseController
     private function update_role()
     {
         $uid = get_login_admin('id');
-        if (intval($uid) == 1) {
+        if (intval($uid) === 1) {
             $list = Db::name('AdminRule')->field('id')->where('status', 1)->select()->toArray();
             $ids = array_column($list, 'id');
             if ($ids) {

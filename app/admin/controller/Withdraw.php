@@ -92,10 +92,10 @@ class Withdraw extends BaseController
             $status = intval($param['status']);
             $coin = intval($param['coin']);
             if ($status == 1) {
-                if (intval($log['status']) == 1) {
+                if (intval($log['status']) === 1) {
                     return to_assign(1, '已打过款了');
                 }
-                if (intval($log['coin']) != $coin) {
+                if (intval($log['coin']) !== $coin) {
                     return to_assign(1, '金币数量有误');
                 }
                 $user = Db::name('user')->where(['id' => $log['user_id']])->find();

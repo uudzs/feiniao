@@ -68,8 +68,7 @@ try {
     if (isset($data['wechatpay']) && $data['wechatpay']['rule']) Route::rule($data['wechatpay']['rule'], 'pay/wechat', 'GET|POST')->name('wechatpay');
     if (isset($data['alipaypay']) && $data['alipaypay']['rule']) Route::rule($data['alipaypay']['rule'], 'pay/alipay', 'GET|POST')->name('alipaypay');
     if (isset($data['becomeauthor']) && $data['becomeauthor']['rule']) Route::rule($data['becomeauthor']['rule'], 'user/author', 'GET|POST')->name('becomeauthor');
-    if (isset($data['report']) && $data['report']['rule']) Route::rule($data['report']['rule'], 'user/report', 'GET|POST')->name('report');
-    if (isset($data['wechat_oauth_callback']) && $data['wechat_oauth_callback']['rule']) Route::rule($data['wechat_oauth_callback']['rule'], 'login/wechat_oauth_callback', 'GET|POST')->name('wechat_oauth_callback');
+    if (isset($data['report']) && $data['report']['rule']) Route::rule($data['report']['rule'], 'user/report', 'GET|POST')->name('report');    
     if (isset($data['wechat_pay_callback']) && $data['wechat_pay_callback']['rule']) Route::rule($data['wechat_pay_callback']['rule'], 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
     if (isset($data['alipay_h5_pay_callback']) && $data['alipay_h5_pay_callback']['rule']) Route::rule($data['alipay_h5_pay_callback']['rule'], 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');
     if (isset($data['comments']) && $data['comments']['rule']) Route::rule($data['comments']['rule'], 'user/comments', 'GET')->name('comments');
