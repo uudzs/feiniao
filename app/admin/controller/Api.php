@@ -160,6 +160,8 @@ class Api extends BaseController
     {
         try {
             \think\facade\Cache::clear();
+            $cache = new \app\common\FileCache();
+            $cache->clear();
             return json([
                 'code' => 0,
                 'msg'  => '系统缓存已清空'
