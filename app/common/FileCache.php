@@ -22,7 +22,7 @@ class FileCache
     public function __construct()
     {
         // 设置缓存目录为 runtime/cache
-        $this->cachePath = root_path() . 'runtime' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
+        $this->cachePath = root_path() . 'runtime' . DIRECTORY_SEPARATOR . 'feiniao' . DIRECTORY_SEPARATOR;
 
         // 确保缓存目录存在且可写
         if (!is_dir($this->cachePath)) {

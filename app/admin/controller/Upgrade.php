@@ -304,7 +304,9 @@ class Upgrade extends BaseController
             if (!get_addons_is_enable($name)) return to_assign(1, '插件没有安装或启用');
             $addoneinfo = get_addons_info($name);
             $url = get_config('upgrade.official_api_url') . 'pluginupgrade' . '/' . $name;
-            $token = get_cache(self::$tokenKey);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            //$token = get_cache(self::$tokenKey);
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
@@ -333,7 +335,9 @@ class Upgrade extends BaseController
             if (empty($name)) {
                 return to_assign(1, '插件信息不存在');
             }
-            $token = get_cache(self::$tokenKey);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            //$token = get_cache(self::$tokenKey);
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
@@ -370,7 +374,9 @@ class Upgrade extends BaseController
             if (empty($paynumber)) {
                 return to_assign(1, '订单号不存在！');
             }
-            $token = get_cache(self::$tokenKey);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            //$token = get_cache(self::$tokenKey);
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
@@ -385,7 +391,9 @@ class Upgrade extends BaseController
 
     public function union_income()
     {
-        $token = get_cache(self::$tokenKey);
+        $cache = new \app\common\FileCache();
+        $token = $cache->get(self::$tokenKey);
+        //$token = get_cache(self::$tokenKey);
         if (empty($token)) {
             return to_assign(1, '请先登录联盟账号');
         }
@@ -428,7 +436,9 @@ class Upgrade extends BaseController
             if (empty($name)) {
                 return to_assign(1, '主题信息不存在');
             }
-            $token = get_cache(self::$tokenKey);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            //$token = get_cache(self::$tokenKey);
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
@@ -592,7 +602,9 @@ class Upgrade extends BaseController
             if (empty($paynumber)) {
                 return to_assign(1, '订单号不存在！');
             }
-            $token = get_cache(self::$tokenKey);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            //$token = get_cache(self::$tokenKey);
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
@@ -634,7 +646,9 @@ class Upgrade extends BaseController
                 return to_assign(1, '主题信息不存在');
             }
             $url = get_config('upgrade.official_api_url') . 'themeupgrade' . '/' . $name;
-            $token = get_cache(self::$tokenKey);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            //$token = get_cache(self::$tokenKey);
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
@@ -713,7 +727,9 @@ class Upgrade extends BaseController
             if (empty($name)) {
                 return to_assign(1, '请选择主题！');
             }
-            $token = get_cache(self::$tokenKey);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            //$token = get_cache(self::$tokenKey);
             if (empty($token)) {
                 return to_assign(1, '请先登录联盟账号');
             }
@@ -813,22 +829,28 @@ class Upgrade extends BaseController
             $result = json_decode($content, true);
             if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
             if (!isset($result['data']['token']) || empty($result['data']['token'])) return to_assign(1, '登录失败');
-            set_cache(self::$tokenKey, $result['data']['token'], 604800);
+            $cache = new \app\common\FileCache();
+            $cache->set(self::$tokenKey, $result['data']['token'], 604800);
+            //set_cache(self::$tokenKey, $result['data']['token'], 604800);
             return to_assign(0, '登录成功');
         } else {
-            return view('union_login', ['official_url' => str_replace('api/', '', get_config('upgrade.official_api_url')), 'islogin' => get_cache(self::$tokenKey) ? 1 : 0]);
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            return view('union_login', ['official_url' => str_replace('api/', '', get_config('upgrade.official_api_url')), 'islogin' => $token ? 1 : 0]);
         }
     }
 
     private static function httpGet($url)
     {
         $http = new HttpFetcher();
+        $cache = new \app\common\FileCache();
+        $token = $cache->get(self::$tokenKey);
         $result = $http->get($url, [], [
             'timeout' => 30,
             'random_delay' => [1, 3],
             'verify_ssl' => false,
             'headers' => [
-                'token' => get_cache(self::$tokenKey) ?? '',
+                'token' => $token ?? '',
                 'Referer' => Request::domain()
             ]
         ]);
@@ -841,12 +863,14 @@ class Upgrade extends BaseController
     private static function httpPost($url, $data)
     {
         $http = new HttpFetcher();
+        $cache = new \app\common\FileCache();
+        $token = $cache->get(self::$tokenKey);
         $result = $http->post($url, $data, [
             'timeout' => 30,
             'random_delay' => [1, 3],
             'verify_ssl' => false,
             'headers' => [
-                'token' => get_cache(self::$tokenKey) ?? '',
+                'token' => $token ?? '',
                 'Referer' => Request::domain()
             ]
         ]);
