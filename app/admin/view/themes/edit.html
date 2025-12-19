@@ -61,7 +61,7 @@
                     tool.sideClose(1000);
                 }
             }
-            tool.post("{:url('themes/edit')}", data.field, callback);
+            tool.post("{:url('themes/edit')}", data.field, callback, {timeout: 0});
             return false;
         });
 	}

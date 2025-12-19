@@ -53,6 +53,7 @@
 			$.ajax({
                 url: "{:url('upgrade/index')}",
                 type: 'post',
+                timeout: 0,
                 data: {id: id},
                 success: function(e) {
                     layer.msg(e.msg);

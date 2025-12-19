@@ -122,7 +122,7 @@
 										return layer.msg(r.msg);
 									}
 								}								
-								tool.post("{:url('upgrade/theme_update')}", { name: name, version: version }, callback);
+								tool.post("{:url('upgrade/theme_update')}", { name: name, version: version }, callback, {timeout: 0});
 								return false;
 							});
 						} else {
@@ -132,7 +132,7 @@
 						layer.msg(e.msg);
 					}
 				}
-				tool.post("{:url('upgrade/theme_check')}", { name: name, version: version }, callback);
+				tool.post("{:url('upgrade/theme_check')}", { name: name, version: version }, callback, {timeout: 0});
 				return false;
         });
         $('[lay-filter="market"]').on('click', function() {
@@ -194,7 +194,7 @@
                         return layer.msg(r.msg);
                     }
                 }								
-                tool.post("{:url('themes/unload')}", { name: name, platform: platform }, callback);
+                tool.post("{:url('themes/unload')}", { name: name, platform: platform }, callback, {timeout: 0});
                 return false;
             });
         });

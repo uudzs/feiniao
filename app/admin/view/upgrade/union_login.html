@@ -81,7 +81,7 @@
 					$('input[name="captcha"]').val('');
                 }
 			}
-			tool.post("{:url('upgrade/union_login')}", data.field, callback);
+			tool.post("{:url('upgrade/union_login')}", data.field, callback, {timeout: 0});
             return false;
         });
 	}
