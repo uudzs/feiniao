@@ -93,13 +93,15 @@ class Order extends BaseController
             if (intval($conf['open'] !== 1)) {
                 $this->apiError('vip.unopened');
             }
-            $day_key = 'level_' . $pid . '_day';
-            $priceKey = 'level_' . $pid;
-            if (!isset($conf[$day_key]) || !isset($conf[$priceKey])) {
-                $this->apiError('empty');
+            $level = Db::name('user_level')->where(['id' => $pid])->find();
+            if (empty($level)) {
+                $this->apiError('404');
             }
-            $day = intval($conf[$day_key]);
-            $price = intval($conf[$priceKey]);
+            if (empty($level['status'])) {
+                $this->apiError('404');
+            }
+            $day = intval($level['duration']);
+            $price = intval($level['price']);
             if ($price <= 0 || $day <= 0) {
                 $this->apiError('vip.unopened');
             }

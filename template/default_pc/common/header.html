@@ -17,9 +17,9 @@
 						<div class="comm_header_search">							
 							{php}$header_keywords = isset($pageconf['header_keywords']) ? model('advsr')->where(['status' => 1, 'adver_id' => $pageconf['header_keywords']])->order('level desc')->find() : '';{/php}
 							{empty name="$header_keywords"}
-								<input class="comm_header_search_ipt" name="keyword" type="text" placeholder="" autocomplete="off" disableautocomplete="">
+								<input class="comm_header_search_ipt" name="keyword" value="{$keyword|default=''}" type="text" placeholder="" autocomplete="off" disableautocomplete="">
 							{else/}
-								<input class="comm_header_search_ipt" name="keyword" type="text" placeholder="{$header_keywords.title}" autocomplete="off" disableautocomplete="">
+								<input class="comm_header_search_ipt" name="keyword" value="{$keyword|default=''}" type="text" placeholder="{$header_keywords.title}" autocomplete="off" disableautocomplete="">
 							{/empty}
 							<button class="comm_header_search_subbtn">搜索</button>
 						</div>

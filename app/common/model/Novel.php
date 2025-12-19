@@ -43,7 +43,7 @@ class Novel extends Model
      */
     public static function getBookDetail($id)
     {
-        $cacheKey = 'book_' . $id;        
+        $cacheKey = 'book_' . $id;
         if (intval($id) === $id) {
             $result = CacheService::remember($cacheKey, function () use ($id) {
                 return self::where('id', $id)->find();
@@ -141,13 +141,104 @@ class Novel extends Model
     }
 
     /**
+     * 搜索小说（改进版：优先精确匹配）
+     */
+    public static function search($keyword, $page = 1, $limit = 20)
+    {
+        $query = self::where('status', 1)
+            ->field('id,title,author,authorid,cover,style,ending,genre,subgenre,isfinish,finishtime,chapters,label,label_custom,hits,words,status,editor,editorid,issign,create_time,update_time,remark,filename');
+
+        $keywords = self::splitKeywords($keyword);
+
+        // 构建查询条件：优先精确匹配整个关键词
+        $query->where(function ($q) use ($keywords, $keyword) {
+            // 1. 首先尝试完整关键词精确匹配（权重最高）
+            $q->whereOr([
+                ['title', 'like', "%{$keyword}%"],
+                ['author', 'like', "%{$keyword}%"]
+            ]);
+
+            // 2. 然后添加分词后的模糊匹配（权重较低）
+            if (count($keywords) > 1) { // 只有当分词结果多于1个时才添加
+                foreach ($keywords as $word) {
+                    // 排除分词后的单字（避免噪声）
+                    if (mb_strlen($word, 'UTF-8') <= 1) {
+                        continue;
+                    }
+                    $q->whereOr([
+                        ['title', 'like', "%{$word}%"],
+                        ['author', 'like', "%{$word}%"]
+                    ]);
+                }
+            }
+        });
+
+        $total = $query->count();
+
+        // 自定义排序：优先完整匹配，其次按分词匹配度，最后按点击量
+        $query->orderRaw("
+        CASE 
+            WHEN title LIKE ? THEN 1000
+            WHEN author LIKE ? THEN 900
+            ELSE 0
+        END + 
+        CASE 
+            WHEN title LIKE ? THEN 100
+            WHEN author LIKE ? THEN 90
+            ELSE 0
+        END DESC, 
+        hits DESC
+    ", [
+            "%{$keyword}%", // 整个关键词匹配标题
+            "%{$keyword}%", // 整个关键词匹配作者
+            "%" . implode("%", $keywords) . "%", // 所有分词都在标题中
+            "%" . implode("%", $keywords) . "%"  // 所有分词都在作者中
+        ]);
+
+        $paginator = $query->paginate($limit, true, [
+            'list_rows' => $limit,
+            'page' => $page,
+            'path' => (string) url('search')
+        ]);
+
+        $paginator->appends(['keyword' => $keyword]);
+
+        // 高亮处理
+        $paginator->each(function ($item) use ($keyword) {
+            $item->title = self::highlightKeyword($item->title, $keyword);
+            $item->author = self::highlightKeyword($item->author, $keyword);
+            return $item;
+        });
+
+        // 记录搜索日志
+        try {
+            SearchLog::create([
+                'type' => SearchLog::TYPE_NOVEL,
+                'client' => SearchLog::CLIENT_WEB,
+                'keyword' => $keyword,
+                'user_id' => defined('JWT_UID') ? JWT_UID : 0,
+                'resnum' => $total,
+                'create_time' => time()
+            ]);
+        } catch (\Exception $e) {
+            // 记录日志但不中断流程
+        }
+
+        return [
+            'total' => $total,
+            'list' => $paginator,
+            'keyword' => $keyword
+        ];
+    }
+
+    /**
      * 搜索小说（支持标题和作者模糊匹配）
      * @param string $keyword 搜索关键词
      * @param int $page 当前页码
      * @param int $limit 每页条数
      * @return array 包含分页数据和高亮结果
      */
-    public static function search($keyword, $page = 1, $limit = 20)
+    public static function search_old($keyword, $page = 1, $limit = 20)
     {
         // 基础查询（只查有效小说）
         $query = self::where('status', 1)->field('id,title,author,filename,cover,hits,words,isfinish,remark');

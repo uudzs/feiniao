@@ -13,14 +13,14 @@
 }
 </style>
 <form class="layui-form p-4">
-	<h3 class="pb-3">VIP设置</h3>
+	<h3 class="pb-3">充值设置</h3>
 	<table class="layui-table layui-table-form">
 		<tr>
 			<td class="layui-td-gray-2">开启状态</td>
 			<td colspan="5">
                 {empty name="$config.open"}
-                    <input type="radio" name="open" value="2" title="禁止">
-                    <input type="radio" name="open" value="1" title="开启" checked>
+                    <input type="radio" name="open" value="2" title="禁止" checked>
+                    <input type="radio" name="open" value="1" title="开启">
                 {else/}
                     <input type="radio" name="open" value="2" title="禁止"{eq name="$config.open" value="2"} checked{/eq}>
                     <input type="radio" name="open" value="1" title="开启"{eq name="$config.open" value="1"} checked{/eq}>
@@ -28,112 +28,112 @@
             </td>
 		</tr>
 		<tr>
-			<td class="layui-td-gray">等级价格</td>
+			<td class="layui-td-gray">充值套餐</td>
 			<td colspan="5">
                 <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">套餐名称</div>
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_1_day"}
-                            <input type="text" value="" name="level_1_day" placeholder="请输入天数" class="layui-input">
+                        {empty name="$config.title_1"}
+                            <input type="text" value="" name="title_1" placeholder="请输入套餐名称" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_1_day}" name="level_1_day" placeholder="请输入天数" class="layui-input">
+                            <input type="text" value="{$config.title_1}" name="title_1" placeholder="请输入套餐名称" class="layui-input">
                         {/empty}
-                    </div>
-                    <div class="layui-form-mid layui-text-em">天</div>
+                    </div>                    
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_1"}
-                            <input type="text" value="" name="level_1" placeholder="请输入价格" class="layui-input">
+                        {empty name="$config.price_1"}
+                            <input type="text" value="" name="price_1" placeholder="请输入价格" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_1}" name="level_1" placeholder="请输入价格" class="layui-input">
-                        {/empty}
-                    </div>
-                    <div class="layui-form-mid layui-text-em">元</div>
-                </div>
-                <div class="layui-form-item">
-                    <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_2_day"}
-                            <input type="text" value="" name="level_2_day" placeholder="请输入天数" class="layui-input">
-                        {else/}
-                            <input type="text" value="{$config.level_2_day}" name="level_2_day" placeholder="请输入天数" class="layui-input">
-                        {/empty}
-                    </div>
-                    <div class="layui-form-mid layui-text-em">天</div>
-                    <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_2"}
-                            <input type="text" value="" name="level_2" placeholder="请输入价格" class="layui-input">
-                        {else/}
-                            <input type="text" value="{$config.level_2}" name="level_2" placeholder="请输入价格" class="layui-input">
+                            <input type="text" value="{$config.price_1}" name="price_1" placeholder="请输入价格" class="layui-input">
                         {/empty}
                     </div>
                     <div class="layui-form-mid layui-text-em">元</div>
                 </div>
                 <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">套餐名称</div>
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_3_day"}
-                            <input type="text" value="" name="level_3_day" placeholder="请输入天数" class="layui-input">
+                        {empty name="$config.title_2"}
+                            <input type="text" value="" name="title_2" placeholder="请输入套餐名称" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_3_day}" name="level_3_day" placeholder="请输入天数" class="layui-input">
+                            <input type="text" value="{$config.title_2}" name="title_2" placeholder="请输入套餐名称" class="layui-input">
                         {/empty}
-                    </div>
-                    <div class="layui-form-mid layui-text-em">天</div>
+                    </div>                    
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_3"}
-                            <input type="text" value="" name="level_3" placeholder="请输入价格" class="layui-input">
+                        {empty name="$config.price_2"}
+                            <input type="text" value="" name="price_2" placeholder="请输入价格" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_3}" name="level_3" placeholder="请输入价格" class="layui-input">
-                        {/empty}
-                    </div>
-                    <div class="layui-form-mid layui-text-em">元</div>
-                </div>
-                <div class="layui-form-item">
-                    <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_4_day"}
-                            <input type="text" value="" name="level_4_day" placeholder="请输入天数" class="layui-input">
-                        {else/}
-                            <input type="text" value="{$config.level_4_day}" name="level_4_day" placeholder="请输入天数" class="layui-input">
-                        {/empty}
-                    </div>
-                    <div class="layui-form-mid layui-text-em">天</div>
-                    <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_4"}
-                            <input type="text" value="" name="level_4" placeholder="请输入价格" class="layui-input">
-                        {else/}
-                            <input type="text" value="{$config.level_4}" name="level_4" placeholder="请输入价格" class="layui-input">
+                            <input type="text" value="{$config.price_2}" name="price_2" placeholder="请输入价格" class="layui-input">
                         {/empty}
                     </div>
                     <div class="layui-form-mid layui-text-em">元</div>
                 </div>
                 <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">套餐名称</div>
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_5_day"}
-                            <input type="text" value="" name="level_5_day" placeholder="请输入天数" class="layui-input">
+                        {empty name="$config.title_3"}
+                            <input type="text" value="" name="title_3" placeholder="请输入套餐名称" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_5_day}" name="level_5_day" placeholder="请输入天数" class="layui-input">
+                            <input type="text" value="{$config.title_3}" name="title_3" placeholder="请输入套餐名称" class="layui-input">
                         {/empty}
-                    </div>
-                    <div class="layui-form-mid layui-text-em">天</div>
+                    </div>                    
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_5"}
-                            <input type="text" value="" name="level_5" placeholder="请输入价格" class="layui-input">
+                        {empty name="$config.price_3"}
+                            <input type="text" value="" name="price_3" placeholder="请输入价格" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_5}" name="level_5" placeholder="请输入价格" class="layui-input">
+                            <input type="text" value="{$config.price_3}" name="price_3" placeholder="请输入价格" class="layui-input">
                         {/empty}
                     </div>
                     <div class="layui-form-mid layui-text-em">元</div>
                 </div>
                 <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">套餐名称</div>
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_6_day"}
-                            <input type="text" value="" name="level_6_day" placeholder="请输入天数" class="layui-input">
+                        {empty name="$config.title_4"}
+                            <input type="text" value="" name="title_4" placeholder="请输入套餐名称" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_6_day}" name="level_6_day" placeholder="请输入天数" class="layui-input">
+                            <input type="text" value="{$config.title_4}" name="title_4" placeholder="请输入套餐名称" class="layui-input">
+                        {/empty}
+                    </div>                   
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.price_4"}
+                            <input type="text" value="" name="price_4" placeholder="请输入价格" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.price_4}" name="price_4" placeholder="请输入价格" class="layui-input">
                         {/empty}
                     </div>
-                    <div class="layui-form-mid layui-text-em">天</div>
+                    <div class="layui-form-mid layui-text-em">元</div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">套餐名称</div>
                     <div class="layui-input-inline layui-input-wrap">
-                        {empty name="$config.level_6"}
-                            <input type="text" value="" name="level_6" placeholder="请输入价格" class="layui-input">
+                        {empty name="$config.title_5"}
+                            <input type="text" value="" name="title_5" placeholder="请输入套餐名称" class="layui-input">
                         {else/}
-                            <input type="text" value="{$config.level_6}" name="level_6" placeholder="请输入价格" class="layui-input">
+                            <input type="text" value="{$config.title_5}" name="title_5" placeholder="请输入套餐名称" class="layui-input">
+                        {/empty}
+                    </div>                    
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.price_5"}
+                            <input type="text" value="" name="price_5" placeholder="请输入价格" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.price_5}" name="price_5" placeholder="请输入价格" class="layui-input">
+                        {/empty}
+                    </div>
+                    <div class="layui-form-mid layui-text-em">元</div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-form-mid layui-text-em">套餐名称</div>
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.title_6"}
+                            <input type="text" value="" name="title_6" placeholder="请输入套餐名称" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.title_6}" name="title_6" placeholder="请输入套餐名称" class="layui-input">
+                        {/empty}
+                    </div>                    
+                    <div class="layui-input-inline layui-input-wrap">
+                        {empty name="$config.price_6"}
+                            <input type="text" value="" name="price_6" placeholder="请输入价格" class="layui-input">
+                        {else/}
+                            <input type="text" value="{$config.price_6}" name="price_6" placeholder="请输入价格" class="layui-input">
                         {/empty}
                     </div>
                     <div class="layui-form-mid layui-text-em">元</div>

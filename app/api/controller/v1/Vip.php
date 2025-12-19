@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace app\api\controller\v1;
 
 use app\api\BaseController;
-use think\Request;
 use app\api\middleware\Auth;
 use think\facade\Db;
-use think\facade\Route;
-use idwork\Idwork;
 
 class Vip extends BaseController
 {
@@ -19,8 +16,54 @@ class Vip extends BaseController
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => []]
+        Auth::class => ['except' => ['userlevel', 'rechargeplans', 'paymentmethods']]
     ];
+
+    public function userlevel()
+    {
+        $level = Db::name('user_level')->where('status', 1)->order('id asc')->select();
+        $this->apiSuccess('success', $level);
+    }
+
+    public function paymentmethods()
+    {
+        $methods = [
+            0 => [
+                'id' => 1,
+                'name' => 'wechat',
+                'title' => '微信',
+            ],
+            1 => [
+                'id' => 2,
+                'name' => 'alipay',
+                'title' => '支付宝',
+            ]
+        ];
+        $this->apiSuccess('success', []);
+    }
+
+    public function rechargeplans()
+    {
+        $vipconf = get_system_config('vip');
+        $retult = [
+            'open' => 0,
+            'list' => []
+        ];
+        if (!empty($vipconf)) {
+            $retult['open'] = isset($vipconf['open']) ? $vipconf['open'] : 0;
+            unset($vipconf['open'], $vipconf['id']);
+            for ($i = 1; $i < 6; $i++) {
+                if (isset($vipconf['price_' . $i]) && $vipconf['price_' . $i]) {
+                    $retult['list'][$i] = [
+                        'id' => $i,
+                        'price' => $vipconf['price_' . $i],
+                        'title' => $vipconf['title_' . $i],
+                    ];
+                }
+            }
+        }
+        $this->apiSuccess('success', $retult);
+    }
 
     /*
     * 获取记录

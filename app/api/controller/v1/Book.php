@@ -10,6 +10,7 @@ use app\api\middleware\Auth;
 use think\facade\Db;
 use think\facade\Route;
 use cover\Cover;
+use app\common\model\Novel;
 
 set_time_limit(0);
 ini_set('memory_limit', '-1');
@@ -137,10 +138,31 @@ class Book extends BaseController
     {
         $param = get_params();
         $where = ['status' => 1];
+        $page = isset($param['page']) ? intval($param['page']) : 1;
         if (isset($param['keywords']) && !empty($param['keywords'])) {
             $where[] = ['title|author', 'like', '%' . $param['keywords'] . '%'];
+            $search = Novel::search($param['keywords'], $page);
+            $result = $search['list']->toArray();
+            $result['total'] = $search['total'];
+            foreach ($result['data'] as $k => $v) {
+                $author = Db::name('author')->where(['id' => $v['authorid']])->find();
+                if (empty($author)) {
+                    unset($result['data'][$k]);
+                    continue;
+                }
+                $result['data'][$k]['title'] = strip_tags($v['title']);
+                $result['data'][$k]['cover'] = get_file($v['cover']);
+                $result['data'][$k]['bigcatetitle'] = Db::name('category')->where(['id' => $v['genre']])->value('name');
+                $result['data'][$k]['sellcatetitle'] = Db::name('category')->where(['id' => $v['subgenre']])->value('name');
+                $result['data'][$k]['headpic'] = get_file($author['headimg'], 1);
+                $result['data'][$k]['cover_str'] = get_file($v['cover']);
+                $result['data'][$k]['isfinish_str'] = intval($v['isfinish']) === 2 ? lang('finish') : lang('serialize');
+                $result['data'][$k]['words_str'] = intval($v['words']) > 0 ? wordCount($v['words']) : 0;
+                $result['data'][$k]['authorurl'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('author_detail', ['id' => $v['authorid']]));
+                $result['data'][$k]['url'] = str_replace(\think\facade\App::initialize()->http->getName(), 'home', (string) Route::buildUrl('book_detail', ['id' => $v['filename'] ? $v['filename'] : $v['id']]));
+            }
+            $this->apiSuccess('success', $result);
         }
-        $page = isset($param['page']) ? intval($param['page']) : 1;
         $areaid = isset($param['areaid']) ? intval($param['areaid']) : 0;
         //最多可以载加多少页
         if ($page > 10) {

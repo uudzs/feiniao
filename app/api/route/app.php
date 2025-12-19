@@ -50,6 +50,9 @@ Route::group('v1', function () {
     Route::rule('orderlist', 'api/v1.order/index', 'GET|POST');
     Route::rule('coinlist', 'api/v1.coin/index', 'GET|POST');
     Route::rule('viplog', 'api/v1.vip/log', 'GET|POST');
+    Route::rule('userlevel', 'api/v1.vip/userlevel', 'GET|POST');
+    Route::rule('rechargeplans', 'api/v1.vip/rechargeplans', 'GET|POST');
+    Route::rule('paymentmethods', 'api/v1.vip/paymentmethods', 'GET|POST');
     Route::rule('bankcard', 'api/v1.user/bankcard', 'GET|POST');
     Route::rule('cardadd', 'api/v1.user/cardadd', 'GET|POST');
     Route::rule('delbankcard', 'api/v1.user/delbankcard', 'GET|POST');

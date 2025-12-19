@@ -5,6 +5,17 @@
 {php}
 $site_title = 'VIP';
 $conf = get_system_config('vip');
+$is_open_recharge = 0;
+$recharge_combo = $vipinfo = [];
+if(!empty($conf)) {
+    $is_open_recharge = isset($conf['open']) ? $conf['open'] : 0;
+    unset($conf['open'],$conf['id']);
+    $recharge_combo = $conf;
+}
+$level = model('user_level')->where('status', 1)->order('create_time asc')->select()->toArray();
+if($level) {
+    $level = array_column($level, null, 'id');
+}
 {/php}
 {include file="common/header"/}
 <link rel="stylesheet" href="{__MOBILE__}/default/css/vip.css?v=4" />
@@ -47,102 +58,20 @@ $conf = get_system_config('vip');
     </div>
     <div class="list">
         <ul>
-            {if condition="$conf.level_1 > 0"}
-            <li>
-                <div class="icons">
-                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
-                </div>
-                <span>时长：{$conf.level_1_day}天</span>
-                <div class="buy">
-                    <span>{$conf.level_1}元</span>
-                    {eq name="$conf.open" value="1"}
-                        <button type="button" b-click="vip.buy(1)">购买</button>
-                    {else/}
-                        <u>禁止购买</u>
-                    {/eq}
-                </div>
-            </li>
-            {/if}
-            {if condition="$conf.level_2 > 0"}
-            <li>
-                <div class="icons">
-                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
-                </div>
-                <span>时长：{$conf.level_2_day}天</span>
-                <div class="buy">
-                    <span>{$conf.level_2}元</span>
-                    {eq name="$conf.open" value="1"}
-                        <button type="button" b-click="vip.buy(2)">购买</button>
-                    {else/}
-                        <u>禁止购买</u>
-                    {/eq}
-                </div>
-            </li>
-            {/if}
-            {if condition="$conf.level_3 > 0"}
-            <li>
-                <div class="icons">
-                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
-                </div>
-                <span>时长：{$conf.level_3_day}天</span>
-                <div class="buy">
-                    <span>{$conf.level_3}元</span>
-                    {eq name="$conf.open" value="1"}
-                        <button type="button" b-click="vip.buy(3)">购买</button>
-                    {else/}
-                        <u>禁止购买</u>
-                    {/eq}
-                </div>
-            </li>
-            {/if}
-            {if condition="$conf.level_4 > 0"}
-            <li>
-                <div class="icons">
-                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
-                </div>
-                <span>时长：{$conf.level_4_day}天</span>
-                <div class="buy">
-                    <span>{$conf.level_4}元</span>
-                    {eq name="$conf.open" value="1"}
-                        <button type="button" b-click="vip.buy(4)">购买</button>
-                    {else/}
-                        <u>禁止购买</u>
-                    {/eq}
-                </div>
-            </li>
-            {/if}
-            {if condition="$conf.level_5 > 0"}
-            <li>
-                <div class="icons">
-                    <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
-                </div>
-                <span>时长：{$conf.level_5_day}天</span>
-                <div class="buy">
-                    <span>{$conf.level_5}元</span>
-                    {eq name="$conf.open" value="1"}
-                        <button type="button" b-click="vip.buy(5)">购买</button>
-                    {else/}
-                        <u>禁止购买</u>
-                    {/eq}
-                </div>
-            </li>
-            {/if}
-            {if condition="$conf.level_6 > 0"}
+            {notempty name="level"}
+                {volist name="$level" id="v"}
                 <li>
                     <div class="icons">
                         <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
                     </div>
-                    <span>时长：{$conf.level_6_day}天</span>
+                    <span>【{$v.title|default='--'}】时长：{$v.duration|default='0'}天</span>
                     <div class="buy">
-                        <span>{$conf.level_6}元</span>
-                        {eq name="$conf.open" value="1"}
-                            <button type="button" b-click="vip.buy(6)">购买</button>
-                        {else/}
-                            <u>禁止购买</u>
-                        {/eq}
+                        <span>{$v.price|default='0'}元</span>    
+                        <button type="button" b-click="vip.buy({$v.id|default='0'})">购买</button>
                     </div>
                 </li>
-            {/if}
+                {/volist}
+            {/notempty}           
         </ul>
     </div>
 </div>

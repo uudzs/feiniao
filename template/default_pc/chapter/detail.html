@@ -146,7 +146,7 @@ $conConfig = get_system_config('content');
                                     <p data-id="0">用户不存在！</p>
                                 {/if}
                                 {if $chapter['chapteraccess'] == -11}
-                                    <p data-id="0">没有阅读权限，请升级会员身份！</p>
+                                    <p data-id="0">没有阅读权限，请<a href="{:url('vip')}">升级</a>会员身份或充值！</p>
                                 {/if}
                                 {if $chapter['chapteraccess'] == -12}
                                     <p data-id="0">非法用户身份！</p>
@@ -167,7 +167,7 @@ $conConfig = get_system_config('content');
                                     <p data-id="0">不够本章节所需的金币数，请充值！</p>
                                 {/if}
                                 {if $chapter['chapteraccess'] == -19}
-                                    <p data-id="0">请登录后再阅读！</p>
+                                    <p data-id="0">请<a href="{:url('login')}">登录</a>后再阅读！</p>
                                 {/if}    
                             {else/}
                                 {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open'] && is_array($content)}
