@@ -72,16 +72,21 @@
 	function feiniaoInit() {
         var form = layui.form, tool = layui.tool;
         form.on('submit(union-login)', function(data) {
-            let callback = function (e) {
-				layer.msg(e.msg);
-				if (e.code == 0) {
-					parent.layui.tool.close(1000);
-				} else {
-                    $('[alt="captcha"]').click();
-					$('input[name="captcha"]').val('');
+            tool.ajax({
+                url: "{:url('upgrade/union_login')}",
+                type: 'POST',
+                data: data.field,
+                timeout: 0,
+                success: function(e) {
+                    layer.msg(e.msg);
+                    if (e.code == 0) {
+                        parent.layui.tool.close(1000);
+                    } else {
+                        $('[alt="captcha"]').click();
+                        $('input[name="captcha"]').val('');
+                    }
                 }
-			}
-			tool.post("{:url('upgrade/union_login')}", data.field, callback, {timeout: 0});
+            });
             return false;
         });
 	}

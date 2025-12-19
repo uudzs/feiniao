@@ -111,18 +111,23 @@
 						if(e.data == 1) {		
 							layer.confirm('此主题有新版本，现在更新该主题吗?', { icon: 3, title: '更新提示', btn: ['更新', '关闭'] }, function (index) {
 								var loadIndex = layer.load(0);
-								let callback = function (r) {
-									layer.msg(r.msg);
-									if (r.code == 0) {
-										layer.close(loadIndex);
-										layer.close(index);
-                                        location.reload();
-									} else {
-										layer.close(loadIndex);
-										return layer.msg(r.msg);
-									}
-								}								
-								tool.post("{:url('upgrade/theme_update')}", { name: name, version: version }, callback, {timeout: 0});
+                                tool.ajax({
+                                    url: "{:url('upgrade/theme_update')}",
+                                    type: 'POST',
+                                    data: { name: name, version: version },
+                                    timeout: 0,
+                                    success: function(r) {
+                                        layer.msg(r.msg);
+                                        if (r.code == 0) {
+                                            layer.close(loadIndex);
+                                            layer.close(index);
+                                            location.reload();
+                                        } else {
+                                            layer.close(loadIndex);
+                                            return layer.msg(r.msg);
+                                        }
+                                    }
+                                });
 								return false;
 							});
 						} else {
@@ -180,21 +185,26 @@
             if(!platform) return layer.msg('参数为空！');
             layer.confirm('确定要卸载此主题吗?', { icon: 3, title: '卸载提示', btn: ['确定', '关闭'] }, function (index) {
                 var loadIndex = layer.load(0);
-                let callback = function (r) {
-                    layer.msg(r.msg);
-                    if (r.code == 0) {
-                        layer.close(loadIndex);
-                        layer.close(index);
-                        $(self).closest(".layui-card").find('.layui-card-header i').remove();
-                        $(self).siblings('[lay-filter="setup"]').show();
-                        $(self).hide();
-                        //location.reload();
-                    } else {
-                        layer.close(loadIndex);
-                        return layer.msg(r.msg);
+                tool.ajax({
+                    url: "{:url('themes/unload')}",
+                    type: 'POST',
+                    data: { name: name, platform: platform },
+                    timeout: 0,
+                    success: function(r) {
+                        layer.msg(r.msg);
+                        if (r.code == 0) {
+                            layer.close(loadIndex);
+                            layer.close(index);
+                            $(self).closest(".layui-card").find('.layui-card-header i').remove();
+                            $(self).siblings('[lay-filter="setup"]').show();
+                            $(self).hide();
+                            //location.reload();
+                        } else {
+                            layer.close(loadIndex);
+                            return layer.msg(r.msg);
+                        }
                     }
-                }								
-                tool.post("{:url('themes/unload')}", { name: name, platform: platform }, callback, {timeout: 0});
+                });
                 return false;
             });
         });
