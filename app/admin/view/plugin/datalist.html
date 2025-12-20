@@ -123,18 +123,23 @@
 						if(e.data == 1) {		
 							layer.confirm('此插件有新版本，现在更新该插件吗?', { icon: 3, title: '更新提示', btn: ['更新', '关闭'] }, function (index) {
 								var loadIndex = layer.load(0);
-								let callback = function (r) {
-									layer.msg(r.msg);
-									if (r.code == 0) {
-										layer.close(loadIndex);
-										layer.close(index);
-										layui.pageTable.reload()
-									} else {
-										layer.close(loadIndex);
-										return layer.msg(r.msg);
+								tool.ajax({
+									url: "{:url('upgrade/plugin_update')}",
+									type: 'POST',
+									data: { name: obj.data.name },
+									timeout: 0,
+									success: function(r) {
+										layer.msg(r.msg);
+										if (r.code == 0) {
+											layer.close(loadIndex);
+											layer.close(index);
+											layui.pageTable.reload()
+										} else {
+											layer.close(loadIndex);
+											return layer.msg(r.msg);
+										}
 									}
-								}								
-								tool.post("{:url('upgrade/plugin_update')}", { name: obj.data.name }, callback);
+								});
 								return false;
 							});
 						} else {
@@ -149,14 +154,19 @@
 			}
 			if (obj.event === 'install') {
 				layer.confirm('确定要安装该插件吗?', { icon: 3, title: '提示' }, function (index) {
-					let callback = function (e) {
-						layer.msg(e.msg);
-						if (e.code == 0) {
-							layer.close(index);
-							layui.pageTable.reload()
+					tool.ajax({
+						url: "{:url('plugin/install')}",
+						type: 'POST',
+						data: { id: obj.data.name },
+						timeout: 0,
+						success: function(e) {
+							layer.msg(e.msg);
+							if (e.code == 0) {
+								layer.close(index);
+								layui.pageTable.reload()
+							}
 						}
-					}
-					tool.post("{:url('plugin/install')}", { id: obj.data.name }, callback);
+					});
 					layer.close(index);
 				});
 			}
