@@ -82,10 +82,9 @@ class Book extends BaseController
         if (empty($book)) {
             $this->error(404);
         }
-        if (intval($id) !== $id) {
+        if (!ctype_digit((string)$id)) {
             $id = $book['id'];
         }
-
         auto_run_addons('collect', [
             'type' => 'single_book',
             'book_id' => $id,

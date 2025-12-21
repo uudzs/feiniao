@@ -147,7 +147,7 @@ $(window).on('load', function () {
                 var html = `<div class="nav-content--main-item">
                     <div class="nav-content--main-item-img global-book--shadow">
                         <a href="${item.url}" target="_blank" title="${item.title}" class="nav-content--main-item-img-cover global-radius global-book--frame">
-                        <img alt="${item.title}" class="animation-img" src="${item.cover_str}" lazy="loaded">
+                        <img alt="${item.title}" class="animation-img" src="${item.cover_str}" lazy="loaded" onerror="javascript:this.src='{:get_file('')}';this.onerror=null;">
                         </a>
                     </div>
                     <div class="nav-content--main-item-content">

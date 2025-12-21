@@ -44,24 +44,19 @@ class Novel extends Model
     public static function getBookDetail($id)
     {
         $cacheKey = 'book_' . $id;
-        if (intval($id) === $id) {
+        if (ctype_digit((string)$id)) {
             $result = CacheService::remember($cacheKey, function () use ($id) {
-                return self::where('id', $id)->find();
+                return self::where('id', intval($id))->find();
             });
-            if ($result instanceof \think\Model) {
-                return $result->toArray();
-            }
-            return $result;
         } else {
             $result = CacheService::remember($cacheKey, function () use ($id) {
                 return self::where('filename', $id)->find();
             });
-            if ($result instanceof \think\Model) {
-                return $result->toArray();
-            }
-            return $result;
         }
-        return [];
+        if ($result instanceof \think\Model) {
+            return $result->toArray();
+        }
+        return $result ?: [];
     }
 
     public static function getList($channelType, $filter)

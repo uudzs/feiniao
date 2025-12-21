@@ -42,36 +42,44 @@ class CacheService
      */
     public static function remember(string $key, callable $callback, int $expire = null, string $store = null)
     {
-        if ($store === null) {
-            $store = Config::get('cache.default', 'file');
-        }
-        // 如果没有传入expire参数，则尝试从配置中获取
-        if ($expire === null) {
-            // 获取当前存储类型的配置
-            $storeConfig = Config::get("cache.stores.{$store}", []);
-            $configExpire = $storeConfig['expire'] ?? 0;
-            // 如果配置中的expire大于0，则使用配置值
-            if ($configExpire > 0) {
-                $expire = $configExpire;
-            } else {
-                // 否则使用默认的类常量
-                $expire = 86400;
-            }
-        }
-        // 先尝试从缓存获取
-        $data = Cache::store($store)->get($key, '__CACHE_MISS__');
-        if ($data !== '__CACHE_MISS__') {
-            return $data;
-        }
-        // 缓存未命中，执行回调获取数据
         try {
+            if ($store === null) {
+                $store = Config::get('cache.default', 'file');
+            }
+
+            // 修复 expire 处理逻辑
+            if ($expire === null) {
+                $storeConfig = Config::get("cache.stores.{$store}", []);
+                $configExpire = $storeConfig['expire'] ?? null;
+
+                if ($configExpire !== null) {
+                    $expire = $configExpire;
+                } else {
+                    $expire = 86400; // 默认 1 小时
+                }
+            }
+
+            // 尝试从缓存获取
+            $data = Cache::store($store)->get($key, '__CACHE_MISS__');
+
+            if ($data !== '__CACHE_MISS__') {
+                return $data;
+            }
+
+            // 缓存未命中，执行回调
             $data = $callback();
-            // 即使是null或false也要缓存，防止缓存穿透
+
+            // 即使返回 null 也要缓存，防止缓存穿透
             Cache::store($store)->set($key, $data, $expire);
+
             return $data;
         } catch (\Exception $e) {
-            trace('Cache remember callback failed: ' . $e->getMessage(), 'error');
-            return null;
+            try {
+                return $callback();
+            } catch (\Exception $e2) {
+                trace('Cache remember callback also failed: ' . $e2->getMessage(), 'error');
+                return null;
+            }
         }
     }
 
