@@ -1766,7 +1766,7 @@ if (!function_exists('chapterCheckAccess')) {
                 if ($login_read_num >= $chaps) {
                     return 1;
                 } else {
-                    return -19;
+                    if (empty($uid)) return -9;
                 }
             }
         }
