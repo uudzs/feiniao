@@ -225,8 +225,7 @@ function get_file($id, $type = 0)
     $port = Request::port();
     $sitepath = Request::scheme() . '://' . $host . ($port && ($port != 443 && $port != 80) ? (':' . $port) : '') . '/';
     if ($id) {
-        $id2num = intval($id);
-        if ($id2num == $id) {
+        if (ctype_digit((string)$id)) {
             $geturl = Db::name("file")->where(['id' => $id])->find();
             if (!empty($geturl)) {
                 if ($geturl['status'] == 1) {

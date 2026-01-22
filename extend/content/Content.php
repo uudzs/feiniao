@@ -171,11 +171,6 @@ class Content
             } catch (Exception $e) {
                 throw new Exception();
             }
-            if (empty($content)) {
-                if (get_addons_is_enable('caijipro')) {
-                    $content = hook('caijiproChapterHook', ['chapterid' => $chapterId]);
-                }
-            }
             return $content;
         } catch (\Exception $e) {
             return $content;
@@ -186,12 +181,7 @@ class Content
     {
         $content = '';
         $chaptertable = calc_hash_db($bookId);
-        $content = Db::name($chaptertable)->where(['sid' => $chapterId])->value('info');
-        if (empty($content)) {
-            if (get_addons_is_enable('caijipro')) {
-                $content = hook('caijiproChapterHook', ['chapterid' => $chapterId]);
-            }
-        }
+        $content = Db::name($chaptertable)->where(['sid' => $chapterId])->value('info');  
         return $content;
     }
 
