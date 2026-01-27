@@ -7,7 +7,7 @@
  */
 declare(strict_types=1);
 
-namespace feiniao;
+namespace uudzs;
 
 use think\App;
 use think\helper\Str;

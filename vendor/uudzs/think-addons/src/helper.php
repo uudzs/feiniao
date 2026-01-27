@@ -8,11 +8,11 @@ use think\helper\{
 };
 
 // 为插件基类创建别名，方便用户使用
-class_alias('feiniao\Addons', 'think\Addons');
+class_alias('uudzs\Addons', 'think\Addons');
 
 \think\Console::starting(function (\think\Console $console) {
     $console->addCommands([
-        'addons:config' => '\\feiniao\\addons\\command\\SendConfig'
+        'addons:config' => '\\uudzs\\addons\\command\\SendConfig'
     ]);
 });
 

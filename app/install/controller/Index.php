@@ -100,6 +100,10 @@ class Index
             // 这是进行异常捕获,创建数据库
             return to_assign(1, '数据库链接失败:' . $e->getMessage());
             die;
+        } catch (\Throwable $e) {
+            // 这是进行异常捕获,创建数据库
+            return to_assign(1, '数据库链接失败:' . $e->getMessage());
+            die;
         }
         // 获取错误信息
         if (!is_null($link->connect_error)) {
@@ -121,6 +125,10 @@ class Index
             // 这是进行异常捕获,创建数据库并选中
             $sql    = "CREATE DATABASE IF NOT EXISTS `{$dbName}` DEFAULT CHARACTER SET utf8mb4";
             $link->query($sql);
+        } catch (\Throwable $e) {
+            // 这是进行异常捕获,创建数据库并选中
+            $sql    = "CREATE DATABASE IF NOT EXISTS `{$dbName}` DEFAULT CHARACTER SET utf8mb4";
+            $link->query($sql);
         }
         //选中数据库
         $link->select_db($dbName);
@@ -134,6 +142,9 @@ class Index
                 }
             }
         } catch (\Exception $e) {
+            return to_assign(1, '创建表失败:' . addslashes($e->getMessage()));
+            die;
+        } catch (\Throwable $e) {
             return to_assign(1, '创建表失败:' . addslashes($e->getMessage()));
             die;
         }
@@ -153,6 +164,9 @@ class Index
                 $link->query($sql);
             }
         } catch (\Exception $e) {
+            return to_assign(1, '创建章节表失败:' . addslashes($e->getMessage()));
+            die;
+        } catch (\Throwable $e) {
             return to_assign(1, '创建章节表失败:' . addslashes($e->getMessage()));
             die;
         }
@@ -178,6 +192,9 @@ class Index
         } catch (\Exception $e) {
             return to_assign(1, '插入管理员信息失败:' . addslashes($e->getMessage()));
             die;
+        } catch (\Throwable $e) {
+            return to_assign(1, '插入管理员信息失败:' . addslashes($e->getMessage()));
+            die;
         }
         try {
             //创建事件
@@ -193,6 +210,8 @@ class Index
             //$sql = "SET GLOBAL event_scheduler = ON;";
             //$link->query($sql);
         } catch (\Exception $e) {
+            //跳过不报错       
+        } catch (\Throwable $e) {
             //跳过不报错
         }
         $link->close();

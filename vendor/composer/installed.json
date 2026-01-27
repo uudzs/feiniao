@@ -129,62 +129,6 @@
             "install-path": "../ezyang/htmlpurifier"
         },
         {
-            "name": "feiniao/think-addons",
-            "version": "dev-main",
-            "version_normalized": "dev-main",
-            "dist": {
-                "type": "path",
-                "url": "../think-addons",
-                "reference": "b9d34573d56bff99c79880469423560f9f198ef4"
-            },
-            "require": {
-                "php": ">=7.1.0",
-                "topthink/framework": "^6.0",
-                "topthink/think-helper": "^3.0.0",
-                "topthink/think-view": "^1.0"
-            },
-            "type": "library",
-            "extra": {
-                "think": {
-                    "services": [
-                        "feiniao\\addons\\Service"
-                    ],
-                    "config": {
-                        "addons": "src/config.php"
-                    }
-                }
-            },
-            "installation-source": "dist",
-            "autoload": {
-                "psr-4": {
-                    "feiniao\\": "src/"
-                },
-                "files": [
-                    "src/helper.php"
-                ]
-            },
-            "scripts": {
-                "post-install-cmd": [
-                    "php think addons:config"
-                ]
-            },
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "feiniao",
-                    "email": "uduzs@qq.com"
-                }
-            ],
-            "description": "The ThinkPHP6 Addons Package",
-            "transport-options": {
-                "symlink": false,
-                "relative": true
-            },
-            "install-path": "../feiniao/think-addons"
-        },
-        {
             "name": "firebase/php-jwt",
             "version": "v6.4.0",
             "version_normalized": "6.4.0.0",
@@ -2063,6 +2007,66 @@
                 "source": "https://github.com/top-think/think-view/tree/v1.0.14"
             },
             "install-path": "../topthink/think-view"
+        },
+        {
+            "name": "uudzs/think-addons",
+            "version": "dev-paheng",
+            "version_normalized": "dev-paheng",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/uudzs/think-addons.git",
+                "reference": "8eaf0b06e0c340de732a7e743cc277249fbb450d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/uudzs/think-addons/zipball/8eaf0b06e0c340de732a7e743cc277249fbb450d",
+                "reference": "8eaf0b06e0c340de732a7e743cc277249fbb450d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1.0",
+                "topthink/framework": "^6.0",
+                "topthink/think-helper": "^3.0.0",
+                "topthink/think-view": "^1.0"
+            },
+            "time": "2026-01-21T13:00:08+00:00",
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "think": {
+                    "config": {
+                        "addons": "src/config.php"
+                    },
+                    "services": [
+                        "uudzs\\addons\\Service"
+                    ]
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "src/helper.php"
+                ],
+                "psr-4": {
+                    "uudzs\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "uudzs",
+                    "email": "uduzs@qq.com"
+                }
+            ],
+            "description": "The ThinkPHP6 Addons Package",
+            "support": {
+                "issues": "https://github.com/uudzs/think-addons/issues",
+                "source": "https://github.com/uudzs/think-addons/tree/paheng"
+            },
+            "install-path": "../uudzs/think-addons"
         }
     ],
     "dev": true,

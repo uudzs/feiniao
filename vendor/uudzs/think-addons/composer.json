@@ -1,10 +1,10 @@
 {
-    "name": "feiniao/think-addons",
+    "name": "uudzs/think-addons",
     "description": "The ThinkPHP6 Addons Package",
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "feiniao",
+            "name": "uudzs",
             "email": "uduzs@qq.com"
         }
     ],
@@ -16,7 +16,7 @@
     },
     "autoload": {
         "psr-4": {
-            "feiniao\\": "src/"
+            "uudzs\\": "src/"
         },
         "files": [
             "src/helper.php"
@@ -25,7 +25,7 @@
     "extra": {
         "think": {
             "services": [
-                "feiniao\\addons\\Service"
+                "uudzs\\addons\\Service"
             ],
             "config":{
                 "addons": "src/config.php"

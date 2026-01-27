@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-namespace feiniao\addons\middleware;
+namespace uudzs\addons\middleware;
 
 use think\App;
 
