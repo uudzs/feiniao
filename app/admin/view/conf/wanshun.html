@@ -1,0 +1,100 @@
+{extend name="common/base"/}
+{block name="style"}
+<style>
+    .help-block {
+        font-size: 12px;
+        color: #999;
+        margin-top: 5px;
+    }
+    .config-intro {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    .config-intro h4 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+    .config-intro ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+    .config-intro li {
+        margin-bottom: 5px;
+        color: #666;
+    }
+</style>
+{/block}
+<!-- 主体 -->
+{block name="body"}
+<form class="layui-form p-4">
+    <h3 class="pb-3">万顺支付配置</h3>
+    
+    <div class="config-intro">
+        <h4><i class="layui-icon layui-icon-tips"></i> 配置说明</h4>
+        <ul>
+            <li><strong>商户号：</strong>在万顺支付平台获取的商户号</li>
+            <li><strong>商户密钥：</strong>在万顺支付平台获取的API密钥</li>
+        </ul>
+    </div>
+    
+    <table class="layui-table layui-table-form">
+        <tr>
+            <td class="layui-td-gray-2">支付开启状态</td>
+            <td>
+                {empty name="$config.open"}
+                    <input type="radio" name="open" value="0" title="关闭" checked>
+                    <input type="radio" name="open" value="1" title="开启">
+                {else/}
+                    <input type="radio" name="open" value="0" title="关闭"{eq name="$config.open" value="0"} checked{/eq}>
+                    <input type="radio" name="open" value="1" title="开启"{eq name="$config.open" value="1"} checked{/eq}>
+                {/empty}
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">商户号(mchNo)</td>
+            <td>
+                <input type="text" name="mch_no" autocomplete="off" placeholder="请输入万顺支付商户号" class="layui-input" {notempty name="$config.mch_no"} value="{$config.mch_no}" {/notempty}>
+                <div class="help-block">在万顺支付平台获取的商户号</div>
+            </td>
+        </tr>
+        <tr>
+            <td class="layui-td-gray">商户密钥(secretKey)</td>
+            <td>
+                <input type="text" name="secret_key" autocomplete="off" placeholder="请输入商户密钥" class="layui-input" {notempty name="$config.secret_key"} value="{$config.secret_key}" {/notempty}>
+                <div class="help-block">在万顺支付平台获取的API密钥</div>
+            </td>
+        </tr>
+    </table>
+    <div class="py-3">
+        <input type="hidden" name="id" value="{$id}">
+        <button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="webform">立即提交</button>
+        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+    </div>
+</form>
+{/block}
+<!-- /主体 -->
+
+<!-- 脚本 -->
+{block name="script"}
+<script>
+    const moduleInit = ['tool'];
+    function feiniaoInit() {
+        var form = layui.form, tool = layui.tool;
+
+        //监听提交
+        form.on('submit(webform)', function (data) {
+            let callback = function (e) {
+                layer.msg(e.msg);
+                if (e.code == 0) {
+                    parent.layui.tool.close(1000);
+                }
+            }
+            tool.post("{:url('conf/edit')}", data.field, callback);
+            return false;
+        });
+    }
+</script>
+{/block}
+<!-- /脚本 -->

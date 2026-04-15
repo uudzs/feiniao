@@ -67,6 +67,7 @@ Route::group('v1', function () {
     Route::rule('caijicategory', 'api/v1.caiji/category', 'GET|POST');
     Route::rule('caijibook', 'api/v1.caiji/book', 'GET|POST');
     Route::rule('caijichapter', 'api/v1.caiji/chapter', 'GET|POST');
+    Route::rule('collectSubmit', 'api/v1.collect/submit', 'GET|POST');
     // 评论列表
     Route::rule('commentlist', 'api/v1.comment/list', 'POST');
     // 发表评论

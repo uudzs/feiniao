@@ -71,6 +71,8 @@ try {
     if (isset($data['report']) && $data['report']['rule']) Route::rule($data['report']['rule'], 'user/report', 'GET|POST')->name('report');    
     if (isset($data['wechat_pay_callback']) && $data['wechat_pay_callback']['rule']) Route::rule($data['wechat_pay_callback']['rule'], 'pay/wechat_pay_callback', 'GET|POST')->name('wechat_pay_callback');
     if (isset($data['alipay_h5_pay_callback']) && $data['alipay_h5_pay_callback']['rule']) Route::rule($data['alipay_h5_pay_callback']['rule'], 'pay/alipay_h5_pay_callback', 'GET|POST')->name('alipay_h5_pay_callback');
+    Route::rule('wanshun_pay_callback', 'pay/wanshun_pay_callback', 'POST')->name('wanshun_pay_callback');
+    Route::rule('wanshunpay', 'pay/wanshun', 'GET|POST')->name('wanshunpay');
     if (isset($data['comments']) && $data['comments']['rule']) Route::rule($data['comments']['rule'], 'user/comments', 'GET')->name('comments');
     Route::rule('follow', 'user/follow', 'GET')->name('follow');
     if (isset($data['novelfilter']) && $data['novelfilter']['rule']) Route::rule($data['novelfilter']['rule'], 'novel/index', 'GET')

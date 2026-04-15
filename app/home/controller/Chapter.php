@@ -41,21 +41,13 @@ class Chapter extends BaseController
             $this->error(404);
         }
         $book['cover'] = get_file($book['cover']);
-        $cacheKey = 'chapter_list_' . $chapter['bookid'];
-        $list = \app\service\CacheService::remember($cacheKey, function () use ($chapter) {
-            return \app\common\model\Chapter::field('id,bookid,title,chaps,create_time')->where(['bookid' => $chapter['bookid'], 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
-        });
         $data = [];
         $config = get_system_config('content');
         if ($config['chapter_pages_content_open']) {
             $chapter['chapteraccess'] = chapterCheckAccess($id);
             $hide_content = $chapter['chapteraccess'] !== 1;
             $chapter['hide_content'] = $hide_content;
-            if (!$hide_content) {
-                auto_run_addons('collect', [
-                    'type' => 'single_chapter',
-                    'chapter_id' => $id
-                ]);
+            if (!$hide_content) {    
                 $content = Content::get($chapter['bookid'], $chapter['id']);
                 if ($content && mb_strlen($content) > 0) {
                     $content = htmlspecialchars_decode($content);
@@ -96,7 +88,6 @@ class Chapter extends BaseController
         $data['chapter'] = $chapter;
         $data['id'] = $id;
         $data['bookid'] = $chapter['bookid'];
-        $data['chapterlist'] = $list;
         $data['book'] = $book;
         View::config(['view_path' => $this->view_path()]);
         if ($ismakecache) $this->makecache(View::fetch('detail', $data));

@@ -61,11 +61,7 @@ class Chapter extends BaseController
             if (app('request')->isMobile() || isWeChat() || !get_system_config('content', 'chapter_pages_content_open')) {
                 $content = Content::get($book['id'], $chapter['id']);
                 if (empty($content)) {
-                    $obj = auto_run_addons('collect', [
-                        'type' => 'single_chapter',
-                        'chapter_id' => $id
-                    ]);
-                    $content = current(array_filter($obj));
+                    $chapter['content'] = '';
                 }
                 if ($content && mb_strlen($content) > 0) {
                     list($wordnum, $content) = countWordsAndContent($content, true);
@@ -318,10 +314,20 @@ class Chapter extends BaseController
                 $chapter['speed'] = round(($reads / $total) * 100, 2);
             }
         }
+        $cacheKey = 'chapter_list_' . $bookid;
+        $list = \app\service\CacheService::remember($cacheKey, function () use ($bookid) {
+            return \app\common\model\Chapter::field('id,bookid,title,chaps,create_time')->where(['bookid' => $bookid, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
+        });
+        foreach ($list as $k => $v) {
+            $url = (string)furl('chapter_detail', ['id' => $v['id'], 'bookid' => $book['filename'] ? $book['filename'] : $v['bookid']]);
+            $list[$k]['chapter_url'] = str_replace($model_name, 'home', $url);
+            $list[$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
+        }
         $chapter['fav'] = Db::name('favorites')->where(['user_id' => $uid, 'pid' => $book['id']])->count();
         $today = date('Y-m-d'); // 当天日期
         $chapter['like'] = Db::name('like_log')->where(['user_id' => $uid, 'book_id' => $book['id'], 'chapter_id' => $chapter_id, 'like_date' => $today])->count();
         $chapter['create_time'] = time_format($chapter['create_time']);
+        $chapter['chapterlist'] = $list;
         $result = [
             'data' => [$chapter],
             'total' => $total,

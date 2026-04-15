@@ -2,421 +2,1761 @@
 <!-- 主体 -->
 {block name="body"}
 <style>
-.laytable-cell-1-0-1 {
-	width: 250px!important;
+:root {
+    --primary-color: #3b82f6;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
 }
-.layui-upload {
-	padding: 10px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
+
+.book-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--gray-700);
+    background: var(--gray-50);	
 }
-.layui-upload .cover {
-	margin-bottom: 20px;
+
+.book-page *,
+.book-page *::before,
+.book-page *::after {
+    box-sizing: border-box;
 }
-.layui-upload-list {
-	width: 90px;
-	border: solid 1px #ccc;
-	height: 90px;
+
+.book-page {
+    margin: 0;
+    padding: 20px;
 }
-.layui-upload-img {
-	width: 100%;
-	height: 100%;
-	border: none;
+
+.btn {
+    height: 36px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+    gap: 6px;
+    text-decoration: none;
+    font-family: inherit;
+    white-space: nowrap;
 }
-.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-1 {
-    height: auto!important;
-	width: auto!important;
-	min-width: 60px!important;
+
+.btn svg {
+    flex-shrink: 0;
 }
-.book_customize_style .laytable-cell-1-0-1 {
-	width: auto!important;
-	min-width: 60px!important;
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
-.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-3, 
-.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-4, 
-.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-5,
-.book_customize_style .layui-table-body .layui-table tr .laytable-cell-1-0-6 {
-    height: auto!important;
-	width: auto!important;
-	min-width: 230px!important;
+
+.btn-primary {
+    background: var(--primary-color);
+    color: #fff;
 }
-.book_customize_style strong {
-	color: #bdbdbd;
-	font-weight: normal;
+
+.btn-primary:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.btn-outline {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+}
+
+.btn-outline:hover:not(:disabled) {
+    border-color: var(--gray-300);
+    background: var(--gray-50);
+}
+
+.btn-danger {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+}
+
+.btn-text {
+    background: transparent;
+    color: var(--primary-color);
+    padding: 0 8px;
+}
+
+.btn-text:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.btn-sm {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+}
+
+.btn-lg {
+    height: 44px;
+    padding: 0 24px;
+    font-size: 16px;
+}
+
+.gg-form-bar {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.gg-form-bar .search-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.gg-form-bar select,
+.gg-form-bar input[type="text"] {
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #fff;
+    min-width: 160px;
+}
+
+.gg-form-bar select:focus,
+.gg-form-bar input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.gg-form-bar input[type="text"] {
+    flex: 1;
+    max-width: 300px;
+}
+
+.gg-form-bar .btn {
+    height: 40px;
+    padding: 0 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gg-form-bar .btn-primary {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.gg-form-bar .btn-primary:hover {
+    background: #2563eb;
+}
+
+.gg-form-bar .btn-outline {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-700);
+}
+
+.gg-form-bar .btn-outline:hover {
+    border-color: var(--gray-300);
+    background: var(--gray-50);
+}
+
+.gg-form-bar .btn-danger {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+.gg-form-bar .btn-danger:hover {
+    background: #dc2626;
+}
+
+/* 工具栏 */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.toolbar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: 0;
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* 统计卡片 */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--primary-color), #60a5fa);
+    color: #fff;
+    padding: 16px 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+.stat-card.success {
+    background: linear-gradient(135deg, var(--success-color), #34d399);
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+}
+
+.stat-card.warning {
+    background: linear-gradient(135deg, var(--warning-color), #fbbf24);
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);
+}
+
+.stat-card.danger {
+    background: linear-gradient(135deg, var(--danger-color), #f87171);
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+}
+
+.stat-card .stat-label {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.stat-card .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+}
+
+/* 作品卡片网格 */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.book-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    border: 1px solid var(--gray-100);
+}
+
+.book-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.book-card-header {
+    position: relative;
+    height: 160px;
+    overflow: hidden;
+    background: var(--gray-100);
+    cursor: pointer;
+}
+
+.book-card-header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.book-cover-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-400);
+    font-size: 48px;
+}
+
+.book-status-badges {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #fff;
+}
+
+.badge-success { background: var(--success-color); }
+.badge-warning { background: var(--warning-color); }
+.badge-danger { background: var(--danger-color); }
+.badge-info { background: var(--primary-color); }
+
+.badge-offline {
+    background: var(--gray-500);
+}
+
+.book-card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.book-card:hover .book-card-actions {
+    opacity: 1;
+}
+
+.book-card-actions .action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255,255,255,0.95);
+    color: var(--gray-700);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.book-card-actions .action-btn:hover {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.book-card-body {
+    padding: 16px;
+}
+
+.book-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.book-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.book-meta-item {
+    font-size: 12px;
+    color: var(--gray-500);
+    background: var(--gray-100);
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.book-stats {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-100);
+}
+
+.book-stat {
+    text-align: center;
+    flex: 1;
+}
+
+.book-stat-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.book-stat-label {
+    font-size: 11px;
+    color: var(--gray-400);
+    margin-top: 2px;
+}
+
+.book-card-footer {
+    padding: 12px 16px;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.book-time {
+    font-size: 12px;
+    color: var(--gray-400);
+}
+
+.book-card-actions-row {
+    display: flex;
+    gap: 8px;
+}
+
+.book-card-actions-row .btn {
+    flex: 1;
+    height: 25px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.book-card-actions-row .btn-primary {
+    background: var(--primary-color);
+    color: #fff;
+}
+
+.book-card-actions-row .btn-primary:hover {
+    background: #2563eb;
+}
+
+.book-card-actions-row .btn-outline {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+}
+
+.book-card-actions-row .btn-outline:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.book-card-actions-row .btn-danger {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    color: var(--danger-color);
+}
+
+.book-card-actions-row .btn-danger:hover {
+    background: var(--danger-color);
+    border-color: var(--danger-color);
+    color: #fff;
+}
+
+/* 开关 */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.switch-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--gray-300);
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.switch-slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.switch input:checked + .switch-slider {
+    background-color: var(--success-color);
+}
+
+.switch input:checked + .switch-slider::before {
+    transform: translateX(20px);
+}
+
+/* 分页 */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+    gap: 16px;
+}
+
+.pagination-left {
+    display: flex;
+    align-items: center;
+    margin-right: auto;
+}
+
+.select-all-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+.select-all-wrapper:hover {
+    color: var(--primary-color);
+}
+
+.select-all-wrapper .custom-checkbox {
+    width: 18px;
+    height: 18px;
+}
+
+.pagination {
+    display: flex;
+    gap: 4px;
+}
+
+.pagination button {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--gray-200);
+    background: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+.pagination button:hover:not(:disabled) {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.pagination button.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    margin-left: 16px;
+    font-size: 14px;
+    color: var(--gray-500);
+}
+
+/* 空状态 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray-400);
+}
+
+.empty-state svg {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--gray-500);
+}
+
+/* 复选框 */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.custom-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--gray-300);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    background: #fff;
+}
+
+.custom-checkbox:checked {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+    background-size: 14px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* 模态框 */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal {
+    background: #fff;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: auto;
+    transform: translateY(20px);
+    transition: transform 0.3s;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0);
+}
+
+.modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: var(--gray-100);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--gray-200);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--gray-100);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* 上传区域 */
+.upload-area {
+    border: 2px dashed var(--gray-200);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.upload-area-icon {
+    font-size: 48px;
+    color: var(--gray-300);
+    margin-bottom: 10px;
+}
+
+.upload-area-text {
+    color: var(--gray-500);
+    font-size: 14px;
+}
+
+.upload-preview {
+    margin-top: 16px;
+}
+
+.upload-preview img {
+    max-width: 200px;
+    max-height: 280px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* 工具提示 */
+.tooltip {
+    position: relative;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 10px;
+    background: var(--gray-800);
+    color: #fff;
+    font-size: 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+    pointer-events: none;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 加载状态 */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 确认框 */
+.confirm-box {
+    text-align: center;
+}
+
+.confirm-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    background: #fef3f2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--danger-color);
+    font-size: 32px;
+}
+
+.confirm-message {
+    font-size: 15px;
+    color: var(--gray-600);
+    margin-bottom: 24px;
+}
+
+/* 图片预览模态框 */
+.image-preview-modal {
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview-modal .modal {
+    max-width: 90%;
+    max-height: 90vh;
+    background: transparent;
+    box-shadow: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: none;
+    border-radius: 0;
+    padding: 20px;
+}
+
+.image-preview-modal img {
+    max-width: 100%;
+    max-height: 85vh;
+    display: block;
+    object-fit: contain;
+}
+
+.image-preview-modal .preview-close-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: all 0.2s;
+    z-index: 1001;
+}
+
+.image-preview-modal .preview-close-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.1);
+}
+
+.image-preview-modal .modal {
+    position: relative;
+}
+
+.image-preview-modal img {
+    max-width: 100%;
+    max-height: 80vh;
+    display: block;
+}
+
+/* 批量操作栏 */
+.batch-actions {
+    background: var(--gray-800);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.batch-actions.active {
+    display: flex;
+}
+
+.batch-actions-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.batch-actions-info span {
+    font-size: 14px;
+}
+
+.batch-actions-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.batch-actions .btn {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.batch-actions .btn-cancel {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.batch-actions .btn-danger {
+    background: var(--danger-color);
+    color: #fff;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+    .book-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gg-form-bar .search-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .gg-form-bar input[type="text"] {
+        max-width: 100%;
+    }
+    
+    .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 </style>
-<div class="p-3">
-	<form class="layui-form gg-form-bar border-t border-x">
-		<div class="layui-input-inline">
-			<select name="cate_id">
-				<option value="">请选择作品分类</option>
-				{volist name=":set_recursion(get_book_cate())" id="v"}
-				<option value="{$v.id}">{$v.title}</option>
-				{/volist}
-			</select>
-		</div>
-		{if get_addons_is_enable('caijipro')}
-			<div class="layui-input-inline">
-				<select name="coll_source_id">
-					<option value="">请选择采集源</option>
-					{volist name=":model('addons_caijipro_rule')->field('id,title')->where(['status' => 1])->order('id desc')->select()" id="vo"}
-					<option value="{$vo.id}">{$vo.title}</option>
-					{/volist}
-				</select>
-			</div>
-		{/if}
-		<div class="layui-input-inline" style="width:300px;">
-			<input type="text" name="keywords" placeholder="请输入关键字" class="layui-input" autocomplete="off" />
-		</div>		
-		<div class="layui-input-inline">
-		<button class="layui-btn layui-btn-normal" lay-submit="" lay-filter="searchform">提交搜索</button>
-		</div>
-	</form>
-	<table class="layui-hide" id="book" lay-filter="book"></table>
+
+<div class="p-3 book-page">
+    <!-- 搜索栏 -->
+    <form class="layui-form gg-form-bar border-t border-x" id="searchForm">
+        <div class="search-group">
+            <select name="cate_id" id="cateSelect">
+                <option value="">全部分类</option>
+                {volist name=":set_recursion(get_book_cate())" id="v"}
+                <option value="{$v.id}">{$v.title}</option>
+                {/volist}
+            </select>
+            {if get_addons_is_enable('caijipro')}
+            <select name="coll_source_id" id="sourceSelect">
+                <option value="">全部采集源</option>
+                {volist name=":model('addons_caijipro_rule')->field('id,title')->where(['status' => 1])->order('id desc')->select()" id="vo"}
+                <option value="{$vo.id}">{$vo.title}</option>
+                {/volist}
+            </select>
+            {/if}
+            <input type="text" name="keywords" id="keywordsInput" placeholder="搜索作品名称、作者..." autocomplete="off" />
+            <button type="submit" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                搜索
+            </button>
+        </div>
+    </form>
+
+    <!-- 批量操作栏 -->
+    <div class="batch-actions" id="batchActions">
+        <div class="batch-actions-info">
+            <span>已选择 <strong id="selectedCount">0</strong> 项</span>
+            <button class="btn btn-cancel" onclick="clearSelection()">取消选择</button>
+        </div>
+        <div class="batch-actions-buttons">
+            <button class="btn btn-danger" onclick="batchDelete()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"></polyline>
+                    <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"></path>
+                </svg>
+                批量删除
+            </button>
+        </div>
+    </div>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+        <h2 class="toolbar-title">           
+            作品列表
+            <span id="totalCount" style="font-size: 14px; color: var(--gray-400); font-weight: normal; margin-left: 8px;"></span>
+        </h2>
+        <div class="toolbar-actions">
+            <button class="btn btn-primary" onclick="openAddModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                添加作品
+            </button>
+            <button class="btn btn-outline" onclick="openImportModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                导入作品
+            </button>
+        </div>
+    </div>
+
+    <!-- 作品网格 -->
+    <div class="book-grid" id="bookGrid">
+        <!-- 动态生成 -->
+    </div>
+
+    <!-- 分页 -->
+    <div class="pagination-wrapper" id="paginationWrapper">
+        <div class="pagination-left">
+            <label class="select-all-wrapper">
+                <input type="checkbox" class="custom-checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                <span>全选</span>
+            </label>
+        </div>
+        <div class="pagination" id="pagination"></div>
+        <div class="pagination-info" id="paginationInfo"></div>
+    </div>
+
+    <!-- 空状态 -->
+    <div class="empty-state" id="emptyState" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <h3>暂无作品</h3>
+        <p>点击上方"添加作品"开始创建</p>
+    </div>
+
+    <!-- 加载状态 -->
+    <div class="loading" id="loadingState">
+        <div class="spinner"></div>
+    </div>
 </div>
 
-<script type="text/html" id="toolbarDemo">
-	<div class="layui-btn-group">
-		<span class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add" data-title="添加作品">添加作品</span>
-		<span class="layui-btn layui-btn-sm" lay-event="import" data-title="导入作品">导入作品</span>
-		<span class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete" data-title="删除作品">删除作品</span>
-  	</div>
-</script>
+<!-- 图片预览模态框 -->
+<div class="modal-overlay image-preview-modal" id="imagePreviewModal">
+    <div class="modal" onclick="event.stopPropagation()">
+        <button class="preview-close-btn" onclick="closeImagePreview()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <img id="previewImage" src="" alt="预览">
+    </div>
+</div>
 
-<script type="text/html" id="barDemo">	
-	<div class="layui-btn-group">
-		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-		<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="chapter">章节</a>
-		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-	</div>
-</script>
+<!-- 删除确认模态框 -->
+<div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>确认删除</h3>
+            <button class="modal-close" onclick="closeDeleteConfirm()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-box">
+                <div class="confirm-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </div>
+                <p class="confirm-message" id="deleteConfirmMessage">确定要删除该记录吗？此操作不可撤销。</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeDeleteConfirm()">取消</button>
+            <button class="btn btn-danger" onclick="confirmDelete()">确认删除</button>
+        </div>
+    </div>
+</div>
 
-<script type="text/html" id="statusTpl">
-	<input type="checkbox" name="status" value="{{d.status}}" lay-skin="switch" lay-text="上架|下架" lay-filter="status" {{ d.status == 1 ? 'checked' : '' }}>
-</script>
-
-<script type="text/html" id="showTpl">
-	<input type="checkbox" name="ishow" value="{{d.ishow}}" lay-skin="switch" lay-text="显示|隐藏" lay-filter="isshow" {{ d.ishow == 1 ? 'checked' : '' }}>
-</script>
-
-<script type="text/html" id="basicinfo">
-    <ul>
-      <li><strong>名称:</strong> {{= d.title }} </li>
-      <li><strong>作者:</strong> {{= d.author }} </li>
-      <li><strong>大类:</strong> {{= d.bigcatetitle ? d.bigcatetitle : '--' }} </li>
-      <li><strong>小类:</strong> {{= d.sellcatetitle ? d.sellcatetitle : '--' }} </li>
-    </ul>
-</script>
-
-<script type="text/html" id="attribute">
-    <ul>
-      <li><strong>风格:</strong> {{= d.style ? d.style : '--' }} </li>
-      <li><strong>结局:</strong> {{= d.ending ? d.ending : '--' }} </li>
-      <li><strong>标签:</strong> {{= d.label ? d.label : '--' }} </li>
-      <li><strong>热度:</strong> {{= d.hits ? d.hits : '--' }} </li>
-    </ul>
-</script>
-
-<script type="text/html" id="basicdata">
-    <ul>
-      <li><strong>作品字数:</strong> {{= d.words ? d.words : '--' }} </li>
-      <li><strong>总章节数:</strong> {{= d.chapters ? d.chapters : '--' }} </li>
-      <li><strong>自定标签:</strong> {{= d.label_custom ? d.label_custom : '--' }} </li>
-      <li><strong>作品排序:</strong> {{= d.sort ? d.sort : '--' }} </li>
-    </ul>
-</script>
-
-<script type="text/html" id="timedata">
-    <ul>
-      <li><strong>创建时间:</strong> {{= d.create_time ? d.create_time : '--' }} </li>
-      <li><strong>更新时间:</strong> {{= d.update_time ? d.update_time : '--' }} </li>
-	  <li><strong>完结状态:</strong> {{= parseInt(d.isfinish) ? (parseInt(d.isfinish) === 2 ? '完结' : '连载') : '--' }} </li>
-      <li><strong>完结时间:</strong> {{= d.finishtime ? layui.util.toDateString((parseInt(d.finishtime) * 1000), 'yyyy-MM-dd HH:mm:ss') : '--' }} </li>      
-    </ul>
-</script>
+<!-- 封面上传模态框 -->
+<div class="modal-overlay" id="uploadModal">
+    <div class="modal" style="max-width: 420px;" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3>上传封面</h3>
+            <button class="modal-close" onclick="closeUploadModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('coverInput').click()">
+                <div class="upload-area-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </div>
+                <p class="upload-area-text">点击上传封面图片</p>
+                <input type="file" id="coverInput" accept="image/*" style="display: none;" onchange="handleCoverSelect(event)">
+            </div>
+            <div class="upload-preview" id="uploadPreview" style="display: none;">
+                <img id="coverPreviewImg" src="" alt="预览">
+            </div>
+            <div style="margin-top: 16px;">
+                <div class="progress-bar" id="uploadProgress" style="display: none; height: 4px; background: var(--gray-200); border-radius: 2px; overflow: hidden;">
+                    <div class="progress-fill" id="progressFill" style="height: 100%; background: var(--primary-color); width: 0%; transition: width 0.3s;"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeUploadModal()">取消</button>
+            <button class="btn btn-primary" onclick="saveCover()" id="saveCoverBtn" disabled>保存</button>
+        </div>
+    </div>
+</div>
 {/block}
 <!-- /主体 -->
 
 <!-- 脚本 -->
 {block name="script"}
 <script>
-	const moduleInit = ['tool'];
-	function feiniaoInit() {
-		var table = layui.table, tool = layui.tool, form = layui.form, element = layui.element, upload = layui.upload;
-		layui.pageTable = table.render({
-			elem: '#book',
-			title: '作品表列表',
-			toolbar: '#toolbarDemo',
-			url: "{:url('book/datalist')}",
-			id: 'booklist',
-			page: true,
-			limit: 20,
-			limits: [10,20,30,50,100,500,1000],			
-			height: 'full-35',
-			lineStyle: 'height: auto;',
-			className: 'book_customize_style', // 用于给表格主容器追加 css 类名
-			cols: [
-				[
-				{checkbox: true},
-				{
-					field: 'id',
-					title: '编号',
-					align: 'center',
-					width: 60
-				},{
-					field: 'cover',
-					title: '封面图片',
-					align: 'center',
-					width: 100,
-					event: 'uploadCover',
-					style:'cursor: pointer;',
-					templet:function(d) {
-						return d.cover ? '<img src="' + d.cover + '" width="80" onerror="javascript:this.src=\'{__ASSETS__}/init/images/data-none.png\';this.onerror=null;">' : '--';
-					}
-				},{
-					field: 'none',
-					title: '基本信息',
-					width: 230,
-					templet: '#basicinfo'
-				},{
-					field: 'none',
-					title: '基本属性',
-					width: 230,
-					templet: '#attribute'
-				},{
-					field: 'none',
-					title: '基本数据',
-					width: 230,
-					templet: '#basicdata'
-				},{
-					field: 'none',
-					title: '其他数据',
-					width: 230,
-					templet: '#timedata'
-				},{
-					field: 'status',
-					title: '是否上架',
-					align: 'center',
-					width: 80,
-					templet: '#statusTpl',
-					unresize: true
-				},{
-					field: 'issign',
-					title: '是否签约',
-					align: 'center',
-					width: 80,
-					templet: function(d) {
-						return parseInt(d.issign) == 1 ? '<i class="layui-icon layui-icon-ok" style="color: #16b777;"></i>' : '<i class="layui-icon layui-icon-close"></i>';
-					}
-				},{
-					field: 'editor',
-					title: '编辑人员',
-					align: 'center',
-					width: 120
-				},
-				{
-					fixed: 'right',
-					field: 'right',
-					title: '操作',
-					toolbar: '#barDemo',
-					align: 'center'
-				}				
-				]
-			]
-		});
-		
-		//监听表头工具栏事件
-		table.on('toolbar(book)', function(obj){
-			if (obj.event === 'add') {
-				tool.side("{:url('book/add')}");
-				return false;
-			} else if(obj.event === 'import') {
-				tool.side("{:url('book/import')}");
-				return false;
-			} else if(obj.event === 'delete') {
-				var id = obj.config.id;
-    			var checkStatus = table.checkStatus(id);
-				var data = checkStatus.data;
-				if(data.length <= 0) return layer.msg('请选择要删除的记录');
-				var arr = [];
-				$.each(data,function(index,items){
-					arr.push(items['id']);					
-				})
-				layer.confirm('确定要删除相关记录吗?', {
-					icon: 3,
-					title: '删除提示'
-				}, function(index) {
-					let callback = function (e) {
-						layer.msg(e.msg);
-						if (e.code == 0) {
-							layui.pageTable.reload({
-								page: {
-									curr: 1
-								}
-							});
-						}
-					}
-					tool.delete("{:url('book/del')}", { id: arr.join(',') }, callback);
-					layer.close(index);
-				});
-				return false;
-			}
-		});
+const moduleInit = ['tool'];
+let currentPage = 1;
+let pageSize = 20;
+let totalCount = 0;
+let totalPages = 0;
+let selectedBooks = [];
+let currentUploadBookId = null;
+let currentCoverPath = '';
+let pendingDeleteCallback = null;
+let tool = null;
+let currentPageBookIds = []; // 当前页所有作品ID
 
-		//监听性别操作
-		form.on('switch(status)', function(obj) {
-			var id = obj.othis.parents('tr').find("td:eq(1)").text()
-			let callback = function (e) {
-				layer.msg(e.msg);
-				if (e.code == 0) {
-					obj.update({
-						status: obj.elem.checked  === true ? 1 : 0,
-					});
-				}
-			}
-			tool.post("{:url('book/savefield')}", {id: id, status: (obj.elem.checked  === true ? 1 : 0)}, callback);
-			return false;
-		});
+function feiniaoInit() {
+    tool = layui.tool;
+    loadBookList();
+    
+    // 搜索表单提交
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        currentPage = 1;
+        loadBookList();
+    });
+}
 
-		//监听表格行工具事件
-		table.on('tool(book)', function(obj) {
-			var data = obj.data;
-			if (obj.event === 'read') {
-				tool.side("{:url('book/read')}?id="+obj.data.id);
-			}
-			else if (obj.event === 'edit') {
-				tool.side("{:url('book/edit')}?id="+obj.data.id);
-			}
-			else if (obj.event === 'chapter') {
-				tool.side("{:url('chapter/datalist')}?bid="+obj.data.id+'&title='+obj.data.title);
-			}
-			else if (obj.event === 'del') {
-				layer.confirm('确定要删除该记录吗?', {
-					icon: 3,
-					title: '提示'
-				}, function(index) {
-					let callback = function (e) {
-						layer.msg(e.msg);
-						if (e.code == 0) {
-							obj.del();
-						}
-					}
-					tool.delete("{:url('book/del')}", { id: data.id }, callback);
-					layer.close(index);
-				});
-			}
-			else if (obj.event === 'uploadCover') {
-				//页面层
-				layer.open({
-					title: '上传封面', //不显示标题
-					type: 1,
-					skin: 'layui-layer-rim', //加上边框
-					area: ['500px', '700px'], //宽高
-					btnAlign: 'c',
-					btn: ['保存','关闭'], //按钮
-					content: '<div class="layui-upload">' + (data.cover ? '<img class="cover" src="' + data.cover + '" style="width: 200px;">' : '') + '<button type="button" class="layui-btn" id="uploadcover">上传封面</button><div class="layui-upload-list"><img class="layui-upload-img" id="cover"><p id="coverText"></p>' +
-						'</div><div style="width: 90px;"><div class="layui-progress layui-progress-big" lay-showpercent="yes" lay-filter="coverprogress"><div class="layui-progress-bar" lay-percent=""></div></div></div></div>',
-					btn1: function(index) {
-						layer.confirm('确定要保存？', {
-							btn: ['确定','取消'] //按钮
-						}, function() {
-							let callback = function (e) {
-								layer.msg(e.msg);
-								if (e.code == 0) {
-									//同步更新缓存对应的值
-									obj.tr.find('td[data-field=cover]').attr('data-content', $('#cover').attr('src'));  // 这句代码是必要的
-									obj.update({
-										cover: $('#cover').attr('src'),
-									});
-									layer.msg('保存成功！', {icon: 1, time: 500}, function() {
-										layer.close(index);
-									});
-								}
-							}
-							tool.post("{:url('book/savefield')}", {id: data.id, cover: $('#cover').attr('src')}, callback);
-							return false;							
-						}, function() {
-							layer.close(index);
-						});
-					}
-				});
-				//常规使用 - 普通图片上传
-				var uploadInst = upload.render({
-					elem: '#uploadcover',
-					url: "{:url('api/upload')}",
-					before: function(obj) {
-						//预读本地文件示例，不支持ie8
-						obj.preview(function(index, file, result) {
-							$('#cover').attr('src', result); //图片链接（base64）
-						});				
-						element.progress('coverprogress', '0%'); //进度条复位
-					},
-					done: function(res) {
-						//如果上传失败
-						if(res.code > 0){
-							return layer.msg('上传失败');
-						}
-						$('#cover').attr('src', res.data.filepath); //图片链接
-						$('#coverText').html(''); //置空上传失败的状态
-					},
-					error: function() {
-						//演示失败状态，并实现重传
-						var coverText = $('#coverText');
-						coverText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs cover-reload">重试</a>');
-						coverText.find('.cover-reload').on('click', function() {
-							uploadInst.upload();
-						});
-					},
-					//进度条
-					progress: function(n, elem, e) {
-						element.progress('coverprogress', n + '%'); //可配合 layui 进度条元素使用
-					}
-				});
-			}
-			return false;
-		});
+// 加载作品列表
+function loadBookList() {
+    showLoading(true);
+    
+    const keywords = document.getElementById('keywordsInput').value;
+    const cateId = document.getElementById('cateSelect').value;
+    const sourceId = document.getElementById('sourceSelect') ? document.getElementById('sourceSelect').value : '';
+    
+    const params = new URLSearchParams({
+        page: currentPage,
+        limit: pageSize,
+        '_ajax': 1
+    });
+    
+    if (keywords) params.append('keywords', keywords);
+    if (cateId) params.append('cate_id', cateId);
+    if (sourceId) params.append('coll_source_id', sourceId);
+    
+    fetch("{:url('book/datalist')}?" + params.toString())
+        .then(response => response.json())
+        .then(res => {
+            showLoading(false);
+            if (res.code === 0) {
+                totalCount = res.count || 0;
+                totalPages = Math.ceil(totalCount / pageSize);
+                renderBookList(res.data || []);
+                renderPagination();
+                updateTotalCount();
+            } else {
+                showError(res.msg || '加载失败');
+            }
+        })
+        .catch(err => {
+            showLoading(false);
+            showError('网络错误');
+            console.error(err);
+        });
+}
 
-		$(document).on('click', '#cover', function() {
-			if($(this).attr('src')) {
-				layer.open({
-					type: 1,
-					title: false,
-					closeBtn: true,
-					shadeClose: true, //点击阴影关闭
-					area: [$(this).width + 'px', $(this).height + 'px'], //宽高
-					content: "<img src=" + $(this).attr('src') + " />"
-				});
-			}
-		});
+// 渲染作品列表
+function renderBookList(books) {
+    const grid = document.getElementById('bookGrid');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (books.length === 0) {
+        grid.innerHTML = '';
+        grid.style.display = 'none';
+        emptyState.style.display = 'block';
+        document.getElementById('paginationWrapper').style.display = 'none';
+        currentPageBookIds = [];
+        return;
+    }
+    
+    grid.style.display = 'grid';
+    emptyState.style.display = 'none';
+    document.getElementById('paginationWrapper').style.display = 'flex';
+    
+    // 存储当前页作品ID
+    currentPageBookIds = books.map(book => book.id);
+    
+    grid.innerHTML = books.map(book => {
+        const isSelected = selectedBooks.includes(book.id);
+        const isFinish = parseInt(book.isfinish) === 2;
+        const isSerial = parseInt(book.isfinish) <= 1;
+        const isSigned = parseInt(book.issign) === 1;
+        const isOn = parseInt(book.status) === 1;
+        
+        return `
+        <div class="book-card" data-id="${book.id}">
+            <div class="book-card-header" onclick="previewImage('${book.cover || ''}')">
+                ${book.cover 
+                    ? `<img src="${book.cover}" alt="${book.title}" onerror="this.parentElement.innerHTML='<div class=\\'book-cover-placeholder\\'><svg width=\\'48\\' height=\\'48\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'1.5\\'><rect x=\\'3\\' y=\\'3\\' width=\\'18\\' height=\\'18\\' rx=\\'2\\' ry=\\'2\\'></rect><circle cx=\\'8.5\\' cy=\\'8.5\\' r=\\'1.5\\'></circle><polyline points=\\'21 15 16 10 5 21\\'></polyline></svg></div>'">`
+                    : `<div class="book-cover-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                       </div>`
+                }
+                <div class="book-status-badges">
+                    ${isOn ? '<span class="badge badge-success">上架</span>' : '<span class="badge badge-offline">下架</span>'}
+                    ${isSigned ? '<span class="badge badge-info">已签约</span>' : ''}
+                    ${isFinish ? '<span class="badge badge-warning">完结</span>' : (isSerial ? '<span class="badge badge-danger">连载</span>' : '')}
+                </div>
+                <div class="book-card-actions">
+                    <button class="action-btn tooltip" data-tooltip="上传封面" onclick="event.stopPropagation(); openUploadModal(${book.id}, '${book.cover || ''}')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="book-card-body">
+                <h3 class="book-title" title="${book.title}">${book.title}</h3>
+                <div class="book-meta">
+                    <span class="book-meta-item">作者: ${book.author || '--'}</span>
+                    <span class="book-meta-item">${book.bigcatetitle || '--'}</span>
+                    ${book.style ? `<span class="book-meta-item">${book.style}</span>` : ''}
+                </div>
+                <div class="book-stats">
+                    <div class="book-stat">
+                        <div class="book-stat-value">${book.words || '0'}</div>
+                        <div class="book-stat-label">字数</div>
+                    </div>
+                    <div class="book-stat">
+                        <div class="book-stat-value">${book.chapters || '0'}</div>
+                        <div class="book-stat-label">章节</div>
+                    </div>
+                    <div class="book-stat">
+                        <div class="book-stat-value">${book.hits || '0'}</div>
+                        <div class="book-stat-label">热度</div>
+                    </div>
+                </div>
+            </div>
+            <div class="book-card-footer">
+                <div>
+                    <div class="book-time">${book.update_time || book.create_time || '--'}</div>
+                </div>
+                <div class="checkbox-wrapper" onclick="event.stopPropagation()">
+                    <input type="checkbox" class="custom-checkbox book-checkbox" value="${book.id}" 
+                        ${isSelected ? 'checked' : ''} onchange="toggleSelect(${book.id})">
+                </div>
+            </div>
+            <div class="book-card-footer" style="border-top: none; background: transparent;">
+                <div class="book-card-actions-row" style="width: 100%;">
+                    <button class="btn btn-primary" onclick="openEditModal(${book.id})">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        编辑
+                    </button>
+                    <button class="btn btn-outline" onclick="openChapterModal(${book.id}, '${book.title}')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        章节
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteBook(${book.id}, '${book.title}')">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"></polyline>
+                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"></path>
+                        </svg>
+                    </button>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; width: 100%; justify-content: flex-end;" onclick="event.stopPropagation()">
+                    <span style="font-size: 12px; color: var(--gray-500);">上架</span>
+                    <label class="switch">
+                        <input type="checkbox" ${isOn ? 'checked' : ''} onchange="toggleStatus(${book.id}, this.checked)">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
+    
+    // 更新全选复选框状态
+    updateSelectAllState();
+}
 
-		window.showBigImage = function (e) {
-			layer.open({
-				type: 1,
-				title: false,
-				closeBtn: true,
-				shadeClose: true, //点击阴影关闭
-				area: [$(e).width + 'px', $(e).height + 'px'], //宽高
-				content: "<img src=" + $(e).attr('src') + " />"
-			});
-		};
+// 更新全选复选框状态
+function updateSelectAllState() {
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    if (!selectAllCheckbox || currentPageBookIds.length === 0) return;
+    
+    const allSelected = currentPageBookIds.every(id => selectedBooks.includes(id));
+    selectAllCheckbox.checked = allSelected;
+}
 
-		//监听搜索提交
-		form.on('submit(searchform)', function(data) {
-			layui.pageTable.reload({
-				where: {
-					keywords: data.field.keywords,
-					cate_id: data.field.cate_id,
-					coll_source_id: data.field.coll_source_id
-				},
-				page: {
-					curr: 1
-				}
-			});
-			return false;
-		});
-	}
+// 全选/取消全选
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    const isChecked = selectAllCheckbox.checked;
+    
+    if (isChecked) {
+        // 全选：添加当前页所有ID
+        currentPageBookIds.forEach(id => {
+            if (!selectedBooks.includes(id)) {
+                selectedBooks.push(id);
+            }
+        });
+    } else {
+        // 取消全选：移除当前页所有ID
+        selectedBooks = selectedBooks.filter(id => !currentPageBookIds.includes(id));
+    }
+    
+    // 更新所有卡片的复选框状态
+    document.querySelectorAll('.book-checkbox').forEach(cb => {
+        cb.checked = isChecked;
+    });
+    
+    // 更新批量操作栏
+    updateBatchActions();
+}
+
+// 渲染分页
+function renderPagination() {
+    const pagination = document.getElementById('pagination');
+    const info = document.getElementById('paginationInfo');
+    
+    if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        info.textContent = `共 ${totalCount} 条`;
+        return;
+    }
+    
+    let html = '';
+    
+    // 上一页
+    html += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+    </button>`;
+    
+    // 页码
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    
+    if (endPage - startPage < maxVisible - 1) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+    
+    if (startPage > 1) {
+        html += `<button onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) {
+            html += `<button disabled>...</button>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            html += `<button disabled>...</button>`;
+        }
+        html += `<button onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    // 下一页
+    html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+    </button>`;
+    
+    pagination.innerHTML = html;
+    info.textContent = `共 ${totalCount} 条，每页 ${pageSize} 条`;
+    
+    // 更新全选复选框状态
+    updateSelectAllState();
+}
+
+// 跳转到指定页
+function goToPage(page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    loadBookList();
+}
+
+// 显示/隐藏加载状态
+function showLoading(show) {
+    document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+    if (show) {
+        document.getElementById('bookGrid').style.display = 'none';
+        document.getElementById('emptyState').style.display = 'none';
+    }
+}
+
+// 显示错误信息
+function showError(msg) {
+    // 简单实现，实际项目中可以替换为 toast
+    if (typeof layer !== 'undefined') {
+        layer.msg(msg);
+    } else {
+        alert(msg);
+    }
+}
+
+// 更新总数
+function updateTotalCount() {
+    document.getElementById('totalCount').textContent = totalCount > 0 ? `(共 ${totalCount} 部作品)` : '';
+}
+
+// 切换选中状态
+function toggleSelect(id) {
+    const index = selectedBooks.indexOf(id);
+    if (index > -1) {
+        selectedBooks.splice(index, 1);
+    } else {
+        selectedBooks.push(id);
+    }
+    updateBatchActions();
+}
+
+// 更新批量操作栏
+function updateBatchActions() {
+    const batchActions = document.getElementById('batchActions');
+    const countEl = document.getElementById('selectedCount');
+    
+    if (selectedBooks.length > 0) {
+        batchActions.classList.add('active');
+        countEl.textContent = selectedBooks.length;
+    } else {
+        batchActions.classList.remove('active');
+    }
+}
+
+// 清除选择
+function clearSelection() {
+    selectedBooks = [];
+    document.querySelectorAll('.book-checkbox').forEach(cb => cb.checked = false);
+    updateBatchActions();
+}
+
+// 批量删除
+function batchDelete() {
+    if (selectedBooks.length === 0) return;
+    
+    document.getElementById('deleteConfirmMessage').textContent = `确定要删除选中的 ${selectedBooks.length} 部作品吗？此操作不可撤销。`;
+    pendingDeleteCallback = function() {
+        performDelete(selectedBooks.join(','));
+    };
+    document.getElementById('deleteConfirmModal').classList.add('active');
+}
+
+// 删除作品
+function deleteBook(id, title) {
+    document.getElementById('deleteConfirmMessage').textContent = `确定要删除《${title}》吗？此操作不可撤销。`;
+    pendingDeleteCallback = function() {
+        performDelete(id);
+    };
+    document.getElementById('deleteConfirmModal').classList.add('active');
+}
+
+// 确认删除
+function confirmDelete() {
+    if (pendingDeleteCallback) {
+        pendingDeleteCallback();
+    }
+    closeDeleteConfirm();
+}
+
+// 执行删除
+function performDelete(id) {
+    fetch("{:url('book/del')}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: 'id=' + id + '&_ajax=1'
+    })
+    .then(response => response.json())
+    .then(res => {
+        showError(res.msg || (res.code == 0 ? '删除成功' : '删除失败'));
+        if (res.code == 0) {
+            selectedBooks = selectedBooks.filter(i => String(i) !== String(id));
+            loadBookList();
+        }
+    })
+    .catch(err => {
+        showError('网络错误');
+        console.error(err);
+    });
+}
+
+// 关闭删除确认框
+function closeDeleteConfirm() {
+    document.getElementById('deleteConfirmModal').classList.remove('active');
+    pendingDeleteCallback = null;
+}
+
+// 切换上下架状态
+function toggleStatus(id, checked) {
+    fetch("{:url('book/savefield')}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `id=${id}&status=${checked ? 1 : 0}&_ajax=1`
+    })
+    .then(response => response.json())
+    .then(res => {
+        showError(res.msg || (res.code == 0 ? '更新成功' : '更新失败'));
+        if (res.code != 0) {
+            // 回滚状态
+            const card = document.querySelector(`.book-card[data-id="${id}"]`);
+            if (card) {
+                const toggle = card.querySelector('.switch input');
+                if (toggle) toggle.checked = !checked;
+            }
+        }
+    })
+    .catch(err => {
+        showError('网络错误');
+        console.error(err);
+    });
+}
+
+// 打开编辑弹窗
+function openEditModal(id) {
+    if (tool && tool.side) {
+        tool.side("{:url('book/edit')}?id=" + id);
+    } else {
+        window.location.href = "{:url('book/edit')}?id=" + id;
+    }
+}
+
+// 打开添加弹窗
+function openAddModal() {
+    if (tool && tool.side) {
+        tool.side("{:url('book/add')}");
+    } else {
+        window.location.href = "{:url('book/add')}";
+    }
+}
+
+// 打开导入弹窗
+function openImportModal() {
+    if (tool && tool.side) {
+        tool.side("{:url('book/import')}");
+    } else {
+        window.location.href = "{:url('book/import')}";
+    }
+}
+
+// 打开章节列表
+function openChapterModal(id, title) {
+    if (tool && tool.side) {
+        tool.side("{:url('chapter/datalist')}?bid=" + id + '&title=' + encodeURIComponent(title));
+    } else {
+        window.location.href = "{:url('chapter/datalist')}?bid=" + id + '&title=' + encodeURIComponent(title);
+    }
+}
+
+// 预览图片
+function previewImage(src) {
+    if (!src) return;
+    document.getElementById('previewImage').src = src;
+    document.getElementById('imagePreviewModal').classList.add('active');
+}
+
+// 关闭图片预览
+function closeImagePreview() {
+    document.getElementById('imagePreviewModal').classList.remove('active');
+}
+
+// 打开封面上传弹窗
+function openUploadModal(bookId, currentCover) {
+    currentUploadBookId = bookId;
+    currentCoverPath = currentCover || '';
+    
+    document.getElementById('coverPreviewImg').src = currentCover || '';
+    document.getElementById('uploadPreview').style.display = currentCover ? 'block' : 'none';
+    document.getElementById('saveCoverBtn').disabled = !currentCover;
+    document.getElementById('progressFill').style.width = '0%';
+    document.getElementById('uploadProgress').style.display = 'none';
+    
+    document.getElementById('uploadModal').classList.add('active');
+}
+
+// 关闭封面上传弹窗
+function closeUploadModal() {
+    document.getElementById('uploadModal').classList.remove('active');
+    currentUploadBookId = null;
+    currentCoverPath = '';
+}
+
+// 处理封面选择
+function handleCoverSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // 预览本地图片
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('coverPreviewImg').src = e.target.result;
+        document.getElementById('uploadPreview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+    
+    // 上传到服务器
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    document.getElementById('uploadProgress').style.display = 'block';
+    document.getElementById('progressFill').style.width = '0%';
+    
+    const xhr = new XMLHttpRequest();
+    
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+    };
+    
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            try {
+                const res = JSON.parse(xhr.responseText);
+                if (res.code === 0 && res.data && res.data.filepath) {
+                    currentCoverPath = res.data.filepath;
+                    document.getElementById('coverPreviewImg').src = res.data.filepath;
+                    document.getElementById('saveCoverBtn').disabled = false;
+                } else {
+                    showError(res.msg || '上传失败');
+                }
+            } catch (e) {
+                showError('上传失败');
+            }
+        } else {
+            showError('上传失败');
+        }
+    };
+    
+    xhr.onerror = function() {
+        showError('网络错误');
+    };
+    
+    xhr.open('POST', "{:url('api/upload')}");
+    xhr.send(formData);
+}
+
+// 保存封面
+function saveCover() {
+    if (!currentUploadBookId || !currentCoverPath) return;
+    
+    fetch("{:url('book/savefield')}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `id=${currentUploadBookId}&cover=${encodeURIComponent(currentCoverPath)}&_ajax=1`
+    })
+    .then(response => response.json())
+    .then(res => {
+        showError(res.msg || (res.code == 0 ? '保存成功' : '保存失败'));
+        if (res.code == 0) {
+            closeUploadModal();
+            loadBookList();
+        }
+    })
+    .catch(err => {
+        showError('网络错误');
+        console.error(err);
+    });
+}
 </script>
 {/block}
 <!-- /脚本 -->

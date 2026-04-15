@@ -95,12 +95,8 @@
       <em b-click="chapter.closeDirectory()"><i class="icon-close"></i></em>
     </div>
     <div class="drawer-content">
-      <ul>
-        {notempty name="$chapterlist"}
-          {volist name="chapterlist" id="v"}
-          <li id="chapterDirectory-{$v.id}" {eq name="v.id" value="$id"}class="active"{/eq}><a href="{:furl('chapter_detail',['id'=>$v['id'],'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}">{:get_full_chapter($v['title'], $v['chaps'])}</a></li>
-          {/volist}
-        {/notempty}
+      <ul id="chapter-list">
+        <li>加载中……</li>
       </ul>
     </div>    
 </div>
@@ -195,27 +191,41 @@
                             size: "data.per_page",
                             data: "data.data"
                         },
-                        template: function (data) {
-                            if(!data[0]) return '';                          
+                        template: function (data) {                   
+                            const chapter = data[0];
+                            if(!chapter) return '';                          
                             let item = that.sl.getData();                 
                             if(that.fid > 0) {
-                                that.id = data[0].after_chapter;
-                                that.sl.option("data", {"id": data[0].after_chapter});
+                                that.id = chapter.after_chapter;
+                                that.sl.option("data", {"id": chapter.after_chapter});
                             } else {                                
-                                that.sl.option("data", {"id": data[0].after_chapter, "fid": data[0].front_chapter});
-                                that.id = data[0].after_chapter;
-                                that.fid = data[0].front_chapter;
-                            }                           
+                                that.sl.option("data", {"id": chapter.after_chapter, "fid": chapter.front_chapter});
+                                that.id = chapter.after_chapter;
+                                that.fid = chapter.front_chapter;
+                            }
+                            const chapterlist = chapter.chapterlist || [];
+                            const container = $('#chapter-list');
+                            if (!container.length || !chapterlist.length) return;
+
+                            const html = chapterlist.map(item => {
+                                const chapterTitle = item.title;
+                                const isOn = String(item.id) === String(chapter.id) ? ' class="active"' : '';
+                                const href = item.chapter_url || '#';
+                                return `<li id="chapterDirectory-${item.id}"${isOn}><a href="${href}">${chapterTitle}</a></li>`;
+                            }).join('');
+
+                            container.html(html);
+
                             if(that.isrefresh) {
                                 return '';
                             } else {
                                 return `<div class="chapterName">
                                             <div class="chapterName-modul">
-                                                <p> ${data[0].chaps} </p><span> ${data[0].title} </span>
+                                                <p> ${chapter.chaps} </p><span> ${chapter.title} </span>
                                             </div>
-                                        </div><div class="content" b-click="chapter.menu($(this))">${that.format_chapter(data[0].content)}</div>
+                                        </div><div class="content" b-click="chapter.menu($(this))">${that.format_chapter(chapter.content)}</div>
                                         <div class="chapterName-line"></div>`;
-                            }
+                            }                            
                         },
                         //刷新前执行
                         onBeforeRefresh: function onBeforeRefresh() {

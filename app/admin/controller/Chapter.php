@@ -40,10 +40,6 @@ class Chapter extends BaseController
                 $where[] = ['title', 'like', '%' . $param['keywords'] . '%'];
             }
             $param['order'] = 'chaps asc';
-            auto_run_addons('collect', [
-                'type' => 'single_book',
-                'book_id' => $param['bid'],
-            ]);
             $list = $this->model->getChapterList($where, $param);
             return table_assign(0, '', $list);
         } else {
@@ -533,14 +529,7 @@ class Chapter extends BaseController
             if (!empty($verify)) {
                 return to_assign(1, '请先审核章节');
             }
-            $content = Content::get($chapter['bookid'], $id);
-            if (empty($content)) {
-                $obj = auto_run_addons('collect', [
-                    'type' => 'single_chapter',
-                    'chapter_id' => $id
-                ]);
-                $content = current(array_filter($obj));
-            }
+            $content = Content::get($chapter['bookid'], $id); 
             if (!empty($content)) {
                 $chapter['info'] = htmlspecialchars_decode($content);
                 View::assign('chapter', $chapter);

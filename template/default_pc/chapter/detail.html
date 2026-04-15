@@ -225,11 +225,7 @@ $conConfig = get_system_config('content');
                 <h3>章节目录</h3><div class="read-speed"><i style="width: 0%;"></i><font>阅读进度：0%</font></div>
                 <div class="panel-list-wrap catalog-scroll-wrap" id="JcatalogListWrap">
                     <ul>
-                        {notempty name="$chapterlist"}
-                            {volist name="$chapterlist" id="v"}
-                            <li data-chapterid="{$v.id}" {eq name="$v['id']" value="$id"} class="active"{/eq}><a href="{:furl('chapter_detail',['id'=>$v['id'],'bookid'=>$book['filename'] ? $book['filename'] : $book['id']])}"><span>{:get_full_chapter($v['title'], $v['chaps'])}</span></a></li>
-                            {/volist}
-                        {/notempty}
+                        <li>加载中……</li>
                     </ul>
                 </div>
             </div>
@@ -660,7 +656,8 @@ $(window).on('load', function () {
                     $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus-fill');
                 } else {
                     $('.bookshelf').find('i').attr('class', 'bi bi-bag-plus');
-                }            
+                }
+                chapterpagination(chapter_info.chapterlist);
             } else {
                 layer.msg(result.msg);
             }
@@ -671,7 +668,8 @@ $(window).on('load', function () {
                 const info = result.data.data[0];
                 chapter_info = info;
                 $('.read-speed').find('i').css('width', info.speed + '%');
-                $('.read-speed').find('font').text('阅读进度：' + info.speed + '%');            
+                $('.read-speed').find('font').text('阅读进度：' + info.speed + '%');
+                chapterpagination(chapter_info.chapterlist);
             }
         });
         {if isset($conConfig['chapter_refuse_collection_open']) && $conConfig['chapter_refuse_collection_open']}
@@ -751,7 +749,8 @@ $(window).on('load', function () {
                         $('.like').find('i').attr('class','bi bi-heart-fill');
                     } else {
                         $('.like').find('i').attr('class','bi bi-heart');
-                    }                
+                    }
+                    chapterpagination(info.chapterlist);
                 } else {
                     layer.msg(result.msg);
                 }
@@ -791,7 +790,8 @@ $(window).on('load', function () {
                             $('.like').find('i').attr('class','bi bi-heart-fill');
                         } else {
                             $('.like').find('i').attr('class','bi bi-heart');
-                        }                    
+                        }
+                        chapterpagination(chapter_info.chapterlist);
                     } else {
                         layer.msg(result.msg);
                     }
@@ -805,6 +805,20 @@ $(window).on('load', function () {
             return '<p>' + chapter.split("<br>").join("</p><p>") + "</p>";
         };
     {/if}
+
+    window.chapterpagination = function(chapterlist) {
+        const container = $('#JcatalogListWrap');
+        if (!container.length || !chapterlist.length) return;
+
+        const html = chapterlist.map(item => {
+        const isOn = String(item.id) === String(chapter_id) ? ' class="active"' : '';
+        const chapterTitle = item.title;
+        const href = item.chapter_url || '#';
+        return `<li data-chapterid="${item.id}"${isOn}><a href="${href}"><span>${chapterTitle}</span></a></li>`;
+        }).join('');
+
+        container.find('ul').html(html);   
+    }
 });
 </script>
 {/block}

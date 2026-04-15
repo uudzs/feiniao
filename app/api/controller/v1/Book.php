@@ -38,9 +38,11 @@ class Book extends BaseController
         if (empty($id)) {
             $this->apiError('empty');
         }
+
         $uid = JWT_UID;
         $detail = \app\common\model\Novel::getBookDetail($id);
         $model_name = \think\facade\App::initialize()->http->getName();
+
         if ($detail) {
             if (intval($detail['status']) !== 1) {
                 $this->apiError('407');
@@ -61,10 +63,12 @@ class Book extends BaseController
             $detail['cover'] = get_file($detail['cover']);
             $detail['issign'] = Db::name('author')->where(['id' => $detail['authorid']])->value('issign');
             $detail['words'] = wordCount($detail['words']);
+
             $cacheKey = 'chapter_list_' . $id;
             $detail['chapter'] = \app\service\CacheService::remember($cacheKey, function () use ($id) {
                 return \app\common\model\Chapter::field('id,bookid,title,chaps,create_time')->where(['bookid' => $id, 'status' => 1, ['verify', 'in', '0,1']])->order('chaps asc')->select()->toArray();
             });
+
             $first_chapter = $last_chapter = [];
             if (!empty($detail['chapter'])) {
                 $first_chapter = $detail['chapter'][0]; //第一章
@@ -75,6 +79,7 @@ class Book extends BaseController
                     $detail['chapter'][$k]['title'] = get_full_chapter($v['title'], $v['chaps']);
                 }
             }
+
             $detail['first_chapter'] = $first_chapter;
             $detail['last_chapter'] = $last_chapter;
             $ip = app('request')->ip();
@@ -108,7 +113,7 @@ class Book extends BaseController
             $detail['chapter_url'] = str_replace($model_name, 'home', $detail['chapter_url']);
             $detail['authorurl'] = str_replace($model_name, 'home', (string) Route::buildUrl('author_detail', ['id' => $detail['authorid']]));
             if (!empty($last_chapter)) {
-                $detail['chaptertime'] = time_tran($last_chapter['create_time']);
+                $detail['chaptertime'] = ctype_digit((string)$last_chapter['create_time']) ? time_tran($last_chapter['create_time']) : time_tran(strtotime($last_chapter['create_time']));
             } else {
                 $detail['chaptertime'] = '';
             }
@@ -126,6 +131,7 @@ class Book extends BaseController
         } else {
             $this->apiError('404');
         }
+
         $this->apiSuccess('success', $detail);
     }
 

@@ -89,10 +89,6 @@ class Order extends BaseController
         }
         $price = $day = 0;
         if ($type == 'vip') {
-            $conf = get_system_config('vip');
-            if (intval($conf['open'] !== 1)) {
-                $this->apiError('vip.unopened');
-            }
             $level = Db::name('user_level')->where(['id' => $pid])->find();
             if (empty($level)) {
                 $this->apiError('404');
@@ -105,45 +101,71 @@ class Order extends BaseController
             if ($price <= 0 || $day <= 0) {
                 $this->apiError('vip.unopened');
             }
-            $where = [
+            $data = [
                 'user_id' => JWT_UID,
                 'pid' => $pid,
                 'product_type' => 'vip',
                 'status' => 0,
                 'paid' => 0,
+                'order_id' => 'v_' . (new Idwork())->generateId(),
+                'total_num' => 1,
+                'total_price' => $price,
+                'total_postage' => 0,
+                'pay_price' => $price,
+                'add_time' => time(),
+                'use_integral' => 0,
                 'is_del' => 0,
                 'is_system_del' => 0,
+                'virtual_type' => 1,
+                'virtual_info' => lang('vip.virtual_info', ['price' => $price, 'day' => $day]),
+                'channel_type' => $channel_type
             ];
-            $order = Db::name('order')->where($where)->find();
-            if (empty($order)) {
-                $data = [
-                    'user_id' => JWT_UID,
-                    'pid' => $pid,
-                    'product_type' => 'vip',
-                    'status' => 0,
-                    'paid' => 0,
-                    'order_id' => 'v_' . (new Idwork())->generateId(),
-                    'total_num' => 1,
-                    'total_price' => $price,
-                    'total_postage' => 0,
-                    'pay_price' => $price,
-                    'add_time' => time(),
-                    'use_integral' => 0,
-                    'is_del' => 0,
-                    'is_system_del' => 0,
-                    'virtual_type' => 1,
-                    'virtual_info' => lang('vip.virtual_info', ['price' => $price, 'day' => $day]),
-                    'channel_type' => $channel_type
-                ];
-                $result = Db::name('order')->strict(false)->field(true)->insertGetId($data);
-                if ($result != false) {
-                    $data['id'] = $result;
-                    $this->apiSuccess('success', $data);
-                } else {
-                    $this->apiError('fail');
-                }
+            $result = Db::name('order')->strict(false)->field(true)->insertGetId($data);
+            if ($result != false) {
+                $data['id'] = $result;
+                $this->apiSuccess('success', $data);
             } else {
-                $this->apiSuccess('success', $order);
+                $this->apiError('fail');
+            }
+        } elseif ($type == 'recharge') {
+            // 充值类型订单（万顺支付）
+            $recharge_conf = get_system_config('vip');
+            if (!isset($recharge_conf['open']) || $recharge_conf['open'] != 1) {
+                $this->apiError('未开启充值功能');
+            }
+            // 从配置中获取套餐价格
+            $price_key = 'price_' . $pid;
+            $title_key = 'title_' . $pid;
+            if (!isset($recharge_conf[$price_key]) || empty($recharge_conf[$price_key])) {
+                $this->apiError('common.empty_param');
+            }
+            $money = floatval($recharge_conf[$price_key]);
+            $title = isset($recharge_conf[$title_key]) ? $recharge_conf[$title_key] : '';
+            $data = [
+                'user_id' => JWT_UID,
+                'pid' => $pid,
+                'product_type' => 'recharge',
+                'status' => 0,
+                'paid' => 0,
+                'order_id' => 'r_' . (new Idwork())->generateId(),
+                'total_num' => 1,
+                'total_price' => $money,
+                'total_postage' => 0,
+                'pay_price' => $money,
+                'add_time' => time(),
+                'use_integral' => 0,
+                'is_del' => 0,
+                'is_system_del' => 0,
+                'virtual_type' => 1,
+                'virtual_info' => lang('recharge.virtual_info', ['title' => $title, 'money' => $money]),
+                'channel_type' => $channel_type
+            ];
+            $result = Db::name('order')->strict(false)->field(true)->insertGetId($data);
+            if ($result != false) {
+                $data['id'] = $result;
+                $this->apiSuccess('success', $data);
+            } else {
+                $this->apiError('fail');
             }
         }
     }

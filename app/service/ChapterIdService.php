@@ -16,18 +16,37 @@ class ChapterIdService
     private static $secretKey = 'feiniao_chapter_key';
 
     /**
-     * 获取加密密钥
+     * 缓存的密钥
+     */
+    private static $cachedKey = null;
+
+    /**
+     * 获取加密密钥（带缓存）
      * @return string
      */
     private static function getSecretKey(): string
     {
+        if (self::$cachedKey !== null) {
+            return self::$cachedKey;
+        }
+
         // 优先从配置文件读取
         try {
             $configKey = get_system_config('token', 'secrect') ?: null;
-            return $configKey ?: self::$secretKey;
+            self::$cachedKey = $configKey ?: self::$secretKey;
         } catch (\Exception $e) {
-            return self::$secretKey;
+            self::$cachedKey = self::$secretKey;
         }
+
+        return self::$cachedKey;
+    }
+
+    /**
+     * 重置缓存（用于测试或配置变更后）
+     */
+    public static function resetCache(): void
+    {
+        self::$cachedKey = null;
     }
 
     /**
