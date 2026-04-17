@@ -83,12 +83,14 @@ class Collect
                 }
             }
 
+
             if (empty($data)) {
                 return $this->error('请求数据为空', 400);
             }
 
-            // 处理字段映射
-            $mappedData = $this->mapWorkFields($data['work'] ?? []);
+            // 处理字段映射 - 同时支持嵌套格式 {"work":{...}} 和扁平格式 {...}
+            $workData = $data['work'] ?? ($data['title'] ?? null ? $data : []);
+            $mappedData = $this->mapWorkFields($workData);
 
             // 必填验证
             if (empty($mappedData['title']) || empty($mappedData['author'])) {
