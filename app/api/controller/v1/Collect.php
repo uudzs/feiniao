@@ -50,25 +50,27 @@ class Collect
             $dataFormat = $request->header('X-Data-Format', 'json');
 
             if ($dataFormat === 'zip') {
-                // ZIP 压缩格式
+                // ZIP 压缩格式 (使用 ZipArchive 类，兼容 PHP 8.0+)
                 $tempFile = tempnam(sys_get_temp_dir(), 'collect_');
                 file_put_contents($tempFile, $rawInput);
 
-                $zip = zip_open($tempFile);
-                if (!is_resource($zip)) {
+                $zip = new \ZipArchive();
+                $result = $zip->open($tempFile, \ZipArchive::RDONLY);
+                if ($result !== true) {
                     unlink($tempFile);
                     return $this->error('ZIP 文件无效', 400);
                 }
 
                 $data = null;
-                while ($entry = zip_read($zip)) {
-                    if (zip_entry_name($entry) === 'data.json') {
-                        $content = zip_entry_read($entry, zip_entry_filesize($entry));
+                for ($i = 0; $i < $zip->numFiles; $i++) {
+                    $name = $zip->getNameIndex($i);
+                    if ($name === 'data.json') {
+                        $content = $zip->getFromIndex($i);
                         $data = json_decode($content, true);
                         break;
                     }
                 }
-                zip_close($zip);
+                $zip->close();
                 unlink($tempFile);
 
                 if ($data === null) {
@@ -82,7 +84,6 @@ class Collect
                     return $this->error("JSON 解析错误: " . json_last_error_msg(), 500);
                 }
             }
-
 
             if (empty($data)) {
                 return $this->error('请求数据为空', 400);
@@ -697,10 +698,27 @@ class Collect
     /**
      * 生成文件名拼音
      */
-    protected function generateFilename($title)
+    private static function generateFilename($title)
     {
         if (empty($title)) {
             return uniqid();
+        }
+        try {
+            // 使用拼音插件生成拼音文件名
+            $Pinyin = new \Overtrue\Pinyin\Pinyin;
+            $filename = $Pinyin->permalink($title, '');
+            // 如果生成的拼音为空，使用备选方案
+            if (empty($filename)) {
+                $filename = preg_replace('/[^\w]/', '', $title);
+                if (empty($filename)) {
+                    $filename = uniqid();
+                }
+            }
+            return $filename;
+        } catch (\Exception $e) {
+            // 如果拼音转换失败，使用备选方案
+            $filename = preg_replace('/[^\w]/', '', $title);
+            return empty($filename) ? uniqid() : $filename;
         }
         $filename = preg_replace('/[^\w]/', '', $title);
         return empty($filename) ? uniqid() : $filename;

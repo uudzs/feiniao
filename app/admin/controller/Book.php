@@ -345,7 +345,7 @@ class Book extends BaseController
             } else {
                 $param['label_custom'] = "";
             }
-            if ($param['title'] != $book['title']) {
+            if ($param['title'] != $book['title'] || empty($book['filename'])) {
                 $filename = Pinyin::permalink($param['title'], '');
                 $filenamebook = Db::name('book')->where(['filename' => $filename, ['id', '<>', $book['id']]])->find();
                 if (!empty($filenamebook)) {
