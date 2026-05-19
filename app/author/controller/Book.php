@@ -135,7 +135,7 @@ class Book extends BaseController
             $param['label'] = implode(',', array_filter([trim($param['identity'] ?? ''), trim($param['image'] ?? ''), trim($param['schools'] ?? ''), trim($param['element'] ?? '')]));
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);
             $param['create_time'] = time();
-            $filename = Pinyin::permalink($param['title'], '');
+            $filename = (new Pinyin)->permalink($param['title'], '');
             $book = Db::name('book')->where(['filename' => $filename])->find();
             $param['filename'] = $filename;
             $insertId = Db::name('book')->strict(false)->field(true)->insertGetId($param);
@@ -386,7 +386,7 @@ class Book extends BaseController
             unset($param['identity'], $param['image'], $param['schools'], $param['element']);
             $param['update_time'] = time();
             if ($param['title'] != $book['title']) {
-                $filename = Pinyin::permalink($param['title'], '');
+                $filename = (new Pinyin)->permalink($param['title'], '');
                 $filenamebook = Db::name('book')->where(['filename' => $filename, ['id', '<>', $book['id']]])->find();
                 if (!empty($filenamebook)) {
                     $filename = $filename . $book['id'];

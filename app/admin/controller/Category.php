@@ -75,7 +75,7 @@ class Category extends BaseController
                 return to_assign(1, $e->getError());
             }
             if (empty($param['key'])) {
-                $param['key'] = Pinyin::permalink($param['name'], '');
+                $param['key'] = (new Pinyin)->permalink($param['name'], '');
             }
             $param['create_user_id'] = $this->uid;
             $this->model->addCategory($param);
@@ -103,7 +103,7 @@ class Category extends BaseController
             }
             $detail = $this->model->getCategoryById($param['id']);
             if (empty($param['key']) || $detail['name'] != $param['name']) {
-                $param['key'] = Pinyin::permalink($param['name'], '');
+                $param['key'] = (new Pinyin)->permalink($param['name'], '');
             }
             if ($param['id'] == $param['pid']) {
                 $param['pid'] = 0;

@@ -207,7 +207,7 @@ class Book extends BaseController
                 return to_assign(1, '作品小类不能为空');
             }
             $param['create_time'] = time();
-            $filename = Pinyin::permalink($param['title'], '');
+            $filename = (new Pinyin)->permalink($param['title'], '');
             $book = Db::name('book')->where(['filename' => $filename])->find();
             $param['filename'] = $filename;
             $insertId = Db::name('book')->strict(false)->field(true)->insertGetId($param);
@@ -346,7 +346,7 @@ class Book extends BaseController
                 $param['label_custom'] = "";
             }
             if ($param['title'] != $book['title'] || empty($book['filename'])) {
-                $filename = Pinyin::permalink($param['title'], '');
+                $filename = (new Pinyin)->permalink($param['title'], '');
                 $filenamebook = Db::name('book')->where(['filename' => $filename, ['id', '<>', $book['id']]])->find();
                 if (!empty($filenamebook)) {
                     $filename = $filename . $book['id'];
@@ -600,7 +600,7 @@ class Book extends BaseController
                             'authorid' => $authorid,
                             'status' => 1,
                             'genre' => $big_cate_id,
-                            'filename' => Pinyin::permalink($title, ''),
+                            'filename' => (new Pinyin)->permalink($title, ''),
                             'create_time' => time(),
                         ];
                         $bookid = Db::name('book')->strict(false)->field(true)->insertGetId($bookdata);
