@@ -44,15 +44,16 @@ class Collect
         $this->verifyApiKey();
 
         try {
+            // 用 file_get_contents 直接读取，ThinkPHP 不会消费 text/plain 类型的 php://input
             $rawInput = file_get_contents('php://input');
-
+            
             // 检查是否为 ZIP 压缩格式
             $dataFormat = $request->header('X-Data-Format', 'json');
-
+    
             if ($dataFormat === 'zip') {
                 // ZIP 压缩格式 (使用 ZipArchive 类，兼容 PHP 8.0+)
                 $tempFile = tempnam(sys_get_temp_dir(), 'collect_');
-                file_put_contents($tempFile, $rawInput);
+                //file_put_contents($tempFile, $rawInput);
 
                 $zip = new \ZipArchive();
                 $result = $zip->open($tempFile, \ZipArchive::RDONLY);
