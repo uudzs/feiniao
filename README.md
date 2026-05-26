@@ -127,10 +127,6 @@ composer install （依赖包默认已集成，可以忽略。）
 |![页面截图](https://www.paheng.com/static/image/feiniao/VIP.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/我的.png "页面截图")|
 |![页面截图](https://www.paheng.com/static/image/feiniao/章节.png "页面截图")|![页面截图](https://www.paheng.com/static/image/feiniao/提现.png "页面截图")|
 
-### 特别感谢
-- 飞鸟阅读基于[勾股CMS](https://gitee.com/gouguopen/gougucms)二次开发完成，同样遵循Apache2开源协议发布。 
-- 在这里特别感谢勾股CMS的付出与努力，谢谢！
-
 ---
 
 ### 相关源码
