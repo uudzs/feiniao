@@ -131,6 +131,20 @@ composer install （依赖包默认已集成，可以忽略。）
 - 飞鸟阅读基于[勾股CMS](https://gitee.com/gouguopen/gougucms)二次开发完成，同样遵循Apache2开源协议发布。 
 - 在这里特别感谢勾股CMS的付出与努力，谢谢！
 
+---
+
+### 相关源码
+
+| 项目 | 地址 | 说明 |
+|------|------|------|
+| 飞鸟漫画 | [GitHub](https://github.com/uudzs/feiniaocomic) | 后端服务 |
+| 飞鸟漫画 | [gitee](https://gitee.com/paheng/feiniaocomic) | 后端服务 |
+
+
+> 更多相关项目请访问：[https://feiniao.paheng.net](https://feiniao.paheng.net)
+
+---
+
 ### 支持我们
 - If the project is very helpful to you, you can buy the author a cup of coffee.
 - 非常感谢您一直以来对我们的关注和支持，我们将不断努力，为您带来更好的体验和回报。
