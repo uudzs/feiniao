@@ -46,10 +46,10 @@ class Collect
         try {
             // 用 file_get_contents 直接读取，ThinkPHP 不会消费 text/plain 类型的 php://input
             $rawInput = file_get_contents('php://input');
-            
+
             // 检查是否为 ZIP 压缩格式
             $dataFormat = $request->header('X-Data-Format', 'json');
-    
+
             if ($dataFormat === 'zip') {
                 // ZIP 压缩格式 (使用 ZipArchive 类，兼容 PHP 8.0+)
                 $tempFile = tempnam(sys_get_temp_dir(), 'collect_');
@@ -123,7 +123,7 @@ class Collect
 
                 $mappedData['status'] = 1;
                 $mappedData['isfinish'] = $mappedData['isfinish'] ?? 1;
-                $mappedData['update_time'] = time();
+                $mappedData['update_time'] = $this->parseUpdateTime($mappedData['update_time'] ?? null);
                 $is_download_cover = $mappedData['download_cover'] ?? false;
                 unset($mappedData['download_cover']);
 
@@ -157,7 +157,7 @@ class Collect
                     $action = 'updated';
                 } else {
                     // 新增作品
-                    $mappedData['create_time'] = time();
+                    $mappedData['create_time'] = $mappedData['update_time'] ?? time();
                     $bookId = Db::name('book')->insertGetId($mappedData);
                     $action = 'created';
                 }
@@ -553,6 +553,51 @@ class Collect
     }
 
     /**
+     * 将各种时间字符串格式统一转换为11位数字时间戳
+     * 支持: ISO8601, Y-m-d H:i:s, Y-m-d, Y/m/d, 中文日期等
+     */
+    protected function parseUpdateTime($value): int
+    {
+        if (empty($value)) {
+            return time();
+        }
+
+        // 已是纯数字时间戳（10位或11位）
+        if (is_numeric($value)) {
+            $t = (int)$value;
+            if ($t > 1000000000 && $t < 99999999999) {
+                return $t;
+            }
+        }
+
+        if (is_string($value)) {
+            $value = trim($value);
+
+            // 尝试 strtotime 解析常见格式
+            $ts = strtotime($value);
+            if ($ts !== false && $ts > 0) {
+                return $ts;
+            }
+
+            // 正则匹配 YYYY-MM-DD 或 YYYY/MM/DD 等
+            if (preg_match('/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/', $value, $m)) {
+                $ts = mktime(0, 0, 0, (int)$m[2], (int)$m[3], (int)$m[1]);
+                if ($ts !== false) {
+                    return $ts;
+                }
+            }
+
+            // 中文日期: 2026年5月22日
+            if (preg_match('/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/', $value, $m)) {
+                return mktime(0, 0, 0, (int)$m[2], (int)$m[3], (int)$m[1]);
+            }
+        }
+
+        // 无法解析，返回当前时间戳
+        return time();
+    }
+
+    /**
      * 字段映射
      */
     protected function mapWorkFields(array $data): array
@@ -568,6 +613,7 @@ class Collect
             'hits' => 'hits',
             'status' => 'status',
             'update_status' => 'isfinish',
+            'updated_time' => 'update_time',
             'word_count' => 'words',
             'download_cover' => 'download_cover',
             'cover_base64' => 'cover_base64',
