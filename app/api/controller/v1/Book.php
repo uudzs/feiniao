@@ -369,7 +369,7 @@ class Book extends BaseController
             foreach ($chapters as $key => $value) {
                 $content = Content::get($book['id'], $value['id']);
                 if ($content && mb_strlen($content) > 0) {
-                    list($wordnum, $content) = countWordsAndContent($content);
+                    list($wordnum, $content) = countWordsAndContent($content, true);
                     $novelContent .= "\r\n\r\n" . get_full_chapter($value['title'], $value['chaps']) . "\r\n";
                     $novelContent .= $content;
                 } else {

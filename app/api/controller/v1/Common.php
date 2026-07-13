@@ -926,6 +926,9 @@ class Common extends BaseController
         if (empty($config)) {
             $this->apiError('empty');
         }
+        if ($config == 'alipay' || $config == 'wechat' || $config == 'email' || $config == 'token' || $config == 'wanshun') {
+            $this->apiError('empty');
+        }
         $res = [];
         if ($name) {
             $res = get_system_config($config, $name);

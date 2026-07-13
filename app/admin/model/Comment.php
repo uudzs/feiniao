@@ -37,7 +37,7 @@ class Comment extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class)->field(['id', 'nickname']);
+        return $this->belongsTo(User::class)->field(['id', 'nickname', 'headimgurl']);
     }
 
     public function replies()
