@@ -430,6 +430,11 @@ INSERT INTO `fn_admin_rule` VALUES ('304', '2', 'logmanage/index', '日志管理
 INSERT INTO `fn_admin_rule` VALUES ('305', '304', 'logmanage/loglist', '日志列表', '日志列表', '', '2', '0', '1', '', '', '1757733578', '0');
 INSERT INTO `fn_admin_rule` VALUES ('306', '304', 'logmanage/cleanlogs', '清理日志文件', '清理日志文件', '', '2', '0', '1', '', '', '1757733802', '0');
 INSERT INTO `fn_admin_rule` VALUES ('307', '304', 'logmanage/saveconfig', '监听日志开关', '监听日志开关', '', '2', '0', '1', '', '', '1757733829', '0');
+INSERT INTO `fn_admin_rule` VALUES ('308', '2', 'envmanage/index', '环境配置', '环境配置', 'ri-settings-4-line', '1', '98', '1', 'admin', '', '1784678400', '0');
+INSERT INTO `fn_admin_rule` VALUES ('309', '308', 'envmanage/saveconfig', '保存环境配置', '保存环境配置', '', '2', '0', '1', '', '', '1784678400', '0');
+INSERT INTO `fn_admin_rule` VALUES ('310', '308', 'envmanage/testcollector', '测试反向采集器', '测试反向采集器', '', '2', '0', '1', '', '', '1784678400', '0');
+INSERT INTO `fn_admin_rule` VALUES ('311', '308', 'envmanage/installtables', '初始化反向采集表', '初始化反向采集表', '', '2', '0', '1', '', '', '1784678400', '0');
+INSERT INTO `fn_admin_rule` VALUES ('312', '308', 'envmanage/testtts', '测试TTS朗读', '测试TTS朗读', '', '2', '0', '1', '', '', '1784678400', '0');
 
 -- ----------------------------
 -- Table structure for fn_adver
@@ -1170,7 +1175,7 @@ CREATE TABLE `fn_config` (
 -- ----------------------------
 -- Records of fn_config
 -- ----------------------------
-INSERT INTO `fn_config` VALUES ('1', '网站配置', 'web', 'a:9:{s:2:\"id\";s:1:\"1\";s:11:\"admin_title\";s:12:\"飞鸟阅读\";s:5:\"title\";s:12:\"飞鸟阅读\";s:4:\"logo\";s:52:\"/storage/202410/6750906c9bd369992d371566b239eee7.png\";s:5:\"appqr\";s:52:\"/storage/202504/9ebc64cfc4acd8edae06f62aecc50444.png\";s:3:\"icp\";s:18:\"京ICP备123456789\";s:5:\"beian\";s:15:\"京A2-123456789\";s:4:\"code\";s:98:\"<script type=\"text/javascript\" src=\"//api.wukongtongji.com/c?_=784071257620463616\" async></script>\";s:9:\"copyright\";s:96:\"Copyright © feiniao All Rights Reserved 版权所有 北京飞鸟阅读网络技术有限公司\";}', '1', '1612514630', '1730020051');
+INSERT INTO `fn_config` VALUES ('1', '网站配置', 'web', 'a:10:{s:2:\"id\";s:1:\"1\";s:11:\"admin_title\";s:12:\"飞鸟阅读\";s:5:\"title\";s:12:\"飞鸟阅读\";s:4:\"logo\";s:59:\"https://demo.feiniao.paheng.net/static/home/images/logo.png\";s:5:\"appqr\";s:83:\"https://demo.feiniao.paheng.net/storage/202504/9ebc64cfc4acd8edae06f62aecc50444.png\";s:3:\"icp\";s:18:\"京ICP备123456789\";s:5:\"beian\";s:15:\"京A2-123456789\";s:8:\"h5domain\";s:22:\"demo.h5.feiniao.ph.com\";s:4:\"code\";s:0:\"\";s:9:\"copyright\";s:96:\"Copyright © feiniao All Rights Reserved 版权所有 北京飞鸟阅读网络技术有限公司\";}', '1', '1612514630', '1784606961');
 INSERT INTO `fn_config` VALUES ('2', '邮箱配置', 'email', 'a:8:{s:2:\"id\";s:1:\"2\";s:4:\"smtp\";s:11:\"smtp.qq.com\";s:9:\"smtp_port\";s:3:\"465\";s:9:\"smtp_user\";s:10:\"123@qq.com\";s:8:\"smtp_pwd\";s:6:\"123456\";s:4:\"from\";s:27:\"飞鸟阅读系统管理员\";s:5:\"email\";s:12:\"admin@qq.com\";s:8:\"template\";s:101:\"<p>飞鸟阅读是一套基于ThinkPHP6 + Layui + MySql打造功能丰富的小说管理系统。</p>\";}', '1', '1612521657', '1730020077');
 INSERT INTO `fn_config` VALUES ('3', '微信配置', 'wechat', 'a:9:{s:8:\"pay_open\";s:1:\"2\";s:5:\"mchid\";s:0:\"\";s:11:\"secrect_key\";s:0:\"\";s:8:\"cert_url\";s:0:\"\";s:7:\"key_url\";s:0:\"\";s:8:\"xcx_open\";s:1:\"2\";s:9:\"xcx_appid\";s:0:\"\";s:13:\"xcx_appsecret\";s:0:\"\";s:2:\"id\";s:1:\"3\";}', '1', '1612522314', '1765423237');
 INSERT INTO `fn_config` VALUES ('4', 'Token配置', 'token', 'a:5:{s:2:\"id\";s:1:\"4\";s:3:\"iss\";s:7:\"feiniao\";s:3:\"aud\";s:7:\"feiniao\";s:7:\"secrect\";s:7:\"feiniao\";s:7:\"exptime\";s:5:\"86400\";}', '1', '1627313142', '1728893702');
@@ -1578,8 +1583,6 @@ CREATE TABLE `fn_nav` (
 INSERT INTO `fn_nav` VALUES ('1', '主导航', 'NAV_HOME', '1', '平台主导航', '0', '0');
 INSERT INTO `fn_nav` VALUES ('2', '底部导航', 'footer_nav', '1', '', '0', '0');
 INSERT INTO `fn_nav` VALUES ('3', '底部帮助中心', 'footer_help', '1', '', '0', '0');
-INSERT INTO `fn_nav` VALUES ('4', '首页AI人工智能', 'home_ai', '1', '', '0', '0');
-INSERT INTO `fn_nav` VALUES ('5', '首页阅读赚钱', 'home_coin', '1', '', '0', '0');
 
 -- ----------------------------
 -- Table structure for fn_nav_info
@@ -1604,20 +1607,18 @@ CREATE TABLE `fn_nav_info` (
 -- Records of fn_nav_info
 -- ----------------------------
 INSERT INTO `fn_nav_info` VALUES ('1', '0', '1', '首页', '/', '', '0', '1', '9', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('6', '0', '1', '公告', '/home/notice.html', '', '0', '1', '5', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('7', '0', '1', '书库', '/home/shuku.html', '', '0', '1', '8', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('8', '0', '2', '关于我们', '/home/page-about.html', '', '1', '1', '9', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('9', '0', '2', '用户协议', '/home/page-agreement.html', '', '1', '1', '3', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('10', '0', '2', '隐私政策', '/home/page-privacy.html', '', '1', '1', '2', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('11', '0', '2', '联系我们', '/home/page-contactus.html', '', '1', '1', '0', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('12', '0', '3', '怎么成为作者？', '/home/news-1.html', '', '1', '1', '0', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('13', '0', '3', '如何创建作品', '/home/news-2.html', '', '1', '1', '0', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('14', '0', '3', '怎么管理作品', '/home/news-3.html', '', '1', '1', '0', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('15', '0', '3', '怎么管理自己的账号', '/home/news-4.html', '', '1', '1', '0', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('16', '0', '4', '成为飞鸟阅读的签约作者利用人工智能为您赋能', '/home/page-homeai.html', '', '1', '1', '0', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('17', '0', '5', '阅读小说，轻松赚现金！', '/home/page-homecoin.html', '', '1', '1', '0', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('18', '0', '1', '排行', '/home/rank.html', '', '0', '1', '7', '0', '0');
-INSERT INTO `fn_nav_info` VALUES ('19', '0', '1', '全本', '/home/quanben.html', '', '0', '1', '6', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('6', '0', '1', '公告', '/he/notice.html', '', '0', '1', '5', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('7', '0', '1', '书库', '/shuku.html', '', '0', '1', '8', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('8', '0', '2', '关于我们', '/page-about.html', '', '1', '1', '9', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('9', '0', '2', '用户协议', '/page-agreement.html', '', '1', '1', '3', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('10', '0', '2', '隐私政策', '/page-privacy.html', '', '1', '1', '2', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('11', '0', '2', '联系我们', '/page-contactus.html', '', '1', '1', '0', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('12', '0', '3', '怎么成为作者？', '/news-1.html', '', '1', '1', '0', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('13', '0', '3', '如何创建作品', '/news-2.html', '', '1', '1', '0', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('14', '0', '3', '怎么管理作品', '/news-3.html', '', '1', '1', '0', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('15', '0', '3', '怎么管理自己的账号', '/news-4.html', '', '1', '1', '0', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('18', '0', '1', '排行', '/rank.html', '', '0', '1', '7', '0', '0');
+INSERT INTO `fn_nav_info` VALUES ('19', '0', '1', '全本', '/quanben.html', '', '0', '1', '6', '0', '0');
 
 -- ----------------------------
 -- Table structure for fn_order
@@ -2314,4 +2315,38 @@ CREATE TABLE `fn_comment_reply` (
   `create_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `comment_id` (`comment_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Reverse collection source mappings and durable outbox
+DROP TABLE IF EXISTS `fn_collect_source`;
+CREATE TABLE `fn_collect_source` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT, `book_id` int unsigned NOT NULL,
+  `collector_task_id` int unsigned NOT NULL, `source_url` varchar(1000) NOT NULL, `source_hash` char(32) NOT NULL,
+  `last_catalog_request_at` int unsigned NOT NULL DEFAULT 0, `last_catalog_sync_at` int unsigned NOT NULL DEFAULT 0,
+  `last_error` varchar(1000) NOT NULL DEFAULT '', `create_time` int unsigned NOT NULL, `update_time` int unsigned NOT NULL,
+  PRIMARY KEY (`id`), UNIQUE KEY `uniq_book` (`book_id`), UNIQUE KEY `uniq_source` (`source_hash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `fn_collect_chapter_source`;
+CREATE TABLE `fn_collect_chapter_source` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT, `book_id` int unsigned NOT NULL, `chapter_id` int unsigned NOT NULL,
+  `collect_source_id` int unsigned NOT NULL, `external_id` varchar(255) NOT NULL DEFAULT '',
+  `source_url` varchar(1000) NOT NULL, `source_hash` char(32) NOT NULL,
+  `last_content_request_at` int unsigned NOT NULL DEFAULT 0, `last_content_sync_at` int unsigned NOT NULL DEFAULT 0,
+  `last_error` varchar(1000) NOT NULL DEFAULT '', `create_time` int unsigned NOT NULL, `update_time` int unsigned NOT NULL,
+  PRIMARY KEY (`id`), UNIQUE KEY `uniq_chapter` (`chapter_id`), UNIQUE KEY `uniq_source` (`source_hash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+DROP TABLE IF EXISTS `fn_collect_job`;
+CREATE TABLE `fn_collect_job` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT, `request_id` char(36) NOT NULL, `job_type` varchar(32) NOT NULL,
+  `book_id` int unsigned NOT NULL DEFAULT 0, `chapter_id` int unsigned NOT NULL DEFAULT 0,
+  `collect_source_id` int unsigned NOT NULL DEFAULT 0, `source_url` varchar(1000) NOT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'pending', `priority` smallint unsigned NOT NULL DEFAULT 30,
+  `attempts` tinyint unsigned NOT NULL DEFAULT 0,
+  `max_attempts` tinyint unsigned NOT NULL DEFAULT 5, `next_retry_at` int unsigned NOT NULL DEFAULT 0,
+  `collector_job_id` varchar(100) NOT NULL DEFAULT '', `last_error` varchar(1000) NOT NULL DEFAULT '',
+  `create_time` int unsigned NOT NULL, `update_time` int unsigned NOT NULL,
+  PRIMARY KEY (`id`), UNIQUE KEY `uniq_request` (`request_id`), KEY `idx_dispatch` (`status`,`next_retry_at`),
+  KEY `idx_priority_dispatch` (`status`,`priority`,`next_retry_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

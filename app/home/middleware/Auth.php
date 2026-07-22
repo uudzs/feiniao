@@ -19,7 +19,7 @@ class Auth
         if ($action == 'user') {
             $session_user = get_config('app.session_user');
             if (!Session::has($session_user)) {
-                return $request->isAjax() ? to_assign(404, '请先登录') : redirect((string) url('/home/login/index'));
+                return $request->isAjax() ? to_assign(404, '请先登录') : redirect((string) url('login'));
             }
         }
         return $next($request);

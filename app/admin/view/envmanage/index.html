@@ -1,0 +1,283 @@
+{extend name="common/base"/}
+{block name="body"}
+<style>
+  .layui-form-mid {
+    float:none;
+  }
+  .env-page .layui-card-header {
+    font-weight: 700
+  }
+
+  .env-help {
+    color: #666;
+    line-height: 1.8
+  }
+
+  .env-page code {
+    background: #f2f2f2;
+    padding: 2px 6px;
+    border-radius: 3px
+  }
+
+  .secret-tip {
+    color: #ff5722
+  }
+
+  .status-ok {
+    color: #16b777
+  }
+
+  .status-bad {
+    color: #ff5722
+  }
+</style>
+<div class="layuimini-container layui-form p-4 env-page">
+  <div class="layuimini-main">
+    {if $env_error}<blockquote class="layui-elem-quote layui-quote-nm status-bad">{$env_error}</blockquote>{/if}
+    <form class="layui-form" id="envForm">
+      <input type="hidden" name="reverse_test_token" id="reverseTestToken" value="">
+
+      <div class="layui-card">
+        <div class="layui-card-header">全站debug</div>
+        <div class="layui-card-body">
+          <div class="layui-form-item"><label class="layui-form-label">调试模式</label>
+            <div class="layui-input-block"><input type="checkbox" name="app_debug" value="1" lay-skin="switch"
+                lay-text="开启|关闭" {if $config.app_debug}checked{/if}>
+              <div class="layui-form-mid layui-word-aux">生产环境建议关闭，开启后错误信息可能暴露路径与配置。</div>
+            </div>
+          </div>        
+        </div>
+      </div>
+
+      <div class="layui-card">
+        <div class="layui-card-header">多语言</div>
+        <div class="layui-card-body">
+          <div class="layui-form-item"><label class="layui-form-label">多语言</label>
+            <div class="layui-input-block"><input type="checkbox" name="lang_switch_on" value="1"
+                lay-filter="langSwitch" lay-skin="switch" lay-text="开启|关闭" {if $config.lang_switch_on}checked{/if}>
+            </div>
+          </div>
+          <div class="layui-form-item" id="defaultLangRow" {if !$config.lang_switch_on}style="display:none" {/if}><label
+              class="layui-form-label">默认语言</label>
+            <div class="layui-input-block">
+              {volist name="languages" id="language"}<input type="radio" name="default_lang" value="{$key}"
+                title="{$language} ({$key})" {if $config.default_lang==$key}checked{/if}>{/volist}
+              <div class="layui-form-mid layui-word-aux">允许语言列表会按 <code>app/lang/</code> 自动读取，如需增加新的语言，可以此目录下增加相应的语言文件即可。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layui-card">
+        <div class="layui-card-header">TTS 小说朗读</div>
+        <div class="layui-card-body">
+          <div class="layui-form-item"><label class="layui-form-label">BASE_URL</label>
+            <div class="layui-input-block"><input type="text" name="tts_base_url" value="{$config.tts_base_url}" placeholder="http://127.0.0.1:25008" class="layui-input">
+              <div class="layui-form-mid layui-word-aux">运行TTS服务：先确保根目录下有 <code>tts_server.py</code> 文件，并成功安装了 <code>pip install edge-tts fastapi uvicorn</code> 相关运行环境，最终成功运行了 <code>nohup uvicorn tts_server:app --host 0.0.0.0 --port 25008 > tts_server.log 2>&1 &</code> TTS服务。</div>
+            </div>
+          </div>
+          <div class="layui-form-item"><label class="layui-form-label">接口鉴权</label>
+            <div class="layui-input-block"><input type="checkbox" name="tts_auth_enabled" value="1" lay-skin="switch" lay-text="开启|关闭" {if $config.tts_auth_enabled}checked{/if}>
+              <div class="layui-form-mid layui-word-aux">此项需与 TTS 服务的 <code>AUTH_ENABLED</code> 保持一致；开启后由系统按现有令牌逻辑访问。
+              </div>
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-input-block">
+              <button type="button" class="layui-btn layui-btn-normal" id="testTts"><i class="layui-icon layui-icon-speaker"></i> 测试朗读</button>
+              <span id="ttsTestResult" style="margin-left:12px"></span>
+              <div class="layui-form-mid layui-word-aux">使用小晓音色朗读一段固定测试文字，测试当前填写的地址和鉴权状态，不需要先保存。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layui-card">
+        <div class="layui-card-header">反向采集</div>
+        <div class="layui-card-body">
+          <blockquote class="layui-elem-quote layui-quote-nm">数据表状态：{if $tables_installed}<span
+              class="status-ok">已初始化</span>{else}<span class="status-bad">未初始化</span> <button type="button"
+              class="layui-btn layui-btn-sm" id="installTables">立即初始化</button>{/if}。开启反向采集前必须完成初始化。</blockquote>
+          <div class="layui-form-item"><label class="layui-form-label">启用功能</label>
+            <div class="layui-input-block"><input type="checkbox" name="reverse_enabled" value="1"
+                lay-filter="reverseSwitch" lay-skin="switch" lay-text="开启|关闭" {if $config.reverse_enabled}checked{/if}>
+            </div>
+          </div>
+          <div id="reverseFields" {if !$config.reverse_enabled}style="display:none"{/if}>
+            <div class="layui-form-item"><label class="layui-form-label">采集器地址</label>
+              <div class="layui-input-block"><input type="text" name="collector_base_url"
+                  value="{$config.collector_base_url}" placeholder="http://127.0.0.1:9001" class="layui-input"></div>
+            </div>
+            <div class="layui-form-item"><label class="layui-form-label">API 密钥</label>
+              <div class="layui-input-block"><input type="password" name="collector_api_key"
+                  value="{$config.collector_api_key}" autocomplete="new-password" lay-verify="required|pass" placeholder="请输入" lay-affix="eye" class="layui-input">
+                <div class="layui-form-mid secret-tip">必须与采集器 <code>.env</code> 中的
+                  <code>COLLECTOR_API_KEY</code> 完全一致。
+                </div>
+              </div>
+            </div>
+            <div class="layui-form-item"><label class="layui-form-label">回调地址</label>
+              <div class="layui-input-block"><input type="text" name="callback_base_url"
+                  value="{$config.callback_base_url}" placeholder="https://你的小说站域名" class="layui-input">
+                <div class="layui-form-mid layui-word-aux">这是采集器访问小说系统的地址，如果采集器与本系统在同一台服务器，建议添加一个本地的请求端口，比如：127.0.0.1:25012，当然也可以写本系统用户可方问的地址。</div>
+              </div>
+            </div>
+            <div class="layui-form-item"><label class="layui-form-label">回调密钥</label>
+              <div class="layui-input-block"><input type="password" name="callback_secret"
+                  value="{$config.callback_secret}" autocomplete="new-password" class="layui-input" lay-verify="required|pass" placeholder="请输入" lay-affix="eye" class="layui-input">
+                <div class="layui-form-mid layui-word-aux">用于验证回调签名，只配置在小说系统，由系统随任务安全传给采集器；建议使用至少 32 位随机字符串。</div>
+              </div>
+            </div>
+            <div class="layui-row layui-col-space15">
+              <div class="layui-col-md6">
+                <div class="layui-form-item"><label class="layui-form-label">目录刷新/秒</label>
+                  <div class="layui-input-block"><input type="number" min="60" name="catalog_refresh_seconds"
+                      value="{$config.catalog_refresh_seconds}" class="layui-input"></div>
+                </div>
+              </div>
+              <div class="layui-col-md6">
+                <div class="layui-form-item"><label class="layui-form-label">章节刷新/秒</label>
+                  <div class="layui-input-block"><input type="number" min="60" name="chapter_refresh_seconds"
+                      value="{$config.chapter_refresh_seconds}" class="layui-input"></div>
+                </div>
+              </div>
+              <div class="layui-col-md6">
+                <div class="layui-form-item"><label class="layui-form-label">请求超时/秒</label>
+                  <div class="layui-input-block"><input type="number" min="1" max="60" name="dispatch_timeout"
+                      value="{$config.dispatch_timeout}" class="layui-input"></div>
+                </div>
+              </div>
+              <div class="layui-col-md6">
+                <div class="layui-form-item"><label class="layui-form-label">最大重试</label>
+                  <div class="layui-input-block"><input type="number" min="1" max="20" name="max_attempts"
+                      value="{$config.max_attempts}" class="layui-input"></div>
+                </div>
+              </div>
+            </div>
+            <div class="layui-form-item">
+              <div class="layui-input-block"><button type="button" class="layui-btn layui-btn-normal"
+                  id="testCollector"><i class="layui-icon layui-icon-vercode"></i> 测试采集器与密钥</button><span
+                  id="testResult" style="margin-left:12px"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layui-card">
+        <div class="layui-card-header">部署说明</div>
+        <div class="layui-card-body env-help">
+          <p><strong>同步采集器密钥：</strong>打开采集器目录 <code>.env</code>，将 <code>COLLECTOR_API_KEY=新密钥</code>
+            保存，然后重启采集器。回到本页填写同一个值并测试。密钥或采集器地址发生变化后，未测试通过将不能保存启用状态。</p>
+          <p><strong>宝塔计划任务：</strong>进入“计划任务” → “添加任务” → 类型选“Shell 脚本” → 名称填写“反向采集调度” → 执行周期建议每分钟 → 脚本填写
+            <code>cd /www/wwwroot/你的站点目录 &amp;&amp; php think collect:dispatch</code>。先在 SSH 中手工执行一次确认输出无错误，再启用计划任务。
+          </p>
+          <p><strong>实时体验：</strong>页面请求只负责快速创建任务，计划任务负责可靠补偿；现有章节缺失时的高优先级触发和前端轮询不会被本页设置阻塞。修改配置后，请重启正在常驻运行的 PHP/队列进程。</p>
+          <p>翻译服务配置当前只读且不在本页面修改，保存时会原样保留。</p>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-input-block"><button type="button" class="layui-btn" id="saveConfig">保存全部配置</button></div>
+      </div>
+    </form>
+  </div>
+</div>
+{/block}
+
+{block name="script"}
+<script>
+  const moduleInit = ['tool'];
+  function feiniaoInit() {
+    var tool = layui.tool, form = layui.form;
+    form.on('switch(langSwitch)', function (data) {
+      $('#defaultLangRow').toggle(data.elem.checked);
+    });
+    form.on('switch(reverseSwitch)', function (data) {
+      $('#reverseFields').toggle(data.elem.checked);
+    });
+    function formData() {
+      var data = {};
+      $('#envForm').serializeArray().forEach(function (item) {
+        data[item.name] = item.value;
+      });
+      return data;
+    }
+    $('#envForm').on('input change', 'input', function () {
+      if (this.name.indexOf('collector_') === 0 || this.name.indexOf('callback_') === 0 || this.name === 'dispatch_timeout') {
+        $('#reverseTestToken').val('');
+        $('#testResult').text('配置已变化，请重新测试').removeClass('status-ok').addClass('status-bad');
+      }
+    });
+    $('#testTts').on('click', function () {
+      var button = this, index = layer.load(2);
+      button.disabled = true;
+      $('#ttsTestResult').text('正在生成测试语音…').removeClass('status-ok status-bad');
+      var data = new URLSearchParams();
+      data.append('tts_base_url', $('[name="tts_base_url"]').val());
+      data.append('tts_auth_enabled', $('[name="tts_auth_enabled"]').prop('checked') ? '1' : '0');
+      fetch("{:url('envmanage/testtts')}", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+        body: data.toString()
+      }).then(function (response) {
+        var type = response.headers.get('content-type') || '';
+        if (!response.ok || (type.indexOf('audio/') === -1 && type.indexOf('application/octet-stream') === -1)) {
+          return response.json().catch(function () { return {msg: 'TTS 服务响应异常，HTTP ' + response.status}; })
+            .then(function (error) { throw new Error(error.msg || '测试失败'); });
+        }
+        return response.blob();
+      }).then(function (blob) {
+        var url = URL.createObjectURL(blob), audio = new Audio(url);
+        audio.onended = audio.onerror = function () { URL.revokeObjectURL(url); };
+        audio.play();
+        $('#ttsTestResult').text('测试成功，正在播放').removeClass('status-bad').addClass('status-ok');
+      }).catch(function (error) {
+        $('#ttsTestResult').text(error.message).removeClass('status-ok').addClass('status-bad');
+        layer.msg(error.message, {icon: 2});
+      }).finally(function () {
+        layer.close(index);
+        button.disabled = false;
+      });
+    });
+    $('#testCollector').on('click', function () {
+      var index = layer.load(2);
+      $.post("{:url('envmanage/testcollector')}", formData(), function (res) {
+        layer.close(index);
+        if (res.code === 0) {
+          $('#reverseTestToken').val(res.data.token);
+          $('#testResult').text(res.msg).removeClass('status-bad').addClass('status-ok');
+        } else {
+          $('#reverseTestToken').val('');
+          $('#testResult').text(res.msg).removeClass('status-ok').addClass('status-bad');
+          layer.msg(res.msg, { icon: 2 });
+        }
+      }, 'json').fail(function () {
+        layer.close(index);
+        layer.msg('请求失败', { icon: 2 });
+      });
+    });
+    $('#installTables').on('click', function () {
+      layer.confirm('确认创建反向采集所需的 3 张数据表？', function (confirmIndex) {
+        layer.close(confirmIndex);
+        var index = layer.load(2);
+        $.post("{:url('envmanage/installtables')}", {}, function (res) {
+          layer.close(index);
+          layer.msg(res.msg, { icon: res.code === 0 ? 1 : 2 }, function () {
+            if (res.code === 0) location.reload();
+          });
+        }, 'json');
+      });
+    });
+    $('#saveConfig').on('click', function () {
+      var index = layer.load(2);
+      $.post("{:url('envmanage/saveconfig')}", formData(), function (res) {
+        layer.close(index);
+        layer.msg(res.msg, { icon: res.code === 0 ? 1 : 2 });
+        if (res.code === 0) $('#reverseTestToken').val('');
+      }, 'json').fail(function () {
+        layer.close(index);
+        layer.msg('保存请求失败', { icon: 2 });
+      });
+    });
+  }
+</script>
+{/block}

@@ -35,9 +35,16 @@ class Themes extends BaseController
             foreach ($floderArr as $k => $v) {
                 $result = self::getconfig($template_path . $v);
                 if (empty($result) || !isset($result['name']) || empty($result['name'])) continue;
-                $themeKey = 'template_' . $result['platform'];
                 $result['floder'] = $v;
-                $result['isuse'] = (isset($config[$themeKey]) && trim($config[$themeKey]) == $v) ? 1 : 0;
+                if ($this->isResponsive($result['platform'])) {
+                    $result['isuse'] = (
+                        isset($config['template_pc']) && trim($config['template_pc']) == $v &&
+                        isset($config['template_mobile']) && trim($config['template_mobile']) == $v
+                    ) ? 1 : 0;
+                } else {
+                    $themeKey = 'template_' . $result['platform'];
+                    $result['isuse'] = (isset($config[$themeKey]) && trim($config[$themeKey]) == $v) ? 1 : 0;
+                }
                 $result['path'] = urlencode($template_path . $v);
                 $themes[] = $result;
             }
@@ -76,10 +83,20 @@ class Themes extends BaseController
             $base64Image = base64_encode($imageData);
             $cover = "data:$mimeType;base64,$base64Image";
             $result['cover'] = $cover;
-        } else {
-            $result['cover'] = '';
         }
         return $result;
+    }
+
+    /**
+     * 判断是否为响应式模板（同时支持PC和移动端）
+     * @param string $platform 平台标识（如 pc、mobile、pc,mobile）
+     * @return bool
+     */
+    private function isResponsive($platform): bool
+    {
+        $platform = strtolower(trim((string)$platform));
+        $parts = array_map('trim', explode(',', $platform));
+        return in_array('pc', $parts) && in_array('mobile', $parts);
     }
 
     public function setup()
@@ -109,13 +126,14 @@ class Themes extends BaseController
                 return to_assign(1, '配置信息有误！');
             }
             $config = get_config('theme');
-            if (strtolower($result['platform']) == 'mobile') {
-                $config['template_mobile'] = $name;
-            }
-            if (strtolower($result['platform']) == 'pc') {
+            if ($this->isResponsive($result['platform'])) {
                 $config['template_pc'] = $name;
-            }
-            if (strtolower($result['platform']) == 'separate') {
+                $config['template_mobile'] = $name;
+            } elseif (strtolower($result['platform']) == 'mobile') {
+                $config['template_mobile'] = $name;
+            } elseif (strtolower($result['platform']) == 'pc') {
+                $config['template_pc'] = $name;
+            } elseif (strtolower($result['platform']) == 'separate') {
                 $config['template_separate'] = $name;
             }
             $config_file = app()->getRootPath() . 'config' . DIRECTORY_SEPARATOR . 'theme.php';
@@ -140,13 +158,14 @@ class Themes extends BaseController
             }
             $platform = trim($param['platform']);
             $config = get_config('theme');
-            if (strtolower($platform) == 'mobile') {
-                $config['template_mobile'] = '';
-            }
-            if (strtolower($platform) == 'pc') {
+            if ($this->isResponsive($platform)) {
                 $config['template_pc'] = '';
-            }
-            if (strtolower($platform) == 'separate') {
+                $config['template_mobile'] = '';
+            } elseif (strtolower($platform) == 'mobile') {
+                $config['template_mobile'] = '';
+            } elseif (strtolower($platform) == 'pc') {
+                $config['template_pc'] = '';
+            } elseif (strtolower($platform) == 'separate') {
                 $config['template_separate'] = '';
             }
             $config_file = app()->getRootPath() . 'config' . DIRECTORY_SEPARATOR . 'theme.php';

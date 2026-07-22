@@ -20,11 +20,11 @@ class Common extends BaseController
 {
 
     /**
-     * 控制器中间件 [登录、token 不需要鉴权]
+     * 控制器中间件 [登录、token、ttsproxy 不需要鉴权]
      * @var array
      */
     protected $middleware = [
-        Auth::class => ['except' => ['login', 'register', 'token', 'captcha']]
+        Auth::class => ['except' => ['login', 'register', 'token', 'captcha', 'ttsProxy']]
     ];
 
     /**
@@ -1190,5 +1190,134 @@ class Common extends BaseController
             }
         }
         $this->apiError('407');
+    }
+
+    /**
+     * TTS 音频代理接口
+     * 前端通过此接口获取 TTS 音频流，PHP 后端自动处理 Token 验证
+     * POST 方式避免长文本导致 URL 过长
+     */
+    public function ttsProxy()
+    {
+        // 关闭 PHP 执行时间限制，TTS 合成可能较慢
+        @set_time_limit(0);
+        @ini_set('memory_limit', '256M');
+
+        $config = get_system_config('content');
+        if (!isset($config['listen_book_open']) || !$config['listen_book_open']) {
+            return $this->ttsJsonResponse(400, lang('tts.not_enabled'));
+        }
+
+        // 从 POST body 读取参数
+        // ThinkPHP 的 param() 在某些配置下不会自动解析 JSON body，需手动读取
+        $text  = '';
+        $voice = '';
+        $rate  = 'normal';
+        $pitch = 'normal';
+
+        $input = file_get_contents('php://input');
+        if ($input) {
+            $jsonData = json_decode($input, true);
+            if (is_array($jsonData)) {
+                $text  = isset($jsonData['text']) ? trim($jsonData['text']) : '';
+                $voice = isset($jsonData['voice']) ? $jsonData['voice'] : '';
+                $rate  = isset($jsonData['rate']) ? $jsonData['rate'] : 'normal';
+                $pitch = isset($jsonData['pitch']) ? $jsonData['pitch'] : 'normal';
+            }
+        }
+
+        // 如果 JSON 解析失败，尝试从 Request param 获取（表单提交场景）
+        if (empty($text)) {
+            $param = request()->param();
+            if (is_array($param) && !empty($param)) {
+                $text  = isset($param['text']) ? trim($param['text']) : '';
+                $voice = isset($param['voice']) ? $param['voice'] : '';
+                $rate  = isset($param['rate']) ? $param['rate'] : 'normal';
+                $pitch = isset($param['pitch']) ? $param['pitch'] : 'normal';
+            }
+        }
+
+        if (empty($text)) {
+            return $this->ttsJsonResponse(400, lang('tts.text_empty'));
+        }
+
+        try {
+            $ttsConfig = getTtsConfig();
+            $voice = $voice ?: $ttsConfig['default_voice'];
+
+            // 使用 POST 方式请求 TTS 服务，避免 URL 过长
+            $ttsReq = getTtsAudioUrlPost($text, $voice, $rate, $pitch);
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => $ttsReq['url'],
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $ttsReq['body'],
+                CURLOPT_HTTPHEADER     => [
+                    'Content-Type: ' . $ttsReq['content_type'],
+                    'Accept: audio/*',
+                ],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => true,
+                // 整章合成比逐段合成耗时更长，留出足够等待时间。
+                CURLOPT_TIMEOUT        => 180,
+                CURLOPT_CONNECTTIMEOUT => 10,
+            ]);
+
+            $audioData = curl_exec($ch);
+            $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            // 调试日志（生产环境可关闭）
+            \think\facade\Log::info('TTS Proxy: httpCode=' . $httpCode . ' contentType=' . $contentType . ' size=' . (is_string($audioData) ? strlen($audioData) : '0') . ' curlError=' . $curlError);
+
+            if ($audioData === false || !empty($curlError)) {
+                return $this->ttsJsonResponse(502, lang('tts.service_error') . ': ' . $curlError);
+            }
+
+            if ($httpCode !== 200) {
+                return $this->ttsJsonResponse($httpCode ?: 502, lang('tts.service_http_error') . ', HTTP ' . $httpCode);
+            }
+
+            // 校验返回的内容是否为音频（避免把 JSON 错误当成音频返回）
+            if (empty($audioData)) {
+                return $this->ttsJsonResponse(502, lang('tts.service_error') . ': 空响应');
+            }
+            // 如果 TTS 服务返回的是 JSON（错误信息），转成 JSON 响应
+            if (stripos($contentType, 'application/json') !== false || stripos($contentType, 'text/') !== false) {
+                $errInfo = json_decode($audioData, true);
+                $errMsg = is_array($errInfo) && isset($errInfo['detail']) ? $errInfo['detail']
+                    : (is_array($errInfo) && isset($errInfo['error']) ? $errInfo['error'] : substr($audioData, 0, 200));
+                return $this->ttsJsonResponse(502, lang('tts.service_error') . ': ' . $errMsg);
+            }
+
+            // 使用 ThinkPHP Response 对象返回二进制流，避免 echo/exit 引入脏数据
+            $audioContentType = $contentType ?: 'audio/mpeg';
+            // 音频流不需要 charset，直接设置 header 避免附加 charset=utf-8
+            return \think\Response::create($audioData, 'html')
+                ->header([
+                    'Content-Type'    => $audioContentType,
+                    'Content-Length'  => strlen($audioData),
+                    'Cache-Control'   => 'no-store',
+                    'Accept-Ranges'   => 'none',
+                ]);
+        } catch (\Exception $e) {
+            return $this->ttsJsonResponse(500, lang('tts.service_error') . ': ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * TTS JSON 错误响应
+     */
+    private function ttsJsonResponse(int $httpCode, string $message)
+    {
+        return json([
+            'code' => $httpCode,
+            'msg'  => $message,
+        ], $httpCode)->header([
+            'Content-Type' => 'application/json; charset=utf-8',
+        ]);
     }
 }

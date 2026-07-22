@@ -48,6 +48,7 @@ class Chapter extends BaseController
         if (empty($book)) {
             $this->apiError('404');
         }
+        \app\service\ReverseCollectService::enqueueChapter((int)$chapter['id'], (int)$chapter['bookid']);
         if (intval($book['status']) !== 1) {
             $this->apiError('407');
         }
@@ -62,6 +63,7 @@ class Chapter extends BaseController
                 $content = Content::get($book['id'], $chapter['id']);
                 if (empty($content)) {
                     $chapter['content'] = '';
+                    \app\service\ReverseCollectService::enqueueChapter((int)$chapter['id'], (int)$chapter['bookid'], true);
                 }
                 if ($content && mb_strlen($content) > 0) {
                     list($wordnum, $content) = countWordsAndContent($content, true);
@@ -77,6 +79,7 @@ class Chapter extends BaseController
         } else {
             $chapter['content'] = lang('common.nopermission');
         }
+        \app\service\ReverseCollectService::prefetchNextChapters((int)$chapter['bookid'], (int)$chapter['chaps'], 2);
         $bookid = $book['id'];
         $chapter_id = $id;
         $ip = request()->ip();

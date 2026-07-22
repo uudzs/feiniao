@@ -1,5 +1,19 @@
 {extend name="common/base"/}
 {block name="style"}
+{if isset($tts_config)}
+<style>
+    #ttsDialog .bui-dialog-main { padding: .3rem; }
+    #ttsDialog .tts-control { margin-bottom: .22rem; }
+    #ttsDialog .tts-control label { display: block; margin-bottom: .08rem; color: #666; }
+    #ttsDialog .tts-control select { width: 100%; height: .72rem; padding: 0 .16rem; border: 1px solid #ddd; border-radius: .08rem; background: #fff; }
+    #ttsDialog .tts-auto { display: flex; align-items: center; gap: .12rem; }
+    #ttsDialog .tts-actions { display: flex; gap: .2rem; margin-top: .28rem; }
+    #ttsDialog .tts-actions .bui-btn { flex: 1; }
+    #ttsDialog #ttsstop { background: #f56c6c; color: #fff; }
+    #ttsDialog #ttsstart { background: #39a9ed; color: #fff; }
+    .chapterList .tts-highlight { background: rgba(57, 169, 237, .18) !important; }
+</style>
+{/if}
 {/block}
 {block name="title"}
 <title>{:get_seo_str('chapter','chapter_title','',['chapterid'=>$id])}</title>	
@@ -77,6 +91,14 @@
                 <p>章节点赞</p>
             </a>
         </div>
+        {if isset($tts_config)}
+        <div class="chapter-top-menu__content-item">
+            <a href="javascript:void(0)" b-click="chapter.openTts()">
+                <i class="fa fa-volume-up" aria-hidden="true"></i>
+                <p>听书</p>
+            </a>
+        </div>
+        {/if}
         <div class="chapter-top-menu__content-item">
             <a href="{:furl('bookshelf', [], true, 'home')}">
                 <i class="fa fa-server" aria-hidden="true"></i>
@@ -88,6 +110,36 @@
         <a href="javascript:void(0)" class="chapter-btn" b-click="chapter.bookshelf()"><i class="fa fa-plus" aria-hidden="true"></i>加入书架</a>
     </div>
 </div>
+{if isset($tts_config)}
+<div id="ttsDialog" class="bui-dialog bui-dialog-center" style="display: none;">
+    <div class="bui-dialog-head">章节朗读</div>
+    <div class="bui-dialog-main">
+        <div class="tts-container">
+            <div class="tts-control">
+                <label for="tts-voices">朗读语音</label>
+                <select id="tts-voices"></select>
+            </div>
+            <div class="tts-control">
+                <label for="tts-rate">朗读语速</label>
+                <select id="tts-rate"></select>
+            </div>
+            <div class="tts-control">
+                <label for="tts-pitch">朗读音调</label>
+                <select id="tts-pitch"></select>
+            </div>
+            <div class="tts-control tts-auto">
+                <input type="checkbox" name="tts-read" id="tts-read" value="1">
+                <label for="tts-read">自动朗读下一章</label>
+            </div>
+            <div class="tts-actions">
+                <button type="button" class="bui-btn" id="ttsstart">开始听书</button>
+                <button type="button" class="bui-btn" id="ttsstop">停止</button>
+            </div>
+        </div>
+    </div>
+    <div class="bui-dialog-close"><i class="icon-close"></i></div>
+</div>
+{/if}
 <div class="drawer drawer-init">
     <div class="drawer-bg" style="display: none;" b-click="chapter.closeDirectory()"></div>
     <div class="cata-title">
@@ -100,13 +152,11 @@
       </ul>
     </div>    
 </div>
-{eq name=":get_addons_is_enable('baiduspeech')" value="1"}
-{:hook('baiduspeechHook', ['terminal' => 'wap', 'bookid' => $bookid, 'chapterid' => $id])}
-{/eq}
 {/block}
 {block name="script"}
 <script>
     bui.ready(function () {
+        var ttsDialog = null;
         $(".footer").hide();
         $(".bui-navbar").hide();
         $(".bui-bar-right a").attr('href', "javascript:;").find('i').removeClass('icon-search').addClass("fa fa-navicon");
@@ -299,6 +349,11 @@
                     $("#adom_panel").toggle().css('transform','none');
                     $("#chapter-top-menu").toggle();
                 },
+                openTts: function() {
+                    if (ttsDialog) {
+                        ttsDialog.open();
+                    }
+                },
                 setTheme: function(t) {
                     $(".bui-page").attr("class", "bui-page " + this.SKIN[t].theme),
                     $(".bui-page").find('.font_bgcolor[data-skin="' + t + '"]').addClass("active").siblings().removeClass("active"),
@@ -403,6 +458,13 @@
                 }
                 that.initialize();
                 that.chapter();
+                if ($('#ttsDialog').length) {
+                    ttsDialog = bui.dialog({
+                        id: '#ttsDialog',
+                        zIndex: 300,
+                        mask: true
+                    });
+                }
             }
         })
         $(".bui-bar-right").on("click", ".bui-btn", function() {
@@ -410,4 +472,31 @@
         })
     })     
 </script>
+{if isset($tts_config)}
+<script>
+    const TTS_PROXY_URL = "{:furl('v1/ttsproxy', [], true, 'api')}";
+    window.TTSConfig = {$tts_config|json_encode|raw};
+    // BUI 会动态追加章节，只朗读当前最后一个章节内容。
+    window.TTSChapterContainer = '.chapterList .content';
+    window.TTSChapterScrollContainer = $('#page_reader');
+    window.TTSChapterContentOpen = 1;
+    window.TTSChapterNextPageObj = $('.c_next');
+    function feiniaoGetCookie() {
+        return getCookie('feiniaoTTS');
+    }
+    function feiniaoSetCookie(value) {
+        return setCookie('feiniaoTTS', value, 365);
+    }
+</script>
+<script src="{__STATIC__}/home/js/tts.js?v={$version}"></script>
+{/if}
+<script>
+window.ReverseCollectChapter = {
+    enabled: {if $reverse_collect_enabled}true{else}false{/if},
+    empty: {if $reverse_collect_missing}true{else}false{/if},
+    chapterId: "{$id}",
+    endpoint: "{:furl('v1/collectChapterStatus', [], true, 'api')}"
+};
+</script>
+<script src="{__STATIC__}/home/js/reverse-collect.js?v={$version}"></script>
 {/block}

@@ -40,15 +40,23 @@ class Chapter extends BaseController
         if (empty($book)) {
             $this->error(404);
         }
+        \app\service\ReverseCollectService::enqueueChapter((int)$chapter['id'], (int)$chapter['bookid']);
+        $storedContent = Content::get((int)$chapter['bookid'], (int)$chapter['id']);
+        $reverseCollectMissing = empty($storedContent);
+        if ($reverseCollectMissing) {
+            $ismakecache = false;
+            \app\service\ReverseCollectService::enqueueChapter((int)$chapter['id'], (int)$chapter['bookid'], true);
+        }
         $book['cover'] = get_file($book['cover']);
         $data = [];
+        $content = '';
         $config = get_system_config('content');
         if ($config['chapter_pages_content_open']) {
             $chapter['chapteraccess'] = chapterCheckAccess($id);
             $hide_content = $chapter['chapteraccess'] !== 1;
             $chapter['hide_content'] = $hide_content;
             if (!$hide_content) {    
-                $content = Content::get($chapter['bookid'], $chapter['id']);
+                $content = $storedContent;
                 if ($content && mb_strlen($content) > 0) {
                     $content = htmlspecialchars_decode($content);
                     $content = preg_replace('/<br\s?\/?>\r?\n?/i', "\n", $content);
@@ -85,10 +93,28 @@ class Chapter extends BaseController
             $data['front_url'] = $front_url;
             $data['after_url'] = $after_url;
         }
+        \app\service\ReverseCollectService::prefetchNextChapters((int)$chapter['bookid'], (int)$chapter['chaps'], 2);
         $data['chapter'] = $chapter;
         $data['id'] = $id;
         $data['bookid'] = $chapter['bookid'];
         $data['book'] = $book;
+        $data['reverse_collect_missing'] = $reverseCollectMissing;
+        $data['reverse_collect_enabled'] = \app\service\ReverseCollectService::enabled();
+        if (isset($config['listen_book_open']) && $config['listen_book_open']) {
+            // TTS 听书功能配置
+            $ttsConfig = getTtsConfig();
+            $data['tts_config'] = [
+                'base_url'       => $ttsConfig['base_url'],
+                'default_voice'  => $ttsConfig['default_voice'],
+                'default_speed'  => $ttsConfig['default_speed'],
+                'default_pitch'  => $ttsConfig['default_pitch'],
+                'lang_code'      => $ttsConfig['lang_code'],
+                'speed_options'  => $ttsConfig['speed_options'],
+                'pitch_options'  => $ttsConfig['pitch_options'],
+                'voice_options'  => $ttsConfig['voice_options'],
+                'auth_enabled'   => $ttsConfig['auth_enabled'],
+            ];
+        }
         View::config(['view_path' => $this->view_path()]);
         if ($ismakecache) $this->makecache(View::fetch('detail', $data));
         return view('detail', $data);

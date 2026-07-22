@@ -1552,40 +1552,25 @@ if (!function_exists('furl')) {
      * @param bool|string $model 模块
      * @return UrlBuild
      */
-    function furl(string $url = '', array $vars = [], bool $suffix = true, string $model = 'home'): string
-    {
-        $domainBind = config('app.domain_bind', []);
-
-        if ($url === 'chapter_detail' && isset($vars['id']) && is_numeric($vars['id'])) {
-            // 自动加密章节ID
-            $vars['id'] = encrypt_chapter_id((int)$vars['id']);
+    function furl(
+        string $url = '',
+        array $vars = [],
+        bool $suffix = true,
+        string $model = 'home'
+    ): string {
+        if (
+            $url === 'chapter_detail'
+            && isset($vars['id'])
+            && is_numeric($vars['id'])
+        ) {
+            $vars['id'] = encrypt_chapter_id((int) $vars['id']);
         }
 
-        // 多域名绑定逻辑
-        if (!empty($domainBind)) {
-            $flippedBind = array_flip($domainBind);
-            $domain = $flippedBind[$model] ?? null;
+        $url = $model !== 'home' ? '/' . ltrim($model . '/' . ltrim($url, '/'), '/') : $url;
 
-            // 处理通配符域名
-            if ($domain === '*') {
-                $domain = config('app.home_domain', request()->host());
-            }
-
-            // 构造带域名的URL
-            return (string) Route::buildUrl($url, $vars)
-                ->suffix($suffix)
-                ->domain($domain ?? true); // true 表示自动当前域名
-        }
-
-        // 非域名绑定逻辑
-        $url = $model !== 'home'
-            ? '/' . ltrim($model . '/' . ltrim($url, '/'), '/')
-            : $url;
-
-        // 生成绝对URL（保持与原函数行为一致）
         return (string) Route::buildUrl($url, $vars)
             ->suffix($suffix)
-            ->domain(true); // 强制带域名
+            ->domain(true);
     }
 }
 
@@ -1810,4 +1795,413 @@ function decrypt_chapter_id($encryptedId)
 function is_valid_chapter_id($encryptedId)
 {
     return \app\service\ChapterIdService::isValid((string)$encryptedId);
+}
+
+
+if (!function_exists('processString')) {
+    function processString($str)
+    {
+        // 1. 大写换成小写
+        $output = mb_strtolower($str, 'UTF-8');
+
+        // 2. 中文转拼音
+        $Pinyin = new \Overtrue\Pinyin\Pinyin;
+        $output = $Pinyin->permalink($output, '');
+
+        // 3. 所有带音标的字母替换成英文字符
+        $output = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $output);
+
+        // 4. 删除所有非数字、英文和连字符的字符（保留原有的"-"）
+        $output = preg_replace('/[^a-z0-9\s-]/', '', $output);
+
+        // 5. 空格（全角/半角）替换成"-"
+        $output = str_replace([' ', '　'], '-', $output);
+
+        // 6. 多个"-"替换成一个"-"
+        $output = preg_replace('/-+/', '-', $output);
+
+        // 7. 删除首位和末尾的"-"
+        $output = trim($output, '-');
+
+        return $output;
+    }
+}
+
+if (!function_exists('isChineseText')) {
+    /**
+     * 检测文本是否包含中文字符（判断是否需要翻译）
+     * 
+     * @param string $text 待检测文本
+     * @return bool  含中文返回 true，否则 false
+     */
+    function isChineseText($text)
+    {
+        if (empty($text)) return false;
+        // 检测 CJK 统一汉字（\x{4e00}-\x{9fff}）及扩展区
+        return (bool) preg_match('/[\x{4e00}-\x{9fff}\x{3400}-\x{4dbf}]/u', $text);
+    }
+}
+
+if (!function_exists('translateZhToId')) {
+    /**
+     * 调用本地 NLLB 翻译服务，将中文翻译为印尼语
+     * 支持长文本分段、超时缩短、失败重试
+     * 
+     * @param string $text       待翻译的中文文本
+     * @param int    $maxRetries 最大重试次数（默认 2 次）
+     * @param int    $timeout    单次请求超时（秒，默认 60）
+     * @param int    $chunkSize  分段翻译时的每段最大字符数（默认 300）
+     * @return string            翻译后的印尼语文本，失败时返回原文
+     */
+    function translateZhToId($text, $maxRetries = 3, $timeout = 120, $chunkSize = 100)
+    {
+        $text = trim($text);
+        if (empty($text)) return '';
+
+        // CPU 模型推理慢，长文本需要放宽 PHP 超时限制
+        set_time_limit(900);
+
+        $apiUrl = env('TRANSLATE.BASE_URL', 'http://127.0.0.1:25009') . '/translate';
+        $maxChunks = 30;
+
+        // 如果文本太长，按固定长度硬切分（不依赖句号，避免某句过长）
+        $chunks = [];
+        if (mb_strlen($text) > $chunkSize) {
+            $total = mb_strlen($text);
+            for ($i = 0; $i < $total; $i += $chunkSize) {
+                $chunks[] = mb_substr($text, $i, $chunkSize);
+                if (count($chunks) >= $maxChunks) break;
+            }
+        } else {
+            $chunks = [$text];
+        }
+
+        // 分段翻译：只翻中文，已翻译的跳过，失败保留原文，顺序不变
+        $results = [];
+        foreach ($chunks as $chunk) {
+            if (isChineseText($chunk)) {
+                $result = translateSingleChunk($chunk, $apiUrl, $maxRetries, $timeout, $chunkSize);
+                $results[] = $result !== false ? $result : $chunk;
+            } else {
+                $results[] = $chunk; // 已经是印尼语，直接保留
+            }
+        }
+
+        return implode('', $results);
+    }
+}
+
+if (!function_exists('translateSingleChunk')) {
+    /**
+     * 翻译单个文本片段，带重试和超时缩短
+     */
+    function translateSingleChunk($text, $apiUrl, $maxRetries, $timeout, $chunkSize)
+    {
+        $retries = 0;
+        $currentText = $text;
+        $currentTimeout = $timeout;
+
+        while ($retries <= $maxRetries) {
+            try {
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL            => $apiUrl,
+                    CURLOPT_POST           => true,
+                    CURLOPT_POSTFIELDS     => json_encode([
+                        'text'   => $currentText,
+                        'source' => 'zh',
+                        'target' => 'id'
+                    ], JSON_UNESCAPED_UNICODE),
+                    CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT        => $currentTimeout,
+                    CURLOPT_CONNECTTIMEOUT => 10,
+                ]);
+
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
+                curl_close($ch);
+
+                // 网络错误（含超时）
+                if ($response === false || !empty($curlError)) {
+                    $retries++;
+                    // 逐次缩短文本，确保最终能跑完
+                    $len = mb_strlen($currentText);
+                    if ($len > 30) {
+                        $currentText = mb_substr($currentText, 0, max(30, (int)($len * 0.5)));
+                        $currentTimeout = max($currentTimeout + 60, 180);
+                    }
+                    continue;
+                }
+
+                // HTTP 错误
+                if ($httpCode !== 200) {
+                    $retries++;
+                    continue;
+                }
+
+                // 解析响应
+                $data = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $retries++;
+                    continue;
+                }
+
+                if (isset($data['translatedText']) && !empty($data['translatedText'])) {
+                    return $data['translatedText'];
+                }
+
+                // 有错误字段，重试
+                if (isset($data['error'])) {
+                    $retries++;
+                    continue;
+                }
+
+                // 返回了空翻译
+                $retries++;
+            } catch (\Exception $e) {
+                $retries++;
+            }
+        }
+
+        // 所有重试失败，返回原文
+        return $text;
+    }
+}
+
+if (!function_exists('getTtsConfig')) {
+    /**
+     * 根据当前语言获取 TTS 服务的配置
+     * 包括 TTS 服务地址、默认音色、语速选项、音调选项等
+     * 
+     * @param string|null $lang 语言代码（如 id-id, en-us, zh-cn），为 null 时自动获取当前语言
+     * @return array TTS 配置数组
+     */
+    function getTtsConfig($lang = null)
+    {
+        if ($lang === null) {
+            $lang = \think\facade\Lang::getLangSet();
+        }
+        $lang = strtolower($lang);
+
+        // TTS 服务地址（从 .env 读取或使用默认值）
+        $ttsBaseUrl = env('TTS.BASE_URL', 'http://127.0.0.1:8000');
+
+        // 语言 -> 默认音色映射（与 tts_server.py 中的 LANG_DEFAULTS 对应）
+        $langVoiceMap = [
+            'zh-cn' => 'zh-CN-XiaoxiaoNeural',
+            'zh'    => 'zh-CN-XiaoxiaoNeural',
+            'en-us' => 'en-US-JennyNeural',
+            'en'    => 'en-US-JennyNeural',
+            'id-id' => 'id-ID-GadisNeural',
+            'id'    => 'id-ID-GadisNeural',
+        ];
+
+        $defaultVoice = isset($langVoiceMap[$lang]) ? $langVoiceMap[$lang] : 'zh-CN-XiaoxiaoNeural';
+
+        // 语速选项
+        $speedOptions = [
+            ['value' => 'x-slow', 'label' => lang('tts.speed_x_slow')],
+            ['value' => 'slow',   'label' => lang('tts.speed_slow')],
+            ['value' => 'normal', 'label' => lang('tts.speed_normal')],
+            ['value' => 'fast',   'label' => lang('tts.speed_fast')],
+            ['value' => 'x-fast', 'label' => lang('tts.speed_x_fast')],
+        ];
+
+        // 音调选项
+        $pitchOptions = [
+            ['value' => 'x-low',  'label' => lang('tts.pitch_x_low')],
+            ['value' => 'low',    'label' => lang('tts.pitch_low')],
+            ['value' => 'normal', 'label' => lang('tts.pitch_normal')],
+            ['value' => 'high',   'label' => lang('tts.pitch_high')],
+            ['value' => 'x-high', 'label' => lang('tts.pitch_x_high')],
+        ];
+
+        // 发声选项（根据当前语言筛选相关 voice，标签通过语言文件翻译）
+        $allVoices = [
+            'zh-CN-XiaoxiaoNeural' => lang('tts.voice_xiaoxiao'),
+            'zh-CN-XiaoyiNeural'   => lang('tts.voice_xiaoyi'),
+            'zh-CN-YunxiNeural'    => lang('tts.voice_yunxi'),
+            'zh-CN-YunjianNeural'  => lang('tts.voice_yunjian'),
+            'zh-CN-YunyangNeural'  => lang('tts.voice_yunyang'),
+            'zh-CN-YunyeNeural'    => lang('tts.voice_yunye'),
+            'zh-HK-HiuMaanNeural'  => lang('tts.voice_hiumaan'),
+            'zh-HK-WanLungNeural'  => lang('tts.voice_wanlung'),
+            'zh-TW-HsiaoChenNeural' => lang('tts.voice_hsiaochen'),
+            'zh-TW-YunJheNeural'   => lang('tts.voice_yunjhe'),
+            'en-US-JennyNeural'    => lang('tts.voice_jenny'),
+            'en-US-AriaNeural'     => lang('tts.voice_aria'),
+            'en-US-GuyNeural'      => lang('tts.voice_guy'),
+            'en-GB-SoniaNeural'    => lang('tts.voice_sonia'),
+            'en-GB-RyanNeural'     => lang('tts.voice_ryan'),
+            'ja-JP-NanamiNeural'   => lang('tts.voice_nanami'),
+            'ja-JP-KeitaNeural'    => lang('tts.voice_keita'),
+            'ko-KR-SunHiNeural'    => lang('tts.voice_sunhi'),
+            'ko-KR-InJoonNeural'   => lang('tts.voice_injoon'),
+            'fil-PH-BlessicaNeural' => lang('tts.voice_blessica'),
+            'fil-PH-AngeloNeural'  => lang('tts.voice_angelo'),
+            'id-ID-ArdiNeural'     => lang('tts.voice_ardi'),
+            'id-ID-GadisNeural'    => lang('tts.voice_gadis'),
+        ];
+
+        // 根据语言前缀筛选 voice 列表
+        $langPrefix = explode('-', $lang)[0];
+        $voiceOptions = [];
+        foreach ($allVoices as $code => $label) {
+            $voicePrefix = explode('-', strtolower($code))[0];
+            // 中文语言组包含 zh-CN, zh-HK, zh-TW
+            if ($langPrefix === 'zh' && in_array($voicePrefix, ['zh'])) {
+                $voiceOptions[] = ['value' => $code, 'label' => $label];
+            } elseif ($voicePrefix === $langPrefix || strtolower(substr($code, 0, strlen($lang))) === $lang) {
+                $voiceOptions[] = ['value' => $code, 'label' => $label];
+            }
+        }
+        // 如果没匹配到任何 voice，使用全部
+        if (empty($voiceOptions)) {
+            foreach ($allVoices as $code => $label) {
+                $voiceOptions[] = ['value' => $code, 'label' => $label];
+            }
+        }
+
+        return [
+            'base_url'       => $ttsBaseUrl,
+            'default_voice'  => $defaultVoice,
+            'default_speed'  => 'normal',
+            'default_pitch'  => 'normal',
+            'lang_code'      => $lang,
+            'speed_options'  => $speedOptions,
+            'pitch_options'  => $pitchOptions,
+            'voice_options'  => $voiceOptions,
+            'auth_enabled'   => env('TTS.AUTH_ENABLED', false),
+        ];
+    }
+}
+
+if (!function_exists('getTtsToken')) {
+    /**
+     * 获取 TTS 防伪 Token（当 TTS 服务开启 Token 验证时需要）
+     * 
+     * @param string $text  要转换的文本
+     * @param string $voice 音色名称
+     * @param string $rate  语速（如 normal, slow, fast）
+     * @param string $pitch 音调（如 normal, low, high）
+     * @return string|null  Token 字符串，失败返回 null
+     */
+    function getTtsToken($text, $voice = 'zh-CN-XiaoxiaoNeural', $rate = 'normal', $pitch = 'normal')
+    {
+        $config = getTtsConfig();
+        $apiUrl = rtrim($config['base_url'], '/') . '/token';
+
+        try {
+            // 使用 POST 方式请求 token，避免长文本导致 URL 过长
+            $postData = json_encode([
+                'text'  => $text,
+                'voice' => $voice,
+                'rate'  => $rate,
+                'pitch' => $pitch,
+            ], JSON_UNESCAPED_UNICODE);
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL            => $apiUrl,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $postData,
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT        => 30,
+                CURLOPT_CONNECTTIMEOUT => 10,
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if (isset($data['token'])) {
+                    return $data['token'];
+                }
+            }
+        } catch (\Exception $e) {
+            // 获取 Token 失败，返回 null（降级为无 Token 模式）
+        }
+
+        return null;
+    }
+}
+
+if (!function_exists('getTtsAudioUrl')) {
+    /**
+     * 生成 TTS 音频流 URL（GET 方式，适用于短文本）
+     * 
+     * @param string $text  要转换的文本
+     * @param string $voice 音色名称
+     * @param string $rate  语速
+     * @param string $pitch 音调
+     * @return string 完整的 TTS 音频 URL
+     */
+    function getTtsAudioUrl($text, $voice = null, $rate = 'normal', $pitch = 'normal')
+    {
+        $config = getTtsConfig();
+        $baseUrl = rtrim($config['base_url'], '/');
+        $voice = $voice ?: $config['default_voice'];
+
+        $params = [
+            'text'  => $text,
+            'voice' => $voice,
+            'rate'  => $rate,
+            'pitch' => $pitch,
+        ];
+
+        // 如果开启了 Token 验证，尝试获取 Token
+        if ($config['auth_enabled']) {
+            $token = getTtsToken($text, $voice, $rate, $pitch);
+            if ($token) {
+                $params['token'] = $token;
+            }
+        }
+
+        return $baseUrl . '/tts?' . http_build_query($params);
+    }
+}
+
+if (!function_exists('getTtsAudioUrlPost')) {
+    /**
+     * 获取 TTS POST 请求所需的 URL 和 JSON body
+     * 适用于长文本场景，避免 GET 请求 URL 过长
+     * 
+     * @param string $text  要转换的文本
+     * @param string $voice 音色名称
+     * @param string $rate  语速
+     * @param string $pitch 音调
+     * @return array ['url' => string, 'body' => string, 'content_type' => string]
+     */
+    function getTtsAudioUrlPost($text, $voice = null, $rate = 'normal', $pitch = 'normal')
+    {
+        $config = getTtsConfig();
+        $baseUrl = rtrim($config['base_url'], '/');
+        $voice = $voice ?: $config['default_voice'];
+
+        $body = [
+            'text'  => $text,
+            'voice' => $voice,
+            'rate'  => $rate,
+            'pitch' => $pitch,
+        ];
+
+        // 如果开启了 Token 验证，尝试获取 Token
+        if ($config['auth_enabled']) {
+            $token = getTtsToken($text, $voice, $rate, $pitch);
+            if ($token) {
+                $body['token'] = $token;
+            }
+        }
+
+        return [
+            'url'          => $baseUrl . '/tts',
+            'body'         => json_encode($body, JSON_UNESCAPED_UNICODE),
+            'content_type' => 'application/json',
+        ];
+    }
 }

@@ -68,6 +68,8 @@ Route::group('v1', function () {
     Route::rule('caijibook', 'api/v1.caiji/book', 'GET|POST');
     Route::rule('caijichapter', 'api/v1.caiji/chapter', 'GET|POST');
     Route::rule('collectSubmit', 'api/v1.collect/submit', 'GET|POST');
+    Route::rule('collectCallback', 'api/v1.collect/reverseCallback', 'POST');
+    Route::rule('collectChapterStatus', 'api/v1.collect/chapterJobStatus', 'GET|POST');
     // 评论列表
     Route::rule('commentlist', 'api/v1.comment/list', 'POST');
     // 发表评论
@@ -76,6 +78,8 @@ Route::group('v1', function () {
     Route::rule('commentlike', 'api/v1.comment/like', 'POST');
     // 回复评论
     Route::rule('commentreply', 'api/v1.comment/reply', 'POST');
+    // tts代理
+    Route::rule('ttsproxy', 'api/v1.common/ttsproxy', 'POST');
 })->prefix('v1.');
 try {
     if (get_addons_is_enable('sitegroup')) {

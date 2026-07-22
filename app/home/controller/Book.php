@@ -85,6 +85,7 @@ class Book extends BaseController
         if (!ctype_digit((string)$id)) {
             $id = $book['id'];
         }
+        \app\service\ReverseCollectService::enqueueBook((int)$id);
 
         $book['bigclassname'] = Db::name('category')->where(['id' => $book['genre']])->cache('category_' . $book['genre'], 86400)->value('name');
         $book['cover'] = get_file($book['cover']);

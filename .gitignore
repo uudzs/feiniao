@@ -9,6 +9,7 @@
 /public/backup/*
 /public/static/home/feiniao/*
 /public/static/quyuedu/*
+/public/static/overseas/*
 /addons/*
 /template/*
 /config/theme.php

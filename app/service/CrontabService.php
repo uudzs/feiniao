@@ -14,7 +14,10 @@ class CrontabService
         // 动态加载插件命令
         $addonsPath = app()->getRootPath() . 'addons';
         if (is_dir($addonsPath)) {
-            $plugins = scandir($addonsPath);
+            $plugins = @scandir($addonsPath);
+            if ($plugins === false) {
+                return $commands;
+            }
             $action = 'config';
 
             foreach ($plugins as $name) {
@@ -28,8 +31,19 @@ class CrontabService
                 }
 
                 $file = trim($name);
+                $infoFile = $addonDir . 'info.ini';
 
-                $config = parse_ini_file($addonDir . 'info.ini', true);
+                // addons 目录中也可能放置独立程序，并非所有子目录都是插件。
+                if (!is_file($infoFile) || !is_readable($infoFile)) {
+                    continue;
+                }
+
+                try {
+                    // 屏蔽 INI 格式警告；解析失败时只跳过当前插件，不能影响应用启动。
+                    $config = @parse_ini_file($infoFile, true, INI_SCANNER_TYPED);
+                } catch (\Throwable $e) {
+                    continue;
+                }
                 if (!$config || !is_array($config)) continue;
                 if (!isset($config['install']) || !isset($config['status'])) continue;
                 if (!$config['install'] || !$config['status']) continue;

@@ -2,6 +2,8 @@
 
 // 这是系统自动生成的middleware定义文件
 return [
+    // 默认应用快捷访问，生成链接时省略 /home 前缀
+    \app\home\middleware\AppExpress::class,
     //开启session中间件
     //'think\middleware\SessionInit',
     // 多语言加载

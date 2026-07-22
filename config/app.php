@@ -12,29 +12,14 @@ return [
     'with_route' => true,
     // 默认应用
     'default_app' => 'home',
+    // 默认应用快捷访问，前台路由无需 /home 前缀
+    'app_express' => true,
     // 默认时区
     'default_timezone' => 'Asia/Shanghai',
     // 自动多应用模式
     'auto_multi_app' => false,
     // 应用映射（自动多应用模式有效）
-    'app_map' => [],
-    // 域名绑定（自动多应用模式有效）
-    /**
-     *  示例
-     * 'domain_bind' => [
-     *      'admin.youdomain.com' => 'admin',
-     *      'author.youdomain.com' => 'author',
-     *      'api.youdomain.com' => 'api',
-     *      '*' => 'home'
-     *  ],
-    */
-    'domain_bind' => [],
-    //home模块域名，只有domain_bind设置多域名时有效，并且只适用home模块
-    /**
-     *  示例
-     *  'home_domain' => 'www.youdomain.com',
-     */
-    'home_domain' => '',
+    'app_map' => [],   
     // 禁止URL访问的应用列表（自动多应用模式有效）
     'deny_app_list' => [],
     // 默认全局过滤方法 用逗号分隔多个

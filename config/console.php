@@ -14,5 +14,6 @@ return [
 		'crud-a' => 'app\crud\command\CrudAdd',
 		'crud-e' => 'app\crud\command\CrudEdit',
 		'crud-r' => 'app\crud\command\CrudRead',
+		'collect:dispatch' => 'app\command\CollectDispatch',
 	] + CrontabService::loadAddonsCrontab()
 ];

@@ -44,6 +44,7 @@ class Book extends BaseController
         $model_name = \think\facade\App::initialize()->http->getName();
 
         if ($detail) {
+            \app\service\ReverseCollectService::enqueueBook((int)$detail['id']);
             if (intval($detail['status']) !== 1) {
                 $this->apiError('407');
             }

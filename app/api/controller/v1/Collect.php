@@ -16,19 +16,20 @@ use content\Content;
 class Collect
 {
     /**
-     * API密钥
-     */
-    protected $apiKey = 'collect_2026_secret_key_abc123';
-
-    /**
      * 验证API密钥（用于POST提交）
      */
     protected function verifyApiKey(): void
     {
         $request = request();
-        $key = $request->header('X-API-Key') ?: $request->param('api_key', '');
+        $key = (string)($request->header('X-API-Key') ?: $request->param('api_key', ''));
+        $apiKey = (string)config('reverse_collect.collector_api_key', '');
 
-        if (empty($key) || $key !== $this->apiKey) {
+        if ($apiKey === '') {
+            $this->error('采集入库API密钥未配置', 503)->send();
+            exit;
+        }
+
+        if ($key === '' || !hash_equals($apiKey, $key)) {
             $this->error('API密钥无效或未提供', 401)->send();
             exit;
         }
@@ -53,8 +54,6 @@ class Collect
             if ($dataFormat === 'zip') {
                 // ZIP 压缩格式 (使用 ZipArchive 类，兼容 PHP 8.0+)
                 $tempFile = tempnam(sys_get_temp_dir(), 'collect_');
-                //file_put_contents($tempFile, $rawInput);
-
                 $zip = new \ZipArchive();
                 $result = $zip->open($tempFile, \ZipArchive::RDONLY);
                 if ($result !== true) {
@@ -85,7 +84,7 @@ class Collect
                     return $this->error("JSON 解析错误: " . json_last_error_msg(), 500);
                 }
             }
-
+            //file_put_contents('./data_' . time() . '.json', json_encode($data, JSON_PRETTY_PRINT));
             if (empty($data)) {
                 return $this->error('请求数据为空', 400);
             }
@@ -171,9 +170,15 @@ class Collect
                     $results = $this->saveChapters($bookId, $mappedData['authorid'], $chapters);
                     $wordnumsum = array_sum(array_column($results, 'wordnum')) ?? 0;
                     if ($wordnumsum > 0) {
-                        $bookUpdateinfo['words'] = $wordnumsum;
-                        $bookUpdateinfo['chapters'] = count($results);
+                        $bookUpdateinfo['words'] = $wordnumsum;                        
                     }
+                    $bookUpdateinfo['chapters'] = count($results);
+                }
+
+                $sourceUrl = (string)($workData['source_url'] ?? $data['source_url'] ?? '');
+                $collectorTaskId = (int)($data['task_id'] ?? $workData['task_id'] ?? 0);
+                if ($sourceUrl !== '' && $collectorTaskId > 0) {
+                    $this->syncSourceMappings($bookId, $collectorTaskId, $sourceUrl, $results ?? []);
                 }
 
                 // 处理封面图片（仅当没有 base64 数据时才通过 URL 下载）
@@ -276,7 +281,9 @@ class Collect
                     'chapter_id' => $chapterId,
                     'wordnum' => $wordnum,
                     'sort' => $sort,
-                    'action' => $action
+                    'action' => $action,
+                    'source_url' => (string)($chapter['source_url'] ?? $chapter['url'] ?? $chapter['link'] ?? ''),
+                    'external_id' => (string)($chapter['external_id'] ?? ''),
                 ];
             } catch (\Exception $e) {
                 continue;
@@ -296,6 +303,119 @@ class Collect
         }
 
         return $results;
+    }
+
+    /** Receive a signed result from the standalone collector. */
+    public function reverseCallback(Request $request)
+    {
+        $raw = file_get_contents('php://input');
+        $timestamp = (string)$request->header('X-Collect-Timestamp', '');
+        $signature = (string)$request->header('X-Collect-Signature', '');
+        $secret = (string)config('reverse_collect.callback_secret');
+        if (
+            !$secret || !ctype_digit($timestamp) || abs(time() - (int)$timestamp) > 300
+            || !hash_equals(hash_hmac('sha256', $timestamp . '.' . $raw, $secret), $signature)
+        ) {
+            return $this->error('Invalid callback signature', 401);
+        }
+        $input = json_decode($raw, true);
+        if (!is_array($input) || empty($input['request_id']) || empty($input['mode'])) return $this->error('Invalid callback payload', 400);
+        if (!\app\service\ReverseCollectService::tablesInstalled()) return $this->error('Reverse collection tables are not installed', 503);
+        $job = Db::name('collect_job')->where('request_id', $input['request_id'])->find();
+        if (!$job) return $this->error('Unknown request_id', 404);
+        if ($job['status'] === 'success') return $this->success(['request_id' => $input['request_id']], 'Already processed');
+        if (isset($input['success']) && !$input['success']) {
+            Db::name('collect_job')->where('id', $job['id'])->update([
+                'status' => 'failed',
+                'last_error' => mb_substr((string)($input['error'] ?? 'Collector failed'), 0, 1000),
+                'next_retry_at' => time() + 60,
+                'update_time' => time(),
+            ]);
+            return $this->success(['request_id' => $input['request_id']], 'Failure recorded');
+        }
+
+        $data = $input['data'] ?? [];
+        try {
+            Db::startTrans();
+            if ($input['mode'] === 'work_catalog') {
+                $book = Db::name('book')->where('id', $job['book_id'])->find();
+                if (!$book) throw new \RuntimeException('Book not found');
+                $update = [];
+                if (!empty($data['summary'])) $update['remark'] = strip_tags((string)$data['summary']);
+                if (isset($data['update_status'])) $update['isfinish'] = (int)$data['update_status'];
+                if ($update) {
+                    $update['update_time'] = time();
+                    Db::name('book')->where('id', $book['id'])->update($update);
+                }
+                if (empty($data['chapters']) || !is_array($data['chapters'])) throw new \RuntimeException('Collector returned an empty catalog');
+                $results = $this->saveChapters((int)$book['id'], (int)$book['authorid'], $data['chapters']);
+                $source = Db::name('collect_source')->where('book_id', $book['id'])->find();
+                $this->syncSourceMappings((int)$book['id'], (int)$input['task_id'], (string)$input['source_url'], $results);
+                Db::name('collect_source')->where('book_id', $book['id'])->update(['last_catalog_sync_at' => time(), 'last_error' => '', 'update_time' => time()]);
+            } elseif ($input['mode'] === 'chapter_content') {
+                $content = trim((string)($data['content'] ?? ''));
+                if ($content === '') throw new \RuntimeException('Collector returned empty chapter content');
+                $chapter = Db::name('chapter')->where(['id' => $job['chapter_id'], 'bookid' => $job['book_id']])->find();
+                if (!$chapter) throw new \RuntimeException('Chapter does not belong to book');
+                list($wordnum, $content) = countWordsAndContent($content, true);
+                Content::add((int)$job['book_id'], (int)$job['chapter_id'], $content);
+                Db::name('chapter')->where('id', $job['chapter_id'])->update(['wordnum' => $wordnum, 'update_time' => time()]);
+                Db::name('collect_chapter_source')->where('chapter_id', $job['chapter_id'])->update(['last_content_sync_at' => time(), 'last_error' => '', 'update_time' => time()]);
+            } else {
+                throw new \RuntimeException('Unsupported callback mode');
+            }
+            Db::name('collect_job')->where('id', $job['id'])->update(['status' => 'success', 'last_error' => '', 'update_time' => time()]);
+            Db::commit();
+            return $this->success(['request_id' => $input['request_id']], 'Callback processed');
+        } catch (\Throwable $e) {
+            Db::rollback();
+            Db::name('collect_job')->where('id', $job['id'])->update(['status' => 'failed', 'last_error' => mb_substr($e->getMessage(), 0, 1000), 'update_time' => time()]);
+            return $this->error($e->getMessage(), 500);
+        }
+    }
+
+    public function chapterJobStatus(Request $request)
+    {
+        $chapterId = (int)$request->param('chapter_id', 0);
+        if ($chapterId <= 0) return $this->error('Invalid chapter_id', 400);
+        return $this->success(\app\service\ReverseCollectService::chapterJobStatus($chapterId));
+    }
+
+    protected function syncSourceMappings(int $bookId, int $taskId, string $sourceUrl, array $chapters): void
+    {
+        if (!\app\service\ReverseCollectService::tablesInstalled()) throw new \RuntimeException('Reverse collection tables are not installed');
+        $now = time();
+        $source = Db::name('collect_source')->where('book_id', $bookId)->find();
+        $values = ['book_id' => $bookId, 'collector_task_id' => $taskId, 'source_url' => $sourceUrl, 'source_hash' => md5($sourceUrl), 'update_time' => $now];
+        if ($source) Db::name('collect_source')->where('id', $source['id'])->update($values);
+        else {
+            $values['create_time'] = $now;
+            $values['last_catalog_sync_at'] = $now;
+            $sourceId = Db::name('collect_source')->insertGetId($values);
+            $source = ['id' => $sourceId];
+        }
+        foreach ($chapters as $chapter) {
+            if (empty($chapter['chapter_id']) || empty($chapter['source_url'])) continue;
+            $sourceHash = md5($chapter['source_url']);
+            $chapterRow = Db::name('collect_chapter_source')->where('chapter_id', $chapter['chapter_id'])->find();
+            $sourceRow = Db::name('collect_chapter_source')->where('source_hash', $sourceHash)->find();
+            $item = ['book_id' => $bookId, 'chapter_id' => $chapter['chapter_id'], 'collect_source_id' => $source['id'], 'external_id' => $chapter['external_id'], 'source_url' => $chapter['source_url'], 'source_hash' => $sourceHash, 'update_time' => $now];
+            if ($sourceRow) {
+                if ($chapterRow && $chapterRow['id'] != $sourceRow['id']) {
+                    Db::name('collect_chapter_source')->where('id', $chapterRow['id'])->delete();
+                }
+                Db::name('collect_chapter_source')->where('id', $sourceRow['id'])->update($item);
+            } elseif ($chapterRow) {
+                Db::name('collect_chapter_source')->where('id', $chapterRow['id'])->update($item);
+            } else {
+                $item['create_time'] = $now;
+                Db::name('collect_chapter_source')->insert($item);
+            }
+        }
+        $validChapterIds = Db::name('chapter')->where('bookid', $bookId)->column('id');
+        if (!empty($validChapterIds)) {
+            Db::name('collect_chapter_source')->where('book_id', $bookId)->whereNotIn('chapter_id', $validChapterIds)->delete();
+        }
     }
 
     /**
