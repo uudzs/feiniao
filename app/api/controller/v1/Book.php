@@ -129,6 +129,10 @@ class Book extends BaseController
             } else {
                 $detail['label'] = [];
             }
+            Db::name('book')
+                ->where('id', $detail['id'])
+                ->inc('hits')
+                ->update();
         } else {
             $this->apiError('404');
         }
