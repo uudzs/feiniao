@@ -1,0 +1,21 @@
+# Edge-TTS 语音服务依赖清单
+# 由 tts_server.py 的 import 分析生成
+# 推荐 Python 版本: 3.9+
+#
+# 安装方式:
+#   pip install -r requirements.txt
+#
+# 启动方式:
+#   uvicorn tts_server:app --host 0.0.0.0 --port 25008
+
+# TTS 核心引擎
+edge-tts==7.2.8
+
+# Web 框架 (提供 FastAPI / HTTPException / StreamingResponse 等)
+fastapi==0.141.1
+
+# ASGI 服务器 (用于 uvicorn tts_server:app 启动)
+uvicorn==0.52.0
+
+# 数据校验 (提供 pydantic.BaseModel，fastapi 运行所需)
+pydantic==2.13.5

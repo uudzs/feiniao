@@ -146,6 +146,7 @@ class ReverseCollectService
 
     public static function dispatch(int $limit = 20): array
     {
+        if (!self::tablesInstalled()) self::installTables();
         if (!self::enabled() || !self::tablesInstalled()) return ['accepted' => 0, 'failed' => 0];
         $jobs = Db::name('collect_job')->whereIn('status', ['pending','failed'])->where('next_retry_at', '<=', time())->order('priority desc,id asc')->limit($limit)->select()->toArray();
         $result = ['accepted' => 0, 'failed' => 0];

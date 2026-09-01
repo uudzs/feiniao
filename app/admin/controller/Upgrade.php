@@ -389,6 +389,34 @@ class Upgrade extends BaseController
         }
     }
 
+    /**
+     * 查询订单支付状态(微信Native支付轮询)
+     *
+     * @return mixed
+     */
+    public function paystatus()
+    {
+        if (request()->isAjax()) {
+            $param = get_params();
+            $ordersn = isset($param['ordersn']) ? trim($param['ordersn']) : '';
+            if (empty($ordersn)) {
+                return to_assign(1, '订单号不存在！');
+            }
+            $cache = new \app\common\FileCache();
+            $token = $cache->get(self::$tokenKey);
+            if (empty($token)) {
+                return to_assign(1, '请先登录联盟账号');
+            }
+            $url = get_config('upgrade.official_api_url') . 'payquery' . '/' . $ordersn;
+            $content = self::httpGet($url);
+            if (empty($content)) return to_assign(1, '获取信息失败');
+            $result = json_decode($content, true);
+            if (!empty($result['code'])) return to_assign(1, $result['msg'] ?? '请求错误');
+            if (!isset($result['data']) || empty($result['data'])) return to_assign(1, '数据不存在');
+            return to_assign(0, 'ok', $result['data']);
+        }
+    }
+
     public function union_income()
     {
         $cache = new \app\common\FileCache();
